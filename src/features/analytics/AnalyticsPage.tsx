@@ -1,7 +1,39 @@
 import React from 'react';
-import { analyticsStats } from '../../data/mockData';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { BarChart3, TrendingUp, Sparkles, Layers, Database, Target } from 'lucide-react';
+
+const analyticsStats = {
+  publicationsPerYear: [
+    { year: 2019, papers: 420 },
+    { year: 2020, papers: 580 },
+    { year: 2021, papers: 850 },
+    { year: 2022, papers: 1200 },
+    { year: 2023, papers: 1650 },
+    { year: 2024, papers: 2100 },
+  ],
+  topResearchTopics: [
+    { topic: 'Self-Supervised Learning', count: 1240 },
+    { topic: 'Large Language Models', count: 3420 },
+    { topic: 'Computer Vision', count: 980 },
+    { topic: 'Graph Neural Networks', count: 750 },
+    { topic: 'Reinforcement Learning', count: 620 },
+  ],
+  modelPopularity: [
+    { name: 'Transformers', score: 85 },
+    { name: 'CNNs', score: 45 },
+    { name: 'GNNs', score: 65 },
+    { name: 'Diffusion', score: 70 },
+    { name: 'RNNs/LSTMs', score: 20 },
+    { name: 'GANs', score: 35 },
+  ],
+  datasetUsage: [
+    { name: 'ImageNet', usage: 1420 },
+    { name: 'COCO', usage: 980 },
+    { name: 'CIFAR-100', usage: 650 },
+    { name: 'Kinetics-400', usage: 420 },
+    { name: 'NuScenes', usage: 380 },
+  ]
+};
 
 export const AnalyticsPage: React.FC = () => {
   const data = analyticsStats;
@@ -89,7 +121,7 @@ export const AnalyticsPage: React.FC = () => {
                   dataKey="count"
                   nameKey="topic"
                 >
-                  {data.topResearchTopics.map((_, index) => (
+                  {data.topResearchTopics.map((_: any, index: number) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -102,7 +134,7 @@ export const AnalyticsPage: React.FC = () => {
             
             {/* Legend */}
             <div className="flex flex-col gap-3 pl-4 flex-shrink-0">
-              {data.topResearchTopics.map((t, idx) => (
+              {data.topResearchTopics.map((t: any, idx: number) => (
                 <div key={idx} className="flex items-center gap-2 text-[12px] font-medium text-brand-textMuted">
                   <span className="h-3 w-3 rounded-full border border-brand-border" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
                   <span className="truncate max-w-[120px]">{t.topic}</span>

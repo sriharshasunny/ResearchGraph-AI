@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
 import { PaperCard } from '../../components/PaperCard';
 import { LoadingSkeleton } from '../../components/LoadingSkeleton';
 import { EmptyState } from '../../components/EmptyState';
+import { searchPapers } from '../../services/api';
+import type { Paper } from '../../types';
 import { Search, SlidersHorizontal, RotateCcw } from 'lucide-react';
 
 export const SearchPage: React.FC = () => {
-  const { searchQuery, setSearchQuery, filters, setFilters, clearFilters } = useApp();
+  const { searchQuery, setSearchQuery, filters, setFilters, clearFilters, cachePapers } = useApp();
   const [isLoading, setIsLoading] = useState(false);
-
+  const [results, setResults] = useState<Paper[]>([]);
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
   // Sync local query with global
@@ -17,27 +18,40 @@ export const SearchPage: React.FC = () => {
     setLocalSearch(searchQuery);
   }, [searchQuery]);
 
-  // Simulate query loading effect for professional feel
+  // Fetch real papers from API
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, [searchQuery, filters]);
+    const fetchResults = async () => {
+      if (!searchQuery.trim()) {
+        setResults([]);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const papers = await searchPapers(searchQuery);
+        setResults(papers);
+        cachePapers(papers);
+      } catch (err) {
+        console.error("Failed to fetch search results", err);
+        setResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchResults();
+  }, [searchQuery]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchQuery(localSearch);
   };
 
-  // Extract filter options dynamically from mock papers
+  // Extract filter options dynamically from search results
   const filterOptions = {
-    years: Array.from(new Set(mockPapers.map(p => p.year))).sort((a, b) => b - a),
-    publications: Array.from(new Set(mockPapers.map(p => p.publication.split(' ')[0]))).sort(),
-    datasets: Array.from(new Set(mockPapers.map(p => p.dataset).filter(Boolean))).slice(0, 8),
-    methods: Array.from(new Set(mockPapers.map(p => p.method).filter(Boolean))).slice(0, 8),
-    models: Array.from(new Set(mockPapers.map(p => p.model).filter(Boolean))).slice(0, 8),
+    years: Array.from(new Set(results.map(p => p.year))).sort((a, b) => b - a),
+    publications: Array.from(new Set(results.map(p => p.publication?.split(' ')[0] || ''))).filter(Boolean).sort(),
+    datasets: Array.from(new Set(results.map(p => p.dataset).filter((d): d is string => !!d))).slice(0, 8),
+    methods: Array.from(new Set(results.map(p => p.method).filter((m): m is string => !!m))).slice(0, 8),
+    models: Array.from(new Set(results.map(p => p.model).filter((m): m is string => !!m))).slice(0, 8),
   };
 
   // Toggle filter arrays
@@ -53,35 +67,23 @@ export const SearchPage: React.FC = () => {
     });
   };
 
-  // Core filter logic
-  const filteredPapers = mockPapers.filter((paper) => {
-    // Search query match
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchTitle = paper.title.toLowerCase().includes(q);
-      const matchAbstract = paper.abstract.toLowerCase().includes(q);
-      const matchAuthors = paper.authors.some(a => a.toLowerCase().includes(q));
-      const matchKeywords = paper.keywords.some(k => k.toLowerCase().includes(q));
-      
-      if (!matchTitle && !matchAbstract && !matchAuthors && !matchKeywords) {
-        return false;
-      }
-    }
+  // Core filter logic (already filtered by API query, this is just for facet filters)
+  const filteredPapers = results.filter((paper) => {
 
     // Filter matches
     if (filters.years.length > 0 && !filters.years.includes(paper.year)) {
       return false;
     }
-    if (filters.publications.length > 0 && !filters.publications.some(pub => paper.publication.startsWith(pub))) {
+    if (filters.publications.length > 0 && !filters.publications.some(pub => paper.publication?.startsWith(pub))) {
       return false;
     }
-    if (filters.datasets.length > 0 && !filters.datasets.includes(paper.dataset)) {
+    if (filters.datasets.length > 0 && (!paper.dataset || !filters.datasets.includes(paper.dataset))) {
       return false;
     }
-    if (filters.methods.length > 0 && !filters.methods.includes(paper.method)) {
+    if (filters.methods.length > 0 && (!paper.method || !filters.methods.includes(paper.method))) {
       return false;
     }
-    if (filters.models.length > 0 && !filters.models.includes(paper.model)) {
+    if (filters.models.length > 0 && (!paper.model || !filters.models.includes(paper.model))) {
       return false;
     }
 
@@ -174,7 +176,7 @@ export const SearchPage: React.FC = () => {
                       onChange={() => handleFilterToggle('datasets', dataset)} 
                       className="rounded border-brand-border text-brand-accent focus:ring-brand-accent h-3.5 w-3.5"
                     />
-                    <span className="truncate">{dataset.split(' ')[0]}</span>
+                    <span className="truncate">{dataset?.split(' ')[0] || ''}</span>
                   </label>
                 );
               })}

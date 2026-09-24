@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { ChatMessage, LitReview } from '../types';
+import type { ChatMessage, LitReview, Paper } from '../types';
 import { mockLiteratureReviews } from '../data/mockData';
 
 type ActivePage =
@@ -52,6 +52,8 @@ interface AppContextType {
   clearFilters: () => void;
   toast: { message: string; type: 'success' | 'info' | 'warning' } | null;
   showToast: (message: string, type?: 'success' | 'info' | 'warning') => void;
+  paperCache: Record<string, Paper>;
+  cachePapers: (papers: Paper[]) => void;
 }
 
 const defaultFilters: SearchFilters = {
@@ -85,6 +87,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filters, setFilters] = useState<SearchFilters>(defaultFilters);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'warning' } | null>(null);
+  const [paperCache, setPaperCache] = useState<Record<string, Paper>>({});
+
+  const cachePapers = (papers: Paper[]) => {
+    setPaperCache(prev => {
+      const next = { ...prev };
+      papers.forEach(p => {
+        next[p.id] = p;
+      });
+      return next;
+    });
+  };
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -205,6 +218,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         clearFilters,
         toast,
         showToast,
+        paperCache,
+        cachePapers,
       }}
     >
       {children}

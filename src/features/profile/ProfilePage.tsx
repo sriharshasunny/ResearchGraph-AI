@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
 import { Bookmark, FileText, Key, User } from 'lucide-react';
+import { getPaperDetails } from '../../services/api';
+import type { Paper } from '../../types';
 
 export const ProfilePage: React.FC = () => {
   const {
@@ -10,11 +11,48 @@ export const ProfilePage: React.FC = () => {
     reviews,
     setActivePage,
     setSelectedPaperId,
+    paperCache,
+    cachePapers,
   } = useApp();
 
-  const savedPapers = savedPaperIds
-    .map(id => mockPapers.find(p => p.id === id))
-    .filter((p): p is typeof mockPapers[0] => p !== undefined);
+  const [savedPapers, setSavedPapers] = useState<Paper[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSavedPapers = async () => {
+      setIsLoading(true);
+      const papers: Paper[] = [];
+      const toFetch: string[] = [];
+
+      for (const id of savedPaperIds) {
+        if (paperCache[id]) {
+          papers.push(paperCache[id]);
+        } else {
+          toFetch.push(id);
+        }
+      }
+
+      if (toFetch.length > 0) {
+        const fetched = await Promise.all(
+          toFetch.map(async (id) => {
+            try {
+              return await getPaperDetails(id);
+            } catch {
+              return null;
+            }
+          })
+        );
+        const validFetched = fetched.filter(Boolean) as Paper[];
+        papers.push(...validFetched);
+        cachePapers(validFetched);
+      }
+      
+      setSavedPapers(papers);
+      setIsLoading(false);
+    };
+
+    fetchSavedPapers();
+  }, [savedPaperIds, paperCache]);
 
   const handlePaperClick = (id: string) => {
     setSelectedPaperId(id);
@@ -53,7 +91,9 @@ export const ProfilePage: React.FC = () => {
               Workspace Saved Papers
             </h3>
 
-            {savedPapers.length > 0 ? (
+            {isLoading ? (
+              <div className="text-[13px] text-brand-textMuted p-4 text-center">Loading saved papers...</div>
+            ) : savedPapers.length > 0 ? (
               <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin">
                 {savedPapers.map((paper) => (
                   <div

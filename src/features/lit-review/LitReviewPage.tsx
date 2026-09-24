@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
+import { searchPapers } from '../../services/api';
 import type { LitReview } from '../../types';
 import { FileText, Sparkles, AlertCircle, RefreshCw, CheckCircle } from 'lucide-react';
 import { EmptyState } from '../../components/EmptyState';
@@ -29,46 +29,49 @@ export const LitReviewPage: React.FC = () => {
 
     // Run progressive steps loader
     const interval = setInterval(() => {
-      setProgressStep((prev) => {
-        if (prev >= 3) {
-          clearInterval(interval);
-          
-          // Generate new LitReview mock object
-          const samplePapers = mockPapers.slice(0, 4);
-          const newReview: LitReview = {
-            id: `lr-${Date.now()}`,
-            topic: topic,
-            summary: `This literature review addresses the state of research in "${topic}". Based on the analyzed corpus of papers, the domain has seen rapid progress focusing on self-supervised optimization and parameter-efficient scaling. Current implementations achieve competitive results but suffer from hardware overhead and generalization challenges under distribution shifts.`,
-            papers: samplePapers,
-            comparisonTable: {
-              headers: ['Paper Title', 'Year', 'Method', 'Dataset', 'Accuracy'],
-              rows: samplePapers.map(p => [
-                p.title.substring(0, 30) + '...',
-                p.year.toString(),
-                p.method || 'Standard baseline',
-                p.dataset || 'Generic dataset',
-                p.accuracy || 'N/A'
-              ])
-            },
-            gaps: [
-              { gap: 'Out-Of-Distribution Robustness', description: 'Models perform poorly when exposed to data collected outside their standard pre-training domain.', impact: 'High' },
-              { gap: 'Resource Overhead', description: 'Training these models demands massive GPU farms, hindering smaller labs from participating in development.', impact: 'Medium' }
-            ],
-            futureWork: [
-              'Develop highly distilled variants that maintain performance under a fraction of inference memory.',
-              'Standardize cross-domain benchmarking procedures.'
-            ],
-            references: samplePapers.map(p => ({ title: p.title, authors: p.authors.join(', '), year: p.year }))
-          };
+      setProgressStep((prev) => prev + 1);
+    }, 1500);
 
-          addReview(newReview);
-          setSelectedReview(newReview);
-          setIsGenerating(false);
-          return 0;
-        }
-        return prev + 1;
-      });
-    }, 1200);
+    // Call API async while showing loader
+    searchPapers(topic).then((fetchedPapers) => {
+      clearInterval(interval);
+      setProgressStep(4);
+      
+      const samplePapers = fetchedPapers.slice(0, 4);
+      const newReview: LitReview = {
+        id: `lr-${Date.now()}`,
+        topic: topic,
+        summary: `This literature review addresses the state of research in "${topic}". Based on the analyzed corpus of papers, the domain has seen rapid progress focusing on self-supervised optimization and parameter-efficient scaling. Current implementations achieve competitive results but suffer from hardware overhead and generalization challenges under distribution shifts.`,
+        papers: samplePapers,
+        comparisonTable: {
+          headers: ['Paper Title', 'Year', 'Method', 'Dataset', 'Accuracy'],
+          rows: samplePapers.map(p => [
+            p.title.substring(0, 30) + '...',
+            p.year.toString(),
+            p.method || 'Standard baseline',
+            p.dataset || 'Generic dataset',
+            p.accuracy || 'N/A'
+          ])
+        },
+        gaps: [
+          { gap: 'Out-Of-Distribution Robustness', description: 'Models perform poorly when exposed to data collected outside their standard pre-training domain.', impact: 'High' },
+          { gap: 'Resource Overhead', description: 'Training these models demands massive GPU farms, hindering smaller labs from participating in development.', impact: 'Medium' }
+        ],
+        futureWork: [
+          'Develop highly distilled variants that maintain performance under a fraction of inference memory.',
+          'Standardize cross-domain benchmarking procedures.'
+        ],
+        references: samplePapers.map(p => ({ title: p.title, authors: p.authors.join(', '), year: p.year }))
+      };
+
+      addReview(newReview);
+      setSelectedReview(newReview);
+      setIsGenerating(false);
+    }).catch(err => {
+      clearInterval(interval);
+      setIsGenerating(false);
+      console.error("Failed to generate literature review", err);
+    });
   };
 
   const stepsList = [

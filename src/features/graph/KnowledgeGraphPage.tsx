@@ -10,7 +10,8 @@ import {
   Position
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { graphData, mockPapers, mockAuthors } from '../../data/mockData';
+import { graphData } from '../../data/mockData';
+import { getPaperDetails } from '../../services/api';
 import { useApp } from '../../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -79,7 +80,7 @@ const CustomNode: React.FC<any> = ({ data }) => {
 };
 
 export const KnowledgeGraphPage: React.FC = () => {
-  const { setActivePage, setSelectedPaperId, addToRecentlyViewed, addChatMessage } = useApp();
+  const { setActivePage, setSelectedPaperId, addToRecentlyViewed, addChatMessage, paperCache } = useApp();
   const [nodes, , onNodesChange] = useNodesState(graphData.nodes);
   const [edges, , onEdgesChange] = useEdgesState(graphData.edges);
   const [selectedNode, setSelectedNode] = useState<any | null>(null);
@@ -88,14 +89,22 @@ export const KnowledgeGraphPage: React.FC = () => {
   const nodeTypes = useMemo(() => ({ customNode: CustomNode }), []);
 
   // Handle clicking a node to display details in sidebar
-  const onNodeClick = (_: any, node: any) => {
+  const onNodeClick = async (_: any, node: any) => {
     // Find node details
     const category = node.data.category;
     const nodeId = node.data.id;
     let details: any = { id: nodeId, label: node.data.label, category };
 
     if (category === 'Paper') {
-      const paper = mockPapers.find((p) => p.id === nodeId);
+      let paper: any = paperCache[nodeId];
+      if (!paper) {
+        try {
+          paper = await getPaperDetails(nodeId);
+        } catch {
+          paper = null;
+        }
+      }
+      
       if (paper) {
         details = {
           ...details,
@@ -109,24 +118,13 @@ export const KnowledgeGraphPage: React.FC = () => {
         };
       }
     } else if (category === 'Author') {
-      const author = mockAuthors.find((a) => `author-${a.name.replace(/\s+/g, '-').toLowerCase()}` === nodeId || a.id === nodeId);
-      if (author) {
-        details = {
-          ...details,
-          affiliation: author.affiliation,
-          hIndex: author.hIndex,
-          citations: author.citations,
-          papersCount: author.papersCount
-        };
-      } else {
-        details = {
-          ...details,
-          affiliation: 'Independent Academic Researcher',
-          hIndex: 25,
-          citations: 1800,
-          papersCount: 14
-        };
-      }
+      details = {
+        ...details,
+        affiliation: 'Independent Academic Researcher',
+        hIndex: 25,
+        citations: 1800,
+        papersCount: 14
+      };
     } else {
       // Methods / Datasets / Models details
       details = {

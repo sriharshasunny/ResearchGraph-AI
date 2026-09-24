@@ -1,23 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
+import { searchPapers, getPaperDetails } from '../../services/api';
 import type { Paper } from '../../types';
 import { Columns3, Plus, X, Search, Sparkles, Quote } from 'lucide-react';
 import { EmptyState } from '../../components/EmptyState';
 
 export const ComparePage: React.FC = () => {
-  const { comparePaperIds, addToCompare, removeFromCompare, clearCompare, setActivePage, setSelectedPaperId, addToRecentlyViewed } = useApp();
+  const { comparePaperIds, addToCompare, removeFromCompare, clearCompare, setActivePage, setSelectedPaperId, addToRecentlyViewed, paperCache, cachePapers } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Paper[]>([]);
+  const [selectedPapers, setSelectedPapers] = useState<Paper[]>([]);
+  
+  useEffect(() => {
+    const fetchMissingPapers = async () => {
+      const papers: Paper[] = [];
+      const toFetch: string[] = [];
 
-  const selectedPapers = comparePaperIds
-    .map(id => mockPapers.find(p => p.id === id))
-    .filter((p): p is Paper => p !== undefined);
+      for (const id of comparePaperIds) {
+        if (paperCache[id]) {
+          papers.push(paperCache[id]);
+        } else {
+          toFetch.push(id);
+        }
+      }
 
-  const filteredSearchList = mockPapers.filter(
-    p =>
-      !comparePaperIds.includes(p.id) &&
-      p.title.toLowerCase().includes(searchQuery.toLowerCase())
-  ).slice(0, 5);
+      if (toFetch.length > 0) {
+        const fetched = await Promise.all(
+          toFetch.map(async (id) => {
+            try {
+              return await getPaperDetails(id);
+            } catch {
+              return null;
+            }
+          })
+        );
+        const validFetched = fetched.filter(Boolean) as Paper[];
+        papers.push(...validFetched);
+        cachePapers(validFetched);
+      }
+      setSelectedPapers(papers);
+    };
+    fetchMissingPapers();
+  }, [comparePaperIds, paperCache]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await searchPapers(searchQuery);
+        setSearchResults(res.slice(0, 5));
+      } catch (err) {
+        console.error("Failed to search", err);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const filteredSearchList = searchResults.filter(
+    p => !comparePaperIds.includes(p.id)
+  );
 
   const handlePaperClick = (id: string) => {
     setSelectedPaperId(id);
@@ -37,7 +81,7 @@ export const ComparePage: React.FC = () => {
       key: 'advantages',
       render: (p: Paper) => (
         <ul className="list-disc pl-4 space-y-1.5">
-          {p.advantages.map((adv, idx) => <li key={idx}>{adv}</li>)}
+          {(p.advantages || []).map((adv, idx) => <li key={idx}>{adv}</li>)}
         </ul>
       )
     },
@@ -46,7 +90,7 @@ export const ComparePage: React.FC = () => {
       key: 'limitations',
       render: (p: Paper) => (
         <ul className="list-disc pl-4 space-y-1.5">
-          {p.limitations.map((lim, idx) => <li key={idx}>{lim}</li>)}
+          {(p.limitations || []).map((lim, idx) => <li key={idx}>{lim}</li>)}
         </ul>
       )
     },
@@ -55,7 +99,7 @@ export const ComparePage: React.FC = () => {
       key: 'futureWork',
       render: (p: Paper) => (
         <ul className="list-disc pl-4 space-y-1.5">
-          {p.futureWork.map((fw, idx) => <li key={idx}>{fw}</li>)}
+          {(p.futureWork || []).map((fw, idx) => <li key={idx}>{fw}</li>)}
         </ul>
       )
     }
@@ -159,7 +203,7 @@ export const ComparePage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-1.5 mt-4 text-[12px] text-brand-textMuted">
                           <Quote className="h-3.5 w-3.5" />
-                          <span>{paper.citationCount.toLocaleString()} citations</span>
+                          <span>{paper.citationCount?.toLocaleString()} citations</span>
                         </div>
                       </>
                     ) : (

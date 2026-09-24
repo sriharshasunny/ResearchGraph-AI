@@ -9,24 +9,28 @@ export interface Paper {
   title: string;
   authors: string[];
   abstract: string;
-  keywords: string[];
-  publication: string;
   year: number;
-  citationCount: number;
-  dataset: string;
-  method: string;
-  model: string;
-  accuracy: string;
-  advantages: string[];
-  limitations: string[];
-  futureWork: string[];
+  doi?: string;
+  source?: string;
+  openAccess?: boolean;
   pdfUrl?: string;
-  references: Reference[];
-  relatedPapers: string[]; // Paper IDs
-  citations: string[]; // Paper IDs that cite this
-  figures: string[]; // Placeholders
-  timeline: { year: number; event: string }[];
-  metrics: {
+  landingPage?: string;
+  topics?: string[];
+  publication?: string;
+  citationCount?: number;
+  dataset?: string;
+  method?: string;
+  model?: string;
+  accuracy?: string;
+  advantages?: string[];
+  limitations?: string[];
+  futureWork?: string[];
+  references?: Reference[];
+  relatedPapers?: string[]; // Paper IDs
+  citations?: string[]; // Paper IDs that cite this
+  figures?: string[]; // Placeholders
+  timeline?: { year: number; event: string }[];
+  metrics?: {
     citationVelocity: number;
     influentialCitations: number;
   };

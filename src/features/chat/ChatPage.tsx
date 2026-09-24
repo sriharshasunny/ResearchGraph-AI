@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
-import type { ChatMessage } from '../../types';
+import { searchPapers } from '../../services/api';
+import type { ChatMessage, Paper } from '../../types';
 import { Send, Sparkles, BookOpen, ChevronRight, HelpCircle, Terminal, Trash2, ListFilter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -59,7 +59,7 @@ export const ChatPage: React.FC = () => {
     setTimeout(() => {
       let content = '';
       let citations: { id: string; index: number; title: string }[] = [];
-      let paperList: typeof mockPapers = [];
+      let paperList: Paper[] = [];
       let codeSnippet: { language: string; code: string } | undefined;
       let table: { headers: string[]; rows: string[][] } | undefined;
       let relatedConcepts: string[] = [];
@@ -68,8 +68,6 @@ export const ChatPage: React.FC = () => {
 
       if (lowerText.includes('explain') && (lowerText.includes('vision') || lowerText.includes('vit'))) {
         content = `The Vision Transformer (ViT) was introduced by Google Research in 2021 [1]. It represents a milestone in computer vision, removing convolutional operations completely and running standard NLP self-attention layers on 16x16 pixel patches of input images.\n\nHere is how it divides an image:\n- Divides image into patches: $x \\in \\mathbb{R}^{H \\times W \\times C} \\to x_p \\in \\mathbb{R}^{N \\times (P^2 \\cdot C)}$ where patch size $P=16$.\n- Flattens patches and projects them linearily into a hidden size $D$.\n- Prepends a learnable \`[class]\` token to collect visual representations.\n- Adds standard 1D positional encodings.\n- Feeds sequence through standard Transformer encoder layers.`;
-        citations = [{ id: 'vit-2021', index: 1, title: 'An Image is Worth 16x16 Words' }];
-        paperList = [mockPapers.find(p => p.id === 'vit-2021')].filter(Boolean) as any;
         relatedConcepts = ['Vision Transformer', 'Self-Attention', 'Patch Embedding', 'Image Classification'];
         codeSnippet = {
           language: 'python',
@@ -77,11 +75,6 @@ export const ChatPage: React.FC = () => {
         };
       } else if (lowerText.includes('compare') && (lowerText.includes('clip') || lowerText.includes('dino'))) {
         content = `Comparing CLIP (Weakly Supervised Contrastive Learning) and DINOv2 (Self-Supervised Self-Distillation) reveals fundamental trade-offs in downstream task performance [1, 2]. \n\n* CLIP excels at semantic zero-shot classification and text-image bridges because it was trained with weak captions.\n* DINOv2 excels at dense downstream tasks (monocular depth, segmentation, semantic boundary alignment) because it optimizes local pixel details via masked image modeling.`;
-        citations = [
-          { id: 'clip-2021', index: 1, title: 'Learning Transferable Visual Models' },
-          { id: 'dinov2-2023', index: 2, title: 'DINOv2: Robust Visual Features without Supervision' }
-        ];
-        paperList = mockPapers.filter(p => p.id === 'clip-2021' || p.id === 'dinov2-2023');
         relatedConcepts = ['Contrastive Learning', 'Self-Supervised Learning', 'Zero-shot Transfer', 'Knowledge Distillation'];
         table = {
           headers: ['Metric / Feature', 'CLIP (Radford et al.)', 'DINOv2 (Oquab et al.)'],
@@ -94,33 +87,53 @@ export const ChatPage: React.FC = () => {
         };
       } else if (lowerText.includes('literature review')) {
         content = `I have compiled a semantic review of the top Vision models in the index. The analysis focuses on the transition from Supervised Transformer training to Multimodal contrastive and Self-supervised representations [1, 2, 3].\n\nThese papers set the foundation for the visual foundation backbones widely used today in robotics, agent models, and synthesis pipelines.`;
-        citations = [
-          { id: 'vit-2021', index: 1, title: 'An Image is Worth 16x16 Words' },
-          { id: 'clip-2021', index: 2, title: 'Learning Transferable Visual Models' },
-          { id: 'dinov2-2023', index: 3, title: 'DINOv2: Robust Visual Features without Supervision' }
-        ];
-        paperList = mockPapers.slice(0, 3);
         relatedConcepts = ['Literature Review', 'Foundation Models', 'Computer Vision Evolution'];
       } else {
         content = `Based on the active paper index, your query relates to key challenges in model scale, optimization bottlenecks, and dataset bias [1]. Many recent papers resolve this by applying self-attention mechanisms or contrastive pre-training to specialize representations.\n\nCould you specify which papers or benchmarks you would like to cross-reference?`;
-        citations = [{ id: 'transformer-2017', index: 1, title: 'Attention Is All You Need' }];
-        paperList = [mockPapers.find(p => p.id === 'transformer-2017')].filter(Boolean) as any;
         relatedConcepts = ['Model Scaling', 'Optimization', 'Self-Attention'];
       }
 
-      addChatMessage({
-        id: `chat-${Date.now()}-a`,
-        sender: 'assistant',
-        content,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        citations,
-        papers: paperList,
-        codeSnippet,
-        table,
-        relatedConcepts
-      });
-      setIsTyping(false);
-    }, 1500);
+      // Try to resolve papers asynchronously based on the topic
+      const resolvePapers = async () => {
+        try {
+          if (lowerText.includes('vit') || lowerText.includes('transformer')) {
+            const results = await searchPapers('vision transformer');
+            paperList = results.slice(0, 1);
+            if (paperList.length > 0) citations = [{ id: paperList[0].id, index: 1, title: paperList[0].title }];
+          } else if (lowerText.includes('clip') || lowerText.includes('dino')) {
+            const results = await searchPapers('clip dinov2');
+            paperList = results.slice(0, 2);
+            citations = paperList.map((p, i) => ({ id: p.id, index: i + 1, title: p.title }));
+          } else if (lowerText.includes('literature review')) {
+            const results = await searchPapers('computer vision foundation models');
+            paperList = results.slice(0, 3);
+            citations = paperList.map((p, i) => ({ id: p.id, index: i + 1, title: p.title }));
+          } else {
+            const results = await searchPapers('attention is all you need');
+            paperList = results.slice(0, 1);
+            if (paperList.length > 0) citations = [{ id: paperList[0].id, index: 1, title: paperList[0].title }];
+          }
+        } catch (e) {
+          console.error("Failed to fetch papers for chat", e);
+        }
+
+        addChatMessage({
+          id: `chat-${Date.now()}-a`,
+          sender: 'assistant',
+          content,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          citations,
+          papers: paperList,
+          codeSnippet,
+          table,
+          relatedConcepts
+        });
+        setIsTyping(false);
+      };
+
+      resolvePapers();
+
+    }, 500);
   };
 
   return (

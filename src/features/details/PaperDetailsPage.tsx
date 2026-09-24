@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
+import { getPaperDetails } from '../../services/api';
+import type { Paper } from '../../types';
 import { Bookmark, BookmarkCheck, Columns3, MessageSquare, ArrowLeft, Calendar, Quote, TrendingUp, BookOpen, ExternalLink, Download } from 'lucide-react';
 
 export const PaperDetailsPage: React.FC = () => {
@@ -14,19 +15,50 @@ export const PaperDetailsPage: React.FC = () => {
     removeFromCompare,
     setSelectedPaperId,
     addToRecentlyViewed,
-    addChatMessage
+    addChatMessage,
+    paperCache,
+    cachePapers
   } = useApp();
 
-  const paper = mockPapers.find(p => p.id === selectedPaperId) || mockPapers[0];
+  const [paper, setPaper] = React.useState<Paper | null>(null);
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const isSaved = savedPaperIds.includes(paper.id);
-  const isComparing = comparePaperIds.includes(paper.id);
+  React.useEffect(() => {
+    const fetchDetails = async () => {
+      if (!selectedPaperId) return;
+      
+      if (paperCache[selectedPaperId]) {
+        setPaper(paperCache[selectedPaperId]);
+        addToRecentlyViewed(selectedPaperId);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const details = await getPaperDetails(selectedPaperId);
+        if (details) {
+          setPaper(details);
+          cachePapers([details]);
+          addToRecentlyViewed(details.id);
+        }
+      } catch (err) {
+        console.error("Failed to load details");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDetails();
+  }, [selectedPaperId, paperCache]);
+
+  const isSaved = paper ? savedPaperIds.includes(paper.id) : false;
+  const isComparing = paper ? comparePaperIds.includes(paper.id) : false;
 
   const handleBack = () => {
     setActivePage('search');
   };
 
   const handleCompareToggle = () => {
+    if (!paper) return;
     if (isComparing) {
       removeFromCompare(paper.id);
     } else {
@@ -35,6 +67,7 @@ export const PaperDetailsPage: React.FC = () => {
   };
 
   const handleChatClick = () => {
+    if (!paper) return;
     addChatMessage({
       id: `chat-init-detail-${Date.now()}`,
       sender: 'user',
@@ -47,7 +80,7 @@ export const PaperDetailsPage: React.FC = () => {
       addChatMessage({
         id: `chat-resp-detail-${Date.now()}`,
         sender: 'assistant',
-        content: `Here is a semantic analysis of **"${paper.title}"** (${paper.year}):\n\n### Core Contribution\nThe paper proposes using **${paper.method}** combined with **${paper.model}** to address key bottlenecks in this domain. Evaluated on the **${paper.dataset}** dataset, it demonstrates **${paper.accuracy}**.\n\n### Key Advantages\n${paper.advantages.map(adv => `- ${adv}`).join('\n')}\n\n### Main Limitations\n${paper.limitations.map(lim => `- ${lim}`).join('\n')}\n\nWould you like to generate a comparative literature review or inspect its citation topology?`,
+        content: `Here is a semantic analysis of **"${paper.title}"** (${paper.year}):\n\n### Core Contribution\nThe paper proposes approaches based on ${paper.topics?.join(', ') || 'various methods'} in this domain.\n\nWould you like to generate a comparative literature review or inspect its citation topology?`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         citations: [{ id: paper.id, index: 1, title: paper.title }]
       });
@@ -60,6 +93,14 @@ export const PaperDetailsPage: React.FC = () => {
     setSelectedPaperId(id);
     addToRecentlyViewed(id);
   };
+
+  if (isLoading) {
+    return <div className="p-10 text-center text-brand-textMuted">Loading paper details...</div>;
+  }
+
+  if (!paper) {
+    return <div className="p-10 text-center text-brand-textMuted">Paper not found.</div>;
+  }
 
   return (
     <div className="max-w-6xl mx-auto pb-16 select-none space-y-6">
@@ -167,9 +208,9 @@ export const PaperDetailsPage: React.FC = () => {
               </p>
             </div>
 
-            {/* Keywords */}
+            {/* Keywords/Topics */}
             <div className="flex flex-wrap gap-2 pt-4">
-              {paper.keywords.map((tag, idx) => (
+              {(paper.topics || []).map((tag, idx) => (
                 <span
                   key={idx}
                   className="text-[12px] font-medium px-3 py-1 rounded-full bg-brand-bg text-brand-textMuted border border-brand-border"
@@ -180,49 +221,44 @@ export const PaperDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Figures Gallery Card */}
-          <div className="pt-8 border-t border-brand-border space-y-6">
-            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Extracted Figures & Diagrams</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {paper.figures.map((figCaption, idx) => (
-                <div key={idx} className="border border-brand-border rounded-xl overflow-hidden bg-brand-bg">
-                  {/* Mock Diagram Canvas */}
-                  <div className="h-40 bg-brand-surface flex items-center justify-center relative p-4 border-b border-brand-border">
-                    <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
-                    {/* SVG mockup nodes */}
-                    <div className="flex gap-4 items-center z-10">
-                      <div className="h-10 w-16 rounded bg-brand-bg border border-brand-border text-[10px] flex items-center justify-center font-semibold text-brand-textMuted shadow-sm">Inputs</div>
-                      <div className="h-px w-6 bg-brand-textMuted" />
-                      <div className="h-12 w-20 rounded bg-brand-bg border border-brand-border text-[10px] flex items-center justify-center font-semibold text-brand-text shadow-sm">Attention Layer</div>
-                      <div className="h-px w-6 bg-brand-textMuted" />
-                      <div className="h-10 w-16 rounded bg-brand-bg border border-brand-border text-[10px] flex items-center justify-center font-semibold text-brand-textMuted shadow-sm">Outputs</div>
+          {/* Figures Gallery Card (If Available) */}
+          {(paper.figures && paper.figures.length > 0) && (
+            <div className="pt-8 border-t border-brand-border space-y-6">
+              <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Extracted Figures & Diagrams</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {paper.figures.map((figCaption, idx) => (
+                  <div key={idx} className="border border-brand-border rounded-xl overflow-hidden bg-brand-bg">
+                    <div className="h-40 bg-brand-surface flex items-center justify-center relative p-4 border-b border-brand-border">
+                      <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+                    </div>
+                    <div className="p-4 text-[12px] text-brand-textMuted text-center leading-relaxed">
+                      {figCaption}
                     </div>
                   </div>
-                  <div className="p-4 text-[12px] text-brand-textMuted text-center leading-relaxed">
-                    {figCaption}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* References Card */}
-          <div className="pt-8 border-t border-brand-border space-y-6">
-            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">References ({paper.references.length})</h3>
-            
-            <div className="space-y-4 divide-y divide-brand-border">
-              {paper.references.map((ref, idx) => (
-                <div key={idx} className={`flex items-start gap-4 text-[14px] text-brand-text ${idx > 0 ? 'pt-4' : ''}`}>
-                  <span className="font-semibold text-brand-textMuted">[{idx + 1}]</span>
-                  <div className="space-y-1 leading-relaxed">
-                    <div className="font-medium">{ref.title}</div>
-                    <div className="text-[13px] text-brand-textMuted">By {ref.authors} &bull; {ref.year}</div>
+          {(paper.references && paper.references.length > 0) && (
+            <div className="pt-8 border-t border-brand-border space-y-6">
+              <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">References ({paper.references.length})</h3>
+              
+              <div className="space-y-4 divide-y divide-brand-border">
+                {paper.references.map((ref, idx) => (
+                  <div key={idx} className={`flex items-start gap-4 text-[14px] text-brand-text ${idx > 0 ? 'pt-4' : ''}`}>
+                    <span className="font-semibold text-brand-textMuted">[{idx + 1}]</span>
+                    <div className="space-y-1 leading-relaxed">
+                      <div className="font-medium">{ref.title}</div>
+                      <div className="text-[13px] text-brand-textMuted">By {ref.authors} &bull; {ref.year}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
 
@@ -238,14 +274,14 @@ export const PaperDetailsPage: React.FC = () => {
                 <div className="text-[11px] font-semibold text-brand-textMuted uppercase">Citation Count</div>
                 <div className="text-[18px] font-semibold text-brand-text mt-2 flex items-center justify-center gap-2">
                   <Quote className="h-4 w-4 text-brand-textMuted" />
-                  {paper.citationCount.toLocaleString()}
+                  {paper.citationCount?.toLocaleString() || 0}
                 </div>
               </div>
               <div className="p-4 bg-brand-bg border border-brand-border rounded-lg">
                 <div className="text-[11px] font-semibold text-brand-textMuted uppercase">Velocity</div>
                 <div className="text-[18px] font-semibold text-brand-text mt-2 flex items-center justify-center gap-1">
                   <TrendingUp className="h-4 w-4 text-brand-textMuted" />
-                  {paper.metrics.citationVelocity.toLocaleString()} / yr
+                  {paper.metrics?.citationVelocity.toLocaleString() || 0} / yr
                 </div>
               </div>
             </div>
@@ -268,52 +304,55 @@ export const PaperDetailsPage: React.FC = () => {
           </div>
 
           {/* Timeline Card */}
-          <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
-            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Citation Timeline</h3>
-            
-            <div className="relative border-l-2 border-brand-border pl-5 ml-2 space-y-6">
-              {paper.timeline.map((eventObj, idx) => (
-                <div key={idx} className="relative">
-                  {/* Dot indicator */}
-                  <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-brand-text ring-4 ring-brand-surface"></span>
-                  <div className="text-[12px] font-semibold text-brand-text">{eventObj.year}</div>
-                  <p className="text-[13px] text-brand-textMuted leading-relaxed mt-1">
-                    {eventObj.event}
-                  </p>
-                </div>
-              ))}
+          {(paper.timeline && paper.timeline.length > 0) && (
+            <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+              <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Citation Timeline</h3>
+              
+              <div className="relative border-l-2 border-brand-border pl-5 ml-2 space-y-6">
+                {paper.timeline.map((eventObj, idx) => (
+                  <div key={idx} className="relative">
+                    <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-brand-text ring-4 ring-brand-surface"></span>
+                    <div className="text-[12px] font-semibold text-brand-text">{eventObj.year}</div>
+                    <p className="text-[13px] text-brand-textMuted leading-relaxed mt-1">
+                      {eventObj.event}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Related Papers Card */}
-          <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
-            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              Related Papers
-            </h3>
+          {(paper.relatedPapers && paper.relatedPapers.length > 0) && (
+            <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+              <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+                <BookOpen className="h-4 w-4" />
+                Related Papers
+              </h3>
 
-            <div className="space-y-3">
-              {paper.relatedPapers.slice(0, 4).map((relId) => {
-                const relPaper = mockPapers.find(p => p.id === relId);
-                if (!relPaper) return null;
-                return (
-                  <div
-                    key={relId}
-                    onClick={() => handleRelatedPaperClick(relId)}
-                    className="p-4 rounded-lg border border-brand-border bg-brand-bg hover:bg-brand-surface hover:border-brand-accent/50 cursor-pointer transition-colors group"
-                  >
-                    <h4 className="text-[13px] font-medium text-brand-text group-hover:text-brand-accent transition-colors line-clamp-2 leading-snug">
-                      {relPaper.title}
-                    </h4>
-                    <div className="flex items-center justify-between text-[11px] text-brand-textMuted mt-2">
-                      <span>{relPaper.publication}</span>
-                      <span className="font-semibold">{relPaper.citationCount.toLocaleString()} cites</span>
+              <div className="space-y-3">
+                {paper.relatedPapers.slice(0, 4).map((relId) => {
+                  const relPaper = paperCache[relId];
+                  if (!relPaper) return null;
+                  return (
+                    <div
+                      key={relId}
+                      onClick={() => handleRelatedPaperClick(relId)}
+                      className="p-4 rounded-lg border border-brand-border bg-brand-bg hover:bg-brand-surface hover:border-brand-accent/50 cursor-pointer transition-colors group"
+                    >
+                      <h4 className="text-[13px] font-medium text-brand-text group-hover:text-brand-accent transition-colors line-clamp-2 leading-snug">
+                        {relPaper.title}
+                      </h4>
+                      <div className="flex items-center justify-between text-[11px] text-brand-textMuted mt-2">
+                        <span>{relPaper.publication}</span>
+                        <span className="font-semibold">{relPaper.citationCount?.toLocaleString()} cites</span>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
         </div>
 
