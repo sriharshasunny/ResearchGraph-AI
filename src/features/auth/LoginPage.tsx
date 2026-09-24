@@ -20,13 +20,13 @@ export const LoginPage: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuc
 
     // Simulate backend authentication
     setTimeout(() => {
-      // Always succeed for demo, but we could add logic to fail
-      if (email === 'fail@test.com') {
-        setIsAuthenticating(false);
-        setError('Invalid credentials. Please try again.');
-      } else {
+      if (email === 'harsha' && password === 'harsha') {
         // Success
         onLoginSuccess();
+      } else {
+        // Fail
+        setIsAuthenticating(false);
+        setError('Invalid credentials. Please try again.');
       }
     }, 1500);
   };
