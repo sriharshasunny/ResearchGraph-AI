@@ -4,6 +4,8 @@ import { mockLiteratureReviews } from '../data/mockData';
 
 type ActivePage =
   | 'landing'
+  | 'login'
+  | 'launch'
   | 'dashboard'
   | 'search'
   | 'chat'

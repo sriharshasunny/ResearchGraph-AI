@@ -16,6 +16,8 @@ import { ComparePage } from './features/compare/ComparePage';
 import { PaperDetailsPage } from './features/details/PaperDetailsPage';
 import { AnalyticsPage } from './features/analytics/AnalyticsPage';
 import { ProfilePage } from './features/profile/ProfilePage';
+import { LoginPage } from './features/auth/LoginPage';
+import { LaunchSequence } from './features/auth/LaunchSequence';
 
 import './App.css';
 
@@ -29,7 +31,7 @@ const queryClient = new QueryClient({
 });
 
 const AppContent: React.FC = () => {
-  const { activePage } = useApp();
+  const { activePage, setActivePage } = useApp();
 
   // Full screen pages (no Sidebar or Top Nav)
   if (activePage === 'landing') {
@@ -37,6 +39,18 @@ const AppContent: React.FC = () => {
       <div className="min-h-screen w-full bg-brand-bg text-brand-text">
         <LandingPage />
       </div>
+    );
+  }
+
+  if (activePage === 'login') {
+    return (
+      <LoginPage onLoginSuccess={() => setActivePage('launch')} />
+    );
+  }
+
+  if (activePage === 'launch') {
+    return (
+      <LaunchSequence onComplete={() => setActivePage('dashboard')} />
     );
   }
 

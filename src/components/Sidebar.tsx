@@ -53,8 +53,9 @@ export const Sidebar: React.FC = () => {
 
   return (
     <motion.aside
-      animate={{ width: isCollapsed ? '68px' : '260px' }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
+      initial={{ x: -20, opacity: 0 }}
+      animate={{ x: 0, opacity: 1, width: isCollapsed ? '68px' : '260px' }}
+      transition={{ duration: 0.3, ease: 'easeOut', delay: 0.2 }}
       className="relative flex flex-col h-screen border-r border-brand-border bg-brand-surface z-30 shrink-0"
     >
       {/* Brand Header */}

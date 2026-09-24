@@ -51,19 +51,19 @@ export const LandingPage: React.FC = () => {
 
         <div className="flex items-center gap-6">
           <button
-            onClick={() => setActivePage('dashboard')}
+            onClick={() => setActivePage('login')}
             className="text-[14px] font-medium text-brand-textMuted hover:text-brand-text transition-colors"
           >
             Workspace
           </button>
           <button
-            onClick={() => setActivePage('graph')}
+            onClick={() => setActivePage('login')}
             className="text-[14px] font-medium text-brand-textMuted hover:text-brand-text transition-colors"
           >
             Knowledge Graph
           </button>
           <button
-            onClick={() => setActivePage('dashboard')}
+            onClick={() => setActivePage('login')}
             className="px-5 py-2.5 rounded-lg bg-brand-text text-brand-surface text-[14px] font-medium hover:bg-brand-textMuted transition-colors"
           >
             Launch Platform
@@ -109,14 +109,14 @@ export const LandingPage: React.FC = () => {
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <button
-            onClick={() => setActivePage('dashboard')}
+            onClick={() => setActivePage('login')}
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-brand-text hover:bg-brand-textMuted text-brand-surface text-[15px] font-medium transition-colors"
           >
             Get Started
             <ArrowRight className="h-4 w-4" />
           </button>
           <button
-            onClick={() => setActivePage('search')}
+            onClick={() => setActivePage('login')}
             className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-brand-surface hover:bg-brand-bg border border-brand-border text-brand-text text-[15px] font-medium transition-colors"
           >
             Explore Demo
