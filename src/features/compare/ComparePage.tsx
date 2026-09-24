@@ -36,7 +36,7 @@ export const ComparePage: React.FC = () => {
       label: 'Core Advantages',
       key: 'advantages',
       render: (p: Paper) => (
-        <ul className="list-disc pl-4 space-y-1">
+        <ul className="list-disc pl-4 space-y-1.5">
           {p.advantages.map((adv, idx) => <li key={idx}>{adv}</li>)}
         </ul>
       )
@@ -45,7 +45,7 @@ export const ComparePage: React.FC = () => {
       label: 'Main Limitations',
       key: 'limitations',
       render: (p: Paper) => (
-        <ul className="list-disc pl-4 space-y-1">
+        <ul className="list-disc pl-4 space-y-1.5">
           {p.limitations.map((lim, idx) => <li key={idx}>{lim}</li>)}
         </ul>
       )
@@ -54,7 +54,7 @@ export const ComparePage: React.FC = () => {
       label: 'Future Work Directions',
       key: 'futureWork',
       render: (p: Paper) => (
-        <ul className="list-disc pl-4 space-y-1">
+        <ul className="list-disc pl-4 space-y-1.5">
           {p.futureWork.map((fw, idx) => <li key={idx}>{fw}</li>)}
         </ul>
       )
@@ -62,25 +62,25 @@ export const ComparePage: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-1 select-none">
+    <div className="space-y-6 max-w-7xl mx-auto select-none">
       
       {/* Selector and Actions Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/40 dark:bg-slate-900/45 border border-slate-200/80 dark:border-slate-800/40 p-5 rounded-2xl backdrop-blur-md shadow-sm">
-        <div className="space-y-1">
-          <h2 className="text-base font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-            <Columns3 className="h-5 w-5 text-indigo-500" />
-            Academic Comparison matrix
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-brand-surface border border-brand-border p-6 rounded-xl shadow-sm">
+        <div className="space-y-1.5">
+          <h2 className="text-[18px] font-semibold text-brand-text flex items-center gap-2">
+            <Columns3 className="h-5 w-5 text-brand-accent" />
+            Academic Comparison
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-[13px] text-brand-textMuted">
             Compare key parameters, datasets, methods, and results for up to 3 papers side by side.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
+        <div className="flex items-center gap-3 w-full md:w-auto">
           {comparePaperIds.length > 0 && (
             <button
               onClick={clearCompare}
-              className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 text-xs font-semibold text-slate-650"
+              className="px-4 py-2.5 rounded-lg border border-brand-border bg-brand-surface hover:bg-brand-bg text-[13px] font-medium text-brand-text transition-colors"
             >
               Clear Comparison
             </button>
@@ -95,14 +95,14 @@ export const ComparePage: React.FC = () => {
                   placeholder="Search paper to add..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full md:w-56 h-9 pl-8 pr-3 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-950/40 text-xs text-slate-800 focus:outline-none"
+                  className="w-full md:w-64 h-10 pl-9 pr-4 rounded-lg border border-brand-border bg-brand-bg text-[13px] text-brand-text focus:outline-none focus:border-brand-accent transition-colors"
                 />
-                <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-400" />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-brand-textMuted" />
               </div>
 
               {/* Suggestions dropdown */}
               {searchQuery && filteredSearchList.length > 0 && (
-                <div className="absolute right-0 top-10 z-20 w-72 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-2xl">
+                <div className="absolute right-0 top-12 z-20 w-72 rounded-xl border border-brand-border bg-brand-surface p-2 shadow-xl">
                   {filteredSearchList.map(paper => (
                     <button
                       key={paper.id}
@@ -110,10 +110,10 @@ export const ComparePage: React.FC = () => {
                         addToCompare(paper.id);
                         setSearchQuery('');
                       }}
-                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/40 text-left text-xs font-semibold"
+                      className="w-full flex items-center justify-between p-2.5 rounded-lg hover:bg-brand-bg text-left text-[13px] font-medium text-brand-text transition-colors"
                     >
                       <span className="truncate pr-4">{paper.title}</span>
-                      <Plus className="h-3.5 w-3.5 text-indigo-500 flex-shrink-0" />
+                      <Plus className="h-4 w-4 text-brand-accent flex-shrink-0" />
                     </button>
                   ))}
                 </div>
@@ -125,11 +125,11 @@ export const ComparePage: React.FC = () => {
 
       {/* Main Grid Comparison */}
       {selectedPapers.length > 0 ? (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 shadow-sm">
-          <div className="min-w-[800px] divide-y divide-slate-200/60 dark:divide-slate-800/40">
+        <div className="overflow-x-auto rounded-xl border border-brand-border bg-brand-surface shadow-sm">
+          <div className="min-w-[800px] divide-y divide-brand-border">
             {/* Table Header: Show Paper Titles */}
-            <div className="grid grid-cols-4 bg-slate-50/50 dark:bg-slate-950/20 p-4">
-              <div className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest self-center">
+            <div className="grid grid-cols-4 bg-brand-bg p-4">
+              <div className="text-[12px] font-semibold text-brand-textMuted uppercase tracking-wider self-center">
                 Parameter Schema
               </div>
 
@@ -137,36 +137,36 @@ export const ComparePage: React.FC = () => {
               {Array.from({ length: 3 }).map((_, idx) => {
                 const paper = selectedPapers[idx];
                 return (
-                  <div key={idx} className="px-4 border-l border-slate-200/65 dark:border-slate-800/50 relative flex flex-col justify-between min-h-[100px]">
+                  <div key={idx} className="px-5 border-l border-brand-border relative flex flex-col justify-between min-h-[120px]">
                     {paper ? (
                       <>
                         <button
                           onClick={() => removeFromCompare(paper.id)}
-                          className="absolute top-0 right-2 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/20 text-slate-400 hover:text-red-500 transition-colors"
+                          className="absolute top-0 right-2 p-1.5 rounded-lg hover:bg-brand-surface text-brand-textMuted hover:text-red-500 transition-colors"
                         >
-                          <X className="h-3.5 w-3.5" />
+                          <X className="h-4 w-4" />
                         </button>
-                        <div className="space-y-1.5 pr-6">
+                        <div className="space-y-2 pr-6 mt-1">
                           <h4
                             onClick={() => handlePaperClick(paper.id)}
-                            className="text-xs font-bold text-slate-800 dark:text-slate-200 hover:text-indigo-600 cursor-pointer line-clamp-2 leading-snug"
+                            className="text-[14px] font-semibold text-brand-text hover:text-brand-accent cursor-pointer line-clamp-2 leading-snug transition-colors"
                           >
                             {paper.title}
                           </h4>
-                          <span className="inline-block text-[10px] font-semibold text-indigo-650 bg-indigo-50 dark:bg-indigo-950/30 px-2 py-0.5 rounded border border-indigo-100/10">
+                          <span className="inline-block text-[11px] font-medium text-brand-textMuted bg-brand-surface px-2 py-0.5 rounded border border-brand-border">
                             {paper.publication}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1.5 mt-3 text-[10px] text-slate-500">
-                          <Quote className="h-3 w-3 text-slate-400" />
+                        <div className="flex items-center gap-1.5 mt-4 text-[12px] text-brand-textMuted">
+                          <Quote className="h-3.5 w-3.5" />
                           <span>{paper.citationCount.toLocaleString()} citations</span>
                         </div>
                       </>
                     ) : (
-                      <div className="h-full border border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex flex-col items-center justify-center text-center p-4 bg-white/10 dark:bg-slate-900/10 text-slate-400">
-                        <Plus className="h-5 w-5 mb-1 text-slate-350" />
-                        <span className="text-[10px] font-semibold">Slot Empty</span>
-                        <span className="text-[8px]">Select a paper above to compare</span>
+                      <div className="h-full border border-dashed border-brand-border rounded-xl flex flex-col items-center justify-center text-center p-4 bg-brand-bg/50 text-brand-textMuted mt-1 mb-1">
+                        <Plus className="h-5 w-5 mb-2 opacity-50" />
+                        <span className="text-[12px] font-semibold">Slot Empty</span>
+                        <span className="text-[11px] mt-1">Select a paper above to compare</span>
                       </div>
                     )}
                   </div>
@@ -176,9 +176,9 @@ export const ComparePage: React.FC = () => {
 
             {/* Table Body Fields */}
             {comparisonFields.map((field) => (
-              <div key={field.key} className="grid grid-cols-4 p-4 hover:bg-slate-50/20 transition-colors">
+              <div key={field.key} className="grid grid-cols-4 p-5 hover:bg-brand-bg/50 transition-colors">
                 {/* Field label */}
-                <div className="text-xs font-extrabold text-slate-700 dark:text-slate-350 pr-4">
+                <div className="text-[13px] font-semibold text-brand-text pr-4 flex items-center">
                   {field.label}
                 </div>
 
@@ -186,17 +186,17 @@ export const ComparePage: React.FC = () => {
                 {Array.from({ length: 3 }).map((_, idx) => {
                   const paper = selectedPapers[idx];
                   return (
-                    <div key={idx} className="px-4 border-l border-slate-200/60 dark:border-slate-800/40 text-xs text-slate-650 dark:text-slate-350 leading-relaxed font-medium">
+                    <div key={idx} className="px-5 border-l border-brand-border text-[13px] text-brand-textMuted leading-relaxed flex items-center">
                       {paper ? (
                         field.highlight ? (
-                          <span className="inline-block px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 font-bold border border-emerald-100/10">
+                          <span className="inline-block px-3 py-1 rounded-lg bg-brand-surface text-brand-text font-medium border border-brand-border">
                             {field.render(paper)}
                           </span>
                         ) : (
                           field.render(paper)
                         )
                       ) : (
-                        <span className="text-slate-350 dark:text-slate-600">&bull;&bull;&bull;</span>
+                        <span className="text-brand-textMuted/30 text-xl">&bull;&bull;&bull;</span>
                       )}
                     </div>
                   );
@@ -215,10 +215,10 @@ export const ComparePage: React.FC = () => {
 
       {/* Pro tips banner */}
       {selectedPapers.length > 0 && (
-        <div className="p-4 rounded-xl border border-indigo-500/10 bg-indigo-500/5 text-xs text-slate-600 dark:text-slate-400 flex gap-2.5 items-start">
-          <Sparkles className="h-4.5 w-4.5 text-indigo-500 flex-shrink-0 mt-0.5" />
-          <div>
-            <span className="font-bold text-slate-800 dark:text-slate-250">Comparison Tip</span>: Use the matrix to isolate modeling differences. Under performance evaluations, pay attention to pre-training dataset size variations (e.g. ImageNet vs WIT 400M) as they heavily impact downstream zero-shot transfer scores.
+        <div className="p-4 rounded-xl border border-brand-border bg-brand-bg text-[13px] text-brand-textMuted flex gap-3 items-start shadow-sm">
+          <Sparkles className="h-5 w-5 text-brand-accent flex-shrink-0" />
+          <div className="leading-relaxed">
+            <span className="font-semibold text-brand-text">Comparison Tip</span>: Use the matrix to isolate modeling differences. Under performance evaluations, pay attention to pre-training dataset size variations (e.g. ImageNet vs WIT 400M) as they heavily impact downstream zero-shot transfer scores.
           </div>
         </div>
       )}

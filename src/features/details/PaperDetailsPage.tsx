@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { mockPapers } from '../../data/mockData';
-import { Bookmark, BookmarkCheck, Columns3, MessageSquare, ArrowLeft, Calendar, Quote, TrendingUp, BookOpen } from 'lucide-react';
+import { Bookmark, BookmarkCheck, Columns3, MessageSquare, ArrowLeft, Calendar, Quote, TrendingUp, BookOpen, ExternalLink, Download } from 'lucide-react';
 
 export const PaperDetailsPage: React.FC = () => {
   const {
@@ -62,35 +62,35 @@ export const PaperDetailsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto px-1 select-none pb-16">
+    <div className="max-w-6xl mx-auto pb-16 select-none space-y-6">
       {/* Back button and page tools */}
-      <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/30 pb-4 flex-wrap gap-4">
+      <div className="flex items-center justify-between border-b border-brand-border pb-5 flex-wrap gap-4">
         <button
           onClick={handleBack}
-          className="flex items-center gap-1.5 text-xs font-bold text-slate-650 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors"
+          className="flex items-center gap-2 text-[14px] font-medium text-brand-textMuted hover:text-brand-text transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Results
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           {/* Compare */}
           <button
             onClick={handleCompareToggle}
-            className={`flex items-center gap-1.5 h-9 px-4 rounded-xl border text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 h-10 px-4 rounded-lg border text-[13px] font-medium transition-colors ${
               isComparing
-                ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-650 dark:text-purple-400 border-purple-200 dark:border-purple-900'
-                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                ? 'bg-brand-surface text-brand-accent border-brand-accent shadow-sm'
+                : 'bg-brand-surface text-brand-text border-brand-border hover:bg-brand-bg'
             }`}
           >
             <Columns3 className="h-4 w-4" />
-            {isComparing ? 'In Comparison' : 'Add to Compare'}
+            {isComparing ? 'In Comparison' : 'Compare'}
           </button>
 
           {/* Chat */}
           <button
             onClick={handleChatClick}
-            className="flex items-center gap-1.5 h-9 px-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-750 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-all"
+            className="flex items-center gap-2 h-10 px-4 rounded-lg border border-brand-border bg-brand-surface text-brand-text hover:bg-brand-bg text-[13px] font-medium transition-colors"
           >
             <MessageSquare className="h-4 w-4" />
             Chat About Paper
@@ -99,16 +99,16 @@ export const PaperDetailsPage: React.FC = () => {
           {/* Bookmark */}
           <button
             onClick={() => toggleSavePaper(paper.id)}
-            className={`flex items-center gap-1.5 h-9 px-4 rounded-xl border text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 h-10 px-4 rounded-lg border text-[13px] font-medium transition-colors ${
               isSaved
-                ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-650 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900'
-                : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-800'
+                ? 'bg-brand-text text-brand-surface border-brand-text'
+                : 'bg-brand-surface text-brand-text border-brand-border hover:bg-brand-bg'
             }`}
           >
             {isSaved ? (
               <>
                 <BookmarkCheck className="h-4 w-4" />
-                Saved in Workspace
+                Saved
               </>
             ) : (
               <>
@@ -121,47 +121,58 @@ export const PaperDetailsPage: React.FC = () => {
       </div>
 
       {/* Main Details Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left Column: Info, Abstract, Figures, References */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-8">
           
-          {/* Core Info card */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
+          {/* Core Info header */}
+          <div className="space-y-6">
             {/* Metadata Badges */}
-            <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold text-slate-500">
-              <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-350">
-                <Calendar className="h-3 w-3" />
+            <div className="flex flex-wrap items-center gap-3 text-[13px] font-medium text-brand-textMuted">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded bg-brand-bg border border-brand-border text-brand-text">
+                <Calendar className="h-3.5 w-3.5" />
                 {paper.year}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100/10">
+              <span className="px-3 py-1 rounded bg-brand-bg border border-brand-border text-brand-text">
                 {paper.publication}
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black text-slate-850 dark:text-slate-100 leading-snug">
+            <h1 className="text-[32px] font-semibold text-brand-text leading-tight">
               {paper.title}
             </h1>
 
-            <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 leading-normal">
-              By {paper.authors.join(', ')}
+            <p className="text-[16px] text-brand-textMuted leading-relaxed">
+              {paper.authors.join(', ')}
             </p>
 
-            <div className="h-px bg-slate-200/60 dark:bg-slate-800/40" />
+            <div className="flex gap-3 pt-2">
+              <button className="flex items-center gap-2 h-9 px-4 rounded-lg bg-brand-bg border border-brand-border text-brand-text text-[13px] font-medium hover:bg-brand-surface transition-colors">
+                <Download className="h-4 w-4" />
+                Download PDF
+              </button>
+              <button className="flex items-center gap-2 h-9 px-4 rounded-lg bg-brand-bg border border-brand-border text-brand-text text-[13px] font-medium hover:bg-brand-surface transition-colors">
+                <ExternalLink className="h-4 w-4" />
+                View Source
+              </button>
+            </div>
+            
+            <div className="h-px bg-brand-border my-6" />
 
-            <div className="space-y-2">
-              <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest">Abstract</h3>
-              <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed font-medium">
+            <div className="space-y-4">
+              <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Abstract</h3>
+              <p className="text-[15px] text-brand-text leading-relaxed font-normal">
                 {paper.abstract}
               </p>
             </div>
 
             {/* Keywords */}
-            <div className="flex flex-wrap gap-1.5 pt-2">
+            <div className="flex flex-wrap gap-2 pt-4">
               {paper.keywords.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="text-[10px] font-semibold px-2.5 py-0.5 rounded-lg bg-slate-50 dark:bg-slate-800/30 text-slate-550 dark:text-slate-400 border border-slate-100 dark:border-slate-850/10"
+                  className="text-[12px] font-medium px-3 py-1 rounded-full bg-brand-bg text-brand-textMuted border border-brand-border"
                 >
                   {tag}
                 </span>
@@ -170,25 +181,25 @@ export const PaperDetailsPage: React.FC = () => {
           </div>
 
           {/* Figures Gallery Card */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-            <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest">Extracted Figures & Diagrams</h3>
+          <div className="pt-8 border-t border-brand-border space-y-6">
+            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Extracted Figures & Diagrams</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {paper.figures.map((figCaption, idx) => (
-                <div key={idx} className="border border-slate-200/60 dark:border-slate-850/60 rounded-xl overflow-hidden bg-slate-950/20 backdrop-blur-md">
+                <div key={idx} className="border border-brand-border rounded-xl overflow-hidden bg-brand-bg">
                   {/* Mock Diagram Canvas */}
-                  <div className="h-32 bg-slate-950/40 flex items-center justify-center relative p-4">
-                    <div className="absolute inset-0 bg-[radial-gradient(#ffffff03_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
+                  <div className="h-40 bg-brand-surface flex items-center justify-center relative p-4 border-b border-brand-border">
+                    <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
                     {/* SVG mockup nodes */}
                     <div className="flex gap-4 items-center z-10">
-                      <div className="h-8 w-12 rounded bg-indigo-650/40 border border-indigo-500/20 text-[8px] flex items-center justify-center font-bold text-slate-300">Inputs</div>
-                      <div className="h-2 w-4 bg-slate-500" />
-                      <div className="h-10 w-16 rounded bg-purple-650/40 border border-purple-500/20 text-[8px] flex items-center justify-center font-bold text-slate-300">Attention Layer</div>
-                      <div className="h-2 w-4 bg-slate-500" />
-                      <div className="h-8 w-12 rounded bg-blue-650/40 border border-blue-500/20 text-[8px] flex items-center justify-center font-bold text-slate-300">Outputs</div>
+                      <div className="h-10 w-16 rounded bg-brand-bg border border-brand-border text-[10px] flex items-center justify-center font-semibold text-brand-textMuted shadow-sm">Inputs</div>
+                      <div className="h-px w-6 bg-brand-textMuted" />
+                      <div className="h-12 w-20 rounded bg-brand-bg border border-brand-border text-[10px] flex items-center justify-center font-semibold text-brand-text shadow-sm">Attention Layer</div>
+                      <div className="h-px w-6 bg-brand-textMuted" />
+                      <div className="h-10 w-16 rounded bg-brand-bg border border-brand-border text-[10px] flex items-center justify-center font-semibold text-brand-textMuted shadow-sm">Outputs</div>
                     </div>
                   </div>
-                  <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-150/40 dark:border-slate-800/20 text-[10px] text-slate-500 text-center leading-normal font-semibold">
+                  <div className="p-4 text-[12px] text-brand-textMuted text-center leading-relaxed">
                     {figCaption}
                   </div>
                 </div>
@@ -197,16 +208,16 @@ export const PaperDetailsPage: React.FC = () => {
           </div>
 
           {/* References Card */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-            <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest">References ({paper.references.length})</h3>
+          <div className="pt-8 border-t border-brand-border space-y-6">
+            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">References ({paper.references.length})</h3>
             
-            <div className="space-y-3 divide-y divide-slate-150 dark:divide-slate-850">
+            <div className="space-y-4 divide-y divide-brand-border">
               {paper.references.map((ref, idx) => (
-                <div key={idx} className={`flex items-start gap-3 text-xs text-slate-600 dark:text-slate-400 ${idx > 0 ? 'pt-3' : ''}`}>
-                  <span className="font-bold text-indigo-500">[{idx + 1}]</span>
-                  <div className="space-y-0.5 leading-relaxed font-medium">
-                    <div className="text-slate-800 dark:text-slate-200 font-bold">{ref.title}</div>
-                    <div>By {ref.authors} &bull; {ref.year}</div>
+                <div key={idx} className={`flex items-start gap-4 text-[14px] text-brand-text ${idx > 0 ? 'pt-4' : ''}`}>
+                  <span className="font-semibold text-brand-textMuted">[{idx + 1}]</span>
+                  <div className="space-y-1 leading-relaxed">
+                    <div className="font-medium">{ref.title}</div>
+                    <div className="text-[13px] text-brand-textMuted">By {ref.authors} &bull; {ref.year}</div>
                   </div>
                 </div>
               ))}
@@ -216,57 +227,57 @@ export const PaperDetailsPage: React.FC = () => {
         </div>
 
         {/* Right Column: Metrics, Parameters, Related papers, timeline */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           
           {/* Key Metrics card */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-            <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest">Semantic Metrics</h3>
+          <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Semantic Metrics</h3>
 
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="p-3.5 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/40 rounded-xl">
-                <div className="text-[9px] font-bold text-slate-400 uppercase">Citation Count</div>
-                <div className="text-base font-black text-slate-800 dark:text-slate-200 mt-1 flex items-center justify-center gap-1">
-                  <Quote className="h-4 w-4 text-indigo-500" />
+            <div className="grid grid-cols-2 gap-4 text-center">
+              <div className="p-4 bg-brand-bg border border-brand-border rounded-lg">
+                <div className="text-[11px] font-semibold text-brand-textMuted uppercase">Citation Count</div>
+                <div className="text-[18px] font-semibold text-brand-text mt-2 flex items-center justify-center gap-2">
+                  <Quote className="h-4 w-4 text-brand-textMuted" />
                   {paper.citationCount.toLocaleString()}
                 </div>
               </div>
-              <div className="p-3.5 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/40 rounded-xl">
-                <div className="text-[9px] font-bold text-slate-400 uppercase">Velocity</div>
-                <div className="text-base font-black text-slate-800 dark:text-slate-200 mt-1 flex items-center justify-center gap-0.5">
-                  <TrendingUp className="h-4 w-4 text-emerald-500" />
+              <div className="p-4 bg-brand-bg border border-brand-border rounded-lg">
+                <div className="text-[11px] font-semibold text-brand-textMuted uppercase">Velocity</div>
+                <div className="text-[18px] font-semibold text-brand-text mt-2 flex items-center justify-center gap-1">
+                  <TrendingUp className="h-4 w-4 text-brand-textMuted" />
                   {paper.metrics.citationVelocity.toLocaleString()} / yr
                 </div>
               </div>
             </div>
 
             {/* Model stats breakdown */}
-            <div className="space-y-2 text-xs font-semibold">
-              <div className="flex justify-between p-2 rounded bg-slate-50 dark:bg-slate-950/10 border border-slate-150/40 dark:border-slate-800/30">
-                <span className="text-slate-400">Method:</span>
-                <span className="text-slate-700 dark:text-indigo-400">{paper.method || 'Standard baseline'}</span>
+            <div className="space-y-3 text-[13px]">
+              <div className="flex justify-between p-3 rounded-lg bg-brand-bg border border-brand-border">
+                <span className="text-brand-textMuted font-medium">Method:</span>
+                <span className="text-brand-text font-semibold">{paper.method || 'Standard baseline'}</span>
               </div>
-              <div className="flex justify-between p-2 rounded bg-slate-50 dark:bg-slate-950/10 border border-slate-150/40 dark:border-slate-800/30">
-                <span className="text-slate-400">Model:</span>
-                <span className="text-slate-700 dark:text-purple-400">{paper.model || 'N/A'}</span>
+              <div className="flex justify-between p-3 rounded-lg bg-brand-bg border border-brand-border">
+                <span className="text-brand-textMuted font-medium">Model:</span>
+                <span className="text-brand-text font-semibold">{paper.model || 'N/A'}</span>
               </div>
-              <div className="flex justify-between p-2 rounded bg-slate-50 dark:bg-slate-950/10 border border-slate-150/40 dark:border-slate-800/30">
-                <span className="text-slate-400">Target Dataset:</span>
-                <span className="text-slate-700 dark:text-blue-400">{paper.dataset || 'N/A'}</span>
+              <div className="flex justify-between p-3 rounded-lg bg-brand-bg border border-brand-border">
+                <span className="text-brand-textMuted font-medium">Target Dataset:</span>
+                <span className="text-brand-text font-semibold">{paper.dataset || 'N/A'}</span>
               </div>
             </div>
           </div>
 
           {/* Timeline Card */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-            <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest">Citation Timeline</h3>
+          <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider">Citation Timeline</h3>
             
-            <div className="relative border-l border-slate-200 dark:border-slate-800 pl-4 ml-2 space-y-4">
+            <div className="relative border-l-2 border-brand-border pl-5 ml-2 space-y-6">
               {paper.timeline.map((eventObj, idx) => (
                 <div key={idx} className="relative">
                   {/* Dot indicator */}
-                  <span className="absolute -left-[21px] top-1.5 h-2.5 w-2.5 rounded-full bg-indigo-500 ring-4 ring-white dark:ring-slate-900"></span>
-                  <div className="text-[10px] font-bold text-indigo-650 dark:text-indigo-400">{eventObj.year}</div>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-400 font-medium leading-relaxed mt-0.5">
+                  <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-brand-text ring-4 ring-brand-surface"></span>
+                  <div className="text-[12px] font-semibold text-brand-text">{eventObj.year}</div>
+                  <p className="text-[13px] text-brand-textMuted leading-relaxed mt-1">
                     {eventObj.event}
                   </p>
                 </div>
@@ -275,13 +286,13 @@ export const PaperDetailsPage: React.FC = () => {
           </div>
 
           {/* Related Papers Card */}
-          <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-            <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest flex items-center gap-1">
-              <BookOpen className="h-4 w-4 text-indigo-500" />
-              Related Semantic Papers
+          <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+            <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+              <BookOpen className="h-4 w-4" />
+              Related Papers
             </h3>
 
-            <div className="space-y-2">
+            <div className="space-y-3">
               {paper.relatedPapers.slice(0, 4).map((relId) => {
                 const relPaper = mockPapers.find(p => p.id === relId);
                 if (!relPaper) return null;
@@ -289,12 +300,12 @@ export const PaperDetailsPage: React.FC = () => {
                   <div
                     key={relId}
                     onClick={() => handleRelatedPaperClick(relId)}
-                    className="p-3 rounded-xl border border-slate-150/80 dark:border-slate-850/60 bg-white/40 dark:bg-slate-900/20 hover:border-indigo-500/20 cursor-pointer shadow-sm group transition-all"
+                    className="p-4 rounded-lg border border-brand-border bg-brand-bg hover:bg-brand-surface hover:border-brand-accent/50 cursor-pointer transition-colors group"
                   >
-                    <h4 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-650 dark:group-hover:text-indigo-400 transition-colors truncate">
+                    <h4 className="text-[13px] font-medium text-brand-text group-hover:text-brand-accent transition-colors line-clamp-2 leading-snug">
                       {relPaper.title}
                     </h4>
-                    <div className="flex items-center justify-between text-[10px] text-slate-450 mt-1 leading-none">
+                    <div className="flex items-center justify-between text-[11px] text-brand-textMuted mt-2">
                       <span>{relPaper.publication}</span>
                       <span className="font-semibold">{relPaper.citationCount.toLocaleString()} cites</span>
                     </div>

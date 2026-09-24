@@ -4,33 +4,34 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
         brand: {
-          light: '#EEF2F6',
-          dark: '#0B0F19',
-          cardLight: 'rgba(255, 255, 255, 0.7)',
-          cardDark: 'rgba(15, 23, 42, 0.7)',
-          borderLight: 'rgba(226, 232, 240, 0.8)',
-          borderDark: 'rgba(51, 65, 85, 0.5)',
+          bg: '#FAFAFA',
+          surface: '#FFFFFF',
+          text: '#111111',
+          textMuted: '#666666',
+          border: '#E5E5E5',
+          accent: '#0052CC', // Professional blue accent
+          accentHover: '#0043A6'
         },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
-      backdropBlur: {
-        xs: '2px',
-      },
       animation: {
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'shimmer': 'shimmer 2.5s infinite linear',
+        'fade-in': 'fadeIn 0.2s ease-in-out',
+        'slide-up': 'slideUp 0.3s ease-out',
       },
       keyframes: {
-        shimmer: {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+        slideUp: {
+          '0%': { opacity: 0, transform: 'translateY(10px)' },
+          '100%': { opacity: 1, transform: 'translateY(0)' },
         }
       }
     },

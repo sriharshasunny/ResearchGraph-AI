@@ -4,39 +4,31 @@
 
 @layer base {
   body {
-    @apply bg-[#EEF2F6] dark:bg-[#0B0F19] text-slate-800 dark:text-slate-200 transition-colors duration-300 antialiased;
+    @apply bg-[#FAFAFA] text-[#111111] transition-colors duration-300 antialiased;
     font-family: 'Inter', sans-serif;
   }
 }
 
-/* Custom background grid pattern */
-.bg-grid-pattern {
-  background-size: 30px 30px;
-  background-image: 
-    linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
-}
-
-.dark .bg-grid-pattern {
-  background-image: 
-    linear-gradient(to right, rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+/* Subtle background pattern for Home page */
+.bg-graph-pattern {
+  background-size: 40px 40px;
+  background-image: radial-gradient(circle, #E5E5E5 1px, transparent 1px);
 }
 
 /* Custom scrollbars */
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 4px;
+  height: 4px;
 }
 .scrollbar-thin::-webkit-scrollbar-track {
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.3);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 4px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.5);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 /* Custom animations for React Flow container */

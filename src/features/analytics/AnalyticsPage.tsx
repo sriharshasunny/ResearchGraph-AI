@@ -6,7 +6,8 @@ import { BarChart3, TrendingUp, Sparkles, Layers, Database, Target } from 'lucid
 export const AnalyticsPage: React.FC = () => {
   const data = analyticsStats;
   const RADIAN = Math.PI / 180;
-  const COLORS = ['#6366f1', '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'];
+  // Use monochromatic or subdued brand-compatible colors instead of bright ones
+  const COLORS = ['#171717', '#525252', '#a3a3a3', '#d4d4d4', '#f5f5f5'];
 
   const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -14,28 +15,28 @@ export const AnalyticsPage: React.FC = () => {
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-      <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-[10px] font-bold">
+      <text x={x} y={y} fill={percent > 0.15 ? 'white' : '#171717'} textAnchor="middle" dominantBaseline="central" className="text-[11px] font-medium">
         {`${(percent * 100).toFixed(0)}%`}
       </text>
     );
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-1 select-none pb-12">
+    <div className="space-y-6 max-w-7xl mx-auto select-none pb-12">
       
       {/* Header Panel */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/40 dark:bg-slate-900/45 border border-slate-200/80 dark:border-slate-800/40 p-5 rounded-2xl backdrop-blur-md shadow-sm">
-        <div className="space-y-1">
-          <h2 className="text-base font-extrabold text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
-            <BarChart3 className="h-5 w-5 text-indigo-500" />
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-brand-surface border border-brand-border p-6 rounded-xl shadow-sm">
+        <div className="space-y-1.5">
+          <h2 className="text-[18px] font-semibold text-brand-text flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-brand-accent" />
             Semantic Research Analytics
           </h2>
-          <p className="text-xs text-slate-500">
+          <p className="text-[13px] text-brand-textMuted">
             Insights on model popularity, publishing velocity, topic clusters, and dataset usage across the research index.
           </p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-100 dark:border-indigo-950/50 bg-indigo-50/20 dark:bg-indigo-950/10 text-xs font-semibold text-indigo-650 dark:text-indigo-400">
-          <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-brand-border bg-brand-bg text-[12px] font-medium text-brand-text">
+          <Sparkles className="h-4 w-4" />
           <span>Realtime Index Analysis</span>
         </div>
       </div>
@@ -44,37 +45,37 @@ export const AnalyticsPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Chart 1: Publications Per Year */}
-        <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest flex items-center gap-1.5">
-            <TrendingUp className="h-4.5 w-4.5 text-indigo-500" />
+        <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+          <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
             Publications Per Year
           </h3>
-          <div className="h-64 w-full text-xs">
+          <div className="h-64 w-full text-[12px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.publicationsPerYear} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:opacity-10" />
-                <XAxis dataKey="year" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <XAxis dataKey="year" stroke="#737373" />
+                <YAxis stroke="#737373" />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: 'none', borderRadius: '12px', color: '#fff' }}
-                  labelStyle={{ fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#171717', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  labelStyle={{ fontWeight: '600', color: '#171717', marginBottom: '4px' }}
                 />
-                <Line type="monotone" dataKey="papers" stroke="#6366f1" strokeWidth={3} activeDot={{ r: 8 }} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="papers" stroke="#171717" strokeWidth={2} activeDot={{ r: 6 }} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] text-slate-450 text-center leading-normal">
+          <p className="text-[12px] text-brand-textMuted text-center leading-relaxed">
             Illustrates the growth of computer vision and transformer publications cataloged in the index over the last 9 years.
           </p>
         </div>
 
         {/* Chart 2: Top Research Topics */}
-        <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest flex items-center gap-1.5">
-            <Target className="h-4.5 w-4.5 text-blue-500" />
+        <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+          <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+            <Target className="h-4 w-4" />
             Top Research Topics
           </h3>
-          <div className="h-64 w-full flex items-center justify-center text-xs">
+          <div className="h-64 w-full flex items-center justify-center text-[12px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -93,67 +94,72 @@ export const AnalyticsPage: React.FC = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: 'none', borderRadius: '12px', color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#171717', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  itemStyle={{ color: '#171717', fontWeight: '500' }}
                 />
               </PieChart>
             </ResponsiveContainer>
             
             {/* Legend */}
-            <div className="flex flex-col gap-2 pl-4 flex-shrink-0">
+            <div className="flex flex-col gap-3 pl-4 flex-shrink-0">
               {data.topResearchTopics.map((t, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-[10px] font-semibold text-slate-600 dark:text-slate-400">
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                  <span className="truncate max-w-[90px]">{t.topic}</span>
+                <div key={idx} className="flex items-center gap-2 text-[12px] font-medium text-brand-textMuted">
+                  <span className="h-3 w-3 rounded-full border border-brand-border" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
+                  <span className="truncate max-w-[120px]">{t.topic}</span>
                 </div>
               ))}
             </div>
           </div>
-          <p className="text-[10px] text-slate-450 text-center leading-normal">
+          <p className="text-[12px] text-brand-textMuted text-center leading-relaxed">
             Breakdown of core technical domains. Generative AI and Computer Vision remain the primary clusters.
           </p>
         </div>
 
         {/* Chart 3: Dataset Usage */}
-        <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest flex items-center gap-1.5">
-            <Database className="h-4.5 w-4.5 text-emerald-500" />
+        <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+          <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+            <Database className="h-4 w-4" />
             Common Reference Datasets
           </h3>
-          <div className="h-64 w-full text-xs">
+          <div className="h-64 w-full text-[12px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.datasetUsage} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:opacity-10" />
-                <XAxis dataKey="name" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                <XAxis dataKey="name" stroke="#737373" />
+                <YAxis stroke="#737373" />
                 <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.95)', border: 'none', borderRadius: '12px', color: '#fff' }}
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#171717', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  cursor={{ fill: '#f5f5f5' }}
                 />
-                <Bar dataKey="usage" fill="#10b981" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="usage" fill="#171717" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] text-slate-450 text-center leading-normal">
+          <p className="text-[12px] text-brand-textMuted text-center leading-relaxed">
             Number of indexed publications using benchmark sets for modeling and testing phases.
           </p>
         </div>
 
         {/* Chart 4: Model Popularity */}
-        <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm space-y-4">
-          <h3 className="text-xs font-bold text-slate-450 uppercase tracking-widest flex items-center gap-1.5">
-            <Layers className="h-4.5 w-4.5 text-purple-500" />
+        <div className="p-6 rounded-xl border border-brand-border bg-brand-surface shadow-sm space-y-6">
+          <h3 className="text-[14px] font-semibold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+            <Layers className="h-4 w-4" />
             Model Architecture Popularity
           </h3>
-          <div className="h-64 w-full text-xs flex justify-center">
+          <div className="h-64 w-full text-[12px] flex justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data.modelPopularity}>
-                <PolarGrid stroke="#e2e8f0" className="dark:opacity-10" />
-                <PolarAngleAxis dataKey="name" stroke="#94a3b8" />
-                <PolarRadiusAxis stroke="#94a3b8" />
-                <Radar name="Index Share" dataKey="score" stroke="#8b5cf6" fill="#8b5cf6" fillOpacity={0.2} />
+                <PolarGrid stroke="#e5e7eb" />
+                <PolarAngleAxis dataKey="name" stroke="#737373" tick={{ fontSize: 11 }} />
+                <PolarRadiusAxis stroke="#737373" angle={30} domain={[0, 'auto']} />
+                <Radar name="Index Share" dataKey="score" stroke="#171717" fill="#171717" fillOpacity={0.1} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px', color: '#171717', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                />
               </RadarChart>
             </ResponsiveContainer>
           </div>
-          <p className="text-[10px] text-slate-450 text-center leading-normal">
+          <p className="text-[12px] text-brand-textMuted text-center leading-relaxed">
             Self-attention Transformers hold the highest share of model implementations, followed by Diffusion backbones.
           </p>
         </div>

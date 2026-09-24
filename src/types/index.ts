@@ -51,6 +51,7 @@ export interface ChatMessage {
   papers?: Paper[];
   codeSnippet?: { language: string; code: string };
   table?: { headers: string[]; rows: string[][] };
+  relatedConcepts?: string[];
 }
 
 export interface LitReview {

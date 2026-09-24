@@ -14,10 +14,10 @@ export const LitReviewPage: React.FC = () => {
   const [progressStep, setProgressStep] = useState(0);
 
   const presets = [
-    'Self-Supervised Vision Transformers (SSL-ViT)',
-    'Graph Representation Learning for Drug Discovery',
-    'Low-Rank Adaptation (LoRA) and LLM Parameter Efficiency',
-    'Retrieval-Augmented Generation (RAG) and Hallucination Mitigation'
+    'Self-Supervised Vision Transformers',
+    'Graph Representation Learning',
+    'Low-Rank Adaptation (LoRA)',
+    'RAG and Hallucination Mitigation'
   ];
 
   const handleGenerate = (e?: React.FormEvent) => {
@@ -79,17 +79,17 @@ export const LitReviewPage: React.FC = () => {
   ];
 
   return (
-    <div className="flex gap-6 max-w-7xl mx-auto px-1 h-[calc(100vh-100px)] relative overflow-hidden select-none">
+    <div className="flex gap-6 max-w-6xl mx-auto h-[calc(100vh-100px)] relative overflow-hidden select-none bg-brand-surface border border-brand-border rounded-xl shadow-sm">
       
       {/* Left Review History Sidebar */}
-      <aside className="w-64 border-r border-slate-200/80 dark:border-slate-800/40 flex flex-col justify-between hidden md:flex flex-shrink-0 bg-slate-50/20 dark:bg-slate-950/10 p-4">
-        <div className="space-y-4">
-          <div className="text-xs font-bold text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200/60 dark:border-slate-800/30 pb-3">
-            <FileText className="h-4.5 w-4.5 text-indigo-500" />
-            Generated Reviews
+      <aside className="w-64 border-r border-brand-border flex flex-col justify-between hidden md:flex flex-shrink-0 bg-brand-bg/50">
+        <div className="space-y-2 flex-1 overflow-hidden flex flex-col">
+          <div className="p-5 text-[13px] font-semibold text-brand-text uppercase tracking-wider flex items-center gap-2 border-b border-brand-border flex-shrink-0">
+            <FileText className="h-4 w-4 text-brand-textMuted" />
+            Saved Reviews
           </div>
 
-          <div className="flex flex-col gap-1.5 overflow-y-auto max-h-[calc(100vh-280px)] scrollbar-none pr-0.5">
+          <div className="flex-1 overflow-y-auto p-3 space-y-1">
             {reviews.map((rev) => (
               <button
                 key={rev.id}
@@ -97,40 +97,36 @@ export const LitReviewPage: React.FC = () => {
                   setSelectedReview(rev);
                   setActiveTab('summary');
                 }}
-                className={`w-full text-left px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
+                className={`w-full text-left px-3 py-2.5 rounded-lg text-[13px] transition-colors ${
                   selectedReview?.id === rev.id
-                    ? 'bg-white dark:bg-slate-900 border-indigo-500 text-indigo-650 dark:text-indigo-400 shadow-sm'
-                    : 'bg-transparent border-transparent text-slate-650 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/20'
+                    ? 'bg-brand-surface border border-brand-border text-brand-text font-medium shadow-sm'
+                    : 'text-brand-textMuted hover:bg-brand-border/30 border border-transparent'
                 }`}
               >
-                <div className="line-clamp-2 leading-snug">{rev.topic}</div>
+                <div className="truncate">{rev.topic}</div>
               </button>
             ))}
           </div>
         </div>
-
-        <div className="p-3 border border-indigo-100 dark:border-indigo-950/45 bg-indigo-50/25 dark:bg-indigo-950/10 rounded-xl text-[10px] text-indigo-600 dark:text-indigo-400 leading-normal">
-          ⚡ Literatures are synthesized instantly utilizing metadata schemas and cross-citations.
-        </div>
       </aside>
 
       {/* Main Panel */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-brand-surface">
         
-        {/* Form Input Section */}
-        <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm mb-6 flex-shrink-0">
-          <form onSubmit={handleGenerate} className="flex gap-3">
+        {/* Header / Input Section */}
+        <div className="p-8 border-b border-brand-border bg-brand-surface flex-shrink-0">
+          <form onSubmit={handleGenerate} className="flex gap-3 max-w-3xl">
             <input
               type="text"
-              placeholder="Enter a literature review topic (e.g. Self-Supervised Vision Transformers)..."
+              placeholder="Enter a literature review topic..."
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              className="w-full h-11 px-4 rounded-xl border border-slate-200/85 dark:border-slate-800/85 bg-white dark:bg-slate-950/40 text-xs text-slate-850 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+              className="flex-1 h-12 px-5 rounded-lg border border-brand-border bg-brand-bg text-[14px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:border-brand-accent transition-colors shadow-sm"
             />
             <button
               type="submit"
               disabled={!topic.trim() || isGenerating}
-              className="h-11 px-5 rounded-xl bg-indigo-650 hover:bg-indigo-755 text-white text-xs font-bold shadow-md transition-colors flex items-center gap-1.5 flex-shrink-0 disabled:opacity-50"
+              className="h-12 px-6 rounded-lg bg-brand-text hover:bg-brand-textMuted text-brand-surface text-[14px] font-medium transition-colors flex items-center gap-2 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               <Sparkles className="h-4 w-4" />
               Generate
@@ -138,15 +134,13 @@ export const LitReviewPage: React.FC = () => {
           </form>
 
           {/* Quick presets */}
-          <div className="flex flex-wrap gap-1.5 mt-3 items-center">
-            <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase mr-1">Presets:</span>
-            {presets.slice(0, 3).map((preset, idx) => (
+          <div className="flex flex-wrap gap-2 mt-4 items-center">
+            <span className="text-[12px] font-semibold text-brand-textMuted uppercase mr-2">Topics:</span>
+            {presets.map((preset, idx) => (
               <button
                 key={idx}
-                onClick={() => {
-                  setTopic(preset);
-                }}
-                className="text-[10px] font-semibold px-2.5 py-1 rounded bg-slate-100/50 dark:bg-slate-800/40 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-slate-200/10 transition-all"
+                onClick={() => setTopic(preset)}
+                className="text-[12px] font-medium px-3 py-1.5 rounded-full bg-brand-bg text-brand-textMuted hover:text-brand-text hover:border-brand-textMuted border border-brand-border transition-colors"
               >
                 {preset}
               </button>
@@ -155,184 +149,182 @@ export const LitReviewPage: React.FC = () => {
         </div>
 
         {/* Loading / Output Canvas */}
-        <div className="flex-1 overflow-y-auto pr-1">
-          {isGenerating ? (
-            /* Progressive Steps Loader */
-            <div className="h-[300px] flex flex-col items-center justify-center text-center p-8 bg-white/20 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 rounded-2xl">
-              <RefreshCw className="h-8 w-8 text-indigo-500 animate-spin mb-4" />
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Synthesizing Literature Review...</h4>
-              <div className="mt-4 max-w-sm w-full space-y-2">
-                {stepsList.map((step, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-left text-xs font-medium">
-                    {progressStep > idx ? (
-                      <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                    ) : progressStep === idx ? (
-                      <RefreshCw className="h-4 w-4 text-indigo-500 animate-spin flex-shrink-0" />
-                    ) : (
-                      <div className="h-4 w-4 rounded-full border border-slate-350 dark:border-slate-800 flex-shrink-0" />
-                    )}
-                    <span className={progressStep === idx ? 'text-slate-850 dark:text-slate-100 font-bold' : 'text-slate-400 dark:text-slate-500'}>
-                      {step}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : selectedReview ? (
-            /* Review Output Container */
-            <div className="space-y-6 pb-12">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-200/60 dark:border-slate-800/30 pb-3 flex-wrap gap-3">
-                <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-100 leading-snug">
-                  {selectedReview.topic}
-                </h3>
-                
-                {/* Tabs */}
-                <div className="flex bg-slate-100/80 dark:bg-slate-950/40 p-1 rounded-xl border border-slate-200/20">
-                  {(['summary', 'matrix', 'gaps'] as const).map((tab) => (
-                    <button
-                      key={tab}
-                      onClick={() => setActiveTab(tab)}
-                      className={`px-3 py-1.5 rounded-lg text-[10.5px] font-bold capitalize transition-all ${
-                        activeTab === tab
-                          ? 'bg-white dark:bg-slate-900 text-indigo-650 dark:text-indigo-400 border border-slate-200/50 dark:border-slate-800/80 shadow-sm'
-                          : 'text-slate-550 dark:text-slate-450 hover:text-slate-900'
-                      }`}
-                    >
-                      {tab === 'matrix' ? 'Comparison Matrix' : tab === 'summary' ? 'Review Summary' : 'Research Gaps'}
-                    </button>
+        <div className="flex-1 overflow-y-auto scrollbar-thin">
+          <div className="max-w-4xl mx-auto px-8 py-8 h-full">
+            {isGenerating ? (
+              /* Progressive Steps Loader */
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <RefreshCw className="h-8 w-8 text-brand-accent animate-spin mb-6" />
+                <h4 className="text-[18px] font-semibold text-brand-text">Synthesizing Literature...</h4>
+                <div className="mt-8 max-w-md w-full space-y-4">
+                  {stepsList.map((step, idx) => (
+                    <div key={idx} className="flex items-center gap-3 text-left">
+                      {progressStep > idx ? (
+                        <CheckCircle className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                      ) : progressStep === idx ? (
+                        <RefreshCw className="h-5 w-5 text-brand-accent animate-spin flex-shrink-0" />
+                      ) : (
+                        <div className="h-5 w-5 rounded-full border-2 border-brand-border flex-shrink-0" />
+                      )}
+                      <span className={`text-[14px] ${progressStep === idx ? 'text-brand-text font-semibold' : 'text-brand-textMuted'}`}>
+                        {step}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>
-
-              {/* Tab Outputs */}
-              <div className="min-h-[220px]">
-                {activeTab === 'summary' && (
-                  <div className="space-y-6">
-                    {/* Executive Summary Card */}
-                    <div className="p-6 rounded-2xl border border-slate-200/80 dark:border-slate-800/40 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm">
-                      <h4 className="text-xs font-bold text-slate-450 uppercase tracking-widest mb-3">Executive Summary</h4>
-                      <p className="text-xs leading-relaxed text-slate-650 dark:text-slate-350 whitespace-pre-line font-medium">
-                        {selectedReview.summary}
-                      </p>
-                    </div>
-
-                    {/* Major Papers List */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedReview.papers.map((paper, idx) => (
-                        <div key={idx} className="p-4 rounded-xl border border-slate-150 dark:border-slate-850 bg-white/30 dark:bg-slate-900/20 backdrop-blur-md flex flex-col justify-between">
-                          <div className="space-y-1">
-                            <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
-                              Core reference [{idx + 1}]
-                            </span>
-                            <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 line-clamp-2 leading-snug">
-                              {paper.title}
-                            </h5>
-                            <p className="text-[10px] text-slate-500">{paper.authors.join(', ')}</p>
-                          </div>
-                          <div className="text-[10px] text-slate-650 dark:text-slate-350 italic mt-3 bg-slate-50/50 dark:bg-slate-950/20 p-2 rounded-lg border border-slate-100">
-                            "{paper.abstract.substring(0, 110)}..."
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+            ) : selectedReview ? (
+              /* Review Output Container */
+              <div className="space-y-8 pb-12">
+                
+                {/* Review Header */}
+                <div className="space-y-6">
+                  <h3 className="text-[24px] font-semibold text-brand-text leading-tight">
+                    {selectedReview.topic}
+                  </h3>
+                  
+                  {/* Tabs */}
+                  <div className="flex border-b border-brand-border">
+                    {(['summary', 'matrix', 'gaps'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-4 py-3 text-[13px] font-medium capitalize transition-colors border-b-2 ${
+                          activeTab === tab
+                            ? 'border-brand-accent text-brand-text'
+                            : 'border-transparent text-brand-textMuted hover:text-brand-text'
+                        }`}
+                      >
+                        {tab === 'matrix' ? 'Comparison Matrix' : tab === 'summary' ? 'Review Summary' : 'Research Gaps'}
+                      </button>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {activeTab === 'matrix' && (
-                  /* Comparison Grid Table */
-                  <div className="overflow-x-auto rounded-2xl border border-slate-200/80 dark:border-slate-800/45 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md shadow-sm">
-                    <table className="w-full text-xs text-left border-collapse">
-                      <thead>
-                        <tr className="bg-slate-50 dark:bg-slate-950/30 border-b border-slate-200/60 dark:border-slate-800/50">
-                          {selectedReview.comparisonTable.headers.map((h, i) => (
-                            <th key={i} className="p-4 font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">{h}</th>
+                {/* Tab Outputs */}
+                <div className="min-h-[300px]">
+                  {activeTab === 'summary' && (
+                    <div className="space-y-8">
+                      {/* Executive Summary */}
+                      <div className="text-[15px] leading-relaxed text-brand-text font-normal whitespace-pre-line">
+                        {selectedReview.summary}
+                      </div>
+
+                      {/* Major Papers List */}
+                      <div>
+                        <h4 className="text-[13px] font-semibold text-brand-textMuted uppercase tracking-wider mb-4">Core Literature</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {selectedReview.papers.map((paper, idx) => (
+                            <div key={idx} className="p-5 rounded-xl border border-brand-border bg-brand-surface flex flex-col justify-between group hover:border-brand-accent/50 transition-colors cursor-pointer">
+                              <div className="space-y-2">
+                                <span className="text-[10px] font-semibold text-brand-textMuted uppercase tracking-wide">
+                                  Ref [{idx + 1}]
+                                </span>
+                                <h5 className="text-[14px] font-semibold text-brand-text line-clamp-2 leading-snug group-hover:text-brand-accent transition-colors">
+                                  {paper.title}
+                                </h5>
+                                <p className="text-[12px] text-brand-textMuted">{paper.authors.join(', ')} · {paper.year}</p>
+                              </div>
+                            </div>
                           ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {selectedReview.comparisonTable.rows.map((row, idx) => (
-                          <tr key={idx} className="border-b border-slate-150 dark:border-slate-850 hover:bg-slate-50/30">
-                            {row.map((cell, cIdx) => (
-                              <td key={cIdx} className="p-4 text-slate-650 dark:text-slate-350 leading-relaxed">{cell}</td>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'matrix' && (
+                    /* Comparison Grid Table */
+                    <div className="overflow-x-auto rounded-xl border border-brand-border">
+                      <table className="w-full text-[13px] text-left border-collapse">
+                        <thead>
+                          <tr className="bg-brand-bg border-b border-brand-border">
+                            {selectedReview.comparisonTable.headers.map((h, i) => (
+                              <th key={i} className="p-4 font-semibold text-brand-text whitespace-nowrap">{h}</th>
                             ))}
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
+                        </thead>
+                        <tbody>
+                          {selectedReview.comparisonTable.rows.map((row, idx) => (
+                            <tr key={idx} className="border-b border-brand-border last:border-0 hover:bg-brand-bg/50 transition-colors">
+                              {row.map((cell, cIdx) => (
+                                <td key={cIdx} className="p-4 text-brand-textMuted leading-relaxed">{cell}</td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
 
-                {activeTab === 'gaps' && (
-                  /* Gaps and Future Work */
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Gaps columns (Span 2) */}
-                    <div className="md:col-span-2 space-y-4">
-                      <h4 className="text-xs font-bold text-slate-450 uppercase tracking-widest pl-1">Identified Research Gaps</h4>
+                  {activeTab === 'gaps' && (
+                    /* Gaps and Future Work */
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {/* Gaps columns */}
                       <div className="space-y-4">
-                        {selectedReview.gaps.map((gapObj, idx) => (
-                          <div key={idx} className="p-5 rounded-xl border border-slate-200/80 dark:border-slate-800/45 bg-white/40 dark:bg-slate-900/45 backdrop-blur-md flex gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-500 border border-amber-500/20 flex-shrink-0">
-                              <AlertCircle className="h-5 w-5" />
-                            </div>
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{gapObj.gap}</span>
-                                <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-red-150 text-red-700 dark:bg-red-950/20 dark:text-red-400">
-                                  {gapObj.impact} Impact
+                        <h4 className="text-[13px] font-semibold text-brand-textMuted uppercase tracking-wider mb-4">Identified Gaps</h4>
+                        <div className="space-y-4">
+                          {selectedReview.gaps.map((gapObj, idx) => (
+                            <div key={idx} className="p-5 rounded-xl border border-brand-border bg-brand-bg">
+                              <div className="flex items-center gap-3 mb-2">
+                                <AlertCircle className="h-4 w-4 text-amber-500" />
+                                <span className="text-[14px] font-semibold text-brand-text">{gapObj.gap}</span>
+                                <span className="ml-auto text-[10px] font-medium px-2 py-0.5 rounded bg-brand-surface text-brand-textMuted border border-brand-border uppercase">
+                                  {gapObj.impact}
                                 </span>
                               </div>
-                              <p className="text-[11.5px] leading-relaxed text-slate-500">{gapObj.description}</p>
+                              <p className="text-[13px] leading-relaxed text-brand-textMuted">{gapObj.description}</p>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Future directions columns */}
+                      <div className="space-y-4">
+                        <h4 className="text-[13px] font-semibold text-brand-textMuted uppercase tracking-wider mb-4">Future Directions</h4>
+                        <div className="space-y-3">
+                          {selectedReview.futureWork.map((fw, idx) => (
+                            <div key={idx} className="flex gap-3 p-4 rounded-xl border border-brand-border bg-brand-surface">
+                              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-bg text-[12px] font-semibold text-brand-textMuted flex-shrink-0">
+                                {idx + 1}
+                              </span>
+                              <p className="text-[13px] text-brand-text leading-relaxed mt-0.5">
+                                {fw}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
-
-                    {/* Future directions columns (Span 1) */}
-                    <div className="space-y-4">
-                      <h4 className="text-xs font-bold text-slate-450 uppercase tracking-widest pl-1">Future Directions</h4>
-                      <div className="p-5 rounded-2xl border border-indigo-500/10 bg-indigo-500/5 backdrop-blur-md space-y-4">
-                        {selectedReview.futureWork.map((fw, idx) => (
-                          <div key={idx} className="flex gap-2">
-                            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-950 text-[10px] font-bold text-indigo-650 dark:text-indigo-400 flex-shrink-0">
-                              {idx + 1}
-                            </span>
-                            <p className="text-xs text-slate-650 dark:text-slate-350 leading-relaxed font-medium">
-                              {fw}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Reference list footer */}
-              <div className="p-5 rounded-2xl border border-slate-200/50 dark:border-slate-850/40 bg-slate-50/40 dark:bg-slate-950/10">
-                <h4 className="text-xs font-bold text-slate-450 uppercase tracking-widest mb-3.5">Review References</h4>
-                <div className="space-y-2 text-[11px] text-slate-500">
-                  {selectedReview.references.map((ref, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <span className="font-semibold">[{idx + 1}]</span>
-                      <p>
-                        <span className="font-bold text-slate-750 dark:text-slate-350">{ref.authors}</span>. "{ref.title}". ({ref.year}).
-                      </p>
-                    </div>
-                  ))}
+                  )}
                 </div>
-              </div>
 
-            </div>
-          ) : (
-            <EmptyState
-              title="No Literature Reviews Generated"
-              description="Type a research topic in the generator input box at the top to build a comprehensive literature analysis."
-            />
-          )}
+                {/* Reference list footer */}
+                <div className="pt-8 mt-8 border-t border-brand-border">
+                  <h4 className="text-[12px] font-semibold text-brand-textMuted uppercase tracking-wider mb-4">Bibliography</h4>
+                  <div className="space-y-3 text-[13px] text-brand-textMuted">
+                    {selectedReview.references.map((ref, idx) => (
+                      <div key={idx} className="flex items-start gap-2">
+                        <span className="font-medium text-brand-text">[{idx + 1}]</span>
+                        <p>
+                          <span className="font-medium text-brand-text">{ref.authors}</span>. "{ref.title}". ({ref.year}).
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center pb-20">
+                <EmptyState
+                  title="No Review Selected"
+                  description="Select a review from the sidebar or generate a new one."
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
     </div>
   );
 };

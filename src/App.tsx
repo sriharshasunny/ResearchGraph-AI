@@ -34,7 +34,7 @@ const AppContent: React.FC = () => {
   // Full screen pages (no Sidebar or Top Nav)
   if (activePage === 'landing') {
     return (
-      <div className="min-h-screen w-full bg-slate-950 text-slate-100">
+      <div className="min-h-screen w-full bg-brand-bg text-brand-text">
         <LandingPage />
       </div>
     );
@@ -42,12 +42,7 @@ const AppContent: React.FC = () => {
 
   // Dashboard / Workspace layout (Sidebar + Nav)
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-brand-light dark:bg-brand-dark transition-colors duration-300 relative">
-      {/* Background radial glow */}
-      <div className="absolute top-0 right-0 w-[40%] h-[40%] rounded-full bg-indigo-500/5 dark:bg-indigo-500/5 blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[30%] h-[30%] rounded-full bg-purple-500/5 dark:bg-purple-500/5 blur-[100px] pointer-events-none" />
-      <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
-
+    <div className="flex h-screen w-screen overflow-hidden bg-brand-bg relative animate-fade-in">
       {/* Main Sidebar */}
       <Sidebar />
 
@@ -57,16 +52,18 @@ const AppContent: React.FC = () => {
         <Navbar />
 
         {/* Dynamic page container */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8 scrollbar-thin">
-          {activePage === 'dashboard' && <Dashboard />}
-          {activePage === 'search' && <SearchPage />}
-          {activePage === 'chat' && <ChatPage />}
-          {activePage === 'graph' && <KnowledgeGraphPage />}
-          {activePage === 'lit-review' && <LitReviewPage />}
-          {activePage === 'compare' && <ComparePage />}
-          {activePage === 'details' && <PaperDetailsPage />}
-          {activePage === 'analytics' && <AnalyticsPage />}
-          {activePage === 'profile' && <ProfilePage />}
+        <main className="flex-1 overflow-y-auto p-8 scrollbar-thin">
+          <div className="max-w-6xl mx-auto h-full">
+            {activePage === 'dashboard' && <Dashboard />}
+            {activePage === 'search' && <SearchPage />}
+            {activePage === 'chat' && <ChatPage />}
+            {activePage === 'graph' && <KnowledgeGraphPage />}
+            {activePage === 'lit-review' && <LitReviewPage />}
+            {activePage === 'compare' && <ComparePage />}
+            {activePage === 'details' && <PaperDetailsPage />}
+            {activePage === 'analytics' && <AnalyticsPage />}
+            {activePage === 'profile' && <ProfilePage />}
+          </div>
         </main>
       </div>
 
