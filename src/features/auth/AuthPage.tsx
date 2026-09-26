@@ -35,8 +35,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
         
         {/* Layer 1: Landing Background */}
         <motion.div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: "url('/epic_launch_bg.jpg')", scale: spaceScale, y: spaceY }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/epic_launch_bg.jpg')" }}
           initial={false}
           animate={{ opacity: pageState === 'LANDING' ? 1 : 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -44,8 +44,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
         {/* Layer 2: Login Background */}
         <motion.div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: "url('/login_bg.jpg')", scale: spaceScale, y: spaceY }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/login_bg.jpg')" }}
           initial={false}
           animate={{ opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1 : 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -53,15 +53,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
         {/* Layer 3: Register Background */}
         <motion.div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: "url('/register_bg.jpg')", scale: spaceScale, y: spaceY }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/register_bg.jpg')" }}
           initial={false}
           animate={{ opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1 : 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         />
 
         {/* Dynamic Stars */}
-        <motion.div className="absolute inset-0 z-0 pointer-events-none" style={{ scale: spaceScale, y: spaceY }}>
+        <div className="absolute inset-0 z-0 pointer-events-none">
           {Array.from({ length: 40 }).map((_, i) => (
             <motion.div key={`ambient-${i}`} className="absolute rounded-full bg-cyan-200"
               style={{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', width: Math.random() * 2 + 1 + 'px', height: Math.random() * 2 + 1 + 'px' }}
@@ -69,7 +69,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: Math.random() * 5 + 3, repeat: Infinity, ease: "easeInOut", delay: Math.random() * 3 }}
             />
           ))}
-        </motion.div>
+        </div>
         
         {/* Gradients */}
         <div className={`absolute inset-0 transition-colors duration-1000 ease-in-out z-0 ${pageState === 'LANDING' ? 'bg-black/50' : 'bg-transparent'}`}></div>
