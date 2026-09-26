@@ -114,9 +114,9 @@ export const Sidebar: React.FC = () => {
       <div className={`p-4 border-t border-brand-border ${isSidebarOpen ? '' : 'flex justify-center'}`}>
         <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
-            <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-brand-accent to-brand-violet p-[2px]">
-              <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                <span className="text-[11px] font-bold text-brand-text">JD</span>
+            <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/20">
+              <div className="w-full h-full rounded-full bg-[#0a0f1c] flex items-center justify-center">
+                <span className="text-[11px] font-extrabold text-cyan-300">JD</span>
               </div>
             </div>
             <AnimatePresence>
