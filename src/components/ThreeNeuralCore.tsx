@@ -87,29 +87,29 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    // Zoomed out camera so rings never clip
+    // Optimized camera distance for immersive 3D presence
     const camera = new THREE.PerspectiveCamera(45, initialW / initialH, 0.1, 100);
-    camera.position.z = 7.5;
+    camera.position.z = 5.9;
 
     const masterGroup = new THREE.Group();
     scene.add(masterGroup);
 
     // ========== 1. CRYSTALLINE CORE (Icosahedron) ==========
-    const crystalGeo = new THREE.IcosahedronGeometry(1.05, 1);
+    const crystalGeo = new THREE.IcosahedronGeometry(1.15, 1);
     const crystalMat = new THREE.MeshPhysicalMaterial({
       color: p.crystal,
       emissive: p.emissive,
-      emissiveIntensity: 0.6,
+      emissiveIntensity: 0.85,
       roughness: 0.02,
-      metalness: 0.2,
-      transmission: 0.55,
-      ior: 1.65,
-      thickness: 1.6,
+      metalness: 0.25,
+      transmission: 0.65,
+      ior: 1.7,
+      thickness: 1.8,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.03,
+      clearcoatRoughness: 0.02,
       flatShading: true,
       transparent: true,
-      opacity: 0.92,
+      opacity: 0.95,
     });
     const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
     masterGroup.add(crystalMesh);

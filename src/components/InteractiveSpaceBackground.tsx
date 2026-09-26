@@ -186,16 +186,17 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712] pointer-events-none select-none">
       
-      {/* Layer 1: Previous Space Background */}
+      {/* Layer 1: Previous Space Background (Subdued/Dulled for optimal UI clarity and depth) */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: "url('/epic_launch_bg.jpg')",
-          transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`
+          transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
+          filter: pageState === 'LANDING' ? 'brightness(0.65) contrast(1.1) saturate(0.85)' : 'none'
         }}
         initial={false}
         animate={{ 
-          opacity: pageState === 'LANDING' ? 0.95 : 0,
+          opacity: pageState === 'LANDING' ? 0.36 : 0,
           scale: pageState === 'LANDING' ? 1.02 : 1.0
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -246,13 +247,13 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       {/* Atmospheric Gradients: Soft vignettes that preserve cockpit space visibility while maintaining UI clarity */}
       <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'bg-transparent' 
+          ? 'bg-gradient-to-b from-[#020512]/60 via-[#030818]/30 to-[#020612]/80' 
           : 'bg-black/25'
       }`}></div>
 
       <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'from-black/30 via-transparent to-black/50 opacity-40' 
+          ? 'from-black/40 via-transparent to-black/70 opacity-60' 
           : 'from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90'
       }`}></div>
 
@@ -260,7 +261,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-10 ${
         pageState === 'AUTH' 
           ? 'opacity-80 bg-[radial-gradient(ellipse_at_center,transparent_20%,#030712_85%)]' 
-          : 'opacity-0'
+          : 'opacity-40 bg-[radial-gradient(ellipse_at_center,transparent_40%,#020512_95%)]'
       }`}></div>
     </div>
   );
