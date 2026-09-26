@@ -46,13 +46,13 @@ export const Sidebar: React.FC = () => {
       initial={{ width: '88px' }}
       animate={{ width: isExpanded ? '280px' : '88px' }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="relative flex flex-col border border-brand-border/30 bg-brand-surface/60 backdrop-blur-xl z-30 shrink-0 m-4 rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.4)] overflow-visible"
+      className="relative flex flex-col border border-brand-border bg-white z-30 shrink-0 m-4 rounded-[24px] shadow-subtle overflow-visible"
       style={{ height: 'calc(100vh - 32px)' }}
     >
       {/* Brand Header */}
       <div className="flex items-center p-6 h-24 relative overflow-hidden shrink-0">
         <div className="flex items-center gap-4 cursor-pointer z-10 w-full" onClick={() => setActivePage('landing')}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-accent to-brand-violet text-brand-bg shrink-0 shadow-[0_0_15px_rgba(0,209,255,0.3)]">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-accent to-blue-600 text-white shrink-0 shadow-md">
             <Hexagon className="h-6 w-6" />
           </div>
           <AnimatePresence>
@@ -73,7 +73,7 @@ export const Sidebar: React.FC = () => {
         {/* Toggle Collapse Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="absolute -right-4 top-8 flex h-8 w-8 items-center justify-center rounded-full border border-brand-border/50 bg-brand-surface text-brand-textMuted hover:text-brand-accent shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_15px_rgba(0,209,255,0.3)] hover:border-brand-accent/30 transition-all z-40"
+          className="absolute -right-4 top-8 flex h-8 w-8 items-center justify-center rounded-full border border-brand-border bg-white text-brand-textMuted hover:text-brand-accent shadow-sm hover:shadow-md hover:border-blue-200 transition-all z-40"
         >
           {isExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
@@ -81,7 +81,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Nav Menu */}
       <div className="flex-1 flex flex-col justify-between overflow-y-auto overflow-x-hidden scrollbar-thin px-4 py-2">
-        <nav className="space-y-1.5 w-full">
+        <nav className="space-y-1 w-full">
           {topMenuItems.map((item) => {
             const isActive = activePage === item.id;
             const Icon = item.icon;
@@ -90,24 +90,24 @@ export const Sidebar: React.FC = () => {
               <button
                 key={item.label}
                 onClick={() => setActivePage(item.id as any)}
-                className={`group flex w-full items-center gap-4 px-3 py-3 rounded-2xl text-left transition-all relative ${
+                className={`group flex w-full items-center gap-4 px-3 py-2.5 rounded-xl text-left transition-all relative ${
                   isActive
-                    ? 'bg-brand-accent/5'
-                    : 'hover:bg-brand-border/20'
+                    ? 'bg-blue-50/50'
+                    : 'hover:bg-gray-50'
                 }`}
                 title={!isExpanded ? item.label : undefined}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-8 bg-brand-accent rounded-r-full shadow-[0_0_12px_rgba(0,209,255,0.8)]"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-accent rounded-r-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
                 
-                <div className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 relative z-10 ${isActive ? 'text-brand-accent drop-shadow-[0_0_8px_rgba(0,209,255,0.5)]' : 'text-brand-textMuted group-hover:text-brand-text group-hover:drop-shadow-[0_0_5px_rgba(255,255,255,0.3)]'}`}>
-                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
-                    <Icon className="h-5 w-5" />
+                <div className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 relative z-10 ${isActive ? 'text-brand-accent bg-blue-100/50' : 'text-brand-textMuted group-hover:text-brand-text group-hover:bg-gray-100/50'}`}>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Icon className="h-[18px] w-[18px]" />
                   </motion.div>
                 </div>
                 
@@ -119,18 +119,15 @@ export const Sidebar: React.FC = () => {
                       exit={{ opacity: 0, width: 0 }}
                       className="flex flex-col overflow-hidden whitespace-nowrap min-w-[140px]"
                     >
-                      <span className={`text-[14px] font-medium transition-colors ${isActive ? 'text-brand-text' : 'text-brand-textMuted group-hover:text-brand-text'}`}>
+                      <span className={`text-[13px] font-medium transition-colors ${isActive ? 'text-brand-accent' : 'text-brand-textSoft group-hover:text-brand-text'}`}>
                         {item.label}
-                      </span>
-                      <span className="text-[11px] text-brand-textMuted/70 truncate">
-                        {item.description}
                       </span>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
                 {item.badge && (
-                  <span className={`absolute right-3 top-1/2 -translate-y-1/2 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${isActive ? 'bg-brand-accent text-brand-bg shadow-[0_0_8px_rgba(0,209,255,0.4)]' : 'bg-brand-border/50 text-brand-text'}`}>
+                  <span className={`absolute right-3 top-1/2 -translate-y-1/2 flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${isActive ? 'bg-brand-accent text-white shadow-sm' : 'bg-gray-100 text-brand-textMuted'}`}>
                     {item.badge}
                   </span>
                 )}
@@ -139,7 +136,7 @@ export const Sidebar: React.FC = () => {
           })}
         </nav>
 
-        <div className="mt-8 space-y-2 border-t border-brand-border/20 pt-4 pb-4 w-full">
+        <div className="mt-6 space-y-1 border-t border-brand-border pt-4 pb-4 w-full">
           {bottomMenuItems.map((item) => {
             const isActive = activePage === item.id;
             const Icon = item.icon;
@@ -147,22 +144,22 @@ export const Sidebar: React.FC = () => {
               <button
                 key={item.label}
                 onClick={() => setActivePage(item.id as any)}
-                className={`group flex w-full items-center gap-4 px-3 py-3 rounded-2xl text-left transition-all relative ${
+                className={`group flex w-full items-center gap-4 px-3 py-2.5 rounded-xl text-left transition-all relative ${
                   isActive
-                    ? 'bg-brand-accent/5'
-                    : 'hover:bg-brand-border/20'
+                    ? 'bg-blue-50/50'
+                    : 'hover:bg-gray-50'
                 }`}
                 title={!isExpanded ? item.label : undefined}
               >
                 {isActive && (
                   <motion.div
                     layoutId="activeIndicator"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-8 bg-brand-accent rounded-r-full shadow-[0_0_12px_rgba(0,209,255,0.8)]"
+                    className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-accent rounded-r-full"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
-                <div className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-300 ${isActive ? 'text-brand-accent drop-shadow-[0_0_8px_rgba(0,209,255,0.5)]' : 'text-brand-textMuted group-hover:text-brand-text'}`}>
-                   <Icon className="h-5 w-5" />
+                <div className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300 ${isActive ? 'text-brand-accent bg-blue-100/50' : 'text-brand-textMuted group-hover:text-brand-text group-hover:bg-gray-100/50'}`}>
+                   <Icon className="h-[18px] w-[18px]" />
                 </div>
                 
                 <AnimatePresence>
@@ -173,7 +170,7 @@ export const Sidebar: React.FC = () => {
                       exit={{ opacity: 0, width: 0 }}
                       className="flex flex-col overflow-hidden whitespace-nowrap min-w-[140px]"
                     >
-                      <span className={`text-[14px] font-medium transition-colors ${isActive ? 'text-brand-text' : 'text-brand-textMuted group-hover:text-brand-text'}`}>
+                      <span className={`text-[13px] font-medium transition-colors ${isActive ? 'text-brand-accent' : 'text-brand-textSoft group-hover:text-brand-text'}`}>
                         {item.label}
                       </span>
                     </motion.div>
@@ -184,8 +181,8 @@ export const Sidebar: React.FC = () => {
           })}
 
           {/* User Profile */}
-          <div className="group flex items-center gap-4 px-3 py-3 mt-2 rounded-2xl cursor-pointer hover:bg-brand-border/20 transition-all overflow-hidden relative">
-            <div className="h-8 w-8 rounded-full bg-brand-border/50 flex items-center justify-center shrink-0 border border-brand-border/50 group-hover:border-brand-accent/50 group-hover:shadow-[0_0_10px_rgba(0,209,255,0.2)] transition-all">
+          <div className="group flex items-center gap-4 px-3 py-3 mt-2 rounded-xl cursor-pointer hover:bg-gray-50 transition-all overflow-hidden relative">
+            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center shrink-0 border border-brand-border group-hover:border-blue-200 group-hover:bg-blue-50 transition-all">
               <User className="h-4 w-4 text-brand-textMuted group-hover:text-brand-accent transition-colors" />
             </div>
             <AnimatePresence>
@@ -196,7 +193,7 @@ export const Sidebar: React.FC = () => {
                   exit={{ opacity: 0, width: 0 }}
                   className="flex flex-col overflow-hidden leading-tight whitespace-nowrap min-w-[140px]"
                 >
-                  <span className="text-[14px] font-semibold text-brand-text group-hover:text-brand-accent transition-colors">Researcher</span>
+                  <span className="text-[13px] font-semibold text-brand-text group-hover:text-brand-accent transition-colors">Researcher</span>
                   <span className="text-[11px] text-brand-textMuted">Pro Access</span>
                 </motion.div>
               )}

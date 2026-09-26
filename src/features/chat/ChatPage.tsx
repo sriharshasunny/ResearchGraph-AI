@@ -142,11 +142,11 @@ export const ChatPage: React.FC = () => {
   const currentConcepts = latestContextMsg?.relatedConcepts || [];
 
   return (
-    <div className="flex h-[calc(100vh-100px)] w-full mx-auto rounded-2xl border border-brand-border/40 bg-brand-bg overflow-hidden shadow-2xl shadow-brand-bg/50">
+    <div className="flex h-[calc(100vh-140px)] w-full mx-auto rounded-2xl border border-brand-border bg-white overflow-hidden shadow-subtle mx-4 my-2">
       
       {/* Left Panel: Conversation History */}
-      <aside className="w-64 border-r border-brand-border/40 flex flex-col justify-between hidden lg:flex flex-shrink-0 bg-brand-surface/30 backdrop-blur-md">
-        <div className="p-5 flex items-center justify-between border-b border-brand-border/40 flex-shrink-0">
+      <aside className="w-64 border-r border-brand-border flex flex-col justify-between hidden lg:flex flex-shrink-0 bg-gray-50/50">
+        <div className="p-5 flex items-center justify-between border-b border-brand-border flex-shrink-0">
           <span className="text-[12px] font-bold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
             <ListFilter className="h-4 w-4" />
             Sessions
@@ -154,7 +154,7 @@ export const ChatPage: React.FC = () => {
           <button
             onClick={clearChat}
             title="Clear Chat History"
-            className="text-brand-textMuted hover:text-brand-accent transition-colors p-1.5 hover:bg-brand-accent/10 rounded-md"
+            className="text-brand-textMuted hover:text-brand-accent transition-colors p-1.5 hover:bg-blue-50 rounded-md"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -166,14 +166,14 @@ export const ChatPage: React.FC = () => {
               key={idx}
               className={`w-full text-left px-3 py-2.5 rounded-lg text-[13px] transition-all flex items-start gap-3 group ${
                 item.active
-                  ? 'bg-brand-accent/10 border border-brand-accent/30 text-brand-text shadow-sm'
-                  : 'text-brand-textMuted hover:bg-brand-surface border border-transparent'
+                  ? 'bg-blue-50 text-brand-accent shadow-sm'
+                  : 'text-brand-textMuted hover:bg-gray-100/80 border border-transparent'
               }`}
             >
               <MessageSquare className={`h-4 w-4 mt-0.5 shrink-0 ${item.active ? 'text-brand-accent' : 'text-brand-textMuted group-hover:text-brand-text'} transition-colors`} />
               <div className="flex-1 min-w-0">
-                <div className={`truncate ${item.active ? 'font-semibold text-brand-accent' : 'font-medium group-hover:text-brand-text'}`}>{item.title}</div>
-                <div className="text-[11px] opacity-60 mt-0.5">{item.date}</div>
+                <div className={`truncate ${item.active ? 'font-bold' : 'font-medium group-hover:text-brand-text'}`}>{item.title}</div>
+                <div className="text-[11px] opacity-70 mt-0.5">{item.date}</div>
               </div>
             </button>
           ))}
@@ -181,17 +181,17 @@ export const ChatPage: React.FC = () => {
       </aside>
 
       {/* Center Panel: Main Chat Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-brand-surface/60 backdrop-blur-md relative">
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-white relative">
         
         {/* Chat Header */}
-        <div className="h-16 border-b border-brand-border/40 flex items-center px-8 flex-shrink-0 bg-brand-surface/90 backdrop-blur-md z-10">
+        <div className="h-16 border-b border-brand-border flex items-center px-8 flex-shrink-0 bg-white z-10 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-brand-accent/20 flex items-center justify-center border border-brand-accent/30 shadow-[0_0_10px_rgba(0,209,255,0.2)]">
+            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
                <BrainCircuit className="h-4 w-4 text-brand-accent" />
             </div>
             <div>
                <h2 className="text-[14px] font-bold text-brand-text leading-tight">ResearchGraph AI</h2>
-               <p className="text-[11px] text-brand-textMuted font-medium tracking-wide">ACADEMIC RESEARCH ASSISTANT</p>
+               <p className="text-[11px] text-brand-textMuted font-semibold tracking-wide">ACADEMIC RESEARCH ASSISTANT</p>
             </div>
           </div>
         </div>
@@ -209,8 +209,8 @@ export const ChatPage: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       className="mb-8 flex justify-end"
                     >
-                      <div className="max-w-[85%] bg-brand-surface border border-brand-border/50 rounded-2xl rounded-tr-sm px-5 py-4 shadow-md">
-                        <h3 className="text-[11px] font-bold text-brand-textMuted uppercase tracking-wider mb-1">You</h3>
+                      <div className="max-w-[85%] bg-blue-50 border border-blue-100 rounded-2xl rounded-tr-sm px-5 py-4 shadow-sm">
+                        <h3 className="text-[11px] font-bold text-brand-accent uppercase tracking-wider mb-1">You</h3>
                         <div className="text-[15px] font-medium text-brand-text leading-snug">
                           {msg.content}
                         </div>
@@ -227,22 +227,22 @@ export const ChatPage: React.FC = () => {
                     >
                       <div className="max-w-[95%]">
                         <div className="flex items-center gap-2 mb-2">
-                           <div className="h-6 w-6 rounded-md bg-brand-accent/20 flex items-center justify-center border border-brand-accent/30">
-                              <Sparkles className="h-3 w-3 text-brand-accent" />
+                           <div className="h-6 w-6 rounded-md bg-gray-50 flex items-center justify-center border border-brand-border">
+                              <Sparkles className="h-3 w-3 text-brand-text" />
                            </div>
-                           <h3 className="text-[11px] font-bold text-brand-accent uppercase tracking-wider">ResearchGraph AI</h3>
+                           <h3 className="text-[11px] font-bold text-brand-text uppercase tracking-wider">ResearchGraph AI</h3>
                         </div>
                         
-                        <div className="text-[15px] text-brand-text/90 leading-relaxed whitespace-pre-line mb-6 pl-8">
+                        <div className="text-[15px] text-brand-text leading-relaxed whitespace-pre-line mb-6 pl-8">
                           {msg.content}
                         </div>
 
                         <div className="pl-8">
                           {/* Code Block */}
                           {msg.codeSnippet && (
-                            <div className="mb-6 rounded-xl border border-brand-border/40 overflow-hidden bg-brand-bg/80 backdrop-blur-sm shadow-sm font-mono text-[13px]">
-                              <div className="px-4 py-2 bg-brand-surface/80 border-b border-brand-border/40 flex items-center justify-between text-brand-textMuted">
-                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-accent">
+                            <div className="mb-6 rounded-xl border border-brand-border overflow-hidden bg-gray-50 shadow-sm font-mono text-[13px]">
+                              <div className="px-4 py-2 bg-gray-100 border-b border-brand-border flex items-center justify-between text-brand-textMuted">
+                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-text">
                                   <Terminal className="h-3.5 w-3.5" />
                                   {msg.codeSnippet.language}
                                 </div>
@@ -255,10 +255,10 @@ export const ChatPage: React.FC = () => {
 
                           {/* Comparison Table */}
                           {msg.table && (
-                            <div className="mb-6 overflow-x-auto rounded-xl border border-brand-border/40 shadow-sm">
+                            <div className="mb-6 overflow-x-auto rounded-xl border border-brand-border shadow-sm">
                               <table className="w-full text-[13px] text-left border-collapse">
                                 <thead>
-                                  <tr className="bg-brand-surface border-b border-brand-border/40">
+                                  <tr className="bg-gray-50 border-b border-brand-border">
                                     {msg.table.headers.map((h, i) => (
                                       <th key={i} className="p-3 font-semibold text-brand-text">{h}</th>
                                     ))}
@@ -266,7 +266,7 @@ export const ChatPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                   {msg.table.rows.map((row, rIdx) => (
-                                    <tr key={rIdx} className="border-b border-brand-border/30 last:border-0 hover:bg-brand-bg transition-colors">
+                                    <tr key={rIdx} className="border-b border-brand-border last:border-0 hover:bg-gray-50/50 transition-colors">
                                       {row.map((cell, cIdx) => (
                                         <td key={cIdx} className="p-3 text-brand-textMuted leading-normal">{cell}</td>
                                       ))}
@@ -289,10 +289,10 @@ export const ChatPage: React.FC = () => {
               <div className="mb-10 flex justify-start">
                  <div className="max-w-[95%]">
                     <div className="flex items-center gap-2 mb-2">
-                       <div className="h-6 w-6 rounded-md bg-brand-accent/20 flex items-center justify-center border border-brand-accent/30">
-                          <Sparkles className="h-3 w-3 text-brand-accent" />
+                       <div className="h-6 w-6 rounded-md bg-gray-50 flex items-center justify-center border border-brand-border">
+                          <Sparkles className="h-3 w-3 text-brand-text" />
                        </div>
-                       <h3 className="text-[11px] font-bold text-brand-accent uppercase tracking-wider">ResearchGraph AI</h3>
+                       <h3 className="text-[11px] font-bold text-brand-text uppercase tracking-wider">ResearchGraph AI</h3>
                     </div>
                     <div className="pl-8 flex items-center gap-1.5 h-6 mt-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-bounce [animation-delay:-0.3s]"></span>
@@ -320,13 +320,10 @@ export const ChatPage: React.FC = () => {
                   <button
                     key={idx}
                     onClick={() => handleSend(promptObj.text)}
-                    className="text-left p-4 rounded-xl border border-brand-border/40 bg-brand-surface/40 hover:border-brand-accent/50 hover:bg-brand-surface hover:shadow-[0_4px_15px_rgba(0,0,0,0.2)] transition-all group relative overflow-hidden"
+                    className="text-left p-4 rounded-xl border border-brand-border bg-white hover:border-blue-200 hover:bg-blue-50/30 hover:shadow-sm transition-all"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-brand-accent/0 via-brand-accent/5 to-brand-accent/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="relative">
-                      <div className="text-[13px] font-bold text-brand-text group-hover:text-brand-accent transition-colors mb-1">{promptObj.text}</div>
-                      <div className="text-[12px] text-brand-textMuted leading-relaxed">{promptObj.desc}</div>
-                    </div>
+                    <div className="text-[13px] font-bold text-brand-text hover:text-brand-accent transition-colors mb-1">{promptObj.text}</div>
+                    <div className="text-[12px] text-brand-textMuted leading-relaxed">{promptObj.desc}</div>
                   </button>
                 ))}
               </div>
@@ -335,7 +332,7 @@ export const ChatPage: React.FC = () => {
         )}
 
         {/* Input Bar */}
-        <div className="p-6 border-t border-brand-border/40 bg-brand-surface/80 backdrop-blur-md">
+        <div className="p-6 border-t border-brand-border bg-white">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -343,19 +340,18 @@ export const ChatPage: React.FC = () => {
             }}
             className="relative flex items-center max-w-3xl mx-auto group"
           >
-            <div className="absolute -inset-1 bg-gradient-to-r from-brand-accent/0 via-brand-accent/10 to-brand-accent/0 rounded-2xl blur opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
             <div className="relative w-full flex items-center">
               <input
                 type="text"
                 placeholder="Ask your research assistant..."
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="w-full h-14 pl-5 pr-14 rounded-xl border border-brand-border/50 bg-brand-bg text-[15px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:border-brand-accent/50 focus:ring-1 focus:ring-brand-accent/50 transition-all shadow-inner"
+                className="w-full h-14 pl-5 pr-14 rounded-xl border border-brand-border bg-white text-[15px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all shadow-sm"
               />
               <button
                 type="submit"
                 disabled={!prompt.trim()}
-                className="absolute right-2 top-2 h-10 w-10 rounded-lg bg-brand-accent text-brand-bg hover:bg-brand-accentHover flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(0,209,255,0.3)] disabled:shadow-none"
+                className="absolute right-2 top-2 h-10 w-10 rounded-lg bg-brand-accent text-white hover:bg-brand-accentHover flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
               >
                 <Send className="h-4 w-4" />
               </button>
@@ -365,8 +361,8 @@ export const ChatPage: React.FC = () => {
       </div>
 
       {/* Right Panel: Context & Knowledge Graph */}
-      <aside className="w-72 border-l border-brand-border/40 hidden xl:flex flex-col bg-brand-surface/30 backdrop-blur-md flex-shrink-0">
-        <div className="p-5 border-b border-brand-border/40">
+      <aside className="w-72 border-l border-brand-border hidden xl:flex flex-col bg-gray-50/50 flex-shrink-0">
+        <div className="p-5 border-b border-brand-border">
           <span className="text-[12px] font-bold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
             <Network className="h-4 w-4" />
             Active Context
@@ -392,15 +388,15 @@ export const ChatPage: React.FC = () => {
                       <div
                         key={paper.id}
                         onClick={() => handlePaperClick(paper.id)}
-                        className="group p-3 rounded-xl border border-brand-border/40 bg-brand-surface/50 hover:bg-brand-surface hover:border-brand-accent/40 cursor-pointer transition-all hover:shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
+                        className="group p-3 rounded-xl border border-brand-border bg-white hover:border-brand-accent cursor-pointer transition-all hover:shadow-md"
                       >
                         <div className="flex items-start gap-2 mb-1">
-                          <span className="text-[10px] font-bold text-brand-bg bg-brand-accent px-1.5 rounded-sm mt-0.5">[{idx + 1}]</span>
-                          <span className="text-[13px] font-semibold text-brand-text group-hover:text-brand-accent transition-colors line-clamp-2 leading-tight">
+                          <span className="text-[10px] font-bold text-white bg-brand-accent px-1.5 rounded-sm mt-0.5">[{idx + 1}]</span>
+                          <span className="text-[13px] font-bold text-brand-text group-hover:text-brand-accent transition-colors line-clamp-2 leading-tight">
                             {paper.title}
                           </span>
                         </div>
-                        <div className="text-[11px] text-brand-textMuted pl-7 line-clamp-1">
+                        <div className="text-[11px] text-brand-textMuted pl-7 line-clamp-1 font-medium">
                           {paper.authors[0]} et al. • {paper.year}
                         </div>
                       </div>
@@ -416,9 +412,9 @@ export const ChatPage: React.FC = () => {
                     <Network className="h-3.5 w-3.5 text-brand-violet" />
                     Knowledge Graph
                   </h4>
-                  <div className="p-4 rounded-xl border border-brand-border/40 bg-brand-surface/50 flex flex-wrap gap-2">
+                  <div className="p-4 rounded-xl border border-brand-border bg-white flex flex-wrap gap-2 shadow-sm">
                     {currentConcepts.map((concept, idx) => (
-                      <span key={idx} className="px-2.5 py-1 text-[11px] font-medium text-brand-textMuted bg-brand-bg border border-brand-border/50 rounded-md hover:border-brand-violet hover:text-brand-violet cursor-pointer transition-colors">
+                      <span key={idx} className="px-2.5 py-1 text-[11px] font-bold text-brand-textMuted bg-gray-50 border border-brand-border rounded-md hover:border-brand-violet hover:text-brand-violet hover:bg-purple-50 cursor-pointer transition-colors">
                         {concept}
                       </span>
                     ))}
@@ -429,7 +425,7 @@ export const ChatPage: React.FC = () => {
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-50">
               <BrainCircuit className="h-10 w-10 text-brand-textMuted mb-3" />
-              <p className="text-[13px] text-brand-textMuted">
+              <p className="text-[13px] text-brand-textMuted font-medium">
                 Context will appear here as the assistant retrieves papers and builds the knowledge graph.
               </p>
             </div>

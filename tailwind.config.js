@@ -8,25 +8,24 @@ export default {
     extend: {
       colors: {
         brand: {
-          bg: '#0A0A0B',
-          surface: '#0B1220',
-          text: '#FFFFFF',
-          textSoft: '#F7F8FA',
-          textMuted: '#8A8F98',
-          border: 'rgba(255,255,255,0.08)',
-          accent: '#00D1FF', // Electric blue / cyan
-          accentHover: '#00B8E6',
-          violet: '#7A00FF', // Subtle violet highlight
+          bg: '#FAFAFA', // Clean off-white background
+          surface: '#FFFFFF', // Pure white surfaces
+          text: '#171717', // Near-black text
+          textSoft: '#404040',
+          textMuted: '#737373', // Soft gray secondary text
+          border: '#E5E5E5', // Thin, subtle borders
+          accent: '#0052FF', // One primary accent (Premium Blue)
+          accentHover: '#0043D1',
+          violet: '#7A00FF', // Used sparingly for AI highlights
         },
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
       },
       animation: {
-        'fade-in': 'fadeIn 0.2s ease-in-out',
-        'slide-up': 'slideUp 0.3s ease-out',
-        'slide-right': 'slideRight 0.3s ease-out',
-        'glow': 'glow 2s ease-in-out infinite alternate',
+        'fade-in': 'fadeIn 0.3s ease-out',
+        'slide-up': 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        'slide-right': 'slideRight 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -34,17 +33,17 @@ export default {
           '100%': { opacity: 1 },
         },
         slideUp: {
-          '0%': { opacity: 0, transform: 'translateY(10px)' },
+          '0%': { opacity: 0, transform: 'translateY(12px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
         slideRight: {
-          '0%': { opacity: 0, transform: 'translateX(-10px)' },
+          '0%': { opacity: 0, transform: 'translateX(-12px)' },
           '100%': { opacity: 1, transform: 'translateX(0)' },
-        },
-        glow: {
-          '0%': { boxShadow: '0 0 5px rgba(0, 209, 255, 0.2)' },
-          '100%': { boxShadow: '0 0 20px rgba(0, 209, 255, 0.6)' },
         }
+      },
+      boxShadow: {
+        'subtle': '0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03)',
+        'float': '0 8px 30px rgba(0, 0, 0, 0.08)',
       }
     },
   },
