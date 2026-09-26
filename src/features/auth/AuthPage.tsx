@@ -165,71 +165,59 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               </nav>
 
               {/* Centered Hero Content */}
-              <div className="w-full max-w-5xl mx-auto px-8 flex flex-col items-center text-center pt-10">
+              <div className="w-full max-w-5xl mx-auto px-8 flex flex-col items-center text-center pt-20 pb-32 relative z-20">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-md mb-8">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">Live Semantic Engine</span>
+                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">ResearchGraph AI v2.0</span>
                 </div>
                 
-                <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] leading-[1.1] mb-6">
+                <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] leading-[1.1] mb-8">
                   Stop Searching.<br/>
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500">Start Connecting.</span>
                 </h1>
                 
-                <p className="text-xl text-gray-300 max-w-2xl leading-relaxed drop-shadow-md mb-10">
+                <p className="text-xl text-gray-300 max-w-2xl leading-relaxed drop-shadow-md mb-14">
                   Enter a research question. Our AI instantly reads millions of academic papers, finds the hidden patterns, and builds a stunning 3D interactive knowledge map for you.
                 </p>
                 
-                {/* Giant Live Preview Widget */}
+                {/* Sleek Floating Search Bar */}
                 <div 
-                  className="w-full max-w-4xl h-[400px] relative bg-[#060B14]/60 backdrop-blur-2xl border border-cyan-500/30 rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(34,211,238,0.15)] group cursor-pointer hover:border-cyan-400/60 transition-colors"
+                  className="w-full max-w-3xl relative group cursor-pointer"
                   onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                 >
-                   <div className="absolute top-6 left-1/2 -translate-x-1/2 w-3/4 max-w-2xl h-14 bg-black/80 border border-cyan-500/30 rounded-2xl flex items-center px-6 z-30 shadow-2xl">
-                     <Search className="w-6 h-6 text-cyan-400 mr-4" />
-                     <motion.div className="overflow-hidden flex" initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", repeatDelay: 5 }}>
-                       <span className="text-gray-200 text-lg font-mono whitespace-nowrap">
-                         "What are the latest breakthroughs in LLM architectures?"
+                  {/* Glowing backdrop */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 rounded-2xl blur-lg opacity-40 group-hover:opacity-70 transition duration-1000 group-hover:duration-300"></div>
+                  
+                  <div className="relative h-20 bg-[#030712]/80 backdrop-blur-2xl border border-white/10 rounded-2xl flex items-center px-6 md:px-8 shadow-2xl group-hover:border-cyan-400/50 transition-colors">
+                     <Search className="w-6 h-6 md:w-8 md:h-8 text-cyan-400 mr-4 md:mr-6 flex-shrink-0" />
+                     <motion.div className="overflow-hidden flex flex-1" initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", repeatDelay: 5 }}>
+                       <span className="text-gray-200 text-lg md:text-2xl font-mono whitespace-nowrap">
+                         "Latest breakthroughs in LLMs"
                        </span>
                      </motion.div>
-                     <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-[3px] h-6 bg-cyan-400 ml-1" />
-                   </div>
-
-                   {/* Orbital Graph Animation */}
-                   <div className="absolute inset-0 pt-20 flex items-center justify-center z-10 overflow-hidden">
-                      <div className="absolute w-[200px] h-[200px] rounded-full border border-purple-500/30 border-dashed"></div>
-                      <div className="absolute w-[350px] h-[350px] rounded-full border border-blue-500/30 border-dashed"></div>
-                      <div className="absolute w-[500px] h-[500px] rounded-full border border-emerald-500/30 border-dashed"></div>
-
-                      <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2, repeat: Infinity }} className="w-20 h-20 rounded-full bg-cyan-500/20 border-2 border-cyan-400 flex items-center justify-center z-30 absolute bg-black/50 backdrop-blur-md">
-                        <BrainCircuit className="w-10 h-10 text-cyan-300" />
-                      </motion.div>
-
-                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
-                         <div className="absolute top-[calc(50%-100px)] left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-purple-500/20 border border-purple-400 flex items-center justify-center bg-black/50 backdrop-blur-sm shadow-[0_0_20px_rgba(168,85,247,0.5)]">
-                           <motion.div animate={{ rotate: -360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}><BookOpen className="w-5 h-5 text-purple-300" /></motion.div>
-                         </div>
-                      </motion.div>
-                      
-                      <motion.div animate={{ rotate: -360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
-                         <div className="absolute top-[calc(50%-175px)] left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-blue-500/20 border border-blue-400 flex items-center justify-center bg-black/50 backdrop-blur-sm shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-                           <motion.div animate={{ rotate: 360 }} transition={{ duration: 30, repeat: Infinity, ease: "linear" }}><Layers className="w-5 h-5 text-blue-300" /></motion.div>
-                         </div>
-                      </motion.div>
-
-                      <motion.div animate={{ rotate: 360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
-                         <div className="absolute top-[calc(50%-250px)] left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center bg-black/50 backdrop-blur-sm shadow-[0_0_20px_rgba(16,185,129,0.5)]">
-                           <motion.div animate={{ rotate: -360 }} transition={{ duration: 40, repeat: Infinity, ease: "linear" }}><Database className="w-5 h-5 text-emerald-300" /></motion.div>
-                         </div>
-                      </motion.div>
-                   </div>
-                   
-                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-40 flex items-center justify-center backdrop-blur-sm">
-                      <div className="px-8 py-4 bg-cyan-500 rounded-full text-black font-bold text-lg flex items-center gap-3 shadow-[0_0_30px_rgba(34,211,238,0.5)]">
-                         <Sparkles className="w-5 h-5" /> Travel to Registration
-                      </div>
-                   </div>
+                     <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-[3px] h-8 md:h-10 bg-cyan-400 ml-1 flex-shrink-0" />
+                     
+                     <button className="hidden md:flex ml-6 px-8 py-3 rounded-xl bg-cyan-500 text-black font-bold text-base shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:scale-105 transition-transform items-center gap-2 flex-shrink-0">
+                       <Sparkles className="w-5 h-5" /> Generate
+                     </button>
+                  </div>
                 </div>
+
+                {/* Floating Decorative 3D Icons in the background */}
+                <div className="absolute inset-0 w-full h-full pointer-events-none -z-10">
+                   <motion.div animate={{ y: [-20, 20, -20], rotate: [0, 10, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[20%] left-[10%] w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/30 backdrop-blur-xl flex items-center justify-center shadow-[0_0_30px_rgba(168,85,247,0.3)]">
+                      <BookOpen className="w-8 h-8 text-purple-300" />
+                   </motion.div>
+                   
+                   <motion.div animate={{ y: [20, -20, 20], rotate: [0, -10, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-[20%] right-[10%] w-20 h-20 rounded-2xl bg-blue-500/10 border border-blue-500/30 backdrop-blur-xl flex items-center justify-center shadow-[0_0_30px_rgba(59,130,246,0.3)]">
+                      <Layers className="w-10 h-10 text-blue-300" />
+                   </motion.div>
+
+                   <motion.div animate={{ y: [-15, 15, -15], rotate: [0, 5, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[10%] right-[20%] w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-xl flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.3)]">
+                      <Database className="w-6 h-6 text-emerald-300" />
+                   </motion.div>
+                </div>
+              </div>
 
                 {/* Additional Content (How it works) */}
                 <div className="w-full max-w-7xl mt-32 border-t border-gray-800/50 pt-20">
