@@ -8,15 +8,15 @@ export default {
     extend: {
       colors: {
         brand: {
-          bg: '#FAFAFA', // Clean off-white background
-          surface: '#FFFFFF', // Pure white surfaces
-          text: '#171717', // Near-black text
-          textSoft: '#404040',
-          textMuted: '#737373', // Soft gray secondary text
-          border: '#E5E5E5', // Thin, subtle borders
-          accent: '#0052FF', // One primary accent (Premium Blue)
-          accentHover: '#0043D1',
-          violet: '#7A00FF', // Used sparingly for AI highlights
+          bg: '#0B0E14', // Deep space dark blue
+          surface: '#131823', // Darker gray-blue for cards
+          text: '#F8FAFC', // White text
+          textSoft: '#CBD5E1', // Light gray
+          textMuted: '#64748B', // Slate 500
+          border: 'rgba(255, 255, 255, 0.08)', // Very subtle white border
+          accent: '#3B82F6', // Neon blue glow
+          accentHover: '#60A5FA',
+          violet: '#8B5CF6', 
         },
       },
       fontFamily: {

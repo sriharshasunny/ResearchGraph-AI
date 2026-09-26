@@ -18,7 +18,7 @@ export const Sidebar: React.FC = () => {
     <motion.aside 
       initial={false}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
-      className="h-full bg-white/80 backdrop-blur-xl border-r border-brand-border flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
+      className="h-full bg-brand-surface/50 backdrop-blur-xl border-r border-brand-border flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
     >
       
       {/* Brand */}
@@ -27,9 +27,9 @@ export const Sidebar: React.FC = () => {
       >
         <button 
           onClick={toggleSidebar}
-          className={`h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm shrink-0 hover:bg-blue-100 transition-colors ${isSidebarOpen ? 'mr-3' : ''}`}
+          className={`h-9 w-9 rounded-xl bg-brand-accent/10 flex items-center justify-center border border-brand-accent/30 shadow-[0_0_15px_rgba(59,130,246,0.2)] shrink-0 hover:bg-brand-accent/20 transition-all ${isSidebarOpen ? 'mr-3' : ''}`}
         >
-          <LayoutGrid className="w-4.5 h-4.5 text-brand-accent" />
+          <LayoutGrid className="w-4.5 h-4.5 text-brand-accent drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
         </button>
         <AnimatePresence>
           {isSidebarOpen && (
@@ -61,8 +61,8 @@ export const Sidebar: React.FC = () => {
             onClick={() => setActivePage(item.id)}
             className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl transition-all font-semibold text-[13px] group ${
               activePage === item.id 
-                ? 'bg-blue-50 text-brand-accent shadow-sm' 
-                : 'text-brand-textSoft hover:bg-gray-50 hover:text-brand-text'
+                ? 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
+                : 'text-brand-textSoft hover:bg-white/5 hover:text-brand-text border border-transparent'
             }`}
           >
             <div className={`shrink-0 transition-transform duration-300 ${activePage === item.id ? 'scale-110' : 'group-hover:scale-110'}`}>
@@ -92,7 +92,7 @@ export const Sidebar: React.FC = () => {
         <button
           title={!isSidebarOpen ? "Saved Papers" : undefined}
           onClick={() => setActivePage('search')}
-          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl text-brand-textSoft hover:bg-gray-50 hover:text-brand-text transition-all font-semibold text-[13px] group`}
+          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl text-brand-textSoft hover:bg-white/5 hover:text-brand-text transition-all border border-transparent font-semibold text-[13px] group`}
         >
           <div className="shrink-0 transition-transform duration-300 group-hover:scale-110"><Bookmark className="w-5 h-5" /></div>
           <AnimatePresence>
@@ -112,7 +112,7 @@ export const Sidebar: React.FC = () => {
 
       {/* Profile */}
       <div className={`p-4 border-t border-brand-border ${isSidebarOpen ? '' : 'flex justify-center'}`}>
-        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group`}>
+        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
             <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-brand-accent to-brand-violet p-[2px]">
               <div className="w-full h-full rounded-full bg-white flex items-center justify-center">

@@ -24,7 +24,7 @@ export const Navbar: React.FC = () => {
   };
 
   return (
-    <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-brand-border flex items-center justify-between px-8 z-40 sticky top-0 relative">
+    <header className="h-20 bg-brand-surface/50 backdrop-blur-xl border-b border-brand-border flex items-center justify-between px-8 z-40 sticky top-0 relative">
       <div className="flex items-center gap-4">
         <h1 className="text-[18px] font-extrabold text-brand-text tracking-tight">{getPageTitle()}</h1>
       </div>
@@ -37,10 +37,10 @@ export const Navbar: React.FC = () => {
              type="text" 
              placeholder="Search papers, authors, topics..." 
              onKeyDown={handleGlobalSearch}
-             className="w-72 h-10 pl-10 pr-12 rounded-xl bg-white border border-brand-border shadow-[0_2px_10px_rgba(0,0,0,0.02)] text-[13px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:border-brand-accent/40 focus:ring-2 focus:ring-brand-accent/10 transition-all"
+             className="w-72 h-10 pl-10 pr-12 rounded-xl bg-brand-bg/50 border border-brand-border shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] text-[13px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:border-brand-accent focus:ring-2 focus:ring-brand-accent/20 transition-all backdrop-blur-md"
            />
            <div className="absolute right-2 flex items-center gap-1 opacity-60">
-             <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-gray-50 border border-brand-border rounded shadow-sm text-brand-textMuted"><Command className="w-3 h-3 inline-block" /> K</kbd>
+             <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-brand-surface border border-brand-border rounded shadow-sm text-brand-textMuted"><Command className="w-3 h-3 inline-block" /> K</kbd>
            </div>
         </div>
 
@@ -53,8 +53,8 @@ export const Navbar: React.FC = () => {
           
           <div className="h-6 w-[1px] bg-brand-border mx-1"></div>
           
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-brand-accent hover:bg-blue-100 transition-colors font-bold text-[12px] uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5" />
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-brand-accent/10 border border-brand-accent/30 text-brand-accent hover:bg-brand-accent/20 hover:shadow-[0_0_15px_rgba(59,130,246,0.15)] transition-all font-bold text-[12px] uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
             Upgrade
           </button>
         </div>

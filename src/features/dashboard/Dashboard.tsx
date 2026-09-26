@@ -69,8 +69,10 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="relative min-h-[calc(100vh-140px)] flex flex-col items-center justify-start pb-12 w-full overflow-x-hidden">
       
-      {/* Clean Light Background Pattern */}
-      <div className="absolute inset-0 z-0 bg-brand-bg bg-graph-pattern opacity-60 pointer-events-none"></div>
+      {/* Dark Sci-Fi Background Pattern */}
+      <div className="absolute inset-0 z-0 bg-brand-bg opacity-100 pointer-events-none">
+         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-brand-accent/10 via-transparent to-transparent"></div>
+      </div>
 
       <motion.div 
         variants={containerVariants}
@@ -81,8 +83,8 @@ export const Dashboard: React.FC = () => {
         
         {/* HERO SECTION */}
         <motion.div variants={itemVariants} className="w-full flex flex-col items-center text-center mt-12 space-y-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-brand-accent text-[12px] font-bold tracking-widest uppercase shadow-sm">
-             <Sparkles className="h-3.5 w-3.5" /> Research Engine Online
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-accent/10 border border-brand-accent/30 text-brand-accent text-[12px] font-bold tracking-widest uppercase shadow-[0_0_15px_rgba(59,130,246,0.15)]">
+             <Sparkles className="h-3.5 w-3.5 drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" /> Research Engine Online
           </div>
           <div className="space-y-3">
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-brand-text">
@@ -96,10 +98,10 @@ export const Dashboard: React.FC = () => {
           {/* Premium Clean Search Box */}
           <div className="w-full max-w-3xl relative mt-6">
             <form onSubmit={handleSearchSubmit} className="relative group w-full">
-              <div className="absolute -inset-1 bg-brand-accent/5 rounded-3xl blur-lg transition-all duration-500 opacity-0 group-focus-within:opacity-100 group-hover:opacity-50"></div>
-              <div className="relative flex items-center bg-white border border-brand-border rounded-2xl px-6 py-4 shadow-float transition-all duration-300 focus-within:border-brand-accent/40 focus-within:ring-4 focus-within:ring-brand-accent/10">
-                <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-blue-50 text-brand-accent mr-4 transition-all shrink-0">
-                  <Search className="h-6 w-6" />
+              <div className="absolute -inset-1 bg-brand-accent/10 rounded-3xl blur-xl transition-all duration-500 opacity-0 group-focus-within:opacity-100"></div>
+              <div className="relative flex items-center bg-brand-surface border border-brand-border rounded-2xl px-6 py-4 shadow-[0_8px_30px_rgba(0,0,0,0.5)] transition-all duration-300 focus-within:border-brand-accent/50 focus-within:shadow-[0_0_25px_rgba(59,130,246,0.2)]">
+                <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-brand-accent/10 text-brand-accent mr-4 transition-all shrink-0">
+                  <Search className="h-6 w-6 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
                 </div>
                 <input
                   type="text"
@@ -109,10 +111,10 @@ export const Dashboard: React.FC = () => {
                   className="w-full bg-transparent text-[18px] text-brand-text placeholder-brand-textMuted/60 focus:outline-none"
                 />
                 <div className="flex items-center gap-2 ml-2 shrink-0">
-                   <button type="button" className="p-3 text-brand-textMuted hover:text-brand-accent transition-all rounded-xl hover:bg-blue-50">
+                   <button type="button" className="p-3 text-brand-textMuted hover:text-brand-accent transition-all rounded-xl hover:bg-white/5">
                      <Mic className="h-5 w-5" />
                    </button>
-                   <button type="submit" className="p-3 bg-brand-accent text-white hover:bg-brand-accentHover transition-all rounded-xl shadow-md hover:shadow-lg">
+                   <button type="submit" className="p-3 bg-brand-accent text-white hover:bg-brand-accentHover transition-all rounded-xl shadow-[0_0_15px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(59,130,246,0.6)]">
                      <ArrowRight className="h-5 w-5" />
                    </button>
                 </div>
@@ -126,7 +128,7 @@ export const Dashboard: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => handleExampleClick(example)}
-                className="group px-5 py-2.5 rounded-full border border-brand-border bg-white hover:bg-blue-50 text-[13px] font-medium text-brand-textSoft hover:text-brand-accent hover:border-blue-200 shadow-sm transition-all"
+                className="group px-5 py-2.5 rounded-full border border-brand-border bg-brand-surface hover:bg-brand-accent/10 hover:border-brand-accent/30 text-[13px] font-medium text-brand-textSoft hover:text-brand-accent shadow-sm transition-all"
               >
                 {example}
               </button>
@@ -161,11 +163,11 @@ export const Dashboard: React.FC = () => {
                <h3 className="text-[13px] font-bold text-brand-textMuted uppercase tracking-wider flex items-center gap-2 px-1">
                  <TrendingUp className="h-4 w-4" /> Trending Topics
                </h3>
-               <div className="p-5 rounded-2xl border border-brand-border bg-white shadow-subtle space-y-4">
+               <div className="p-5 rounded-2xl border border-brand-border bg-brand-surface shadow-subtle space-y-4">
                  {trendingTopics.map((topic, idx) => (
-                   <div key={idx} className="group flex items-center justify-between cursor-pointer p-2 -mx-2 rounded-xl hover:bg-gray-50 transition-colors">
+                   <div key={idx} className="group flex items-center justify-between cursor-pointer p-2 -mx-2 rounded-xl hover:bg-white/5 transition-colors">
                      <span className="text-[14px] font-medium text-brand-text group-hover:text-brand-accent transition-colors truncate pr-4">{topic.topic}</span>
-                     <span className="text-[12px] text-brand-textMuted whitespace-nowrap bg-gray-100 px-2 py-1 rounded-md">{topic.count}</span>
+                     <span className="text-[12px] text-brand-textMuted whitespace-nowrap bg-brand-bg border border-brand-border px-2 py-1 rounded-md">{topic.count}</span>
                    </div>
                  ))}
                </div>
@@ -176,10 +178,10 @@ export const Dashboard: React.FC = () => {
                <h3 className="text-[13px] font-bold text-brand-textMuted uppercase tracking-wider flex items-center gap-2 px-1">
                  <History className="h-4 w-4" /> Recent Activity
                </h3>
-               <div className="p-5 rounded-2xl border border-brand-border bg-white shadow-subtle space-y-4">
+               <div className="p-5 rounded-2xl border border-brand-border bg-brand-surface shadow-subtle space-y-4">
                  {recentActivity.map((act, idx) => (
                    <div key={idx} className="flex items-start gap-3 p-1">
-                     <div className="mt-1 h-2 w-2 rounded-full bg-brand-border border border-gray-300"></div>
+                     <div className="mt-1 h-2 w-2 rounded-full bg-brand-accent/50 border border-brand-accent shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
                      <div className="flex flex-col">
                        <span className="text-[14px] font-medium text-brand-text leading-tight">{act.title}</span>
                        <span className="text-[12px] text-brand-textMuted mt-1 flex items-center"><Clock className="inline h-3 w-3 mr-1 opacity-70" />{act.time}</span>

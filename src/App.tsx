@@ -15,12 +15,11 @@ export const App: React.FC = () => {
     return <LaunchSequence onComplete={() => setShowLaunch(false)} />;
   }
 
-  return (
-    <div className="flex h-screen w-full bg-[#f8fafc] text-brand-text overflow-hidden font-sans relative">
-      {/* Smooth Ambient Background */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-blue-100/40 blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-100/30 blur-[120px]"></div>
+    <div className="flex h-screen w-full bg-brand-bg text-brand-text overflow-hidden font-sans relative">
+      {/* Sci-Fi Ambient Background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-brand-bg to-brand-bg">
+        <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-brand-accent/10 blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-900/20 blur-[120px]"></div>
       </div>
 
       <div className="relative z-10 flex h-full w-full">
