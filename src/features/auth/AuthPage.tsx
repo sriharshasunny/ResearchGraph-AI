@@ -59,12 +59,13 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     setIsAuthenticating(true);
 
     try {
+      const trimmedEmail = email.trim();
       if (authMode === 'REGISTER') {
         const { error } = await supabase.auth.signUp({
-          email,
+          email: trimmedEmail,
           password,
           options: {
-            data: { full_name: fullName }
+            data: { full_name: fullName.trim() }
           }
         });
         if (error) throw error;
@@ -72,7 +73,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
         onAuthComplete();
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: trimmedEmail,
           password
         });
         if (error) throw error;
