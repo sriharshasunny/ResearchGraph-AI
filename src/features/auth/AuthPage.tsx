@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, BookOpen, Layers, Sparkles, ArrowLeft, Zap, Globe, Shield } from 'lucide-react';
+import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, BookOpen, Layers, Sparkles, ArrowLeft, Zap, Globe, Shield, KeyRound, CheckCircle2 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 
 type PageState = 'LANDING' | 'AUTH';
@@ -37,21 +37,27 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           transition={{ duration: 0.8, ease: "easeInOut" }}
         />
 
-        {/* Layer 2: Login Background */}
+        {/* Layer 2: Login Background (Subdued and dimmed for high contrast in Auth mode) */}
         <motion.div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat filter"
           style={{ backgroundImage: "url('/login_bg.jpg')" }}
           initial={false}
-          animate={{ opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1 : 0 }}
+          animate={{ 
+            opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 0.22 : 0,
+            scale: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1.02 : 1.0
+          }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         />
 
-        {/* Layer 3: Register Background */}
+        {/* Layer 3: Register Background (Subdued and dimmed for high contrast in Auth mode) */}
         <motion.div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat filter"
           style={{ backgroundImage: "url('/register_bg.jpg')" }}
           initial={false}
-          animate={{ opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1 : 0 }}
+          animate={{ 
+            opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 0.22 : 0,
+            scale: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1.02 : 1.0
+          }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         />
 
@@ -60,15 +66,30 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           {Array.from({ length: 40 }).map((_, i) => (
             <motion.div key={`ambient-${i}`} className="absolute rounded-full bg-cyan-200"
               style={{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', width: Math.random() * 2 + 1 + 'px', height: Math.random() * 2 + 1 + 'px' }}
-              animate={{ opacity: [0.1, 0.6, 0.1] }}
+              animate={{ opacity: pageState === 'AUTH' ? [0.05, 0.35, 0.05] : [0.1, 0.6, 0.1] }}
               transition={{ duration: Math.random() * 5 + 3, repeat: Infinity, ease: "easeInOut", delay: Math.random() * 3 }}
             />
           ))}
         </div>
         
-        {/* Gradients */}
-        <div className={`absolute inset-0 transition-colors duration-1000 ease-in-out z-0 ${pageState === 'LANDING' ? 'bg-black/50' : 'bg-transparent'}`}></div>
-        <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-1000 ease-in-out z-0 ${pageState === 'LANDING' ? 'from-[#030712]/90 via-black/30 to-[#030712] opacity-100' : 'from-[#030712]/40 via-transparent to-[#030712]/40 opacity-100'}`}></div>
+        {/* Gradients & Deep Scrim: Dull background in Auth mode so UI & 3D objects pop */}
+        <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-0 ${
+          pageState === 'LANDING' 
+            ? 'bg-black/50' 
+            : 'bg-[#030712]/85'
+        }`}></div>
+        <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-0 ${
+          pageState === 'LANDING' 
+            ? 'from-[#030712]/90 via-black/30 to-[#030712] opacity-100' 
+            : 'from-[#030712] via-[#030712]/80 to-[#030712] opacity-100'
+        }`}></div>
+        
+        {/* Soft Radial Vignette for Auth mode */}
+        <div className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-0 ${
+          pageState === 'AUTH' 
+            ? 'opacity-100 bg-[radial-gradient(circle_at_center,rgba(3,7,18,0.4)_0%,#030712_90%)]' 
+            : 'opacity-0'
+        }`}></div>
       </div>
 
       {/* --- PAGE CONTENT CONTAINER --- */}
@@ -280,13 +301,13 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="w-full min-h-screen flex items-center justify-center relative p-4 sm:p-8 z-50"
             >
-              {/* BACK TO BASE */}
+              {/* BACK TO BASE BUTTON */}
               <button 
                 onClick={() => triggerTraversal('LANDING')} 
-                className="absolute top-6 left-6 z-[110] px-5 py-2.5 rounded-full bg-[#0a0f1c]/80 border border-white/10 flex items-center gap-2 hover:bg-white/10 transition-colors backdrop-blur-md shadow-lg"
+                className="absolute top-6 left-6 z-[110] px-4 py-2 rounded-full bg-[#0a0f1c]/90 border border-white/15 flex items-center gap-2 hover:bg-white/10 hover:border-cyan-500/40 transition-all backdrop-blur-md shadow-xl"
               >
-                <ArrowLeft className="w-4 h-4 text-gray-300" />
-                <span className="font-semibold text-sm text-gray-300">Return to Base</span>
+                <ArrowLeft className="w-4 h-4 text-cyan-400" />
+                <span className="font-semibold text-xs sm:text-sm text-gray-200">Return to Base</span>
               </button>
 
               <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 lg:gap-14 items-center justify-center relative z-20 pt-16 md:pt-0">
@@ -294,8 +315,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 {/* 3D QUANTUM NEURAL CORE HUD */}
                 <div className="flex-1 flex flex-col items-center justify-center max-w-lg">
                   
-                  {/* The Real WebGL 3D Quantum Core */}
+                  {/* The Real WebGL 3D Quantum Core with Ambient Backglow */}
                   <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 flex items-center justify-center">
+                    <div className={`absolute w-64 h-64 rounded-full blur-[80px] pointer-events-none transition-colors duration-700 ${
+                      authMode === 'LOGIN' ? 'bg-cyan-500/15' : 'bg-purple-500/15'
+                    }`} />
                     <ThreeNeuralCore 
                       className="w-full h-full" 
                       theme={authMode === 'LOGIN' ? 'cyan' : 'purple'} 
@@ -305,8 +329,12 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   
                   {/* High-Tech Telemetry HUD */}
                   <div className="mt-2 text-center max-w-md px-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono mb-3 tracking-wider">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono mb-3 tracking-wider border transition-colors duration-500 ${
+                      authMode === 'LOGIN' 
+                        ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' 
+                        : 'bg-purple-500/10 border-purple-500/30 text-purple-400'
+                    }`}>
+                      <span className={`w-1.5 h-1.5 rounded-full animate-ping ${authMode === 'LOGIN' ? 'bg-cyan-400' : 'bg-purple-400'}`}></span>
                       <span>3D NEURAL UPLINK ACTIVE</span>
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
@@ -331,54 +359,153 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
                 </div>
 
-                {/* AUTH BOX */}
-                <div className="w-full max-w-[430px] bg-[#0a0f1c]/80 backdrop-blur-2xl border border-white/10 hover:border-cyan-500/30 transition-all duration-300 rounded-3xl p-8 sm:p-10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] relative z-20">
-                  <div className="flex justify-center mb-6">
-                     <div className="w-12 h-12 rounded-2xl border border-cyan-500/30 flex items-center justify-center bg-cyan-500/10 shadow-[0_0_20px_rgba(34,211,238,0.25)]">
-                       <Network className="w-6 h-6 text-cyan-400" />
-                     </div>
+                {/* PREMIUM GLASSMORPHIC AUTH CARD */}
+                <div className={`w-full max-w-[440px] bg-[#080d1a]/95 backdrop-blur-3xl border rounded-3xl p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative z-20 transition-all duration-500 ${
+                  authMode === 'LOGIN' 
+                    ? 'border-white/15 hover:border-cyan-500/40 shadow-cyan-950/20' 
+                    : 'border-white/15 hover:border-purple-500/40 shadow-purple-950/20'
+                }`}>
+                  
+                  {/* Subtle Top Specular Accent Line */}
+                  <div className={`absolute top-0 left-10 right-10 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent transition-colors duration-500 ${
+                    authMode === 'LOGIN' ? 'via-cyan-400/60' : 'via-purple-400/60'
+                  }`} />
+
+                  {/* Mode Switcher Tabs */}
+                  <div className="flex p-1 bg-black/50 rounded-2xl border border-white/10 mb-6">
+                    <button 
+                      type="button"
+                      onClick={() => setAuthMode('LOGIN')}
+                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                        authMode === 'LOGIN' 
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <KeyRound className="w-3.5 h-3.5" /> Sign In
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setAuthMode('REGISTER')}
+                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                        authMode === 'REGISTER' 
+                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" /> Create Account
+                    </button>
                   </div>
 
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-white mb-2 tracking-tight">
-                    {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Account'}
+                    {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Researcher ID'}
                   </h2>
                   <p className="text-gray-400 text-xs sm:text-sm text-center mb-6">
-                    {authMode === 'LOGIN' ? 'Access your research universe.' : 'Join the academic network.'}
+                    {authMode === 'LOGIN' ? 'Access your research universe and knowledge maps.' : 'Join 140K+ researchers mapping scientific literature.'}
                   </p>
 
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <AnimatePresence mode="wait">
                       {authMode === 'REGISTER' && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="relative overflow-hidden">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400" />
-                          <input type="text" placeholder="Full Name" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm" />
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-1.5 overflow-hidden">
+                          <label className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider block">Full Name</label>
+                          <div className="relative">
+                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
+                            <input 
+                              type="text" 
+                              placeholder="Dr. Elena Vance" 
+                              required 
+                              className="w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition-all text-sm" 
+                            />
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
 
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400" />
-                      <input type="email" placeholder="Email Address" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm" />
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider block">Email Address</label>
+                      <div className="relative">
+                        <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
+                        <input 
+                          type="email" 
+                          placeholder="researcher@lab.org" 
+                          required 
+                          className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
+                            authMode === 'LOGIN' 
+                              ? 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50' 
+                              : 'focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50'
+                          }`} 
+                        />
+                      </div>
                     </div>
 
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-cyan-400" />
-                      <input type="password" placeholder="Password" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all text-sm" />
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider block">Password</label>
+                        {authMode === 'LOGIN' && (
+                          <span className="text-[11px] text-cyan-400 hover:text-cyan-300 cursor-pointer">Forgot?</span>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
+                        <input 
+                          type="password" 
+                          placeholder="••••••••••••" 
+                          required 
+                          className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
+                            authMode === 'LOGIN' 
+                              ? 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50' 
+                              : 'focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50'
+                          }`} 
+                        />
+                      </div>
                     </div>
 
-                    <button type="submit" className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white rounded-xl py-3.5 mt-6 font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] text-sm tracking-wide">
-                      {authMode === 'LOGIN' ? 'Launch Platform' : 'Start Researching'}
+                    {/* Features checklist for register mode */}
+                    {authMode === 'REGISTER' && (
+                      <div className="text-[11px] text-gray-400 space-y-1 py-1">
+                        <div className="flex items-center gap-1.5 text-gray-300">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Unlimited 3D Knowledge Graph querying</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-gray-300">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Autonomous citation analysis and RAG summaries</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <button 
+                      type="submit" 
+                      className={`w-full text-white rounded-xl py-3.5 mt-4 font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide shadow-lg ${
+                        authMode === 'LOGIN'
+                          ? 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-500/25 hover:shadow-cyan-500/40'
+                          : 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/25 hover:shadow-purple-500/40'
+                      }`}
+                    >
+                      {authMode === 'LOGIN' ? 'Launch Platform' : 'Initialize Account'}
                       <ArrowRight className="w-4 h-4" />
+                    </button>
+
+                    {/* Guest Instant Demo Access */}
+                    <button
+                      type="button"
+                      onClick={onAuthComplete}
+                      className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Instant Demo Explorer
                     </button>
                   </form>
 
-                  <div className="mt-8 text-center text-xs sm:text-sm text-gray-400 border-t border-white/5 pt-6">
-                    {authMode === 'LOGIN' ? "Don't have an account? " : "Already have an account? "}
+                  <div className="mt-6 text-center text-xs text-gray-400 border-t border-white/10 pt-5">
+                    {authMode === 'LOGIN' ? "Don't have an account? " : "Already registered? "}
                     <button 
-                      onClick={() => triggerTraversal('AUTH', authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
-                      className="text-cyan-400 hover:text-cyan-300 font-semibold ml-1 transition-colors"
+                      onClick={() => setAuthMode(authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
+                      className={`font-semibold ml-1 transition-colors ${
+                        authMode === 'LOGIN' ? 'text-cyan-400 hover:text-cyan-300' : 'text-purple-400 hover:text-purple-300'
+                      }`}
                     >
-                      {authMode === 'LOGIN' ? 'Sign up' : 'Login'}
+                      {authMode === 'LOGIN' ? 'Sign up free' : 'Log in here'}
                     </button>
                   </div>
                 </div>
