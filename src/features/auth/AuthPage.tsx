@@ -48,28 +48,49 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: 0.3, ease: "easeInOut" }}
               className="w-full flex flex-col items-center pb-40"
             >
-              {/* Navbar */}
-              <nav className="w-full px-6 sm:px-10 py-6 flex justify-between items-center max-w-7xl mx-auto relative z-50">
+              {/* ============ PREMIUM NAVBAR ============ */}
+              <nav className="w-full px-6 sm:px-10 py-5 flex justify-between items-center max-w-7xl mx-auto relative z-50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl border border-white/10 flex items-center justify-center bg-white/5 backdrop-blur-xl shadow-lg">
+                  <div className="w-10 h-10 rounded-xl border border-cyan-500/30 flex items-center justify-center bg-cyan-500/10 backdrop-blur-xl shadow-lg shadow-cyan-500/10">
                     <Network className="w-5 h-5 text-cyan-400" />
                   </div>
-                  <span className="font-bold text-xl tracking-wide text-gray-200">ResearchGraph</span>
+                  <span className="font-bold text-xl tracking-wide text-white">ResearchGraph</span>
                 </div>
-                <div className="flex items-center gap-4 sm:gap-6">
-                  <button onClick={() => triggerTraversal('AUTH', 'LOGIN')} className="text-sm font-bold text-gray-400 hover:text-white transition-colors">
+                
+                {/* Nav Links */}
+                <div className="hidden md:flex items-center gap-1">
+                  {['Home', 'Explore', '3D Graph', 'Features', 'Pricing', 'Docs'].map((link, i) => (
+                    <button 
+                      key={link}
+                      className={`px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
+                        i === 0 
+                          ? 'text-white bg-white/10 border border-white/10' 
+                          : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      }`}
+                    >
+                      {i === 0 && <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 mr-2 align-middle" />}
+                      {link}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <button className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
+                    <Search className="w-4 h-4 text-gray-400" />
+                  </button>
+                  <button onClick={() => triggerTraversal('AUTH', 'LOGIN')} className="text-sm font-semibold text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5">
                     Log in
                   </button>
-                  <button onClick={() => triggerTraversal('AUTH', 'REGISTER')} className="px-5 sm:px-6 py-2 sm:py-2.5 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs sm:text-sm transition-colors shadow-lg shadow-cyan-600/30">
+                  <button onClick={() => triggerTraversal('AUTH', 'REGISTER')} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-600/30 border border-cyan-500/30">
                     Get Started
                   </button>
                 </div>
               </nav>
 
-              {/* Top Hero Section: Split Left Copy & Right 3D Visualizer */}
+              {/* ============ HERO SECTION: SPLIT LAYOUT ============ */}
               <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 pt-10 sm:pt-16 pb-24 relative z-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-14">
                 
-                {/* Left Column: Headline, Subtitle, Search */}
+                {/* ---- LEFT: Hero Copy ---- */}
                 <div className="flex-1 flex flex-col items-start text-left max-w-2xl">
                   <motion.div 
                     initial={{ opacity: 0, y: 15 }}
@@ -103,7 +124,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     Enter any research question. Our neural AI reads millions of academic papers, extracts hidden citations, and constructs an interactive 3D knowledge map in real time.
                   </motion.p>
                   
-                  {/* Clean Floating Search Bar */}
+                  {/* Search Bar */}
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -111,69 +132,109 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     className="w-full max-w-xl relative cursor-text group"
                     onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                   >
-                    <div className="relative h-16 sm:h-20 bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/15 rounded-2xl flex items-center px-5 shadow-2xl hover:border-cyan-500/50 transition-all">
+                    <div className="relative h-16 sm:h-[72px] bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/15 rounded-2xl flex items-center px-5 shadow-2xl hover:border-cyan-500/50 transition-all group-hover:shadow-cyan-500/10">
                        <Search className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-3.5 flex-shrink-0" />
                        <div className="flex-1 text-left overflow-hidden">
-                         <span className="text-gray-300 text-sm sm:text-lg font-mono whitespace-nowrap">
+                         <span className="text-gray-300 text-sm sm:text-base font-mono whitespace-nowrap">
                            "Breakthroughs in Quantum Neural Networks"
                          </span>
                          <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-[2px] h-4 bg-cyan-400 ml-1 align-middle" />
                        </div>
-                       <button className="flex px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all items-center gap-2 shadow-lg shadow-cyan-500/20">
-                         <Sparkles className="w-4 h-4" /> <span className="hidden sm:inline">Explore</span>
+                       <button className="flex px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all items-center gap-2 shadow-lg shadow-cyan-500/20 border border-cyan-400/20">
+                         <Sparkles className="w-4 h-4" /> Explore
                        </button>
                     </div>
                   </motion.div>
 
-                  {/* Highlights under search */}
+                  {/* Feature Highlights */}
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="flex flex-wrap items-center gap-4 text-xs text-gray-400 font-mono mt-6"
+                    className="flex flex-wrap items-center gap-5 text-xs text-gray-400 mt-7"
                   >
-                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> 200M+ Papers</span>
-                    <span className="text-gray-600">•</span>
-                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Real-time Synthesis</span>
-                    <span className="text-gray-600">•</span>
-                    <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> 3D Citation Grid</span>
+                    {[
+                      { icon: Globe, label: '200M+', sub: 'Papers' },
+                      { icon: Zap, label: 'Real-time', sub: 'Synthesis' },
+                      { icon: Network, label: '3D Citation', sub: 'Grid' },
+                      { icon: BrainCircuit, label: 'Multi-domain', sub: 'Knowledge' },
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                          <item.icon className="w-3.5 h-3.5 text-cyan-400" />
+                        </div>
+                        <div className="leading-tight">
+                          <span className="text-white font-bold block text-xs">{item.label}</span>
+                          <span className="text-gray-500 text-[10px]">{item.sub}</span>
+                        </div>
+                      </div>
+                    ))}
                   </motion.div>
                 </div>
 
-                {/* Right Column: TOP RIGHT 3D VIEW IN HERO */}
+                {/* ---- RIGHT: 3D KNOWLEDGE SPHERE PANEL ---- */}
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, duration: 0.6 }}
                   className="flex-1 w-full max-w-lg lg:max-w-xl flex flex-col items-center justify-center relative"
                 >
-                  {/* Holographic Glowing Backdrop Aura */}
+                  {/* Glow backdrop */}
                   <div className="absolute w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-cyan-500/15 blur-[90px] pointer-events-none -z-10 animate-pulse"></div>
                   <div className="absolute w-64 h-64 rounded-full bg-purple-500/10 blur-[70px] pointer-events-none -z-10 translate-x-12 translate-y-8"></div>
                   
-                  {/* 3D Neural Core Holographic Console Viewport */}
-                  <div className="relative w-full aspect-square max-w-[420px] sm:max-w-[460px] rounded-3xl bg-[#080d1a]/70 border border-white/15 backdrop-blur-xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] overflow-hidden flex flex-col items-center justify-center group hover:border-cyan-500/40 transition-all duration-500">
+                  {/* 3D Console Card */}
+                  <div className="relative w-full aspect-square max-w-[440px] sm:max-w-[480px] rounded-3xl bg-[#080d1a]/80 border border-white/15 backdrop-blur-xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] flex flex-col items-center justify-center group hover:border-cyan-500/40 transition-all duration-500">
                     
-                    {/* Top Console HUD bar */}
-                    <div className="w-full px-5 py-3 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 text-xs font-mono">
+                    {/* Top HUD bar */}
+                    <div className="w-full px-5 py-3 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 text-xs font-mono rounded-t-3xl">
                       <div className="flex items-center gap-2 text-cyan-400">
                         <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
                         <span className="font-bold tracking-wider">3D KNOWLEDGE SPHERE</span>
                       </div>
-                      <span className="text-gray-400 text-[11px] font-mono">WEBGL • 60 FPS</span>
+                      <span className="text-gray-400 text-[11px] font-mono">WebGL • 60 FPS</span>
                     </div>
 
-                    {/* The Real 3D Three.js WebGL Scene */}
-                    <div className="relative w-full flex-1 min-h-[280px] flex items-center justify-center">
+                    {/* 3D Scene with floating labels */}
+                    <div className="relative w-full flex-1 min-h-[260px] flex items-center justify-center overflow-visible">
                       <ThreeNeuralCore className="w-full h-full" theme="cyan" interactive={true} />
+                      
+                      {/* Floating Category Labels */}
+                      <div className="absolute top-[12%] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                        <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Paper</span>
+                      </div>
+                      <div className="absolute top-[30%] left-[8%] z-20 pointer-events-none">
+                        <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Author</span>
+                      </div>
+                      <div className="absolute top-[30%] right-[6%] z-20 pointer-events-none">
+                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Dataset</span>
+                      </div>
+                      <div className="absolute bottom-[28%] left-[10%] z-20 pointer-events-none">
+                        <span className="px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Model</span>
+                      </div>
+                      <div className="absolute bottom-[24%] right-[6%] z-20 pointer-events-none">
+                        <span className="px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Algorithm</span>
+                      </div>
                     </div>
 
-                    {/* Bottom Console HUD Telemetry Strip */}
-                    <div className="w-full px-5 py-3 border-t border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 text-[11px] font-mono text-gray-400">
-                      <div className="flex items-center gap-3">
-                        <span className="text-cyan-400 font-bold">45 NODES</span>
-                        <span className="text-gray-600">|</span>
-                        <span className="text-purple-400 font-bold">85 SYNAPSES</span>
+                    {/* Bottom Stats Strip */}
+                    <div className="w-full px-5 py-3 border-t border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 text-[11px] font-mono text-gray-400 rounded-b-3xl">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                          <span className="text-cyan-400 font-bold">45,231</span>
+                          <span className="text-gray-500">Nodes</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                          <span className="text-purple-400 font-bold">128,944</span>
+                          <span className="text-gray-500">Connections</span>
+                        </div>
+                        <div className="hidden sm:flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                          <span className="text-emerald-400 font-bold">12</span>
+                          <span className="text-gray-500">Research Domains</span>
+                        </div>
                       </div>
                       <button 
                         onClick={() => triggerTraversal('AUTH', 'REGISTER')}
@@ -187,7 +248,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
               </div>
 
-              {/* Core Features - Scroll Animated */}
+              {/* ============ HOW IT WORKS SECTION ============ */}
               <motion.div 
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -201,22 +262,29 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-6 sm:px-8">
                   {[
-                    { icon: Search, color: 'text-blue-400', title: '1. Semantic Query', desc: 'Our AI understands deep context, moving beyond standard keyword matching to find true relevance.' },
-                    { icon: BrainCircuit, color: 'text-purple-400', title: '2. Neural Analysis', desc: 'Instantly ingests thousands of papers to extract key findings and hidden connections.' },
-                    { icon: Network, color: 'text-cyan-400', title: '3. 3D Exploration', desc: 'Outputs a fully interactive, immersive 3D map of the landscape to navigate knowledge visually.' }
+                    { icon: Search, color: 'text-blue-400', border: 'hover:border-blue-500/30', title: '1. Semantic Query', desc: 'Our AI understands deep context, moving beyond standard keyword matching to find true relevance.' },
+                    { icon: BrainCircuit, color: 'text-purple-400', border: 'hover:border-purple-500/30', title: '2. Neural Analysis', desc: 'Instantly ingests thousands of papers to extract key findings and hidden connections.' },
+                    { icon: Network, color: 'text-cyan-400', border: 'hover:border-cyan-500/30', title: '3. 3D Exploration', desc: 'Outputs a fully interactive, immersive 3D map of the landscape to navigate knowledge visually.' }
                   ].map((feat, idx) => (
-                    <div key={idx} className="rounded-2xl bg-[#0a0f1c]/70 border border-white/10 p-8 text-left hover:border-cyan-500/30 transition-all backdrop-blur-md shadow-xl group">
+                    <motion.div 
+                      key={idx} 
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: idx * 0.15 }}
+                      className={`rounded-2xl bg-[#0a0f1c]/70 border border-white/10 p-8 text-left ${feat.border} transition-all backdrop-blur-md shadow-xl group`}
+                    >
                       <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                         <feat.icon className={`w-6 h-6 ${feat.color}`} />
                       </div>
                       <h3 className="text-xl font-bold mb-3 text-white">{feat.title}</h3>
                       <p className="text-gray-400 text-sm leading-relaxed">{feat.desc}</p>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </motion.div>
 
-              {/* Deep Dive Section */}
+              {/* ============ DEEP DIVE SECTION ============ */}
               <motion.div 
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -237,18 +305,30 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         { icon: Shield, text: "Unbiased, hallucination-free citations" },
                         { icon: Cpu, text: "Automated synthesis across cross-domain papers" }
                       ].map((item, idx) => (
-                        <li key={idx} className="flex items-center gap-4 text-gray-300 font-medium">
+                        <motion.li 
+                          key={idx} 
+                          initial={{ opacity: 0, x: -20 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: idx * 0.1 }}
+                          className="flex items-center gap-4 text-gray-300 font-medium"
+                        >
                           <div className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center">
                             <item.icon className="w-4 h-4 text-cyan-400" />
                           </div>
                           {item.text}
-                        </li>
+                        </motion.li>
                       ))}
                     </ul>
                   </div>
                   
-                  {/* Visual Capabilities Showcase */}
-                  <div className="rounded-3xl bg-[#080d1a]/80 border border-white/10 p-8 backdrop-blur-xl shadow-2xl space-y-6">
+                  {/* Capabilities Showcase Panel */}
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    className="rounded-3xl bg-[#080d1a]/80 border border-white/10 p-8 backdrop-blur-xl shadow-2xl space-y-6"
+                  >
                     <div className="flex items-center justify-between border-b border-white/10 pb-4">
                       <span className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                         <Share2 className="w-4 h-4 text-cyan-400" /> Graph Intelligence
@@ -259,32 +339,32 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/20 transition-all">
                         <span className="text-2xl font-bold text-cyan-400 block font-mono">99.4%</span>
                         <span className="text-xs text-gray-400">Citation Accuracy</span>
                       </div>
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/20 transition-all">
                         <span className="text-2xl font-bold text-purple-400 block font-mono">3.2x</span>
                         <span className="text-xs text-gray-400">Faster Synthesis</span>
                       </div>
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-sky-500/20 transition-all">
                         <span className="text-2xl font-bold text-sky-400 block font-mono">100%</span>
                         <span className="text-xs text-gray-400">Grounded Citations</span>
                       </div>
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5">
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/20 transition-all">
                         <span className="text-2xl font-bold text-emerald-400 block font-mono">204M</span>
                         <span className="text-xs text-gray-400">Scientific Papers</span>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 to-blue-950/40 border border-cyan-500/20 text-xs text-gray-300 leading-relaxed">
+                    <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 to-blue-950/40 border border-cyan-500/20 text-xs text-gray-300 leading-relaxed italic">
                       "ResearchGraph allowed our quantum physics lab to synthesize 1,200 papers in 30 minutes, identifying three unlinked experimental correlations."
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               </motion.div>
 
-              {/* Bottom CTA */}
+              {/* ============ BOTTOM CTA ============ */}
               <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
@@ -293,9 +373,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 className="w-full max-w-4xl mx-auto mt-28 text-center px-8"
               >
                 <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to accelerate your research?</h2>
+                <p className="text-gray-400 text-sm mb-8 max-w-lg mx-auto">Join 140,000+ researchers already mapping the frontiers of scientific knowledge.</p>
                 <button 
                   onClick={() => triggerTraversal('AUTH', 'REGISTER')} 
-                  className="px-8 py-4 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-base sm:text-lg transition-colors shadow-lg shadow-cyan-500/30 flex items-center gap-3 mx-auto"
+                  className="px-8 py-4 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-base sm:text-lg transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-3 mx-auto border border-cyan-400/20"
                 >
                   Join the Network <ArrowRight className="w-5 h-5" />
                 </button>
