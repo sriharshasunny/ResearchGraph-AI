@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, ChevronDown, BookOpen, Layers, X, Globe, Sparkles } from 'lucide-react';
+import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, ChevronDown, BookOpen, Layers, X, Sparkles } from 'lucide-react';
 
 type AuthMode = 'LOGIN' | 'REGISTER';
 
