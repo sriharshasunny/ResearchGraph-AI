@@ -4,14 +4,32 @@ import {
   Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Sparkles, ArrowLeft, 
   Zap, Database, Layers, Info, X, Compass, Award, KeyRound, CheckCircle2,
   Play, ChevronDown, Activity, Cpu, Share2, Radio, FileText,
-  Microscope, Binary
+  Microscope, Binary, Eye, EyeOff, Loader2
 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
+import { supabase } from '../../lib/supabase';
 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
 type InfoModalType = 'HOW_IT_WORKS' | 'SOURCES' | 'ABOUT' | 'DEMO' | null;
+
+const TypingEffect: React.FC<{ text: string, trigger: any }> = ({ text, trigger }) => {
+  const [displayedText, setDisplayedText] = useState('');
+
+  React.useEffect(() => {
+    setDisplayedText('');
+    let i = 0;
+    const intervalId = setInterval(() => {
+      setDisplayedText(text.slice(0, i + 1));
+      i++;
+      if (i > text.length) clearInterval(intervalId);
+    }, 15);
+    return () => clearInterval(intervalId);
+  }, [text, trigger]);
+
+  return <span>{displayedText}</span>;
+};
 
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
   const [pageState, setPageState] = useState<PageState>('LANDING');
@@ -23,37 +41,54 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [activeDemoQuery, setActiveDemoQuery] = useState(0);
 
   // Authentication State
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topologySectionRef = useRef<HTMLDivElement>(null);
   const sourcesSectionRef = useRef<HTMLDivElement>(null);
   const pipelineSectionRef = useRef<HTMLDivElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setIsAuthenticating(true);
 
-    // Mock validation logic
-    if (authMode === 'LOGIN') {
-      if (email !== 'admin@researchgraph.ai') {
-        setAuthError('No user found with this email address.');
-        return;
+    try {
+      if (authMode === 'REGISTER') {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName }
+          }
+        });
+        if (error) throw error;
+        // Proceed to platform if successful
+        onAuthComplete();
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (error) throw error;
+        // Proceed to platform if successful
+        onAuthComplete();
       }
-      if (password !== 'admin123') {
-        setAuthError('Invalid password credentials.');
-        return;
-      }
+    } catch (err: any) {
+      setAuthError(err.message || 'Authentication failed.');
+    } finally {
+      setIsAuthenticating(false);
     }
-    
-    onAuthComplete();
   };
 
   const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onAuthComplete();
+    triggerTraversal('AUTH', 'LOGIN');
   };
 
   const triggerTraversal = (destination: PageState, mode?: AuthMode) => {
@@ -1141,8 +1176,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       <span className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
                         <BrainCircuit className="w-3.5 h-3.5" /> Synthesized Multi-Paper Consensus
                       </span>
-                      <p className="text-sm text-gray-200 leading-relaxed p-4 rounded-xl bg-black/40 border border-white/5">
-                        {demoQueries[activeDemoQuery].summary}
+                      <p className="text-sm text-gray-200 leading-relaxed p-4 rounded-xl bg-black/40 border border-white/5 min-h-[100px]">
+                        <TypingEffect text={demoQueries[activeDemoQuery].summary} trigger={activeDemoQuery} />
+                        <span className="inline-block w-1.5 h-4 ml-1 bg-cyan-400 animate-pulse"></span>
                       </p>
                     </div>
 
@@ -1613,7 +1649,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
 
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-white mb-2 tracking-tight">
-                    {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Researcher ID'}
+                    {authMode === 'LOGIN' ? 'Supabase Secure Login' : 'Create Researcher ID'}
                   </h2>
                   <p className="text-gray-400 text-xs sm:text-sm text-center mb-6">
                     {authMode === 'LOGIN' ? 'Access your research universe and knowledge maps.' : 'Join 140K+ researchers mapping scientific literature.'}
@@ -1628,8 +1664,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                             <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
                             <input 
                               type="text" 
+                              value={fullName}
+                              onChange={(e) => setFullName(e.target.value)}
                               placeholder="Dr. Elena Vance" 
-                              required 
+                              required={authMode === 'REGISTER'} 
                               className="w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition-all text-sm" 
                             />
                           </div>
@@ -1666,17 +1704,24 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       <div className="relative">
                         <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
                         <input 
-                          type="password" 
+                          type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => { setPassword(e.target.value); setAuthError(null); }}
                           placeholder="••••••••••••" 
                           required 
-                          className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
+                          className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-11 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
                             authMode === 'LOGIN' 
                               ? 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50' 
                               : 'focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50'
                           }`} 
                         />
+                        <button 
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
                       </div>
                     </div>
 
@@ -1710,24 +1755,28 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     <button 
                       type="submit" 
+                      disabled={isAuthenticating}
                       className={`w-full text-white rounded-xl py-3.5 mt-4 font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide shadow-lg ${
+                        isAuthenticating ? 'opacity-80 cursor-wait' : ''
+                      } ${
                         authMode === 'LOGIN'
                           ? 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-500/25 hover:shadow-cyan-500/40'
                           : 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/25 hover:shadow-purple-500/40'
                       }`}
                     >
-                      {authMode === 'LOGIN' ? 'Launch Platform' : 'Initialize Account'}
-                      <ArrowRight className="w-4 h-4" />
+                      {isAuthenticating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" /> 
+                          {authMode === 'LOGIN' ? 'Authenticating...' : 'Initializing Account...'}
+                        </>
+                      ) : (
+                        <>
+                          {authMode === 'LOGIN' ? 'Launch Platform' : 'Initialize Account'}
+                          <ArrowRight className="w-4 h-4" />
+                        </>
+                      )}
                     </button>
 
-                    {/* Guest Instant Demo Access */}
-                    <button
-                      type="button"
-                      onClick={onAuthComplete}
-                      className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-2"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Instant Demo Explorer
-                    </button>
                   </form>
 
                   <div className="mt-6 text-center text-xs text-gray-400 border-t border-white/10 pt-5">
