@@ -315,21 +315,16 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         userRotX += dragVelocityY;
       }
 
-      // Smooth cursor-follow with lerp (positional offset + tilt)
-      const lerpFactor = 0.06;
+      // Smooth cursor-follow with lerp (rotation only, no position change)
+      const lerpFactor = 0.08;
       currentFollowX += (targetFollowX - currentFollowX) * lerpFactor;
       currentFollowY += (targetFollowY - currentFollowY) * lerpFactor;
-
-      // Translate the whole object toward the cursor (max ~0.6 units offset)
-      const followStrength = 0.6;
-      masterGroup.position.x = currentFollowX * followStrength;
-      masterGroup.position.y = -currentFollowY * followStrength;
 
       // Speed multiplier when hovered
       const speed = isHovered ? 1.5 : 1.0;
 
-      // Master rotation combining user drag, cursor tilt, and gentle cosmic drift
-      const tiltStrength = 0.15;
+      // Master rotation: user drag + cursor tilt + gentle cosmic drift
+      const tiltStrength = 0.4;
       masterGroup.rotation.x = userRotX + Math.sin(t * 0.5) * 0.05 + currentFollowY * tiltStrength;
       masterGroup.rotation.y = userRotY + t * 0.12 * speed - currentFollowX * tiltStrength;
 
