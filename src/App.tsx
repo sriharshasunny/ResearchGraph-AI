@@ -14,7 +14,7 @@ export const App: React.FC = () => {
   if (showLaunch) {
     return <LaunchSequence onComplete={() => setShowLaunch(false)} />;
   }
-
+  return (
     <div className="flex h-screen w-full bg-brand-bg text-brand-text overflow-hidden font-sans relative">
       {/* Sci-Fi Ambient Background */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-brand-bg to-brand-bg">
