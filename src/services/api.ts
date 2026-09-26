@@ -1,5 +1,5 @@
 import { mockPapers } from '../data/mockData';
-import { Paper } from '../types';
+import type { Paper } from '../types';
 
 export const searchPapers = async (query: string): Promise<Paper[]> => {
   // Simulate network latency

@@ -1,4 +1,4 @@
-import { Paper } from '../types';
+import type { Paper } from '../types';
 
 export const mockPapers: Paper[] = [
   {

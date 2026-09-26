@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { mockPapers } from '../../data/mockData';
-import { Network, Info, ZoomIn, ZoomOut, Maximize, BrainCircuit, ExternalLink } from 'lucide-react';
-import { PaperCard } from '../../components/PaperCard';
+import { Network, ZoomIn, ZoomOut, Maximize, BrainCircuit } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const KnowledgeGraphPage: React.FC = () => {

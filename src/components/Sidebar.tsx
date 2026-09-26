@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Home, MessageSquare, Network, Search, Bookmark, Settings, LogOut, LayoutGrid } from 'lucide-react';
-import { PageType } from '../types';
+import { Home, MessageSquare, Network, Search, Bookmark, Settings, LayoutGrid } from 'lucide-react';
+import type { PageType } from '../types';
 
 export const Sidebar: React.FC = () => {
   const { activePage, setActivePage } = useApp();

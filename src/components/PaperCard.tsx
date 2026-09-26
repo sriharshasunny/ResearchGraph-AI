@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper } from '../types';
+import type { Paper } from '../types';
 import { useApp } from '../context/AppContext';
 import { Bookmark, FileText, ExternalLink, Calendar, Users } from 'lucide-react';
 import { motion } from 'framer-motion';

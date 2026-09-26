@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { ChatMessage, PageType } from '../types';
+import React, { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
+import type { ChatMessage, PageType } from '../types';
 
 interface AppContextType {
   activePage: PageType;
