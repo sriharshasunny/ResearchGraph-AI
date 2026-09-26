@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, BookOpen, Layers, Sparkles, ArrowLeft } from 'lucide-react';
+import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, BookOpen, Layers, Sparkles, ArrowLeft, Zap, Globe, Shield } from 'lucide-react';
 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
@@ -17,7 +17,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   };
 
   const triggerTraversal = (destination: PageState, mode?: AuthMode) => {
-    // Immediately set state; AnimatePresence handles the smooth crossfade transition naturally.
     setPageState(destination);
     if (mode) setAuthMode(mode);
   };
@@ -111,24 +110,42 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* Centered Hero Content */}
               <div className="w-full max-w-5xl mx-auto px-8 flex flex-col items-center text-center pt-24 pb-32 relative z-20">
                 
-                <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8">
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8"
+                >
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                   <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">ResearchGraph AI v2.0</span>
-                </div>
+                </motion.div>
                 
-                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-6">
+                <motion.h1 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                  className="text-5xl md:text-7xl font-extrabold tracking-tight leading-tight mb-6"
+                >
                   Stop Searching.<br/>
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
                     Start Connecting.
                   </span>
-                </h1>
+                </motion.h1>
                 
-                <p className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-12">
+                <motion.p 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-lg md:text-xl text-gray-400 max-w-2xl leading-relaxed mb-12"
+                >
                   Enter a research question. Our AI instantly reads millions of academic papers, finds the hidden patterns, and builds a 3D interactive knowledge map.
-                </p>
+                </motion.p>
                 
                 {/* Clean Floating Search Bar */}
-                <div 
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
                   className="w-full max-w-3xl relative cursor-text group"
                   onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                 >
@@ -144,7 +161,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                        <Sparkles className="w-4 h-4" /> Initialize
                      </button>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Minimal 3D Icons */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none -z-10 flex items-center justify-center">
@@ -160,25 +177,97 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
               </div>
 
-              {/* Clean Feature Cards */}
-              <div className="w-full max-w-6xl mt-10 pt-10">
+              {/* Core Features - Scroll Animated */}
+              <motion.div 
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+                className="w-full max-w-6xl mt-10 pt-10"
+              >
                 <div className="text-center mb-16">
                   <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-200">How ResearchGraph Works</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-8">
                   {[
-                    { icon: Search, color: 'text-blue-400', title: '1. Semantic Query', desc: 'Our AI understands deep context, moving beyond standard keyword matching.' },
-                    { icon: BrainCircuit, color: 'text-purple-400', title: '2. Neural Analysis', desc: 'Instantly ingests thousands of papers to find hidden connections.' },
-                    { icon: Network, color: 'text-cyan-400', title: '3. 3D Exploration', desc: 'Outputs a fully interactive, immersive 3D map of the landscape.' }
+                    { icon: Search, color: 'text-blue-400', title: '1. Semantic Query', desc: 'Our AI understands deep context, moving beyond standard keyword matching to find true relevance.' },
+                    { icon: BrainCircuit, color: 'text-purple-400', title: '2. Neural Analysis', desc: 'Instantly ingests thousands of papers to extract key findings and hidden connections.' },
+                    { icon: Network, color: 'text-cyan-400', title: '3. 3D Exploration', desc: 'Outputs a fully interactive, immersive 3D map of the landscape to navigate knowledge visually.' }
                   ].map((feat, idx) => (
-                    <div key={idx} className="rounded-2xl bg-[#0a0f1c]/60 border border-white/5 p-8 text-left">
+                    <div key={idx} className="rounded-2xl bg-[#0a0f1c]/60 border border-white/5 p-8 text-left hover:border-white/10 transition-colors">
                       <feat.icon className={`w-10 h-10 ${feat.color} mb-6`} />
                       <h3 className="text-xl font-bold mb-3 text-white">{feat.title}</h3>
                       <p className="text-gray-400 text-sm leading-relaxed">{feat.desc}</p>
                     </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Deep Dive Section - Scroll Animated */}
+              <motion.div 
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.6 }}
+                className="w-full max-w-6xl mt-32 pt-10 border-t border-white/5"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 px-8 items-center">
+                  <div>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-200">Beyond traditional search engines.</h2>
+                    <p className="text-gray-400 text-lg leading-relaxed mb-8">
+                      Traditional academic search gives you a list of links. ResearchGraph gives you the actual answers, mapped out in a visual database that lets you trace citations, track methodologies, and discover breakthroughs.
+                    </p>
+                    <ul className="space-y-4">
+                      {[
+                        { icon: Zap, text: "Lightning-fast RAG generation" },
+                        { icon: Globe, text: "Global database of 200M+ papers" },
+                        { icon: Shield, text: "Unbiased, hallucination-free citations" }
+                      ].map((item, idx) => (
+                        <li key={idx} className="flex items-center gap-4 text-gray-300 font-medium">
+                          <div className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center">
+                            <item.icon className="w-4 h-4 text-cyan-400" />
+                          </div>
+                          {item.text}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  {/* Decorative element replacing image */}
+                  <div className="relative h-80 rounded-3xl bg-[#0a0f1c]/80 border border-white/10 overflow-hidden flex items-center justify-center">
+                     <div className="absolute inset-0 bg-graph-pattern opacity-10"></div>
+                     <motion.div 
+                       animate={{ rotate: 360 }} 
+                       transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                       className="relative w-48 h-48 border border-cyan-500/20 rounded-full flex items-center justify-center"
+                     >
+                       <motion.div 
+                         animate={{ rotate: -720 }} 
+                         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                         className="absolute w-32 h-32 border border-purple-500/30 rounded-full"
+                       />
+                       <Network className="w-12 h-12 text-cyan-400" />
+                     </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Bottom CTA */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="w-full max-w-4xl mx-auto mt-32 text-center px-8"
+              >
+                <h2 className="text-4xl font-bold mb-8">Ready to accelerate your research?</h2>
+                <button 
+                  onClick={() => triggerTraversal('AUTH', 'REGISTER')} 
+                  className="px-8 py-4 rounded-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-lg transition-colors shadow-lg shadow-cyan-500/20 flex items-center gap-3 mx-auto"
+                >
+                  Join the Network <ArrowRight className="w-5 h-5" />
+                </button>
+              </motion.div>
 
             </motion.div>
           )}
@@ -204,55 +293,105 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 <span className="font-semibold text-sm text-gray-300">Return to Base</span>
               </button>
 
-              {/* AUTH BOX */}
-              <div className="w-full max-w-[420px] bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-10 shadow-2xl">
-                <div className="flex justify-center mb-8">
-                   <div className="w-14 h-14 rounded-xl border border-white/10 flex items-center justify-center bg-white/5">
-                     <Network className="w-7 h-7 text-cyan-400" />
-                   </div>
+              <div className="w-full max-w-5xl flex gap-12 items-center justify-center">
+                
+                {/* 3D FLOATING ELEMENT (Desktop Only) */}
+                <div className="hidden lg:flex flex-1 flex-col items-center justify-center perspective-1000">
+                  <motion.div 
+                    animate={{ 
+                      rotateX: [0, 10, -10, 0],
+                      rotateY: [0, -15, 15, 0],
+                    }}
+                    transition={{ 
+                      duration: 10, 
+                      repeat: Infinity, 
+                      ease: "linear" 
+                    }}
+                    className="relative w-80 h-80 preserve-3d"
+                  >
+                    {/* Outer Rings */}
+                    <motion.div 
+                      className="absolute inset-0 border-2 border-cyan-500/20 rounded-full"
+                      animate={{ rotateZ: 360 }}
+                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    />
+                    <motion.div 
+                      className="absolute inset-4 border border-purple-500/30 rounded-full"
+                      animate={{ rotateZ: -360, rotateX: 60 }}
+                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                    />
+                    <motion.div 
+                      className="absolute inset-8 border border-blue-500/30 rounded-full"
+                      animate={{ rotateZ: 360, rotateY: 60 }}
+                      transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+                    />
+                    
+                    {/* Core */}
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-24 h-24 bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(34,211,238,0.2)]">
+                        <Network className="w-12 h-12 text-cyan-400" />
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <div className="mt-12 text-center max-w-md">
+                    <h3 className="text-2xl font-bold text-white mb-4">Secure Neural Uplink</h3>
+                    <p className="text-gray-400 leading-relaxed">
+                      Your connection to the global research grid is encrypted. Authenticate to access your personalized 3D knowledge universe.
+                    </p>
+                  </div>
                 </div>
 
-                <h2 className="text-3xl font-bold text-center text-white mb-2">
-                  {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Account'}
-                </h2>
-                <p className="text-gray-400 text-sm text-center mb-8">
-                  {authMode === 'LOGIN' ? 'Access your research universe.' : 'Join the academic network.'}
-                </p>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <AnimatePresence mode="wait">
-                    {authMode === 'REGISTER' && (
-                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="relative overflow-hidden">
-                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                        <input type="text" placeholder="Full Name" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input type="email" placeholder="Email Address" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors" />
+                {/* AUTH BOX */}
+                <div className="w-full max-w-[420px] bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/10 rounded-3xl p-10 shadow-2xl relative z-20">
+                  <div className="flex justify-center mb-8 lg:hidden">
+                     <div className="w-14 h-14 rounded-xl border border-white/10 flex items-center justify-center bg-white/5">
+                       <Network className="w-7 h-7 text-cyan-400" />
+                     </div>
                   </div>
 
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input type="password" placeholder="Password" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors" />
+                  <h2 className="text-3xl font-bold text-center text-white mb-2">
+                    {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Account'}
+                  </h2>
+                  <p className="text-gray-400 text-sm text-center mb-8">
+                    {authMode === 'LOGIN' ? 'Access your research universe.' : 'Join the academic network.'}
+                  </p>
+
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <AnimatePresence mode="wait">
+                      {authMode === 'REGISTER' && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="relative overflow-hidden">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                          <input type="text" placeholder="Full Name" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors" />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="relative">
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <input type="email" placeholder="Email Address" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors" />
+                    </div>
+
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <input type="password" placeholder="Password" required className="w-full bg-black/40 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 transition-colors" />
+                    </div>
+
+                    <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl py-3 mt-6 font-bold flex items-center justify-center gap-2 transition-colors">
+                      {authMode === 'LOGIN' ? 'Launch Platform' : 'Start Researching'}
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </form>
+
+                  <div className="mt-8 text-center text-sm text-gray-400">
+                    {authMode === 'LOGIN' ? "Don't have an account? " : "Already have an account? "}
+                    <button 
+                      onClick={() => triggerTraversal('AUTH', authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
+                      className="text-cyan-400 hover:text-cyan-300 font-semibold ml-1"
+                    >
+                      {authMode === 'LOGIN' ? 'Sign up' : 'Login'}
+                    </button>
                   </div>
-
-                  <button type="submit" className="w-full bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl py-3 mt-6 font-bold flex items-center justify-center gap-2 transition-colors">
-                    {authMode === 'LOGIN' ? 'Launch Platform' : 'Start Researching'}
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-
-                <div className="mt-8 text-center text-sm text-gray-400">
-                  {authMode === 'LOGIN' ? "Don't have an account? " : "Already have an account? "}
-                  <button 
-                    onClick={() => triggerTraversal('AUTH', authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
-                    className="text-cyan-400 hover:text-cyan-300 font-semibold ml-1"
-                  >
-                    {authMode === 'LOGIN' ? 'Sign up' : 'Login'}
-                  </button>
                 </div>
               </div>
             </motion.div>
