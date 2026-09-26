@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { searchPapers } from '../../services/api';
 import type { ChatMessage, Paper } from '../../types';
-import { Send, Sparkles, HelpCircle, Terminal, Trash2, ListFilter, BrainCircuit, Network, BookMarked, MessageSquare } from 'lucide-react';
+import { Send, Sparkles, HelpCircle, Terminal, Trash2, ListFilter, BrainCircuit, Network, BookMarked, MessageSquare, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ChatPage: React.FC = () => {
@@ -127,7 +127,7 @@ export const ChatPage: React.FC = () => {
       };
 
       resolvePapers();
-    }, 500);
+    }, 1500); // Increased latency for realism
   };
 
   const latestContextMsg = [...chatMessages].reverse().find(msg => msg.sender === 'assistant' && ((msg.papers && msg.papers.length > 0) || (msg.relatedConcepts && msg.relatedConcepts.length > 0)));
@@ -135,19 +135,22 @@ export const ChatPage: React.FC = () => {
   const currentConcepts = latestContextMsg?.relatedConcepts || [];
 
   return (
-    <div className="flex h-[calc(100vh-140px)] w-full mx-auto rounded-2xl border border-brand-border bg-white overflow-hidden shadow-subtle mx-4 my-2">
+    <div className="flex h-[calc(100vh-140px)] w-full mx-auto rounded-3xl border border-white/10 bg-[#070b14]/80 backdrop-blur-2xl shadow-2xl mx-4 my-2 overflow-hidden relative">
       
+      {/* Sci-Fi Glows */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-32 bg-cyan-500/10 blur-[100px] pointer-events-none"></div>
+
       {/* Left Panel: Conversation History */}
-      <aside className="w-64 border-r border-brand-border flex flex-col justify-between hidden lg:flex flex-shrink-0 bg-gray-50/50">
-        <div className="p-5 flex items-center justify-between border-b border-brand-border flex-shrink-0">
-          <span className="text-[12px] font-bold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+      <aside className="w-64 border-r border-white/10 flex flex-col justify-between hidden lg:flex flex-shrink-0 bg-[#0a0f1c]/50">
+        <div className="p-5 flex items-center justify-between border-b border-white/10 flex-shrink-0">
+          <span className="text-[12px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
             <ListFilter className="h-4 w-4" />
             Sessions
           </span>
           <button
             onClick={clearChat}
             title="Clear Chat History"
-            className="text-brand-textMuted hover:text-brand-accent transition-colors p-1.5 hover:bg-blue-50 rounded-md"
+            className="text-gray-500 hover:text-cyan-400 transition-colors p-1.5 hover:bg-white/5 rounded-md"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -157,15 +160,15 @@ export const ChatPage: React.FC = () => {
           {conversationHistory.map((item, idx) => (
             <button
               key={idx}
-              className={`w-full text-left px-3 py-2.5 rounded-lg text-[13px] transition-all flex items-start gap-3 group ${
+              className={`w-full text-left px-3 py-2.5 rounded-xl text-[13px] transition-all flex items-start gap-3 group border ${
                 item.active
-                  ? 'bg-blue-50 text-brand-accent shadow-sm'
-                  : 'text-brand-textMuted hover:bg-gray-100/80 border border-transparent'
+                  ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.1)]'
+                  : 'text-gray-400 hover:bg-white/5 border-transparent hover:border-white/10'
               }`}
             >
-              <MessageSquare className={`h-4 w-4 mt-0.5 shrink-0 ${item.active ? 'text-brand-accent' : 'text-brand-textMuted group-hover:text-brand-text'} transition-colors`} />
+              <MessageSquare className={`h-4 w-4 mt-0.5 shrink-0 ${item.active ? 'text-cyan-400' : 'text-gray-500 group-hover:text-gray-300'} transition-colors`} />
               <div className="flex-1 min-w-0">
-                <div className={`truncate ${item.active ? 'font-bold' : 'font-medium group-hover:text-brand-text'}`}>{item.title}</div>
+                <div className={`truncate ${item.active ? 'font-bold' : 'font-medium group-hover:text-white'}`}>{item.title}</div>
                 <div className="text-[11px] opacity-70 mt-0.5">{item.date}</div>
               </div>
             </button>
@@ -174,15 +177,20 @@ export const ChatPage: React.FC = () => {
       </aside>
 
       {/* Center Panel: Main Chat Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden bg-white relative">
-        <div className="h-16 border-b border-brand-border flex items-center px-8 flex-shrink-0 bg-white z-10 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center">
-               <BrainCircuit className="h-4 w-4 text-brand-accent" />
+      <div className="flex-1 flex flex-col h-full overflow-hidden bg-transparent relative z-10">
+        <div className="h-16 border-b border-white/10 flex items-center px-8 flex-shrink-0 bg-[#070b14]/50 backdrop-blur-md z-10">
+          <div className="flex items-center gap-3 w-full justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-lg bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30">
+                 <BrainCircuit className="h-4 w-4 text-cyan-400" />
+              </div>
+              <div>
+                 <h2 className="text-[14px] font-bold text-white leading-tight">ResearchGraph Core</h2>
+                 <p className="text-[11px] text-cyan-400/80 font-mono tracking-wide">RAG SYNTHESIS UPLINK</p>
+              </div>
             </div>
-            <div>
-               <h2 className="text-[14px] font-bold text-brand-text leading-tight">ResearchGraph AI</h2>
-               <p className="text-[11px] text-brand-textMuted font-semibold tracking-wide">ACADEMIC RESEARCH ASSISTANT</p>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400">
+               <Activity className="w-3 h-3 animate-pulse" /> SYSTEM ONLINE
             </div>
           </div>
         </div>
@@ -194,9 +202,9 @@ export const ChatPage: React.FC = () => {
                 if (msg.sender === 'user') {
                   return (
                     <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex justify-end">
-                      <div className="max-w-[85%] bg-blue-50 border border-blue-100 rounded-2xl rounded-tr-sm px-5 py-4 shadow-sm">
-                        <h3 className="text-[11px] font-bold text-brand-accent uppercase tracking-wider mb-1">You</h3>
-                        <div className="text-[15px] font-medium text-brand-text leading-snug">{msg.content}</div>
+                      <div className="max-w-[85%] bg-[#0c1427] border border-cyan-500/20 rounded-2xl rounded-tr-sm px-5 py-4 shadow-[0_0_15px_rgba(6,182,212,0.1)]">
+                        <h3 className="text-[11px] font-bold text-cyan-400 uppercase tracking-wider mb-1">Researcher</h3>
+                        <div className="text-[15px] font-medium text-white leading-snug">{msg.content}</div>
                       </div>
                     </motion.div>
                   );
@@ -205,39 +213,39 @@ export const ChatPage: React.FC = () => {
                     <motion.div key={msg.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-10 flex justify-start">
                       <div className="max-w-[95%]">
                         <div className="flex items-center gap-2 mb-2">
-                           <div className="h-6 w-6 rounded-md bg-gray-50 flex items-center justify-center border border-brand-border">
-                              <Sparkles className="h-3 w-3 text-brand-text" />
+                           <div className="h-6 w-6 rounded-md bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                              <Sparkles className="h-3 w-3 text-purple-400" />
                            </div>
-                           <h3 className="text-[11px] font-bold text-brand-text uppercase tracking-wider">ResearchGraph AI</h3>
+                           <h3 className="text-[11px] font-bold text-gray-300 uppercase tracking-wider">ResearchGraph AI</h3>
                         </div>
                         
-                        <div className="text-[15px] text-brand-text leading-relaxed whitespace-pre-line mb-6 pl-8">
+                        <div className="text-[15px] text-gray-300 leading-relaxed whitespace-pre-line mb-6 pl-8 font-light">
                           {msg.content}
                         </div>
 
                         <div className="pl-8">
                           {msg.codeSnippet && (
-                            <div className="mb-6 rounded-xl border border-brand-border overflow-hidden bg-gray-50 shadow-sm font-mono text-[13px]">
-                              <div className="px-4 py-2 bg-gray-100 border-b border-brand-border flex items-center justify-between text-brand-textMuted">
-                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-brand-text">
+                            <div className="mb-6 rounded-xl border border-white/10 overflow-hidden bg-[#05080f] shadow-lg font-mono text-[13px]">
+                              <div className="px-4 py-2 bg-white/5 border-b border-white/10 flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-cyan-400">
                                   <Terminal className="h-3.5 w-3.5" /> {msg.codeSnippet.language}
                                 </div>
                               </div>
-                              <pre className="p-4 overflow-x-auto text-brand-text"><code>{msg.codeSnippet.code}</code></pre>
+                              <pre className="p-4 overflow-x-auto text-gray-300"><code>{msg.codeSnippet.code}</code></pre>
                             </div>
                           )}
                           {msg.table && (
-                            <div className="mb-6 overflow-x-auto rounded-xl border border-brand-border shadow-sm">
+                            <div className="mb-6 overflow-x-auto rounded-xl border border-white/10 shadow-lg bg-[#05080f]">
                               <table className="w-full text-[13px] text-left border-collapse">
                                 <thead>
-                                  <tr className="bg-gray-50 border-b border-brand-border">
-                                    {msg.table.headers.map((h, i) => <th key={i} className="p-3 font-semibold text-brand-text">{h}</th>)}
+                                  <tr className="bg-white/5 border-b border-white/10">
+                                    {msg.table.headers.map((h, i) => <th key={i} className="p-3 font-semibold text-gray-200">{h}</th>)}
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {msg.table.rows.map((row, rIdx) => (
-                                    <tr key={rIdx} className="border-b border-brand-border last:border-0 hover:bg-gray-50/50 transition-colors">
-                                      {row.map((cell, cIdx) => <td key={cIdx} className="p-3 text-brand-textMuted leading-normal">{cell}</td>)}
+                                    <tr key={rIdx} className="border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors">
+                                      {row.map((cell, cIdx) => <td key={cIdx} className="p-3 text-gray-400 leading-normal">{cell}</td>)}
                                     </tr>
                                   ))}
                                 </tbody>
@@ -256,15 +264,15 @@ export const ChatPage: React.FC = () => {
               <div className="mb-10 flex justify-start">
                  <div className="max-w-[95%]">
                     <div className="flex items-center gap-2 mb-2">
-                       <div className="h-6 w-6 rounded-md bg-gray-50 flex items-center justify-center border border-brand-border">
-                          <Sparkles className="h-3 w-3 text-brand-text" />
+                       <div className="h-6 w-6 rounded-md bg-purple-500/20 flex items-center justify-center border border-purple-500/30">
+                          <Sparkles className="h-3 w-3 text-purple-400" />
                        </div>
-                       <h3 className="text-[11px] font-bold text-brand-text uppercase tracking-wider">ResearchGraph AI</h3>
+                       <h3 className="text-[11px] font-bold text-gray-300 uppercase tracking-wider">ResearchGraph AI</h3>
                     </div>
                     <div className="pl-8 flex items-center gap-1.5 h-6 mt-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="h-1.5 w-1.5 rounded-full bg-brand-accent animate-bounce"></span>
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse [animation-delay:-0.3s]"></span>
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse [animation-delay:-0.15s]"></span>
+                      <span className="h-1.5 w-1.5 rounded-full bg-purple-400 animate-pulse"></span>
                     </div>
                  </div>
               </div>
@@ -276,14 +284,14 @@ export const ChatPage: React.FC = () => {
         {chatMessages.length === 1 && !isTyping && (
           <div className="px-8 pb-4 w-full">
             <div className="max-w-3xl mx-auto">
-              <div className="flex items-center gap-1.5 text-[11px] font-bold text-brand-textMuted uppercase tracking-wider mb-3">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-cyan-400 uppercase tracking-wider mb-3">
                 <HelpCircle className="h-3.5 w-3.5" /> Research Suggestions
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {samplePrompts.map((promptObj, idx) => (
-                  <button key={idx} onClick={() => handleSend(promptObj.text)} className="text-left p-4 rounded-xl border border-brand-border bg-white hover:border-blue-200 hover:bg-blue-50/30 hover:shadow-sm transition-all">
-                    <div className="text-[13px] font-bold text-brand-text hover:text-brand-accent transition-colors mb-1">{promptObj.text}</div>
-                    <div className="text-[12px] text-brand-textMuted leading-relaxed">{promptObj.desc}</div>
+                  <button key={idx} onClick={() => handleSend(promptObj.text)} className="text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:border-cyan-500/40 hover:bg-cyan-500/10 hover:shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all">
+                    <div className="text-[13px] font-bold text-white hover:text-cyan-300 transition-colors mb-1">{promptObj.text}</div>
+                    <div className="text-[12px] text-gray-400 leading-relaxed">{promptObj.desc}</div>
                   </button>
                 ))}
               </div>
@@ -291,11 +299,11 @@ export const ChatPage: React.FC = () => {
           </div>
         )}
 
-        <div className="p-6 border-t border-brand-border bg-white">
+        <div className="p-6 border-t border-white/10 bg-[#070b14]/50 backdrop-blur-md">
           <form onSubmit={(e) => { e.preventDefault(); handleSend(prompt); }} className="relative flex items-center max-w-3xl mx-auto group">
             <div className="relative w-full flex items-center">
-              <input type="text" placeholder="Ask your research assistant..." value={prompt} onChange={(e) => setPrompt(e.target.value)} className="w-full h-14 pl-5 pr-14 rounded-xl border border-brand-border bg-white text-[15px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all shadow-sm" />
-              <button type="submit" disabled={!prompt.trim()} className="absolute right-2 top-2 h-10 w-10 rounded-lg bg-brand-accent text-white hover:bg-brand-accentHover flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400">
+              <input type="text" placeholder="Initiate RAG synthesis query..." value={prompt} onChange={(e) => setPrompt(e.target.value)} className="w-full h-14 pl-5 pr-14 rounded-xl border border-white/15 bg-[#0a0f1c] text-[15px] text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-lg" />
+              <button type="submit" disabled={!prompt.trim()} className="absolute right-2 top-2 h-10 w-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 text-white hover:from-cyan-400 hover:to-blue-500 flex items-center justify-center transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(6,182,212,0.4)]">
                 <Send className="h-4 w-4" />
               </button>
             </div>
@@ -303,9 +311,10 @@ export const ChatPage: React.FC = () => {
         </div>
       </div>
 
-      <aside className="w-72 border-l border-brand-border hidden xl:flex flex-col bg-gray-50/50 flex-shrink-0">
-        <div className="p-5 border-b border-brand-border">
-          <span className="text-[12px] font-bold text-brand-textMuted uppercase tracking-wider flex items-center gap-2">
+      {/* Right Panel: Context & Graph */}
+      <aside className="w-72 border-l border-white/10 hidden xl:flex flex-col bg-[#0a0f1c]/50 flex-shrink-0">
+        <div className="p-5 border-b border-white/10">
+          <span className="text-[12px] font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2">
             <Network className="h-4 w-4" /> Active Context
           </span>
         </div>
@@ -314,17 +323,17 @@ export const ChatPage: React.FC = () => {
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8">
               {currentSources.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-bold text-brand-text uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <BookMarked className="h-3.5 w-3.5 text-brand-accent" /> Cited Papers
+                  <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <BookMarked className="h-3.5 w-3.5 text-cyan-400" /> Cited Papers
                   </h4>
                   <div className="space-y-2">
                     {currentSources.map((paper, idx) => (
-                      <div key={paper.id} onClick={() => handlePaperClick(paper.id)} className="group p-3 rounded-xl border border-brand-border bg-white hover:border-brand-accent cursor-pointer transition-all hover:shadow-md">
+                      <div key={paper.id} onClick={() => handlePaperClick(paper.id)} className="group p-3 rounded-xl border border-white/10 bg-[#070b14] hover:border-cyan-500/50 cursor-pointer transition-all hover:shadow-[0_0_15px_rgba(6,182,212,0.15)]">
                         <div className="flex items-start gap-2 mb-1">
-                          <span className="text-[10px] font-bold text-white bg-brand-accent px-1.5 rounded-sm mt-0.5">[{idx + 1}]</span>
-                          <span className="text-[13px] font-bold text-brand-text group-hover:text-brand-accent transition-colors line-clamp-2 leading-tight">{paper.title}</span>
+                          <span className="text-[10px] font-bold text-[#070b14] bg-cyan-400 px-1.5 rounded-sm mt-0.5 font-mono">[{idx + 1}]</span>
+                          <span className="text-[13px] font-bold text-gray-200 group-hover:text-cyan-300 transition-colors line-clamp-2 leading-tight">{paper.title}</span>
                         </div>
-                        <div className="text-[11px] text-brand-textMuted pl-7 line-clamp-1 font-medium">{paper.authors[0]} et al. • {paper.year}</div>
+                        <div className="text-[11px] text-gray-500 pl-7 line-clamp-1 font-medium">{paper.authors[0]} et al. • {paper.year}</div>
                       </div>
                     ))}
                   </div>
@@ -332,12 +341,12 @@ export const ChatPage: React.FC = () => {
               )}
               {currentConcepts.length > 0 && (
                 <div>
-                  <h4 className="text-[11px] font-bold text-brand-text uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Network className="h-3.5 w-3.5 text-brand-violet" /> Knowledge Graph
+                  <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Network className="h-3.5 w-3.5 text-purple-400" /> Topologies
                   </h4>
-                  <div className="p-4 rounded-xl border border-brand-border bg-white flex flex-wrap gap-2 shadow-sm">
+                  <div className="p-4 rounded-xl border border-white/10 bg-[#070b14] flex flex-wrap gap-2 shadow-sm">
                     {currentConcepts.map((concept, idx) => (
-                      <span key={idx} className="px-2.5 py-1 text-[11px] font-bold text-brand-textMuted bg-gray-50 border border-brand-border rounded-md hover:border-brand-violet hover:text-brand-violet hover:bg-purple-50 cursor-pointer transition-colors">{concept}</span>
+                      <span key={idx} className="px-2.5 py-1 text-[11px] font-bold text-gray-400 bg-white/5 border border-white/10 rounded-md hover:border-purple-500/50 hover:text-purple-300 hover:bg-purple-500/10 cursor-pointer transition-colors shadow-sm">{concept}</span>
                     ))}
                   </div>
                 </div>
@@ -345,8 +354,8 @@ export const ChatPage: React.FC = () => {
             </motion.div>
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-center px-4 opacity-50">
-              <BrainCircuit className="h-10 w-10 text-brand-textMuted mb-3" />
-              <p className="text-[13px] text-brand-textMuted font-medium">Context will appear here as the assistant retrieves papers and builds the knowledge graph.</p>
+              <BrainCircuit className="h-10 w-10 text-cyan-500/50 mb-3 drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]" />
+              <p className="text-[13px] text-gray-500 font-medium">Context will map here as the RAG engine synthesizes research topologies.</p>
             </div>
           )}
         </div>

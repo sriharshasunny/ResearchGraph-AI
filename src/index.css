@@ -28,8 +28,8 @@
   }
 
   .bg-graph-pattern {
-    background-image: radial-gradient(circle at center, #e2e8f0 1px, transparent 1px);
-    background-size: 24px 24px;
+    background-image: radial-gradient(circle at center, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 
   .animate-gradient-x {

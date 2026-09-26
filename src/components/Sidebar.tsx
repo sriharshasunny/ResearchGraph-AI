@@ -18,12 +18,12 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     <motion.aside 
       initial={false}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
-      className="h-full bg-brand-surface/50 backdrop-blur-xl border-r border-brand-border flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
+      className="h-full bg-[#070b14]/50 backdrop-blur-2xl border-r border-white/10 flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
     >
       
       {/* Brand */}
       <div 
-        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-brand-border transition-all duration-300`} 
+        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-white/10 transition-all duration-300`} 
       >
         <button 
           onClick={toggleSidebar}
@@ -51,7 +51,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         {isSidebarOpen ? (
           <div className="px-3 mb-3 text-[11px] font-bold text-brand-textMuted uppercase tracking-widest transition-opacity duration-300">Main Menu</div>
         ) : (
-          <div className="h-[1px] w-8 mx-auto bg-brand-border mb-3 mt-1 rounded-full"></div>
+          <div className="h-[1px] w-8 mx-auto bg-white/10 mb-3 mt-1 rounded-full"></div>
         )}
         
         {navItems.map(item => (
@@ -86,7 +86,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         {isSidebarOpen ? (
           <div className="px-3 mt-8 mb-3 text-[11px] font-bold text-brand-textMuted uppercase tracking-widest transition-opacity duration-300">Library</div>
         ) : (
-          <div className="h-[1px] w-8 mx-auto bg-brand-border mt-8 mb-3 rounded-full"></div>
+          <div className="h-[1px] w-8 mx-auto bg-white/10 mt-8 mb-3 rounded-full"></div>
         )}
         
         <button
@@ -111,7 +111,7 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
       </div>
 
       {/* Profile & Logout */}
-      <div className={`p-4 border-t border-brand-border space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
+      <div className={`p-4 border-t border-white/10 space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
         <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
             <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/20">
