@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, BookOpen, Layers, Sparkles, ArrowLeft } from 'lucide-react';
 
 type PageState = 'LANDING' | 'AUTH';
@@ -9,6 +9,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
   const [isTraversing, setIsTraversing] = useState(false);
+
+  // Scroll Parallax logic
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ container: scrollContainerRef });
+  
+  // As we scroll down, scale the background up to simulate flying into space
+  const spaceScale = useTransform(scrollYProgress, [0, 1], [1, 1.4]);
+  // As we scroll down, slightly shift the background down for parallax
+  const spaceY = useTransform(scrollYProgress, [0, 1], ['0%', '15%']);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,50 +49,32 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
         {/* Layer 1: Landing Background */}
         <motion.div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: "url('/epic_launch_bg.jpg')" }}
+          style={{ backgroundImage: "url('/epic_launch_bg.jpg')", scale: spaceScale, y: spaceY }}
           initial={{ opacity: 1 }}
-          animate={{ 
-            opacity: pageState === 'LANDING' ? 1 : 0,
-            scale: [1, 1.05, 1],
-          }}
-          transition={{ 
-            opacity: { duration: 1.2, ease: "easeInOut" },
-            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" }
-          }}
+          animate={{ opacity: pageState === 'LANDING' ? 1 : 0 }}
+          transition={{ opacity: { duration: 1.2, ease: "easeInOut" } }}
         />
 
         {/* Layer 2: Login Background */}
         <motion.div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: "url('/login_bg.jpg')" }}
+          style={{ backgroundImage: "url('/login_bg.jpg')", scale: spaceScale, y: spaceY }}
           initial={{ opacity: 0 }}
-          animate={{ 
-            opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1 : 0,
-            scale: [1, 1.05, 1],
-          }}
-          transition={{ 
-            opacity: { duration: 1.2, ease: "easeInOut" },
-            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" }
-          }}
+          animate={{ opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1 : 0 }}
+          transition={{ opacity: { duration: 1.2, ease: "easeInOut" } }}
         />
 
         {/* Layer 3: Register Background */}
         <motion.div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: "url('/register_bg.jpg')" }}
+          style={{ backgroundImage: "url('/register_bg.jpg')", scale: spaceScale, y: spaceY }}
           initial={{ opacity: 0 }}
-          animate={{ 
-            opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1 : 0,
-            scale: [1, 1.05, 1],
-          }}
-          transition={{ 
-            opacity: { duration: 1.2, ease: "easeInOut" },
-            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" }
-          }}
+          animate={{ opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1 : 0 }}
+          transition={{ opacity: { duration: 1.2, ease: "easeInOut" } }}
         />
 
-        {/* Normal Ambient Stars */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Normal Ambient Stars tied to Parallax */}
+        <motion.div className="absolute inset-0 z-0 pointer-events-none" style={{ scale: spaceScale, y: spaceY }}>
           {Array.from({ length: 40 }).map((_, i) => (
             <motion.div key={`ambient-${i}`} className="absolute rounded-full bg-cyan-200"
               style={{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', width: Math.random() * 2 + 1 + 'px', height: Math.random() * 2 + 1 + 'px' }}
@@ -91,7 +82,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: Math.random() * 6 + 4, repeat: Infinity, ease: "easeInOut", delay: Math.random() * 3 }}
             />
           ))}
-        </div>
+        </motion.div>
         
         {/* Dynamic Darkening Gradients - Lightened severely during AUTH so images pop! */}
         <div className={`absolute inset-0 transition-colors duration-1000 ease-in-out z-0 ${pageState === 'LANDING' ? 'bg-black/50' : 'bg-transparent'}`}></div>
@@ -99,7 +90,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
       </div>
 
       {/* --- PAGE CONTENT CONTAINER --- */}
-      <div className="relative z-20 w-full h-full overflow-y-auto overflow-x-hidden">
+      <div 
+        ref={scrollContainerRef}
+        className="relative z-20 w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+      >
         <AnimatePresence mode="wait">
           
           {/* ==================================================== */}
