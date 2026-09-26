@@ -2,24 +2,37 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Sparkles, ArrowLeft, 
-  Zap, Database, Layers, Info, X, ExternalLink, Compass, Award, KeyRound, CheckCircle2
+  Zap, Database, Layers, Info, X, Compass, Award, KeyRound, CheckCircle2,
+  Play, ChevronDown, Activity, Cpu, Share2, Radio, FileText,
+  Microscope, Binary
 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
-type InfoModalType = 'HOW_IT_WORKS' | 'SOURCES' | 'ABOUT' | null;
+type InfoModalType = 'HOW_IT_WORKS' | 'SOURCES' | 'ABOUT' | 'DEMO' | null;
 
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
   const [activeModal, setActiveModal] = useState<InfoModalType>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDomain, setSelectedDomain] = useState<'ai' | 'bio' | 'quantum' | 'materials' | 'neuro'>('ai');
+  const [activeDemoQuery, setActiveDemoQuery] = useState(0);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const topologySectionRef = useRef<HTMLDivElement>(null);
+  const sourcesSectionRef = useRef<HTMLDivElement>(null);
+  const pipelineSectionRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAuthComplete();
+  };
+
+  const handleHeroSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onAuthComplete();
   };
@@ -30,6 +43,67 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     setActiveModal(null);
     setMobileMenuOpen(false);
   };
+
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+    setActiveModal(null);
+  };
+
+  // Demo queries for the interactive sandbox
+  const demoQueries = [
+    {
+      query: "How do Graph Neural Networks improve molecular drug discovery?",
+      domain: "Biomedical AI",
+      nodesFound: 428,
+      papersFound: 1420,
+      confidence: "98.4%",
+      summary: "GNNs model molecular structures as graphs where atoms are nodes and covalent bonds are edges. Message-passing neural networks (MPNNs) effectively predict ADMET pharmacokinetics and bind affinities, reducing initial synthesis cycles by ~68% across recent Stanford and DeepMind clinical trials.",
+      papers: [
+        { title: "Pushing the Boundaries of Molecular Property Prediction with Graph Neural Networks", authors: "K. Yang et al.", journal: "ACS Cent. Sci.", citations: "1,842", doi: "10.1021/acscentsci.9b00476" },
+        { title: "Geometric Deep Learning Grids for Structure-Based Drug Discovery", authors: "M. Bronstein et al.", journal: "Nature Biotech.", citations: "2,310", doi: "10.1038/s41587-021-00984-3" }
+      ],
+      connections: ["ADMET Profiling", "Message Passing Networks", "Protein-Ligand Docking", "E(3)-Equivariance"]
+    },
+    {
+      query: "Topological quantum error correction using surface codes",
+      domain: "Quantum Computing",
+      nodesFound: 312,
+      papersFound: 980,
+      confidence: "97.1%",
+      summary: "Surface codes encode logical qubits into 2D lattices of physical qubits using stabilizer measurements. Anyonic excitations (syndrome measurements) allow real-time decoding via Minimum Weight Perfect Matching (MWPM), demonstrating fault-tolerant threshold fidelity above 99.3%.",
+      papers: [
+        { title: "Fault-tolerant quantum computation with surface codes", authors: "A. G. Fowler et al.", journal: "Phys. Rev. A", citations: "3,140", doi: "10.1103/PhysRevA.86.032324" },
+        { title: "Suppressing quantum errors by scaling a quantum error-correcting code", authors: "Google Quantum AI", journal: "Nature", citations: "1,120", doi: "10.1038/s41586-022-05434-1" }
+      ],
+      connections: ["MWPM Decoders", "Stabilizer Formalism", "Toric Code Topology", "Logical Qubits"]
+    },
+    {
+      query: "Multi-modal foundation models for clinical oncology diagnosis",
+      domain: "Clinical Oncology",
+      nodesFound: 516,
+      papersFound: 2180,
+      confidence: "99.1%",
+      summary: "Cross-attention transformers fusing whole slide pathology images (WSIs), genomic sequencing, and radiological CT/MRI scans demonstrate statistically significant AUC improvements (+0.14) over unimodal architectures in predicting 5-year patient survival rates.",
+      papers: [
+        { title: "Multimodal Foundation Models in Pathology and Oncology", authors: "F. Chen et al.", journal: "Cell Genomics", citations: "890", doi: "10.1016/j.xgen.2023.100345" },
+        { title: "Deep learning-enabled medical computer vision in histopathology", authors: "J. Lipkova et al.", journal: "Nature Medicine", citations: "1,520", doi: "10.1038/s41591-022-01764-w" }
+      ],
+      connections: ["Whole Slide Imaging", "Survival Prediction AUC", "Cross-Attention Fusion", "Genomic Stratification"]
+    },
+    {
+      query: "CRISPR-Cas12 target specificity compared to Cas9",
+      domain: "Gene Editing",
+      nodesFound: 384,
+      papersFound: 1650,
+      confidence: "98.8%",
+      summary: "Cas12a (Cpf1) creates staggered double-strand breaks with 4-5 nucleotide 5'-overhangs using a single T-rich PAM (TTTV), demonstrating significantly reduced off-target cleavage compared to canonical SpCas9 in mammalian ex vivo therapeutic edits.",
+      papers: [
+        { title: "Cpf1 Is a Single RNA-Guided Endonuclease of a Class 2 CRISPR-Cas System", authors: "B. Zetsche, F. Zhang et al.", journal: "Cell", citations: "4,210", doi: "10.1016/j.cell.2015.09.038" },
+        { title: "Genome-wide specificities of CRISPR-Cas9 vs Cas12a ribonucleoproteins", authors: "J. S. Kim et al.", journal: "Nature Biotech.", citations: "1,390", doi: "10.1038/nbt.3609" }
+      ],
+      connections: ["PAM Specificity (TTTV)", "Staggered Cleavage Overhangs", "Off-Target GUIDESeq", "Ex Vivo Gene Therapy"]
+    }
+  ];
 
   return (
     <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
@@ -54,16 +128,19 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="w-full min-h-screen flex flex-col relative"
+              className="w-full flex flex-col relative"
             >
               {/* ═══════════════ TOP NAVBAR ═══════════════ */}
-              <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#060a14]/90 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50 shadow-2xl shadow-black/50">
+              <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#040816]/85 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50 shadow-2xl shadow-black/80">
                 {/* Brand Logo */}
                 <div 
                   className="flex items-center gap-3 cursor-pointer group" 
-                  onClick={() => { setActiveModal(null); }}
+                  onClick={() => {
+                    scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+                    setActiveModal(null);
+                  }}
                 >
-                  <div className="w-10 h-10 rounded-xl border border-cyan-500/40 flex items-center justify-center bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/20 shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-all">
+                  <div className="w-10 h-10 rounded-xl border border-cyan-500/40 flex items-center justify-center bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/20 shadow-lg shadow-cyan-500/25 group-hover:scale-105 transition-all">
                     <Network className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
                   </div>
                   <div className="flex items-center gap-2">
@@ -76,38 +153,45 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
                 </div>
                 
-                {/* Center Navigation Links: How it works, Sources, Info */}
+                {/* Center Navigation Links */}
                 <div className="hidden lg:flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-xl">
                   <button 
-                    onClick={() => setActiveModal(null)}
+                    onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
                   >
-                    Overview
+                    Cockpit View
                   </button>
 
                   <button 
-                    onClick={() => setActiveModal('HOW_IT_WORKS')}
+                    onClick={() => scrollToSection(topologySectionRef)}
                     className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-cyan-300 rounded-full hover:bg-cyan-500/10 transition-all flex items-center gap-1.5"
                   >
-                    <Zap className="w-3 h-3 text-cyan-400" />
-                    How It Works
-                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">AI Pipeline</span>
+                    <Network className="w-3 h-3 text-cyan-400" />
+                    3D Topology
                   </button>
 
                   <button 
-                    onClick={() => setActiveModal('SOURCES')}
+                    onClick={() => scrollToSection(pipelineSectionRef)}
                     className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-purple-300 rounded-full hover:bg-purple-500/10 transition-all flex items-center gap-1.5"
                   >
-                    <Database className="w-3 h-3 text-purple-400" />
+                    <Zap className="w-3 h-3 text-purple-400" />
+                    RAG Pipeline
+                  </button>
+
+                  <button 
+                    onClick={() => scrollToSection(sourcesSectionRef)}
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-emerald-300 rounded-full hover:bg-emerald-500/10 transition-all flex items-center gap-1.5"
+                  >
+                    <Database className="w-3 h-3 text-emerald-400" />
                     Data Sources
-                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">45+ Repos</span>
+                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">45+</span>
                   </button>
 
                   <button 
                     onClick={() => setActiveModal('ABOUT')}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-emerald-300 rounded-full hover:bg-emerald-500/10 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-sky-300 rounded-full hover:bg-sky-500/10 transition-all flex items-center gap-1.5"
                   >
-                    <Info className="w-3 h-3 text-emerald-400" />
+                    <Info className="w-3 h-3 text-sky-400" />
                     About Us
                   </button>
                 </div>
@@ -145,336 +229,957 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     initial={{ opacity: 0, y: -10 }} 
                     animate={{ opacity: 1, y: 0 }} 
                     exit={{ opacity: 0, y: -10 }}
-                    className="lg:hidden w-full bg-[#0a0f1c]/95 border-b border-white/10 px-6 py-4 flex flex-col gap-2 relative z-40 backdrop-blur-2xl"
+                    className="lg:hidden w-full bg-[#070b18]/95 border-b border-white/10 px-6 py-4 flex flex-col gap-2 relative z-40 backdrop-blur-2xl"
                   >
                     <button 
-                      onClick={() => { setActiveModal(null); setMobileMenuOpen(false); }}
+                      onClick={() => { scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}
                       className="text-left py-2 px-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-lg"
                     >
-                      Overview
+                      Cockpit View
                     </button>
                     <button 
-                      onClick={() => { setActiveModal('HOW_IT_WORKS'); setMobileMenuOpen(false); }}
+                      onClick={() => { scrollToSection(topologySectionRef); setMobileMenuOpen(false); }}
                       className="text-left py-2 px-3 text-sm font-medium text-cyan-300 hover:bg-cyan-500/10 rounded-lg flex items-center gap-2"
                     >
-                      <Zap className="w-4 h-4 text-cyan-400" /> How It Works
+                      <Network className="w-4 h-4 text-cyan-400" /> 3D Topology
                     </button>
                     <button 
-                      onClick={() => { setActiveModal('SOURCES'); setMobileMenuOpen(false); }}
+                      onClick={() => { scrollToSection(pipelineSectionRef); setMobileMenuOpen(false); }}
                       className="text-left py-2 px-3 text-sm font-medium text-purple-300 hover:bg-purple-500/10 rounded-lg flex items-center gap-2"
                     >
-                      <Database className="w-4 h-4 text-purple-400" /> Data Sources (45+ Repos)
+                      <Zap className="w-4 h-4 text-purple-400" /> RAG Pipeline
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection(sourcesSectionRef); setMobileMenuOpen(false); }}
+                      className="text-left py-2 px-3 text-sm font-medium text-emerald-300 hover:bg-emerald-500/10 rounded-lg flex items-center gap-2"
+                    >
+                      <Database className="w-4 h-4 text-emerald-400" /> Data Sources (45+ Repos)
                     </button>
                     <button 
                       onClick={() => { setActiveModal('ABOUT'); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-emerald-300 hover:bg-emerald-500/10 rounded-lg flex items-center gap-2"
+                      className="text-left py-2 px-3 text-sm font-medium text-sky-300 hover:bg-sky-500/10 rounded-lg flex items-center gap-2"
                     >
-                      <Info className="w-4 h-4 text-emerald-400" /> About ResearchGraph AI
+                      <Info className="w-4 h-4 text-sky-400" /> About ResearchGraph AI
                     </button>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* ═══════════════ MAIN CONTENT AREA (NO SIDEBAR, FULL BREADTH) ═══════════════ */}
-              <div className="flex-1 flex flex-col relative w-full overflow-hidden">
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*           THE EXACT STARSHIP COCKPIT BRIDGE HERO VIEW (MATCHING IMAGE)               */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-[#02050e]">
+                
+                {/* Cockpit Canopy Framing: High-Resolution Background Image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
+                  style={{ backgroundImage: `url('/cockpit_landing_hero.jpg')` }}
+                />
 
-                {/* Hero Showcase Container */}
-                <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 py-6 lg:py-10 flex-1 flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 relative z-20">
-                  
-                  {/* ─── LEFT: HERO COPY & CALL TO ACTIONS ─── */}
-                  <div className="flex-1 flex flex-col items-start text-left max-w-xl z-30">
+                {/* Subtle Star Twinkle & Holographic Glow Atmosphere */}
+                <div className="absolute inset-0 pointer-events-none z-10 bg-radial-vignette opacity-30"></div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none z-10"></div>
+                
+                {/* ─── TOP SECTION: FLOATING HUD PANELS & CANOPY HEADER ─── */}
+                <div className="relative z-20 w-full max-w-[1550px] mx-auto px-4 sm:px-8 pt-4 pb-2">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    
+                    {/* Top-Left: Research Databases HUD Panel */}
                     <motion.div 
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                      className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-5 text-xs text-gray-300 font-semibold shadow-sm"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                      <span>Next-Gen Autonomous Scientific Intelligence</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono font-bold">RAG 3D</span>
-                    </motion.div>
-
-                    <motion.h1 
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: -15 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
-                      className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.08] mb-5"
+                      onClick={() => setActiveModal('SOURCES')}
+                      className="hidden md:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#070d1e]/80 border border-cyan-500/30 backdrop-blur-xl shadow-lg shadow-cyan-950/40 hover:border-cyan-400 transition-all cursor-pointer group"
                     >
-                      A Universe<br/>
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                          <Database className="w-3 h-3 text-cyan-400" />
+                          Research Databases
+                        </span>
+                        <span className="text-[9px] text-cyan-400/80 group-hover:text-cyan-300 font-mono transition-colors">
+                          + more sources ↗
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-bold">arXiv</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold">PubMed</span>
+                        <span className="px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-bold">IEEE</span>
+                        <span className="px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-bold">Semantic Scholar</span>
+                        <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold">CrossRef</span>
+                      </div>
+                    </motion.div>
+
+                    {/* Top-Center: RAG Pipeline HUD Flow */}
+                    <motion.div 
+                      initial={{ opacity: 0, y: -15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
+                      onClick={() => setActiveModal('HOW_IT_WORKS')}
+                      className="hidden lg:flex flex-col gap-1.5 px-5 py-2.5 rounded-2xl bg-[#070d1e]/80 border border-purple-500/30 backdrop-blur-xl shadow-lg shadow-purple-950/40 hover:border-purple-400 transition-all cursor-pointer group"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                          <Zap className="w-3 h-3 text-purple-400" />
+                          RAG Pipeline
+                        </span>
+                        <span className="text-[9px] text-purple-300/80 group-hover:text-purple-200 font-mono transition-colors">
+                          Live Architecture ↗
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px]">
+                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-300">
+                          <Database className="w-3 h-3 text-blue-400" />
+                          <span>Retrieve</span>
+                        </div>
+                        <span className="text-gray-500 font-bold">→</span>
+                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-300">
+                          <FileText className="w-3 h-3 text-purple-400" />
+                          <span>Augment</span>
+                        </div>
+                        <span className="text-gray-500 font-bold">→</span>
+                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+                          <BrainCircuit className="w-3 h-3 text-emerald-400" />
+                          <span>Generate</span>
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Top-Right: Large Language Models HUD */}
+                    <motion.div 
+                      initial={{ opacity: 0, y: -15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="hidden xl:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#070d1e]/80 border border-emerald-500/30 backdrop-blur-xl shadow-lg shadow-emerald-950/40"
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                          <Cpu className="w-3 h-3 text-emerald-400" />
+                          Large Language Models
+                        </span>
+                        <span className="text-[9px] text-emerald-400/80 font-mono">
+                          + custom models
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold">GPT-4o</span>
+                        <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-semibold">Claude 3.5</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300 text-[10px] font-semibold">Gemini 1.5</span>
+                        <span className="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-semibold">Llama 3.1</span>
+                        <span className="px-2 py-0.5 rounded bg-pink-500/15 border border-pink-500/30 text-pink-300 text-[10px] font-semibold">Mistral</span>
+                      </div>
+                    </motion.div>
+
+                  </div>
+                </div>
+
+                {/* ─── MIDDLE HERO STAGE: LEFT TEXT + CENTER 3D KNOWLEDGE SPHERE + RIGHT LIVE ANALYTICS ─── */}
+                <div className="relative z-20 w-full max-w-[1550px] mx-auto px-4 sm:px-8 py-2 lg:py-4 flex-1 flex flex-col lg:flex-row items-center justify-between gap-6">
+                  
+                  {/* LEFT: HERO COPY & CALL TO ACTIONS */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: -25 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.6 }}
+                    className="flex-1 flex flex-col items-start text-left max-w-xl z-30"
+                  >
+                    {/* Brand Pill */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-widest uppercase mb-4 shadow-sm">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                      RESEARCHGRAPH AI
+                    </div>
+
+                    {/* Massive Punchy Headline */}
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-4">
+                      A Universe<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">
                         of Connected
-                      </span><br/>
+                      </span><br />
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-fuchsia-400">
                         Knowledge
                       </span>
-                    </motion.h1>
+                    </h1>
 
-                    <motion.p 
-                      initial={{ opacity: 0, y: 15 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="text-gray-300/80 text-sm sm:text-base leading-relaxed mb-8 max-w-lg"
-                    >
-                      RAG-powered research intelligence with 3D knowledge topologies, 45+ multi-source scientific repositories, and multi-LLM synthesis to help you discover, connect, and understand research like never before.
-                    </motion.p>
+                    {/* Subtitle Description */}
+                    <p className="text-gray-300/90 text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                      RAG-powered research intelligence with knowledge graphs, multi-source data and LLMs to help you discover, connect and understand research like never before.
+                    </p>
 
-                    <motion.div 
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="flex flex-wrap items-center gap-3.5 mb-10"
-                    >
+                    {/* Action Buttons */}
+                    <div className="flex flex-wrap items-center gap-3.5 mb-8">
                       <button 
                         onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm transition-all shadow-xl shadow-cyan-500/30 flex items-center gap-2.5 border border-cyan-400/30 hover:scale-[1.02] active:scale-[0.98]"
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-sm transition-all shadow-xl shadow-cyan-500/30 flex items-center gap-2.5 border border-cyan-400/40 hover:scale-[1.03] active:scale-[0.98]"
                       >
                         Explore 3D Graph <ArrowRight className="w-4 h-4" />
                       </button>
+
                       <button 
-                        onClick={() => setActiveModal('HOW_IT_WORKS')}
-                        className="px-5 py-3 rounded-xl bg-white/5 border border-white/15 text-gray-200 font-semibold text-sm hover:bg-white/10 transition-all flex items-center gap-2 backdrop-blur-sm hover:border-cyan-400/30"
+                        onClick={() => setActiveModal('DEMO')}
+                        className="px-5 py-3 rounded-xl bg-[#081026]/80 border border-white/20 hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm transition-all flex items-center gap-2.5 backdrop-blur-md hover:bg-white/10"
                       >
-                        <Zap className="w-4 h-4 text-cyan-400" />
-                        See How It Works
+                        <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" />
+                        Watch Demo
                       </button>
-                    </motion.div>
+                    </div>
 
-                    {/* Stats Grid */}
-                    <motion.div 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.5 }}
-                      className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full pt-4 border-t border-white/10"
-                    >
-                      {[
-                        { value: '200M+', label: 'Research Papers', color: 'text-cyan-400' },
-                        { value: '45+', label: 'Data Sources', color: 'text-purple-400' },
-                        { value: 'Multi-LLM', label: 'AI Intelligence', color: 'text-emerald-400' },
-                        { value: 'Real-time', label: 'Knowledge Graph', color: 'text-sky-400' },
-                      ].map((stat, idx) => (
-                        <div key={idx} className="bg-white/5 border border-white/5 rounded-xl p-2.5 backdrop-blur-sm">
-                          <span className={`text-base sm:text-lg font-extrabold ${stat.color} block`}>{stat.value}</span>
-                          <span className="text-gray-400 text-[11px] leading-tight block">{stat.label}</span>
-                        </div>
-                      ))}
-                    </motion.div>
-                  </div>
-
-                  {/* ─── CENTER: 3D KNOWLEDGE SPHERE & ORBITING LABELS ─── */}
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, duration: 0.8 }}
-                    className="relative w-[340px] h-[340px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] flex items-center justify-center flex-shrink-0"
-                  >
-                    {/* Glowing Auras */}
-                    <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-cyan-500/15 blur-[100px] pointer-events-none animate-pulse"></div>
-                    <div className="absolute w-60 h-60 rounded-full bg-purple-500/10 blur-[80px] pointer-events-none translate-x-8 translate-y-10"></div>
-
-                    {/* Three.js Interactive Neural Core */}
-                    <ThreeNeuralCore className="w-full h-full" theme="cyan" interactive={true} />
-
-                    {/* Orbiting Category Badges */}
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="absolute top-[4%] left-[34%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-blue-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Authors
-                      </span>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }} className="absolute top-[38%] left-[-4%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Papers
-                      </span>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }} className="absolute bottom-[18%] left-[4%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-orange-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Concepts
-                      </span>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.85 }} className="absolute top-[22%] right-[-6%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-cyan-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Knowledge Graph
-                      </span>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.95 }} className="absolute top-[52%] right-[-10%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-purple-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Datasets
-                      </span>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.05 }} className="absolute bottom-[24%] right-[-4%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-yellow-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> Citations
-                      </span>
-                    </motion.div>
-
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }} className="absolute bottom-[4%] right-[16%] z-20 pointer-events-none">
-                      <span className="px-2.5 py-1 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-pink-500/10">
-                        <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span> Research Trends
-                      </span>
-                    </motion.div>
+                    {/* 4 Stats Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full pt-4 border-t border-white/10">
+                      <div>
+                        <span className="text-lg sm:text-xl font-black text-cyan-400 block tracking-tight">200M+</span>
+                        <span className="text-gray-400 text-[11px] leading-tight block">Research Papers</span>
+                      </div>
+                      <div>
+                        <span className="text-lg sm:text-xl font-black text-purple-400 block tracking-tight">45+</span>
+                        <span className="text-gray-400 text-[11px] leading-tight block">Data Sources</span>
+                      </div>
+                      <div>
+                        <span className="text-lg sm:text-xl font-black text-emerald-400 block tracking-tight">Multi-LLM</span>
+                        <span className="text-gray-400 text-[11px] leading-tight block">AI Intelligence</span>
+                      </div>
+                      <div>
+                        <span className="text-lg sm:text-xl font-black text-sky-400 block tracking-tight">Real-time</span>
+                        <span className="text-gray-400 text-[11px] leading-tight block">Knowledge Graph</span>
+                      </div>
+                    </div>
                   </motion.div>
 
-                  {/* ─── RIGHT: SCI-FI TELEMETRY & CAPABILITY CARDS ─── */}
-                  <div className="hidden xl:flex flex-col gap-3.5 w-[240px] z-30 flex-shrink-0">
+                  {/* CENTER: 3D HOLOGRAPHIC PROJECTION PEDESTAL & INTERACTIVE SPHERE */}
+                  <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[520px] lg:h-[520px] flex items-center justify-center flex-shrink-0 my-2">
                     
-                    {/* Research Databases Panel */}
-                    <motion.div 
-                      initial={{ opacity: 0, x: 20 }} 
-                      animate={{ opacity: 1, x: 0 }} 
-                      transition={{ delay: 0.6 }}
-                      onClick={() => setActiveModal('SOURCES')}
-                      className="rounded-2xl bg-[#0a0f1c]/90 border border-white/10 p-3.5 backdrop-blur-xl hover:border-cyan-500/40 transition-all cursor-pointer group shadow-xl"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Research Databases</h4>
-                        <ExternalLink className="w-3 h-3 text-gray-500 group-hover:text-cyan-400 transition-colors" />
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {['PubMed', 'IEEE', 'Semantic Scholar', 'CrossRef', 'arXiv'].map(db => (
-                          <span key={db} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] text-gray-300 font-medium group-hover:border-cyan-500/20 transition-colors">{db}</span>
-                        ))}
-                      </div>
-                    </motion.div>
+                    {/* Concentric Holographic Emitter Rings */}
+                    <div className="absolute inset-0 rounded-full border border-cyan-500/20 animate-spin-slow pointer-events-none"></div>
+                    <div className="absolute inset-6 rounded-full border border-purple-500/20 animate-reverse-spin pointer-events-none"></div>
+                    
+                    {/* The Real Interactive WebGL 3D Quantum Neural Core */}
+                    <div className="relative w-full h-full flex items-center justify-center z-10 cursor-grab active:cursor-grabbing">
+                      <ThreeNeuralCore className="w-full h-full" theme="cyan" interactive={true} />
+                    </div>
 
-                    {/* RAG Pipeline Panel */}
+                    {/* Center Hex Badge on Globe: Knowledge Graph */}
                     <motion.div 
-                      initial={{ opacity: 0, x: 20 }} 
-                      animate={{ opacity: 1, x: 0 }} 
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.7 }}
-                      onClick={() => setActiveModal('HOW_IT_WORKS')}
-                      className="rounded-2xl bg-[#0a0f1c]/90 border border-white/10 p-3.5 backdrop-blur-xl hover:border-purple-500/40 transition-all cursor-pointer group shadow-xl"
+                      className="absolute z-20 pointer-events-none flex flex-col items-center justify-center"
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">RAG Pipeline</h4>
-                        <ExternalLink className="w-3 h-3 text-gray-500 group-hover:text-purple-400 transition-colors" />
+                      <div className="w-11 h-11 rounded-xl bg-blue-600/30 border border-cyan-400/80 backdrop-blur-md flex items-center justify-center shadow-lg shadow-cyan-500/40">
+                        <Network className="w-6 h-6 text-cyan-300" />
                       </div>
-                      <div className="flex items-center gap-1 text-[9px]">
-                        <span className="px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-300 font-medium">Retrieve</span>
-                        <span className="text-gray-500">→</span>
-                        <span className="px-2 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300 font-medium">Augment</span>
-                        <span className="text-gray-500">→</span>
-                        <span className="px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-medium">Generate</span>
-                      </div>
+                      <span className="mt-1 px-2.5 py-0.5 rounded-full bg-[#040816]/90 border border-cyan-500/50 text-[10px] font-extrabold text-cyan-300 uppercase tracking-wider shadow-md">
+                        Knowledge Graph
+                      </span>
                     </motion.div>
 
-                    {/* Large Language Models Panel */}
-                    <motion.div 
-                      initial={{ opacity: 0, x: 20 }} 
-                      animate={{ opacity: 1, x: 0 }} 
-                      transition={{ delay: 0.8 }}
-                      className="rounded-2xl bg-[#0a0f1c]/90 border border-white/10 p-3.5 backdrop-blur-xl shadow-xl"
-                    >
-                      <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2">Large Language Models</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {['GPT-4o', 'Claude 3.5', 'Gemini 1.5', 'Llama 3.1', 'Mistral'].map(llm => (
-                          <span key={llm} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] text-gray-300 font-medium">{llm}</span>
-                        ))}
-                      </div>
-                    </motion.div>
+                    {/* Orbiting Category Badges (Matching Image Placement) */}
+                    {/* 1. Authors (Top-Left, Amber) */}
+                    <div className="absolute top-[8%] left-[20%] z-20 pointer-events-none animate-float-slow">
+                      <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-amber-500/20">
+                        <User className="w-3 h-3 text-amber-400" />
+                        Authors
+                      </span>
+                    </div>
 
-                    {/* Live Analytics Panel */}
-                    <motion.div 
-                      initial={{ opacity: 0, x: 20 }} 
-                      animate={{ opacity: 1, x: 0 }} 
-                      transition={{ delay: 0.9 }}
-                      className="rounded-2xl bg-[#0a0f1c]/90 border border-white/10 p-3.5 backdrop-blur-xl shadow-xl"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Live Global Index</h4>
-                        <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono font-bold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Streaming
+                    {/* 2. Papers (Mid-Left, Blue) */}
+                    <div className="absolute top-[40%] left-[2%] z-20 pointer-events-none animate-float-mid">
+                      <span className="px-2.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/50 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
+                        <FileText className="w-3 h-3 text-blue-400" />
+                        Papers
+                      </span>
+                    </div>
+
+                    {/* 3. Concepts (Bottom-Left, Purple) */}
+                    <div className="absolute bottom-[16%] left-[10%] z-20 pointer-events-none animate-float-slow">
+                      <span className="px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/50 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-purple-500/20">
+                        <Sparkles className="w-3 h-3 text-purple-400" />
+                        Concepts
+                      </span>
+                    </div>
+
+                    {/* 4. Datasets (Top-Right, Green) */}
+                    <div className="absolute top-[16%] right-[8%] z-20 pointer-events-none animate-float-mid">
+                      <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+                        <Database className="w-3 h-3 text-emerald-400" />
+                        Datasets
+                      </span>
+                    </div>
+
+                    {/* 5. Citations (Mid-Right, Coral) */}
+                    <div className="absolute top-[46%] right-[-2%] z-20 pointer-events-none animate-float-slow">
+                      <span className="px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/50 text-rose-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-rose-500/20">
+                        <Share2 className="w-3 h-3 text-rose-400" />
+                        Citations
+                      </span>
+                    </div>
+
+                    {/* 6. Research Trends (Bottom-Right, Violet) */}
+                    <div className="absolute bottom-[12%] right-[10%] z-20 pointer-events-none animate-float-mid">
+                      <span className="px-2.5 py-1 rounded-full bg-fuchsia-500/20 border border-fuchsia-400/50 text-fuchsia-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-fuchsia-500/20">
+                        <Activity className="w-3 h-3 text-fuchsia-400" />
+                        Research Trends
+                      </span>
+                    </div>
+
+                    {/* Floating 3D Scientific Paper Card Mockups in Orbit */}
+                    <div className="absolute top-[18%] left-[12%] z-15 pointer-events-none hidden sm:block opacity-75 transform -rotate-12 hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-22 bg-white/90 rounded shadow-md p-1.5 border border-white/50 text-[5px] text-gray-800 flex flex-col justify-between">
+                        <div className="w-full h-1.5 bg-blue-600 rounded-xs mb-1"></div>
+                        <div className="space-y-0.5">
+                          <div className="w-10 h-0.5 bg-gray-400 rounded"></div>
+                          <div className="w-12 h-0.5 bg-gray-400 rounded"></div>
+                          <div className="w-8 h-0.5 bg-gray-400 rounded"></div>
+                        </div>
+                        <div className="w-4 h-1 bg-cyan-500 rounded self-end"></div>
+                      </div>
+                    </div>
+
+                    <div className="absolute top-[28%] right-[14%] z-15 pointer-events-none hidden sm:block opacity-75 transform rotate-6 hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-22 bg-white/90 rounded shadow-md p-1.5 border border-white/50 text-[5px] text-gray-800 flex flex-col justify-between">
+                        <div className="w-full h-1.5 bg-purple-600 rounded-xs mb-1"></div>
+                        <div className="space-y-0.5">
+                          <div className="w-11 h-0.5 bg-gray-400 rounded"></div>
+                          <div className="w-9 h-0.5 bg-gray-400 rounded"></div>
+                          <div className="w-12 h-0.5 bg-gray-400 rounded"></div>
+                        </div>
+                        <div className="w-5 h-1 bg-emerald-500 rounded self-end"></div>
+                      </div>
+                    </div>
+
+                    <div className="absolute bottom-[24%] right-[22%] z-15 pointer-events-none hidden sm:block opacity-70 transform -rotate-6">
+                      <div className="w-14 h-18 bg-white/85 rounded shadow p-1 border border-white/40 flex flex-col justify-between">
+                        <div className="w-full h-1 bg-amber-500 rounded-xs mb-1"></div>
+                        <div className="space-y-0.5">
+                          <div className="w-8 h-0.5 bg-gray-400 rounded"></div>
+                          <div className="w-10 h-0.5 bg-gray-400 rounded"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* RIGHT: LIVE ANALYTICS HUD DISPLAY (MATCHING IMAGE) */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: 25 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                    className="hidden lg:flex flex-col gap-3 w-[260px] z-30 flex-shrink-0"
+                  >
+                    <div className="rounded-2xl bg-[#060c1d]/90 border border-cyan-500/30 p-4 backdrop-blur-xl shadow-xl shadow-black/60 relative overflow-hidden">
+                      {/* Top Row: Live Analytics + Pulsing indicator */}
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                          <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                          Live Analytics
+                        </span>
+                        <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                          ● Live
                         </span>
                       </div>
-                      {/* Mini bar chart */}
-                      <div className="flex items-end gap-[3px] h-7 mb-2.5">
-                        {[60, 85, 45, 70, 90, 55, 75, 95, 65, 80].map((h, i) => (
-                          <div key={i} className="flex-1 bg-gradient-to-t from-cyan-500/40 to-cyan-400/80 rounded-sm" style={{ height: `${h}%` }} />
+
+                      {/* Equalizer Frequency Bar Graph */}
+                      <div className="flex items-end gap-[3px] h-9 mb-4 px-1 py-1 bg-black/40 rounded-lg border border-white/5">
+                        {[45, 75, 60, 90, 100, 80, 65, 85, 95, 70, 85, 60, 78, 92].map((height, i) => (
+                          <div 
+                            key={i} 
+                            className="flex-1 bg-gradient-to-t from-cyan-600 via-sky-400 to-cyan-200 rounded-xs transition-all duration-300" 
+                            style={{ height: `${height}%` }}
+                          />
                         ))}
                       </div>
-                      <div className="space-y-1.5 text-[9px]">
-                        <div className="flex justify-between"><span className="text-gray-400">Papers Indexed</span><span className="text-cyan-400 font-bold">200M+</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400">Topology Connections</span><span className="text-purple-400 font-bold">1.2B+</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400">Concept Entities</span><span className="text-emerald-400 font-bold">45K+</span></div>
-                        <div className="flex justify-between"><span className="text-gray-400">Research Domains</span><span className="text-sky-400 font-bold">120+</span></div>
+
+                      {/* Metrics List */}
+                      <div className="space-y-2.5 text-xs font-mono">
+                        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                          <span className="text-gray-400">Papers Indexed</span>
+                          <span className="text-cyan-300 font-extrabold text-sm">200M+</span>
+                        </div>
+                        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                          <span className="text-gray-400">Connections</span>
+                          <span className="text-purple-300 font-extrabold text-sm">1.2B+</span>
+                        </div>
+                        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                          <span className="text-gray-400">Concepts</span>
+                          <span className="text-emerald-300 font-extrabold text-sm">45K+</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-400">Research Domains</span>
+                          <span className="text-sky-300 font-extrabold text-sm">120+</span>
+                        </div>
                       </div>
-                    </motion.div>
-                  </div>
+                    </div>
+
+                    {/* Quick Explore Button */}
+                    <button 
+                      onClick={() => triggerTraversal('AUTH', 'LOGIN')}
+                      className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40 text-xs font-bold text-gray-200 hover:text-white transition-all flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                      Open Full Telemetry Grid
+                    </button>
+                  </motion.div>
 
                 </div>
 
-                {/* ═══════════════ COCKPIT COMMAND BAR (BOTTOM) ═══════════════ */}
+                {/* ─── BOTTOM COCKPIT COMMAND DECK & SEARCH CONSOLE ─── */}
                 <motion.div 
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
                   className="relative z-30 w-full mt-auto"
                 >
-                  {/* Center Pedestal Badge */}
-                  <div className="flex justify-center mb-0">
-                    <div className="px-6 py-1.5 rounded-t-xl bg-[#0a0f1c]/95 border border-white/10 border-b-0 backdrop-blur-xl text-center shadow-lg">
-                      <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-[0.2em] block">ResearchGraph AI</span>
-                      <span className="text-[8px] text-gray-500 uppercase tracking-widest">Integrating Global Scientific Knowledge</span>
+                  {/* Central Pedestal Badge Mounting */}
+                  <div className="flex justify-center -mb-[1px]">
+                    <div className="px-8 py-2 rounded-t-2xl bg-[#070e24]/95 border border-cyan-500/40 border-b-0 backdrop-blur-2xl text-center shadow-[0_-10px_25px_rgba(6,182,212,0.15)] flex flex-col items-center">
+                      <span className="text-[11px] font-black text-cyan-300 uppercase tracking-[0.25em] block">
+                        RESEARCHGRAPH AI
+                      </span>
+                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] block">
+                        INTEGRATING GLOBAL KNOWLEDGE
+                      </span>
                     </div>
                   </div>
 
-                  {/* Glass Console Bar */}
-                  <div className="w-full bg-[#060a14]/95 backdrop-blur-2xl border-t border-white/10 px-4 sm:px-8 py-3.5 shadow-2xl">
-                    <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                  {/* Cockpit Command Deck Bar */}
+                  <div className="w-full bg-[#050a1a]/95 backdrop-blur-2xl border-t border-cyan-500/30 px-4 sm:px-8 py-4 shadow-2xl shadow-black">
+                    <div className="max-w-[1550px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
                       
-                      {/* Multi-Source Retrieval */}
+                      {/* Left Console: Multi-Source Retrieval */}
                       <div 
-                        onClick={() => setActiveModal('SOURCES')}
-                        className="hidden sm:block flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => scrollToSection(sourcesSectionRef)}
+                        className="hidden sm:flex items-center gap-3.5 flex-shrink-0 cursor-pointer group p-2 rounded-xl hover:bg-white/5 transition-all"
                       >
-                        <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">
-                          Multi-Source Retrieval (45+)
-                        </span>
-                        <div className="flex gap-1.5">
-                          {['arXiv', 'PubMed', 'IEEE', 'CrossRef', 'Semantic Scholar'].map(s => (
-                            <span key={s} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] text-gray-300 font-medium hover:border-cyan-500/30 transition-colors">{s}</span>
-                          ))}
+                        {/* High-Tech Rotating Radar Grid */}
+                        <div className="relative w-11 h-11 rounded-full border border-cyan-500/40 bg-black/60 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
+                          <div className="absolute inset-0 rounded-full border border-cyan-400/20"></div>
+                          <div className="absolute w-full h-[1px] bg-cyan-500/30 top-1/2 -translate-y-1/2"></div>
+                          <div className="absolute h-full w-[1px] bg-cyan-500/30 left-1/2 -translate-x-1/2"></div>
+                          <div className="absolute inset-0 rounded-full border-t-2 border-cyan-400 animate-spin"></div>
+                          <Radio className="w-4 h-4 text-cyan-400 z-10" />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-wider block group-hover:text-cyan-300 transition-colors">
+                            Multi-Source Retrieval
+                          </span>
+                          <span className="text-[9px] text-gray-400 font-mono block">
+                            45+ Academic Repositories Connected
+                          </span>
                         </div>
                       </div>
 
-                      {/* Central Search Bar Console */}
-                      <div 
-                        className="flex-1 w-full max-w-lg cursor-pointer"
-                        onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                      {/* Center Console: Interactive Search Question Console */}
+                      <form 
+                        onSubmit={handleHeroSearch}
+                        className="flex-1 w-full max-w-2xl"
                       >
-                        <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block mb-1 text-center sm:text-left">Ask a Research Question</span>
-                        <div className="relative h-11 bg-[#0a0f1c]/90 border border-white/15 rounded-xl flex items-center px-4 hover:border-cyan-500/50 hover:shadow-lg hover:shadow-cyan-500/10 transition-all group">
-                          <Search className="w-4 h-4 text-cyan-400 mr-2.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                          <span className="text-gray-400 text-xs font-mono truncate">
-                            E.g., "How do graph neural networks improve drug discovery?"
+                        <div className="flex items-center justify-between mb-1.5 px-1">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                            <BrainCircuit className="w-3 h-3 text-cyan-400" />
+                            ASK A RESEARCH QUESTION
                           </span>
-                          <button className="ml-auto w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/20 group-hover:from-cyan-500 group-hover:to-blue-500 transition-all">
-                            <ArrowRight className="w-3.5 h-3.5 text-white" />
+                          <span className="text-[9px] text-cyan-400/80 font-mono hidden sm:inline">
+                            Direct Natural Language Search
+                          </span>
+                        </div>
+
+                        <div className="relative h-12 bg-[#091129]/90 border border-cyan-500/40 focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/30 rounded-xl flex items-center px-4 shadow-lg shadow-cyan-950/30 transition-all group">
+                          <Search className="w-4 h-4 text-cyan-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                          <input 
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder='E.g., "How does graph neural networks improve drug discovery?"'
+                            className="w-full bg-transparent text-white placeholder-gray-400 text-xs sm:text-sm font-sans focus:outline-none"
+                          />
+                          <button 
+                            type="submit"
+                            className="ml-2 w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/25 transition-all hover:scale-105"
+                          >
+                            <ArrowRight className="w-4 h-4 text-white" />
                           </button>
                         </div>
-                      </div>
+                      </form>
 
-                      {/* AI-Powered Insights */}
+                      {/* Right Console: AI-Powered Insights */}
                       <div 
-                        onClick={() => setActiveModal('HOW_IT_WORKS')}
-                        className="hidden sm:block flex-shrink-0 text-right cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => scrollToSection(pipelineSectionRef)}
+                        className="hidden sm:flex items-center gap-3.5 flex-shrink-0 text-left cursor-pointer group p-2 rounded-xl hover:bg-white/5 transition-all"
                       >
-                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider block mb-1">AI-Powered Insights</span>
-                        <div className="space-y-0.5 text-[9px] text-gray-400">
-                          <div className="flex items-center gap-1 justify-end"><BrainCircuit className="w-2.5 h-2.5 text-purple-400" /> Multi-paper synthesis</div>
-                          <div className="flex items-center gap-1 justify-end"><Network className="w-2.5 h-2.5 text-cyan-400" /> Cross-domain connections</div>
-                          <div className="flex items-center gap-1 justify-end"><Search className="w-2.5 h-2.5 text-emerald-400" /> Citation validation</div>
+                        {/* Glowing AI Chip Icon */}
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-600/20 border border-cyan-400/40 flex items-center justify-center flex-shrink-0 shadow-md">
+                          <Cpu className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform" />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold text-cyan-400 uppercase tracking-wider block group-hover:text-cyan-300 transition-colors">
+                            AI-Powered Insights
+                          </span>
+                          <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[9px] text-gray-300">
+                            <span>• Summarize</span>
+                            <span>• Connect concepts</span>
+                            <span>• Find related work</span>
+                            <span>• Generate insights</span>
+                          </div>
                         </div>
                       </div>
 
                     </div>
+                  </div>
+
+                  {/* Downward Scroll Prompt */}
+                  <div 
+                    onClick={() => scrollToSection(topologySectionRef)}
+                    className="w-full py-2 bg-[#030612]/90 border-t border-white/5 flex items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-cyan-400 transition-colors group"
+                  >
+                    <span className="text-[10px] font-bold tracking-widest uppercase font-mono group-hover:tracking-wider transition-all">
+                      Scroll to explore platform architecture & 3D topology
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 animate-bounce text-cyan-400" />
                   </div>
                 </motion.div>
 
               </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION 1: 3D KNOWLEDGE GRAPH TOPOLOGY DEEP-DIVE                     */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div 
+                ref={topologySectionRef}
+                className="w-full py-20 px-4 sm:px-8 bg-[#04091a] relative z-20 border-t border-white/10"
+              >
+                <div className="max-w-7xl mx-auto">
+                  
+                  {/* Section Header */}
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+                      <Network className="w-3.5 h-3.5" /> High-Dimensional Knowledge Topologies
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
+                      Every Paper, Author & Concept<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400">
+                        Mapped in 3D Vector Space
+                      </span>
+                    </h2>
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                      Traditional keyword searches fail to capture cross-disciplinary connections. ResearchGraph AI projects 200M+ academic documents into a geometric graph, where conceptual proximity reflects mathematical relevance.
+                    </p>
+                  </div>
+
+                  {/* Domain Filter Tabs */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+                    {[
+                      { id: 'ai', label: 'Artificial Intelligence', icon: BrainCircuit, color: 'border-cyan-500 text-cyan-400 bg-cyan-500/10' },
+                      { id: 'bio', label: 'Genomics & Biomedicine', icon: Microscope, color: 'border-emerald-500 text-emerald-400 bg-emerald-500/10' },
+                      { id: 'quantum', label: 'Quantum Computing', icon: Binary, color: 'border-purple-500 text-purple-400 bg-purple-500/10' },
+                      { id: 'materials', label: 'Materials Discovery', icon: Sparkles, color: 'border-amber-500 text-amber-400 bg-amber-500/10' },
+                      { id: 'neuro', label: 'Neurobiology', icon: Network, color: 'border-rose-500 text-rose-400 bg-rose-500/10' },
+                    ].map((tab) => {
+                      const Icon = tab.icon;
+                      const isActive = selectedDomain === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setSelectedDomain(tab.id as any)}
+                          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
+                            isActive 
+                              ? `${tab.color} shadow-lg shadow-cyan-950/50` 
+                              : 'border-white/10 text-gray-400 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* 6 Dimensions Grid Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {[
+                      { title: "Authors & PIs", count: "38.4M Entities", desc: "Maps co-authorship networks, institutional affiliations, and h-index citation trajectories across global labs.", color: "border-amber-500/30 text-amber-400 bg-amber-500/5", icon: User },
+                      { title: "Research Papers", count: "204.8M Nodes", desc: "Full-text embeddings including methodologies, mathematical theorems, experimental datasets, and abstract vectors.", color: "border-blue-500/30 text-blue-400 bg-blue-500/5", icon: FileText },
+                      { title: "Extracted Concepts", count: "45,200 Clusters", desc: "Autonomous ontology extraction identifying emerging paradigm shifts, theoretical frameworks, and taxonomies.", color: "border-purple-500/30 text-purple-400 bg-purple-500/5", icon: Sparkles },
+                      { title: "Empirical Datasets", count: "1.4M Repositories", desc: "Direct associations between published claims, benchmark performance tables, Hugging Face repos, and PDB structures.", color: "border-emerald-500/30 text-emerald-400 bg-emerald-500/5", icon: Database },
+                      { title: "Citation Networks", count: "1.24B Verified Edges", desc: "Directional citation graphs distinguishing between background mentions, conflicting results, and fundamental extensions.", color: "border-rose-500/30 text-rose-400 bg-rose-500/5", icon: Share2 },
+                      { title: "Research Trends", count: "Live Velocity Index", desc: "Real-time tracking of preprint momentum, rapid citation velocity, and interdisciplinary convergence spikes.", color: "border-fuchsia-500/30 text-fuchsia-400 bg-fuchsia-500/5", icon: Activity },
+                    ].map((card, idx) => {
+                      const Icon = card.icon;
+                      return (
+                        <div key={idx} className={`p-6 rounded-2xl border ${card.color} backdrop-blur-xl relative overflow-hidden group hover:scale-[1.02] transition-transform`}>
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2.5">
+                              <Icon className="w-5 h-5" />
+                              <h3 className="font-extrabold text-white text-base">{card.title}</h3>
+                            </div>
+                            <span className="text-xs font-mono font-bold text-gray-400">{card.count}</span>
+                          </div>
+                          <p className="text-xs text-gray-300 leading-relaxed">{card.desc}</p>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION 2: 45+ CONNECTED SCHOLARLY REPOSITORIES                      */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div 
+                ref={sourcesSectionRef}
+                className="w-full py-20 px-4 sm:px-8 bg-[#030612] relative z-20 border-t border-white/10"
+              >
+                <div className="max-w-7xl mx-auto">
+                  
+                  {/* Section Header */}
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+                      <Database className="w-3.5 h-3.5" /> 45+ Global Academic Databases
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
+                      Continuous Ingestion Across<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-cyan-400">
+                        The World's Scientific Repositories
+                      </span>
+                    </h2>
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                      ResearchGraph AI automatically polls, parses, and normalizes preprints and peer-reviewed journals 24/7, providing instant access to 200M+ publications through standardized vector endpoints.
+                    </p>
+                  </div>
+
+                  {/* Sources Cards Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                    {[
+                      { name: 'arXiv', papers: '13.4M Preprints', domain: 'Physics, Math, CS & AI', tag: 'Open Access', status: 'Continuous Sync', color: 'border-red-500/40 text-red-400' },
+                      { name: 'PubMed & NCBI', papers: '36.2M Citations', domain: 'Biomedical & Clinical Health', tag: 'NIH / Medline', status: 'Live Ingestion', color: 'border-blue-500/40 text-blue-400' },
+                      { name: 'IEEE Xplore', papers: '8.1M Papers', domain: 'Electrical Eng & Robotics', tag: 'Peer-Reviewed', status: 'API Connected', color: 'border-sky-500/40 text-sky-400' },
+                      { name: 'Semantic Scholar', papers: '203M Corpus', domain: 'All Scientific Fields', tag: 'Vector Graph', status: 'Real-time Feed', color: 'border-amber-500/40 text-amber-400' },
+                      { name: 'CrossRef', papers: '140M DOIs', domain: 'Global Citations & Publishers', tag: 'Universal DOI', status: 'Connected', color: 'border-emerald-500/40 text-emerald-400' },
+                      { name: 'OpenAlex', papers: '250M Entities', domain: 'Scholarly Ontologies & PIs', tag: 'Open Data', status: 'Active Sync', color: 'border-purple-500/40 text-purple-400' },
+                      { name: 'bioRxiv / medRxiv', papers: '5.2M Preprints', domain: 'Life Sciences & Therapeutics', tag: 'Preprints', status: 'Hourly Poll', color: 'border-teal-500/40 text-teal-400' },
+                      { name: 'Nature Portfolio', papers: '18.6M Articles', domain: 'High-Impact Multi-Disciplinary', tag: 'Springer Nature', status: 'Cataloged', color: 'border-indigo-500/40 text-indigo-400' },
+                    ].map((source, idx) => (
+                      <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/40 transition-all flex flex-col justify-between group">
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-extrabold text-white text-base">{source.name}</span>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white/5 font-mono ${source.color}`}>
+                              {source.tag}
+                            </span>
+                          </div>
+                          <span className="text-cyan-400 font-extrabold text-sm block mb-1">{source.papers}</span>
+                          <p className="text-[11px] text-gray-400 mb-3">{source.domain}</p>
+                        </div>
+                        <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[10px] font-mono text-gray-400">
+                          <span className="flex items-center gap-1.5 text-emerald-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                            {source.status}
+                          </span>
+                          <span className="group-hover:text-cyan-400 transition-colors">Details →</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Connect Sources Banner */}
+                  <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950/40 via-purple-950/40 to-cyan-950/40 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-1">Need custom private repository integration?</h3>
+                      <p className="text-xs text-gray-300">Connect institutional repositories, lab databases, internal patents, and private PDFs with enterprise end-to-end encryption.</p>
+                    </div>
+                    <button 
+                      onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2 flex-shrink-0"
+                    >
+                      Connect Enterprise Sources <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION 3: RAG MULTI-LLM SYNTHESIS ARCHITECTURE                      */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div 
+                ref={pipelineSectionRef}
+                className="w-full py-20 px-4 sm:px-8 bg-[#04091a] relative z-20 border-t border-white/10"
+              >
+                <div className="max-w-7xl mx-auto">
+                  
+                  {/* Section Header */}
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+                      <Zap className="w-3.5 h-3.5" /> End-to-End Autonomous Pipeline
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
+                      How RAG & Multi-LLM Synthesis<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
+                        Delivers Hallucination-Free Answers
+                      </span>
+                    </h2>
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                      Every generated literature review, hypothesis, and answer is mathematically anchored to peer-reviewed source literature with direct DOI citation links.
+                    </p>
+                  </div>
+
+                  {/* 4-Stage Pipeline Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    {[
+                      {
+                        step: "01",
+                        title: "Ingest & Chunk",
+                        subtitle: "PDF Structural Parsing",
+                        desc: "High-throughput document processors parse LaTeX equations, figure captions, experimental tables, and citation markers into semantic chunks.",
+                        tag: "Multimodal OCR",
+                        color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30 text-blue-400"
+                      },
+                      {
+                        step: "02",
+                        title: "Embed & Index",
+                        subtitle: "GNN + Dense Vectors",
+                        desc: "Dual embeddings combine dense language semantics with Graph Neural Network message passing to preserve topological citation context.",
+                        tag: "1536-Dim Vectors",
+                        color: "from-cyan-500/20 to-teal-500/20 border-cyan-500/30 text-cyan-400"
+                      },
+                      {
+                        step: "03",
+                        title: "Hybrid Retrieval",
+                        subtitle: "Dense + Graph Traversal",
+                        desc: "Combines cosine vector similarity with multi-hop graph walks to unearth non-obvious interdisciplinary bridge papers across domains.",
+                        tag: "Sub-15ms Latency",
+                        color: "from-purple-500/20 to-fuchsia-500/20 border-purple-500/30 text-purple-400"
+                      },
+                      {
+                        step: "04",
+                        title: "LLM Synthesis",
+                        subtitle: "Ensemble Consensus",
+                        desc: "Ensembles of GPT-4o, Claude 3.5, and Gemini synthesize literature reviews, validate mathematical claims, and cross-reference citations.",
+                        tag: "Zero Hallucination",
+                        color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30 text-emerald-400"
+                      },
+                    ].map((stage, idx) => (
+                      <div key={idx} className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 flex flex-col justify-between relative group">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className={`text-2xl font-black bg-gradient-to-r ${stage.color} bg-clip-text text-transparent`}>
+                            {stage.step}
+                          </span>
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-mono text-gray-300">
+                            {stage.tag}
+                          </span>
+                        </div>
+                        <div>
+                          <h3 className="font-extrabold text-white text-lg mb-0.5">{stage.title}</h3>
+                          <span className="text-xs font-semibold text-cyan-400 block mb-3">{stage.subtitle}</span>
+                          <p className="text-xs text-gray-300 leading-relaxed mb-4">{stage.desc}</p>
+                        </div>
+                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                          <div className={`h-full bg-gradient-to-r ${stage.color}`} style={{ width: `${(idx + 1) * 25}%` }}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION 4: INTERACTIVE RESEARCH QUESTION SANDBOX                     */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div className="w-full py-20 px-4 sm:px-8 bg-[#02050e] relative z-20 border-t border-white/10">
+                <div className="max-w-6xl mx-auto">
+                  
+                  {/* Section Header */}
+                  <div className="text-center max-w-3xl mx-auto mb-12">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+                      <Sparkles className="w-3.5 h-3.5" /> Interactive Research Sandbox
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
+                      Test the Autonomous Engine<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-blue-500">
+                        In Real-Time
+                      </span>
+                    </h2>
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                      Select a scientific hypothesis below to see how ResearchGraph AI traverses the knowledge graph and compiles an authoritative, cited answer.
+                    </p>
+                  </div>
+
+                  {/* Sample Query Pills */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                    {demoQueries.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setActiveDemoQuery(idx)}
+                        className={`p-4 rounded-2xl text-left transition-all border flex items-center justify-between gap-3 ${
+                          activeDemoQuery === idx
+                            ? 'bg-[#09132e] border-cyan-400 shadow-lg shadow-cyan-950/40 text-white'
+                            : 'bg-white/5 border-white/10 text-gray-300 hover:text-white hover:bg-white/10'
+                        }`}
+                      >
+                        <div>
+                          <span className="text-[10px] font-mono font-bold text-cyan-400 block mb-1 uppercase tracking-wider">
+                            {item.domain}
+                          </span>
+                          <span className="text-xs sm:text-sm font-semibold">{item.query}</span>
+                        </div>
+                        <ArrowRight className={`w-4 h-4 flex-shrink-0 transition-transform ${activeDemoQuery === idx ? 'text-cyan-400 translate-x-1' : 'text-gray-500'}`} />
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Sandbox Simulated Output Display */}
+                  <div className="p-6 sm:p-8 rounded-3xl bg-[#060c1f] border border-cyan-500/40 shadow-2xl relative overflow-hidden">
+                    <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10 mb-6">
+                      <div>
+                        <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Query Target</span>
+                        <h4 className="text-base sm:text-lg font-bold text-white">{demoQueries[activeDemoQuery].query}</h4>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs font-mono">
+                        <span className="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold">
+                          {demoQueries[activeDemoQuery].nodesFound} Nodes
+                        </span>
+                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 font-bold">
+                          {demoQueries[activeDemoQuery].papersFound} Papers
+                        </span>
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold">
+                          {demoQueries[activeDemoQuery].confidence} Confidence
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Synthesized Summary */}
+                    <div className="mb-6">
+                      <span className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
+                        <BrainCircuit className="w-3.5 h-3.5" /> Synthesized Multi-Paper Consensus
+                      </span>
+                      <p className="text-sm text-gray-200 leading-relaxed p-4 rounded-xl bg-black/40 border border-white/5">
+                        {demoQueries[activeDemoQuery].summary}
+                      </p>
+                    </div>
+
+                    {/* Cited Papers */}
+                    <div className="mb-6">
+                      <span className="text-[11px] font-mono text-purple-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5" /> Primary Anchor Literature
+                      </span>
+                      <div className="space-y-2">
+                        {demoQueries[activeDemoQuery].papers.map((p, pIdx) => (
+                          <div key={pIdx} className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                              <span className="text-xs font-bold text-white block">{p.title}</span>
+                              <span className="text-[11px] text-gray-400">{p.authors} • {p.journal} • {p.citations} citations</span>
+                            </div>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 self-start sm:self-auto">
+                              DOI: {p.doi}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Discovered Conceptual Bridges */}
+                    <div>
+                      <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
+                        <Share2 className="w-3.5 h-3.5" /> Discovered Concept Bridges
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {demoQueries[activeDemoQuery].connections.map((conn, cIdx) => (
+                          <span key={cIdx} className="px-3 py-1 rounded-full bg-white/5 border border-white/15 text-xs text-gray-300 font-semibold flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                            {conn}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-8 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <span className="text-xs text-gray-400">Want to run custom full-text synthesis queries?</span>
+                      <button 
+                        onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
+                      >
+                        Launch Interactive Explorer <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION 5: FINAL LAUNCHPAD CALL TO ACTION                            */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div className="w-full py-24 px-4 sm:px-8 bg-gradient-to-b from-[#02050e] to-[#04091a] relative z-20 border-t border-white/10">
+                <div className="max-w-4xl mx-auto text-center">
+                  
+                  <div className="w-16 h-16 rounded-2xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-cyan-500/30">
+                    <Network className="w-8 h-8 text-cyan-300" />
+                  </div>
+
+                  <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+                    Ready to Enter the Universe of<br />
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400">
+                      Connected Scientific Knowledge?
+                    </span>
+                  </h2>
+
+                  <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-8 max-w-2xl mx-auto">
+                    Join 140,000+ researchers, university labs, and innovators exploring 200M+ research publications with autonomous graph intelligence.
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center gap-4">
+                    <button 
+                      onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                      className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-sm sm:text-base transition-all shadow-xl shadow-cyan-500/35 border border-cyan-400/40 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5"
+                    >
+                      Launch 3D Explorer Free <ArrowRight className="w-4 h-4" />
+                    </button>
+
+                    <button 
+                      onClick={() => triggerTraversal('AUTH', 'LOGIN')}
+                      className="px-8 py-3.5 rounded-xl bg-white/5 border border-white/20 hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm sm:text-base transition-all backdrop-blur-md hover:bg-white/10"
+                    >
+                      Sign In to Account
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*                                HIGH-TECH FOOTER                                    */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <footer className="w-full bg-[#02040b] border-t border-white/10 px-4 sm:px-8 py-10 relative z-20 text-xs text-gray-400">
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                  
+                  {/* Brand & Mission */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg border border-cyan-500/40 flex items-center justify-center bg-cyan-500/10">
+                      <Network className="w-4 h-4 text-cyan-400" />
+                    </div>
+                    <div>
+                      <span className="font-bold text-white text-sm block">ResearchGraph AI</span>
+                      <span className="text-[10px] text-gray-400">Autonomous 3D Scientific Knowledge Navigation</span>
+                    </div>
+                  </div>
+
+                  {/* Status Indicator */}
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px]">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>All 45+ Sources Connected • 100% Operational</span>
+                  </div>
+
+                  {/* Copyright & Quick Links */}
+                  <div className="flex items-center gap-4 text-[11px]">
+                    <button onClick={() => setActiveModal('SOURCES')} className="hover:text-cyan-400 transition-colors">Data Sources</button>
+                    <button onClick={() => setActiveModal('HOW_IT_WORKS')} className="hover:text-cyan-400 transition-colors">Pipeline Docs</button>
+                    <button onClick={() => setActiveModal('ABOUT')} className="hover:text-cyan-400 transition-colors">About Us</button>
+                    <span>© 2026 ResearchGraph AI</span>
+                  </div>
+
+                </div>
+              </footer>
 
               {/* ═══════════════ INTERACTIVE INFORMATION MODALS ═══════════════ */}
               <AnimatePresence>
@@ -499,7 +1204,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <X className="w-4 h-4" />
                       </button>
 
-                      {/* --- MODAL CONTENT 1: HOW IT WORKS --- */}
+                      {/* --- MODAL 1: HOW IT WORKS --- */}
                       {activeModal === 'HOW_IT_WORKS' && (
                         <div>
                           <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2">
@@ -554,7 +1259,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       )}
 
-                      {/* --- MODAL CONTENT 2: DATA SOURCES --- */}
+                      {/* --- MODAL 2: DATA SOURCES --- */}
                       {activeModal === 'SOURCES' && (
                         <div>
                           <div className="flex items-center gap-2.5 text-purple-400 font-bold text-xs uppercase tracking-widest mb-2">
@@ -597,7 +1302,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       )}
 
-                      {/* --- MODAL CONTENT 3: ABOUT US --- */}
+                      {/* --- MODAL 3: ABOUT US --- */}
                       {activeModal === 'ABOUT' && (
                         <div>
                           <div className="flex items-center gap-2.5 text-emerald-400 font-bold text-xs uppercase tracking-widest mb-2">
@@ -647,6 +1352,51 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs sm:text-sm hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/30"
                             >
                               Join Free Today
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* --- MODAL 4: INTERACTIVE DEMO WALKTHROUGH --- */}
+                      {activeModal === 'DEMO' && (
+                        <div>
+                          <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2">
+                            <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" /> Interactive Platform Demonstration
+                          </div>
+                          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Cockpit Research Traversal</h2>
+                          <p className="text-gray-300 text-sm leading-relaxed mb-6">
+                            Experience how ResearchGraph AI automates months of literature discovery into seconds of deep graph traversal.
+                          </p>
+
+                          <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/30 mb-6">
+                            <div className="flex items-center justify-between mb-3 text-xs font-mono text-gray-400">
+                              <span className="text-cyan-400 font-bold">SIMULATION: GNN DRUG DISCOVERY</span>
+                              <span className="text-emerald-400 font-bold">● ACTIVE SYNTHESIS</span>
+                            </div>
+
+                            <div className="space-y-3 text-xs">
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                                <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 1 • Parallel Query Dispatch</span>
+                                <span className="text-white font-semibold">Broadcasting to arXiv, PubMed, IEEE, CrossRef (1,420 matched candidates)</span>
+                              </div>
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                                <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 2 • 3D Topology Clustering</span>
+                                <span className="text-cyan-300 font-semibold">Extracting ADMET prediction cluster & E(3)-equivariant graph neural networks</span>
+                              </div>
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                                <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 3 • Multi-LLM Consensus Synthesis</span>
+                                <span className="text-emerald-300 font-semibold">Ensemble generated 4 key hypotheses with 100% verified citation anchors</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                            <span className="text-xs text-gray-400">Ready to explore with your own research queries?</span>
+                            <button 
+                              onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
+                            >
+                              Launch Explorer Now <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                           </div>
                         </div>

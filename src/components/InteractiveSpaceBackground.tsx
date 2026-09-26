@@ -186,17 +186,17 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712] pointer-events-none select-none">
       
-      {/* Layer 1: Landing Background */}
+      {/* Layer 1: Landing Cockpit Background */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: "url('/epic_launch_bg.jpg')",
-          transform: `translate3d(${parallax.x * 0.5}px, ${parallax.y * 0.5}px, 0)`
+          backgroundImage: "url('/cockpit_landing_hero.jpg')",
+          transform: `translate3d(${parallax.x * 0.25}px, ${parallax.y * 0.25}px, 0)`
         }}
         initial={false}
         animate={{ 
           opacity: pageState === 'LANDING' ? 1 : 0,
-          scale: pageState === 'LANDING' ? 1.02 : 1.0
+          scale: pageState === 'LANDING' ? 1.0 : 1.0
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
       />
@@ -243,16 +243,16 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         className="absolute inset-0 z-10 pointer-events-none"
       />
 
-      {/* Atmospheric Gradients: Soft vignettes that preserve space visibility while maintaining UI clarity */}
+      {/* Atmospheric Gradients: Soft vignettes that preserve cockpit space visibility while maintaining UI clarity */}
       <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'bg-black/40' 
+          ? 'bg-transparent' 
           : 'bg-black/25'
       }`}></div>
 
       <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'from-[#030712]/90 via-black/30 to-[#030712] opacity-100' 
+          ? 'from-black/30 via-transparent to-black/50 opacity-40' 
           : 'from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90'
       }`}></div>
 
