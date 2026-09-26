@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Sparkles, ArrowLeft, 
-  Zap, Database, Layers, Info, X, ExternalLink, Compass, Award
+  Zap, Database, Layers, Info, X, ExternalLink, Compass, Award, KeyRound, CheckCircle2
 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
@@ -681,124 +681,203 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 <span className="font-semibold text-xs sm:text-sm text-gray-200">Return to Base</span>
               </button>
 
-              {/* CARD CONTAINER */}
-              <div className="w-full max-w-md relative z-10">
-                {/* Glow Aura behind card */}
-                <div 
-                  className={`absolute -inset-1 rounded-3xl blur-2xl opacity-40 transition-all duration-700 pointer-events-none ${
-                    authMode === 'LOGIN' 
-                      ? 'bg-gradient-to-r from-cyan-500/50 via-blue-500/30 to-purple-600/40' 
-                      : 'bg-gradient-to-r from-purple-500/50 via-fuchsia-500/30 to-cyan-500/40'
-                  }`}
-                />
-
-                <div className="relative rounded-3xl bg-[#0a0f1c]/90 backdrop-blur-2xl border border-white/15 p-8 sm:p-10 shadow-2xl">
-                  {/* BRAND HEADER */}
-                  <div className="flex flex-col items-center text-center mb-8">
-                    <div className="w-12 h-12 rounded-2xl border border-white/20 flex items-center justify-center bg-gradient-to-br from-cyan-500/20 to-blue-600/20 shadow-lg shadow-cyan-500/20 mb-4">
-                      <Network className="w-6 h-6 text-cyan-400" />
+              <div className="w-full max-w-6xl flex flex-col md:flex-row gap-8 lg:gap-14 items-center justify-center relative z-20 pt-16 md:pt-0">
+                
+                {/* 3D QUANTUM NEURAL CORE HUD */}
+                <div className="flex-1 flex flex-col items-center justify-center max-w-lg">
+                  
+                  {/* The Real WebGL 3D Quantum Core with Ambient Backglow */}
+                  <div className="relative w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 flex items-center justify-center">
+                    <div className={`absolute w-64 h-64 rounded-full blur-[80px] pointer-events-none transition-colors duration-700 ${
+                      authMode === 'LOGIN' ? 'bg-cyan-500/20' : 'bg-purple-500/20'
+                    }`} />
+                    <ThreeNeuralCore 
+                      className="w-full h-full" 
+                      theme={authMode === 'LOGIN' ? 'cyan' : 'purple'} 
+                      interactive={true}
+                    />
+                  </div>
+                  
+                  {/* High-Tech Telemetry HUD */}
+                  <div className="mt-2 text-center max-w-md px-4">
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wider border transition-colors duration-500 ${
+                        authMode === 'LOGIN' 
+                          ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' 
+                          : 'bg-purple-500/10 border-purple-500/30 text-purple-400'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full animate-ping ${authMode === 'LOGIN' ? 'bg-cyan-400' : 'bg-purple-400'}`}></span>
+                        <span>3D NEURAL UPLINK ACTIVE</span>
+                      </div>
+                      <span className="text-[10px] text-gray-300 font-mono bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                        ✦ DRAG TO ROTATE
+                      </span>
                     </div>
-                    <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-1">
-                      {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Account'}
-                    </h2>
-                    <p className="text-gray-400 text-xs sm:text-sm">
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                      {authMode === 'LOGIN' ? 'Quantum Knowledge Grid' : 'Neural Node Genesis'}
+                    </h3>
+                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4">
                       {authMode === 'LOGIN' 
-                        ? 'Connect to the universal research knowledge graph' 
-                        : 'Begin mapping the frontier of human research'}
+                        ? 'Connected to the decentralized scientific graph. Authenticate to sync your papers and explore 3D citation maps.' 
+                        : 'Generate your cryptographic researcher identity to contribute hypotheses and synthesize discoveries.'}
                     </p>
+                    <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-gray-400 border-t border-white/10 pt-3">
+                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
+                        <span className="text-cyan-400 font-bold block">204.8M</span> Papers
+                      </div>
+                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
+                        <span className="text-purple-400 font-bold block">14ms</span> Latency
+                      </div>
+                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
+                        <span className="text-emerald-400 font-bold block">TLS 1.3</span> Encrypted
+                      </div>
+                    </div>
                   </div>
+                </div>
 
-                  {/* TOGGLE PILL */}
-                  <div className="flex rounded-xl bg-white/5 p-1 border border-white/10 mb-6">
-                    <button
+                {/* PREMIUM GLASSMORPHIC AUTH CARD */}
+                <div className={`w-full max-w-[440px] bg-[#080d1a]/95 backdrop-blur-3xl border rounded-3xl p-8 sm:p-10 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] relative z-20 transition-all duration-500 ${
+                  authMode === 'LOGIN' 
+                    ? 'border-white/15 hover:border-cyan-500/40 shadow-cyan-950/20' 
+                    : 'border-white/15 hover:border-purple-500/40 shadow-purple-950/20'
+                }`}>
+                  
+                  {/* Subtle Top Specular Accent Line */}
+                  <div className={`absolute top-0 left-10 right-10 h-[1.5px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent transition-colors duration-500 ${
+                    authMode === 'LOGIN' ? 'via-cyan-400/60' : 'via-purple-400/60'
+                  }`} />
+
+                  {/* Mode Switcher Tabs */}
+                  <div className="flex p-1 bg-black/50 rounded-2xl border border-white/10 mb-6">
+                    <button 
+                      type="button"
                       onClick={() => setAuthMode('LOGIN')}
-                      className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                        authMode === 'LOGIN'
-                          ? 'bg-gradient-to-r from-cyan-600 to-blue-600 text-white shadow-md'
+                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                        authMode === 'LOGIN' 
+                          ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]' 
                           : 'text-gray-400 hover:text-white'
                       }`}
                     >
-                      Sign In
+                      <KeyRound className="w-3.5 h-3.5" /> Sign In
                     </button>
-                    <button
+                    <button 
+                      type="button"
                       onClick={() => setAuthMode('REGISTER')}
-                      className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
-                        authMode === 'REGISTER'
-                          ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md'
+                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                        authMode === 'REGISTER' 
+                          ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
                           : 'text-gray-400 hover:text-white'
                       }`}
                     >
-                      Register
+                      <Sparkles className="w-3.5 h-3.5" /> Create Account
                     </button>
                   </div>
 
-                  {/* FORM */}
+                  <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-white mb-2 tracking-tight">
+                    {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Researcher ID'}
+                  </h2>
+                  <p className="text-gray-400 text-xs sm:text-sm text-center mb-6">
+                    {authMode === 'LOGIN' ? 'Access your research universe and knowledge maps.' : 'Join 140K+ researchers mapping scientific literature.'}
+                  </p>
+
                   <form onSubmit={handleSubmit} className="space-y-4">
+                    <AnimatePresence mode="wait">
+                      {authMode === 'REGISTER' && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="space-y-1.5 overflow-hidden">
+                          <label className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider block">Full Name</label>
+                          <div className="relative">
+                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-400" />
+                            <input 
+                              type="text" 
+                              placeholder="Dr. Elena Vance" 
+                              required 
+                              className="w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50 transition-all text-sm" 
+                            />
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider block">Email Address</label>
+                      <div className="relative">
+                        <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
+                        <input 
+                          type="email" 
+                          placeholder="researcher@lab.org" 
+                          required 
+                          className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
+                            authMode === 'LOGIN' 
+                              ? 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50' 
+                              : 'focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50'
+                          }`} 
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex justify-between items-center">
+                        <label className="text-[11px] font-semibold text-gray-300 uppercase tracking-wider block">Password</label>
+                        {authMode === 'LOGIN' && (
+                          <span className="text-[11px] text-cyan-400 hover:text-cyan-300 cursor-pointer">Forgot?</span>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
+                        <input 
+                          type="password" 
+                          placeholder="••••••••••••" 
+                          required 
+                          className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
+                            authMode === 'LOGIN' 
+                              ? 'focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50' 
+                              : 'focus:border-purple-400 focus:ring-1 focus:ring-purple-400/50'
+                          }`} 
+                        />
+                      </div>
+                    </div>
+
+                    {/* Features checklist for register mode */}
                     {authMode === 'REGISTER' && (
-                      <div>
-                        <label className="block text-xs font-medium text-gray-300 mb-1.5">Full Name</label>
-                        <div className="relative">
-                          <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                          <input 
-                            type="text" 
-                            required 
-                            placeholder="Dr. Eleanor Vance"
-                            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-purple-400 focus:outline-none focus:ring-1 focus:ring-purple-400 text-sm text-white placeholder-gray-500 transition-all"
-                          />
+                      <div className="text-[11px] text-gray-400 space-y-1 py-1">
+                        <div className="flex items-center gap-1.5 text-gray-300">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Unlimited 3D Knowledge Graph querying</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-gray-300">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Autonomous citation analysis and RAG summaries</span>
                         </div>
                       </div>
                     )}
 
-                    <div>
-                      <label className="block text-xs font-medium text-gray-300 mb-1.5">Academic / Work Email</label>
-                      <div className="relative">
-                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input 
-                          type="email" 
-                          required 
-                          placeholder="researcher@university.edu"
-                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 text-sm text-white placeholder-gray-500 transition-all"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex justify-between items-center mb-1.5">
-                        <label className="block text-xs font-medium text-gray-300">Password</label>
-                        {authMode === 'LOGIN' && (
-                          <a href="#forgot" className="text-[11px] text-cyan-400 hover:underline">Forgot password?</a>
-                        )}
-                      </div>
-                      <div className="relative">
-                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <input 
-                          type="password" 
-                          required 
-                          placeholder="••••••••••••"
-                          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 text-sm text-white placeholder-gray-500 transition-all"
-                        />
-                      </div>
-                    </div>
-
                     <button 
                       type="submit" 
-                      className={`w-full py-3 rounded-xl font-bold text-sm text-white transition-all shadow-lg flex items-center justify-center gap-2 mt-6 ${
+                      className={`w-full text-white rounded-xl py-3.5 mt-4 font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide shadow-lg ${
                         authMode === 'LOGIN'
-                          ? 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-600/30'
-                          : 'bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 shadow-purple-600/30'
+                          ? 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-500/25 hover:shadow-cyan-500/40'
+                          : 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/25 hover:shadow-purple-500/40'
                       }`}
                     >
-                      {authMode === 'LOGIN' ? 'Sign In to Workspace' : 'Initialize Research Hub'}
+                      {authMode === 'LOGIN' ? 'Launch Platform' : 'Initialize Account'}
                       <ArrowRight className="w-4 h-4" />
+                    </button>
+
+                    {/* Guest Instant Demo Access */}
+                    <button
+                      type="button"
+                      onClick={onAuthComplete}
+                      className="w-full py-2.5 rounded-xl border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" /> Instant Demo Explorer
                     </button>
                   </form>
 
-                  {/* FOOTER */}
-                  <div className="mt-6 text-center text-xs text-gray-400">
-                    {authMode === 'LOGIN' ? "Don't have an account? " : "Already have access? "}
+                  <div className="mt-6 text-center text-xs text-gray-400 border-t border-white/10 pt-5">
+                    {authMode === 'LOGIN' ? "Don't have an account? " : "Already registered? "}
                     <button 
                       onClick={() => setAuthMode(authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
-                      className={`font-semibold hover:underline ${
+                      className={`font-semibold ml-1 transition-colors ${
                         authMode === 'LOGIN' ? 'text-cyan-400 hover:text-cyan-300' : 'text-purple-400 hover:text-purple-300'
                       }`}
                     >
