@@ -190,13 +190,13 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: "url('/cyber_grid_bg.jpg')",
+          backgroundImage: "url('/dark_ufo_bg.jpg')",
           transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
-          filter: pageState === 'LANDING' ? 'brightness(0.8) contrast(1.1)' : 'none'
+          filter: pageState === 'LANDING' ? 'brightness(1.1) contrast(1.05)' : 'none'
         }}
         initial={false}
         animate={{ 
-          opacity: pageState === 'LANDING' ? 0.6 : 0,
+          opacity: pageState === 'LANDING' ? 0.75 : 0,
           scale: pageState === 'LANDING' ? 1.02 : 1.0
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
