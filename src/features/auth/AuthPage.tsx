@@ -12,9 +12,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   // Scroll Parallax logic
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: scrollContainerRef });
-  
-  const spaceScale = useTransform(scrollYProgress, [0, 1], [1, 1.3]);
-  const spaceY = useTransform(scrollYProgress, [0, 1], ['0%', '15%']);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
