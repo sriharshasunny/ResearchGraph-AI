@@ -219,31 +219,30 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
               </div>
 
-                {/* Additional Content (How it works) */}
-                <div className="w-full max-w-7xl mt-32 border-t border-gray-800/50 pt-20">
-                  <div className="text-center mb-16">
-                    <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">How ResearchGraph Works</h2>
+              {/* Additional Content (How it works) */}
+              <div className="w-full max-w-7xl mt-10 border-t border-gray-800/50 pt-20">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">How ResearchGraph Works</h2>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="p-8 rounded-3xl bg-[#060B14]/80 border border-gray-800 backdrop-blur-md">
+                    <Search className="w-10 h-10 text-blue-400 mb-6" />
+                    <h3 className="text-2xl font-bold mb-4">1. Query</h3>
+                    <p className="text-gray-400">Semantic contextual search beyond keywords.</p>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="p-8 rounded-3xl bg-[#060B14]/80 border border-gray-800 backdrop-blur-md">
-                      <Search className="w-10 h-10 text-blue-400 mb-6" />
-                      <h3 className="text-2xl font-bold mb-4">1. Query</h3>
-                      <p className="text-gray-400">Semantic contextual search beyond keywords.</p>
-                    </div>
-                    <div className="p-8 rounded-3xl bg-[#060B14]/80 border border-gray-800 backdrop-blur-md">
-                      <Network className="w-10 h-10 text-purple-400 mb-6" />
-                      <h3 className="text-2xl font-bold mb-4">2. Visualize</h3>
-                      <p className="text-gray-400">Interactive 3D knowledge map generation.</p>
-                    </div>
-                    <div className="p-8 rounded-3xl bg-[#060B14]/80 border border-gray-800 backdrop-blur-md">
-                      <BrainCircuit className="w-10 h-10 text-emerald-400 mb-6" />
-                      <h3 className="text-2xl font-bold mb-4">3. Discover</h3>
-                      <p className="text-gray-400">AI finds the hidden patterns automatically.</p>
-                    </div>
+                  <div className="p-8 rounded-3xl bg-[#060B14]/80 border border-gray-800 backdrop-blur-md">
+                    <Network className="w-10 h-10 text-purple-400 mb-6" />
+                    <h3 className="text-2xl font-bold mb-4">2. Visualize</h3>
+                    <p className="text-gray-400">Interactive 3D knowledge map generation.</p>
+                  </div>
+                  <div className="p-8 rounded-3xl bg-[#060B14]/80 border border-gray-800 backdrop-blur-md">
+                    <BrainCircuit className="w-10 h-10 text-emerald-400 mb-6" />
+                    <h3 className="text-2xl font-bold mb-4">3. Discover</h3>
+                    <p className="text-gray-400">AI finds the hidden patterns automatically.</p>
                   </div>
                 </div>
-
               </div>
+
             </motion.div>
           )}
 
