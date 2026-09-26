@@ -22,6 +22,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [selectedDomain, setSelectedDomain] = useState<'ai' | 'bio' | 'quantum' | 'materials' | 'neuro'>('ai');
   const [activeDemoQuery, setActiveDemoQuery] = useState(0);
 
+  // Authentication State
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topologySectionRef = useRef<HTMLDivElement>(null);
   const sourcesSectionRef = useRef<HTMLDivElement>(null);
@@ -29,6 +34,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
+
+    // Mock validation logic
+    if (authMode === 'LOGIN') {
+      if (email !== 'admin@researchgraph.ai') {
+        setAuthError('No user found with this email address.');
+        return;
+      }
+      if (password !== 'admin123') {
+        setAuthError('Invalid password credentials.');
+        return;
+      }
+    }
+    
     onAuthComplete();
   };
 
@@ -1624,7 +1643,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <Mail className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
                         <input 
                           type="email" 
-                          placeholder="researcher@lab.org" 
+                          value={email}
+                          onChange={(e) => { setEmail(e.target.value); setAuthError(null); }}
+                          placeholder="admin@researchgraph.ai" 
                           required 
                           className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
                             authMode === 'LOGIN' 
@@ -1646,6 +1667,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <Lock className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 ${authMode === 'LOGIN' ? 'text-cyan-400' : 'text-purple-400'}`} />
                         <input 
                           type="password" 
+                          value={password}
+                          onChange={(e) => { setPassword(e.target.value); setAuthError(null); }}
                           placeholder="••••••••••••" 
                           required 
                           className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${
@@ -1670,6 +1693,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       </div>
                     )}
+
+                    <AnimatePresence>
+                      {authError && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -10 }} 
+                          animate={{ opacity: 1, y: 0 }} 
+                          exit={{ opacity: 0, height: 0 }}
+                          className="w-full p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2"
+                        >
+                          <Info className="w-4 h-4 text-red-400 flex-shrink-0" />
+                          <span className="text-xs text-red-200 font-semibold">{authError}</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     <button 
                       type="submit" 
