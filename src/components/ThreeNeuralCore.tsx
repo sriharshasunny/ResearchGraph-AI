@@ -18,7 +18,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
-    // Vibrant, clean theme palettes
+    // Vibrant theme palettes with specular highlights
     const palettes = {
       cyan: {
         crystal: 0x0ea5e9,
@@ -31,6 +31,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         vertices: 0x67e8f9,
         keyLight: 0x38bdf8,
         rimLight: 0xa855f7,
+        glowHex: '#22d3ee',
       },
       purple: {
         crystal: 0x9333ea,
@@ -43,6 +44,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         vertices: 0xf0abfc,
         keyLight: 0xc084fc,
         rimLight: 0x38bdf8,
+        glowHex: '#c084fc',
       },
       emerald: {
         crystal: 0x059669,
@@ -55,6 +57,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         vertices: 0xa7f3d0,
         keyLight: 0x34d399,
         rimLight: 0x38bdf8,
+        glowHex: '#34d399',
       }
     };
 
@@ -75,64 +78,63 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     const initialH = container.clientHeight || 300;
 
     renderer.setSize(initialW, initialH);
-    // Cap pixel ratio to 1.5 for ultra-smooth 60-120fps performance on all displays
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.25;
+    renderer.toneMappingExposure = 1.35;
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, initialW / initialH, 0.1, 100);
-    camera.position.z = 6.2;
+    const camera = new THREE.PerspectiveCamera(40, initialW / initialH, 0.1, 100);
+    camera.position.z = 6.4;
 
-    // Master Group for smooth mouse parallax & rotation
+    // Master Group for smooth mouse parallax, user drag & auto-rotation
     const masterGroup = new THREE.Group();
     scene.add(masterGroup);
 
-    // --- 1. CLEAN FACETED CRYSTALLINE CORE ---
-    // Beautiful, symmetrical Icosahedron with razor-clean chamfered faces
-    const crystalGeo = new THREE.IcosahedronGeometry(1.2, 0);
+    // --- 1. CLEAN FACETED CRYSTALLINE JEWEL (Icosahedron) ---
+    const crystalGeo = new THREE.IcosahedronGeometry(1.22, 0);
     const crystalMat = new THREE.MeshPhysicalMaterial({
       color: p.crystal,
       emissive: p.emissive,
-      emissiveIntensity: 0.5,
-      roughness: 0.08,
-      metalness: 0.85,
+      emissiveIntensity: 0.55,
+      roughness: 0.05,
+      metalness: 0.15,
+      transmission: 0.6,
+      ior: 1.52,
+      thickness: 1.4,
       clearcoat: 1.0,
       clearcoatRoughness: 0.05,
       flatShading: true,
       transparent: true,
-      opacity: 0.92,
+      opacity: 0.94,
     });
     const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
     masterGroup.add(crystalMesh);
 
-    // --- 2. RAZOR-SHARP GLOWING EDGES ---
-    // Traces exact geometric facets with crisp neon lines (100% GPU, 0 CPU overhead)
+    // --- 2. RAZOR-SHARP NEON FACET EDGES ---
     const edgesGeo = new THREE.EdgesGeometry(crystalGeo);
     const edgesMat = new THREE.LineBasicMaterial({
       color: p.edges,
       transparent: true,
-      opacity: 0.65,
+      opacity: 0.75,
     });
     const edgesMesh = new THREE.LineSegments(edgesGeo, edgesMat);
     crystalMesh.add(edgesMesh);
 
-    // --- 3. INNER QUANTUM EMITTER (Pulsing Energy Core) ---
-    const innerGeo = new THREE.OctahedronGeometry(0.55, 0);
+    // --- 3. INNER RADIANT QUANTUM EMITTER ---
+    const innerGeo = new THREE.OctahedronGeometry(0.58, 0);
     const innerMat = new THREE.MeshStandardMaterial({
       color: p.inner,
       emissive: p.edges,
-      emissiveIntensity: 1.6,
+      emissiveIntensity: 1.8,
       roughness: 0.1,
-      metalness: 0.5,
+      metalness: 0.3,
       flatShading: true,
     });
     const innerMesh = new THREE.Mesh(innerGeo, innerMat);
     masterGroup.add(innerMesh);
 
     // --- 4. GEOMETRIC VERTEX BEACONS ---
-    // Pristine glowing nodes locked at the 12 crystal vertices
     const vertexPositions = crystalGeo.attributes.position;
     const vertexCount = vertexPositions.count;
     const vertexGeo = new THREE.SphereGeometry(0.045, 12, 12);
@@ -152,9 +154,11 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     vertexMesh.instanceMatrix.needsUpdate = true;
     crystalMesh.add(vertexMesh);
 
-    // --- 5. CLEAN GYROSCOPIC CHRONO-RINGS ---
-    // Outer Ring: ultra-fine precision ring
-    const ring1Geo = new THREE.TorusGeometry(1.95, 0.016, 16, 100);
+    // --- 5. CHRONO-RINGS & SATELLITES ---
+    const ringGroup = new THREE.Group();
+    masterGroup.add(ringGroup);
+
+    const ring1Geo = new THREE.TorusGeometry(1.95, 0.018, 16, 100);
     const ring1Mat = new THREE.MeshStandardMaterial({
       color: p.ringOuter,
       emissive: p.ringOuter,
@@ -164,10 +168,9 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     });
     const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
     ring1.rotation.x = Math.PI / 3.2;
-    masterGroup.add(ring1);
+    ringGroup.add(ring1);
 
-    // Inner Ring: intersecting tilted gimbal ring
-    const ring2Geo = new THREE.TorusGeometry(2.2, 0.014, 16, 100);
+    const ring2Geo = new THREE.TorusGeometry(2.25, 0.015, 16, 100);
     const ring2Mat = new THREE.MeshStandardMaterial({
       color: p.ringInner,
       emissive: p.ringInner,
@@ -178,53 +181,109 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
     ring2.rotation.y = Math.PI / 4;
     ring2.rotation.x = -Math.PI / 4;
-    masterGroup.add(ring2);
+    ringGroup.add(ring2);
 
-    // Satellite beads: 3 small polished spheres orbiting cleanly
-    const satelliteGeo = new THREE.SphereGeometry(0.065, 16, 16);
-    const satelliteMat = new THREE.MeshBasicMaterial({ color: p.satellites });
-    const sat1 = new THREE.Mesh(satelliteGeo, satelliteMat);
-    const sat2 = new THREE.Mesh(satelliteGeo, satelliteMat);
-    const sat3 = new THREE.Mesh(satelliteGeo, satelliteMat);
-    masterGroup.add(sat1);
-    masterGroup.add(sat2);
-    masterGroup.add(sat3);
+    // Satellites
+    const satGeo = new THREE.SphereGeometry(0.07, 16, 16);
+    const satMat = new THREE.MeshBasicMaterial({ color: p.satellites });
+    const sat1 = new THREE.Mesh(satGeo, satMat);
+    const sat2 = new THREE.Mesh(satGeo, satMat);
+    const sat3 = new THREE.Mesh(satGeo, satMat);
+    ringGroup.add(sat1);
+    ringGroup.add(sat2);
+    ringGroup.add(sat3);
 
-    // --- 6. CINEMATIC DIRECTIONAL & SPECULAR LIGHTING ---
-    const ambientLight = new THREE.AmbientLight(0x080e22, 2.2);
+    // --- 6. LIGHTING ---
+    const ambientLight = new THREE.AmbientLight(0x0a1026, 2.4);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(p.keyLight, 4.0);
+    const keyLight = new THREE.DirectionalLight(p.keyLight, 4.2);
     keyLight.position.set(4, 5, 4);
     scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(p.rimLight, 3.5);
+    const rimLight = new THREE.DirectionalLight(p.rimLight, 3.8);
     rimLight.position.set(-4, -4, -3);
     scene.add(rimLight);
 
-    const coreLight = new THREE.PointLight(p.edges, 4.0, 5);
+    const coreLight = new THREE.PointLight(p.edges, 4.5, 6);
     masterGroup.add(coreLight);
 
-    // --- 7. ULTRA-LIGHTWEIGHT PARALLAX INTERACTION ---
-    let targetRotX = 0;
-    let targetRotY = 0;
-    let currentRotX = 0;
-    let currentRotY = 0;
+    // --- 7. RICH INTERACTION: DRAG TO ROTATE & HOVER SPEEDUP ---
+    let isDragging = false;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let dragVelocityX = 0;
+    let dragVelocityY = 0;
+    let userRotX = 0;
+    let userRotY = 0;
+    let isHovered = false;
+    let pulseScale = 1.0;
 
-    const handlePointerMove = (e: MouseEvent) => {
+    const onPointerDown = (e: PointerEvent) => {
       if (!interactive) return;
-      const rect = container.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      targetRotY = x * 0.4;
-      targetRotX = -y * 0.4;
+      isDragging = true;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+      container.style.cursor = 'grabbing';
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!interactive) return;
+      if (isDragging) {
+        const deltaX = e.clientX - prevMouseX;
+        const deltaY = e.clientY - prevMouseY;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+
+        dragVelocityX = deltaX * 0.008;
+        dragVelocityY = deltaY * 0.008;
+        userRotY += dragVelocityX;
+        userRotX += dragVelocityY;
+      }
+    };
+
+    const onPointerUp = () => {
+      isDragging = false;
+      if (container) {
+        container.style.cursor = 'grab';
+      }
+    };
+
+    const onMouseEnter = () => {
+      isHovered = true;
+      pulseScale = 1.08;
+    };
+
+    const onMouseLeave = () => {
+      isHovered = false;
+      isDragging = false;
+      pulseScale = 1.0;
+      if (container) {
+        container.style.cursor = 'grab';
+      }
+    };
+
+    const onClick = () => {
+      // Trigger brief luminous energy pulse
+      pulseScale = 1.15;
+      coreLight.intensity = 8.0;
+      setTimeout(() => {
+        pulseScale = isHovered ? 1.08 : 1.0;
+        coreLight.intensity = 4.5;
+      }, 250);
     };
 
     if (interactive) {
-      window.addEventListener('mousemove', handlePointerMove, { passive: true });
+      container.style.cursor = 'grab';
+      container.addEventListener('pointerdown', onPointerDown);
+      window.addEventListener('pointermove', onPointerMove, { passive: true });
+      window.addEventListener('pointerup', onPointerUp);
+      container.addEventListener('mouseenter', onMouseEnter);
+      container.addEventListener('mouseleave', onMouseLeave);
+      container.addEventListener('click', onClick);
     }
 
-    // --- 8. SMART VISIBILITY & INTERSECTION OBSERVER (0% CPU when off-screen) ---
+    // --- 8. SMART VISIBILITY & ANIMATION LOOP ---
     let isVisible = true;
     let animationFrameId: number;
     const clock = new THREE.Clock();
@@ -233,44 +292,58 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
       if (!isVisible) return;
       animationFrameId = requestAnimationFrame(animate);
 
+      const delta = clock.getDelta();
       const t = clock.getElapsedTime();
 
-      // Smooth mouse lerp
-      currentRotX += (targetRotX - currentRotX) * 0.06;
-      currentRotY += (targetRotY - currentRotY) * 0.06;
+      // Inertia dampening for user drag
+      if (!isDragging) {
+        dragVelocityX *= 0.94;
+        dragVelocityY *= 0.94;
+        userRotY += dragVelocityX;
+        userRotX += dragVelocityY;
+      }
 
-      // Master subtle breathing tilt
-      masterGroup.rotation.x = currentRotX + Math.sin(t * 0.6) * 0.05;
-      masterGroup.rotation.y = currentRotY + t * 0.14;
+      // Smooth scale interpolation for hover pulse
+      const currentScale = masterGroup.scale.x;
+      const targetScale = pulseScale;
+      const newScale = currentScale + (targetScale - currentScale) * 0.1;
+      masterGroup.scale.set(newScale, newScale, newScale);
 
-      // Crystal rotation (clean multi-axis spin)
-      crystalMesh.rotation.y = t * 0.22;
-      crystalMesh.rotation.x = Math.sin(t * 0.25) * 0.18;
+      // Speed multiplier when hovered
+      const speed = isHovered ? 1.8 : 1.0;
+
+      // Master rotation combining user drag and gentle cosmic drift
+      masterGroup.rotation.x = userRotX + Math.sin(t * 0.5) * 0.05;
+      masterGroup.rotation.y = userRotY + t * 0.12 * speed;
+
+      // Crystal rotation
+      crystalMesh.rotation.y += delta * 0.3 * speed;
+      crystalMesh.rotation.x = Math.sin(t * 0.3) * 0.18;
 
       // Inner core counter-rotation
-      innerMesh.rotation.y = -t * 0.45;
-      innerMesh.rotation.z = t * 0.28;
+      innerMesh.rotation.y -= delta * 0.6 * speed;
+      innerMesh.rotation.z += delta * 0.4 * speed;
 
-      // Gyroscopic rings rotation
-      ring1.rotation.z = t * 0.28;
-      ring2.rotation.z = -t * 0.22;
+      // Gyroscope rings rotation
+      ring1.rotation.z += delta * 0.35 * speed;
+      ring2.rotation.z -= delta * 0.28 * speed;
 
-      // Satellites orbiting along rings (precomputed circular path, 0 CPU overhead)
-      const t1 = t * 1.1;
+      // Satellites orbiting along rings
+      const t1 = t * 1.2 * speed;
       sat1.position.set(
         Math.cos(t1) * 1.95 * Math.cos(ring1.rotation.x),
         Math.sin(t1) * 1.95,
         -Math.cos(t1) * 1.95 * Math.sin(ring1.rotation.x)
       );
 
-      const t2 = -t * 0.9;
+      const t2 = -t * 0.95 * speed;
       sat2.position.set(
-        Math.cos(t2) * 2.2,
-        Math.sin(t2) * 2.2 * Math.cos(ring2.rotation.x),
-        Math.sin(t2) * 2.2 * Math.sin(ring2.rotation.y)
+        Math.cos(t2) * 2.25,
+        Math.sin(t2) * 2.25 * Math.cos(ring2.rotation.x),
+        Math.sin(t2) * 2.25 * Math.sin(ring2.rotation.y)
       );
 
-      const t3 = t * 0.75 + Math.PI;
+      const t3 = t * 0.8 * speed + Math.PI;
       sat3.position.set(
         Math.cos(t3) * 1.95 * Math.cos(ring1.rotation.x),
         Math.sin(t3) * 1.95,
@@ -280,7 +353,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
       renderer.render(scene, camera);
     };
 
-    // Pause when off-screen to avoid lag on other pages or below fold
+    // Pause when off-screen to avoid lag on other pages
     const intersectionObserver = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
@@ -299,7 +372,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     );
     intersectionObserver.observe(container);
 
-    // Pause when browser tab is inactive
+    // Pause when tab is hidden
     const handleVisibilityChange = () => {
       if (document.hidden) {
         isVisible = false;
@@ -312,10 +385,8 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Initial start
     animate();
 
-    // Resize Observer
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width: newWidth, height: newHeight } = entry.contentRect;
@@ -328,7 +399,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     });
     resizeObserver.observe(container);
 
-    // --- 9. TOTAL CLEANUP ON UNMOUNT (Guarantees zero effect on other pages) ---
+    // --- CLEANUP ---
     return () => {
       cancelAnimationFrame(animationFrameId);
       isVisible = false;
@@ -337,28 +408,30 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
       document.removeEventListener('visibilitychange', handleVisibilityChange);
 
       if (interactive) {
-        window.removeEventListener('mousemove', handlePointerMove);
+        container.removeEventListener('pointerdown', onPointerDown);
+        window.removeEventListener('pointermove', onPointerMove);
+        window.removeEventListener('pointerup', onPointerUp);
+        container.removeEventListener('mouseenter', onMouseEnter);
+        container.removeEventListener('mouseleave', onMouseLeave);
+        container.removeEventListener('click', onClick);
       }
 
-      // Dispose Geometries
       crystalGeo.dispose();
       edgesGeo.dispose();
       innerGeo.dispose();
       vertexGeo.dispose();
       ring1Geo.dispose();
       ring2Geo.dispose();
-      satelliteGeo.dispose();
+      satGeo.dispose();
 
-      // Dispose Materials
       crystalMat.dispose();
       edgesMat.dispose();
       innerMat.dispose();
       vertexMat.dispose();
       ring1Mat.dispose();
       ring2Mat.dispose();
-      satelliteMat.dispose();
+      satMat.dispose();
 
-      // Explicitly lose context and destroy renderer
       renderer.forceContextLoss();
       renderer.dispose();
 
@@ -371,7 +444,8 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
   return (
     <div 
       ref={containerRef} 
-      className={`relative flex items-center justify-center select-none overflow-hidden ${className}`}
+      className={`relative flex items-center justify-center select-none overflow-hidden touch-none ${className}`}
+      title="Click & Drag to rotate • Hover to energize"
     />
   );
 };

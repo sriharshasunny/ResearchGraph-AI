@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface InteractiveSpaceBackgroundProps {
@@ -11,6 +11,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   authMode
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [parallax, setParallax] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,7 +22,6 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
 
-    // Mouse tracking for parallax
     let mouseX = 0;
     let mouseY = 0;
     let targetMouseX = 0;
@@ -30,12 +30,17 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     const handleMouseMove = (e: MouseEvent) => {
       targetMouseX = (e.clientX / window.innerWidth - 0.5) * 35;
       targetMouseY = (e.clientY / window.innerHeight - 0.5) * 35;
+      // Also update subtle background parallax state smoothly
+      setParallax({
+        x: (e.clientX / window.innerWidth - 0.5) * -18,
+        y: (e.clientY / window.innerHeight - 0.5) * -18,
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // Generate Stars with depth layers (optimized count for locked 60fps)
-    const starCount = 65;
+    // Dynamic Starfield with 3D Depth
+    const starCount = 75;
     const stars: Array<{
       x: number;
       y: number;
@@ -52,16 +57,16 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.4 + 0.5,
-        baseAlpha: Math.random() * 0.4 + 0.2,
+        size: Math.random() * 1.5 + 0.5,
+        baseAlpha: Math.random() * 0.45 + 0.25,
         alpha: 0.5,
         depth,
-        twinkleSpeed: Math.random() * 0.02 + 0.01,
+        twinkleSpeed: Math.random() * 0.025 + 0.01,
         twinklePhase: Math.random() * Math.PI * 2,
       });
     }
 
-    // Occasional shooting star
+    // Occasional shooting stars
     interface ShootingStar {
       x: number;
       y: number;
@@ -75,20 +80,20 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     const shootingStar: ShootingStar = {
       x: 0,
       y: 0,
-      length: 75,
-      speed: 12,
+      length: 80,
+      speed: 14,
       angle: Math.PI / 4,
       opacity: 0,
       active: false,
     };
 
-    let nextShootingStarTime = Date.now() + Math.random() * 4000 + 3000;
+    let nextShootingStarTime = Date.now() + 3000;
 
     const spawnShootingStar = () => {
       shootingStar.x = Math.random() * width * 0.8;
       shootingStar.y = Math.random() * height * 0.4;
-      shootingStar.length = Math.random() * 60 + 50;
-      shootingStar.speed = Math.random() * 6 + 10;
+      shootingStar.length = Math.random() * 70 + 60;
+      shootingStar.speed = Math.random() * 8 + 12;
       shootingStar.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
       shootingStar.opacity = 1;
       shootingStar.active = true;
@@ -101,7 +106,6 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       if (!isRunning) return;
       animationId = requestAnimationFrame(render);
 
-      // Smooth mouse lerp
       mouseX += (targetMouseX - mouseX) * 0.05;
       mouseY += (targetMouseY - mouseY) * 0.05;
 
@@ -121,10 +125,10 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         ctx.fill();
       }
 
-      // Shooting star logic
+      // Check shooting star
       if (Date.now() > nextShootingStarTime && !shootingStar.active) {
         spawnShootingStar();
-        nextShootingStarTime = Date.now() + Math.random() * 7000 + 5000;
+        nextShootingStarTime = Date.now() + Math.random() * 8000 + 4000;
       }
 
       if (shootingStar.active) {
@@ -141,7 +145,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
         shootingStar.x += Math.cos(shootingStar.angle) * shootingStar.speed;
         shootingStar.y += Math.sin(shootingStar.angle) * shootingStar.speed;
-        shootingStar.opacity -= 0.018;
+        shootingStar.opacity -= 0.016;
 
         if (shootingStar.opacity <= 0 || shootingStar.x > width || shootingStar.y > height) {
           shootingStar.active = false;
@@ -185,7 +189,10 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       {/* Layer 1: Landing Background */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/epic_launch_bg.jpg')" }}
+        style={{ 
+          backgroundImage: "url('/epic_launch_bg.jpg')",
+          transform: `translate3d(${parallax.x * 0.5}px, ${parallax.y * 0.5}px, 0)`
+        }}
         initial={false}
         animate={{ 
           opacity: pageState === 'LANDING' ? 1 : 0,
@@ -194,33 +201,39 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         transition={{ duration: 0.8, ease: "easeInOut" }}
       />
 
-      {/* Layer 2: Login Background (Deep Space Cyan Vortex) */}
+      {/* Layer 2: Login Background (Photorealistic Planetary Arc & Cosmos Vista) */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/login_bg.jpg')" }}
+        style={{ 
+          backgroundImage: "url('/login_bg.jpg')",
+          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
+        }}
         initial={false}
         animate={{ 
-          opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 0.38 : 0,
-          scale: (pageState === 'AUTH' && authMode === 'LOGIN') ? [1.0, 1.03, 1.0] : 1.0
+          opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 0.88 : 0,
+          scale: (pageState === 'AUTH' && authMode === 'LOGIN') ? [1.02, 1.05, 1.02] : 1.0
         }}
         transition={{ 
           opacity: { duration: 0.8, ease: "easeInOut" },
-          scale: { duration: 30, repeat: Infinity, ease: "easeInOut" }
+          scale: { duration: 35, repeat: Infinity, ease: "easeInOut" }
         }}
       />
 
-      {/* Layer 3: Register Background (Deep Space Purple Nebula) */}
+      {/* Layer 3: Register Background (Photorealistic Interstellar Nebula Star Cluster) */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/register_bg.jpg')" }}
+        style={{ 
+          backgroundImage: "url('/register_bg.jpg')",
+          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
+        }}
         initial={false}
         animate={{ 
-          opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 0.38 : 0,
-          scale: (pageState === 'AUTH' && authMode === 'REGISTER') ? [1.0, 1.03, 1.0] : 1.0
+          opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 0.88 : 0,
+          scale: (pageState === 'AUTH' && authMode === 'REGISTER') ? [1.02, 1.05, 1.02] : 1.0
         }}
         transition={{ 
           opacity: { duration: 0.8, ease: "easeInOut" },
-          scale: { duration: 30, repeat: Infinity, ease: "easeInOut" }
+          scale: { duration: 35, repeat: Infinity, ease: "easeInOut" }
         }}
       />
 
@@ -230,21 +243,23 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         className="absolute inset-0 z-10 pointer-events-none"
       />
 
-      {/* Atmospheric Scrim: Keeps the background deep/dull in Auth mode so UI elements pop */}
+      {/* Atmospheric Gradients: Soft vignettes that preserve space visibility while maintaining UI clarity */}
       <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-10 ${
-        pageState === 'LANDING' ? 'bg-black/45' : 'bg-[#030712]/75'
+        pageState === 'LANDING' 
+          ? 'bg-black/40' 
+          : 'bg-black/25'
       }`}></div>
 
       <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
           ? 'from-[#030712]/90 via-black/30 to-[#030712] opacity-100' 
-          : 'from-[#030712] via-[#030712]/60 to-[#030712] opacity-100'
+          : 'from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90'
       }`}></div>
 
-      {/* Radial Vignette Focus */}
+      {/* Radial Focus Vignette */}
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-10 ${
         pageState === 'AUTH' 
-          ? 'opacity-100 bg-[radial-gradient(circle_at_center,rgba(3,7,18,0.3)_0%,#030712_85%)]' 
+          ? 'opacity-80 bg-[radial-gradient(ellipse_at_center,transparent_20%,#030712_85%)]' 
           : 'opacity-0'
       }`}></div>
     </div>

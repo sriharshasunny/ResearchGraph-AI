@@ -344,13 +344,18 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   
                   {/* High-Tech Telemetry HUD */}
                   <div className="mt-2 text-center max-w-md px-4">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono mb-3 tracking-wider border transition-colors duration-500 ${
-                      authMode === 'LOGIN' 
-                        ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' 
-                        : 'bg-purple-500/10 border-purple-500/30 text-purple-400'
-                    }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full animate-ping ${authMode === 'LOGIN' ? 'bg-cyan-400' : 'bg-purple-400'}`}></span>
-                      <span>3D NEURAL UPLINK ACTIVE</span>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mb-3">
+                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wider border transition-colors duration-500 ${
+                        authMode === 'LOGIN' 
+                          ? 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400' 
+                          : 'bg-purple-500/10 border-purple-500/30 text-purple-400'
+                      }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full animate-ping ${authMode === 'LOGIN' ? 'bg-cyan-400' : 'bg-purple-400'}`}></span>
+                        <span>3D NEURAL UPLINK ACTIVE</span>
+                      </div>
+                      <span className="text-[10px] text-gray-300 font-mono bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                        ✦ DRAG TO ROTATE
+                      </span>
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
                       {authMode === 'LOGIN' ? 'Quantum Knowledge Grid' : 'Neural Node Genesis'}
