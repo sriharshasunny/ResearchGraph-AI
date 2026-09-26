@@ -186,17 +186,17 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712] pointer-events-none select-none">
       
-      {/* Layer 1: Landing Cockpit Background */}
+      {/* Layer 1: Previous Space Background */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: "url('/cockpit_landing_hero.jpg')",
-          transform: `translate3d(${parallax.x * 0.25}px, ${parallax.y * 0.25}px, 0)`
+          backgroundImage: "url('/epic_launch_bg.jpg')",
+          transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`
         }}
         initial={false}
         animate={{ 
-          opacity: pageState === 'LANDING' ? 1 : 0,
-          scale: pageState === 'LANDING' ? 1.0 : 1.0
+          opacity: pageState === 'LANDING' ? 0.95 : 0,
+          scale: pageState === 'LANDING' ? 1.02 : 1.0
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
       />

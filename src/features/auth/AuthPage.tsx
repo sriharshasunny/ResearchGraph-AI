@@ -266,22 +266,46 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               </AnimatePresence>
 
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              {/*           THE EXACT STARSHIP COCKPIT BRIDGE HERO VIEW (MATCHING IMAGE)               */}
+              {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (PURE CRISP UI ARCHITECTURE)      */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-[#02050e]">
+              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-transparent">
                 
-                {/* Cockpit Canopy Framing: High-Resolution Background Image */}
-                <div 
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none z-0"
-                  style={{ backgroundImage: `url('/cockpit_landing_hero.jpg')` }}
-                />
+                {/* ─── COCKPIT CANOPY STRUCTURAL FRAME (TOP & SIDES) ─── */}
+                {/* Top Canopy Arch Beam */}
+                <div className="absolute top-0 left-0 right-0 h-10 pointer-events-none z-20 bg-gradient-to-b from-[#060a18] via-[#070e24]/70 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/15">
+                  <div className="flex items-center gap-2 text-[9px] font-mono text-cyan-400/80">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span>COCKPIT HUD // CANOPY PRESSURIZED</span>
+                  </div>
+                  <div className="hidden sm:flex items-center gap-4 text-[9px] font-mono text-gray-500">
+                    <span>SENSORS: OPTIMAL</span>
+                    <span>ORBITAL RECEPTORS: 45/45</span>
+                    <span className="text-emerald-400">TELEMETRY: SYNCHRONIZED</span>
+                  </div>
+                </div>
 
-                {/* Subtle Star Twinkle & Holographic Glow Atmosphere */}
-                <div className="absolute inset-0 pointer-events-none z-10 bg-radial-vignette opacity-30"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none z-10"></div>
+                {/* Left Canopy Structural Pillar (Strut) */}
+                <div className="absolute top-0 left-0 bottom-24 w-12 sm:w-16 pointer-events-none z-20 hidden md:block">
+                  <div className="w-full h-full bg-gradient-to-r from-[#050916] via-[#070e24]/40 to-transparent border-r border-cyan-500/10 relative">
+                    <div className="absolute top-1/4 left-2 w-1.5 h-16 bg-cyan-500/20 rounded-full"></div>
+                    <div className="absolute top-1/2 left-2 w-1.5 h-24 bg-purple-500/20 rounded-full"></div>
+                    <div className="absolute bottom-1/4 left-2 w-1.5 h-12 bg-emerald-500/20 rounded-full"></div>
+                  </div>
+                </div>
+
+                {/* Right Canopy Structural Pillar (Strut) */}
+                <div className="absolute top-0 right-0 bottom-24 w-12 sm:w-16 pointer-events-none z-20 hidden md:block">
+                  <div className="w-full h-full bg-gradient-to-l from-[#050916] via-[#070e24]/40 to-transparent border-l border-cyan-500/10 relative">
+                    <div className="absolute top-1/3 right-2 w-1.5 h-20 bg-cyan-500/20 rounded-full"></div>
+                    <div className="absolute bottom-1/3 right-2 w-1.5 h-28 bg-purple-500/20 rounded-full"></div>
+                  </div>
+                </div>
+
+                {/* Ambient Radial Lighting over space background */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-cyan-500/10 blur-[140px] pointer-events-none z-0"></div>
                 
-                {/* ─── TOP SECTION: FLOATING HUD PANELS & CANOPY HEADER ─── */}
-                <div className="relative z-20 w-full max-w-[1550px] mx-auto px-4 sm:px-8 pt-4 pb-2">
+                {/* ─── TOP SECTION: FLOATING HUD PANELS ─── */}
+                <div className="relative z-20 w-full max-w-[1550px] mx-auto px-4 sm:px-8 pt-6 pb-2">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     
                     {/* Top-Left: Research Databases HUD Panel */}
@@ -290,11 +314,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.2 }}
                       onClick={() => setActiveModal('SOURCES')}
-                      className="hidden md:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#070d1e]/80 border border-cyan-500/30 backdrop-blur-xl shadow-lg shadow-cyan-950/40 hover:border-cyan-400 transition-all cursor-pointer group"
+                      className="hidden md:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c1d]/90 border border-cyan-500/40 backdrop-blur-2xl shadow-xl shadow-black/80 hover:border-cyan-400 transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-                          <Database className="w-3 h-3 text-cyan-400" />
+                          <Database className="w-3.5 h-3.5 text-cyan-400" />
                           Research Databases
                         </span>
                         <span className="text-[9px] text-cyan-400/80 group-hover:text-cyan-300 font-mono transition-colors">
@@ -302,11 +326,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-bold">arXiv</span>
-                        <span className="px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold">PubMed</span>
-                        <span className="px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-bold">IEEE</span>
-                        <span className="px-2 py-0.5 rounded bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-bold">Semantic Scholar</span>
-                        <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold">CrossRef</span>
+                        <span className="px-2 py-0.5 rounded-md bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-bold shadow-sm">arXiv</span>
+                        <span className="px-2 py-0.5 rounded-md bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-bold shadow-sm">PubMed</span>
+                        <span className="px-2 py-0.5 rounded-md bg-sky-500/20 border border-sky-500/40 text-sky-300 text-[10px] font-bold shadow-sm">IEEE</span>
+                        <span className="px-2 py-0.5 rounded-md bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-bold shadow-sm">Semantic Scholar</span>
+                        <span className="px-2 py-0.5 rounded-md bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold shadow-sm">CrossRef</span>
                       </div>
                     </motion.div>
 
@@ -316,11 +340,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.3 }}
                       onClick={() => setActiveModal('HOW_IT_WORKS')}
-                      className="hidden lg:flex flex-col gap-1.5 px-5 py-2.5 rounded-2xl bg-[#070d1e]/80 border border-purple-500/30 backdrop-blur-xl shadow-lg shadow-purple-950/40 hover:border-purple-400 transition-all cursor-pointer group"
+                      className="hidden lg:flex flex-col gap-1.5 px-5 py-2.5 rounded-2xl bg-[#060c1d]/90 border border-purple-500/40 backdrop-blur-2xl shadow-xl shadow-black/80 hover:border-purple-400 transition-all cursor-pointer group"
                     >
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                          <Zap className="w-3 h-3 text-purple-400" />
+                          <Zap className="w-3.5 h-3.5 text-purple-400" />
                           RAG Pipeline
                         </span>
                         <span className="text-[9px] text-purple-300/80 group-hover:text-purple-200 font-mono transition-colors">
@@ -328,17 +352,17 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-[10px]">
-                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-300">
+                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/20 border border-blue-500/40 text-blue-300 font-semibold shadow-sm">
                           <Database className="w-3 h-3 text-blue-400" />
                           <span>Retrieve</span>
                         </div>
                         <span className="text-gray-500 font-bold">→</span>
-                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-purple-500/15 border border-purple-500/30 text-purple-300">
+                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-300 font-semibold shadow-sm">
                           <FileText className="w-3 h-3 text-purple-400" />
                           <span>Augment</span>
                         </div>
                         <span className="text-gray-500 font-bold">→</span>
-                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
+                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold shadow-sm">
                           <BrainCircuit className="w-3 h-3 text-emerald-400" />
                           <span>Generate</span>
                         </div>
@@ -350,11 +374,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       initial={{ opacity: 0, y: -15 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.4 }}
-                      className="hidden xl:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#070d1e]/80 border border-emerald-500/30 backdrop-blur-xl shadow-lg shadow-emerald-950/40"
+                      className="hidden xl:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c1d]/90 border border-emerald-500/40 backdrop-blur-2xl shadow-xl shadow-black/80"
                     >
                       <div className="flex items-center justify-between gap-4">
                         <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                          <Cpu className="w-3 h-3 text-emerald-400" />
+                          <Cpu className="w-3.5 h-3.5 text-emerald-400" />
                           Large Language Models
                         </span>
                         <span className="text-[9px] text-emerald-400/80 font-mono">
@@ -362,11 +386,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold">GPT-4o</span>
-                        <span className="px-2 py-0.5 rounded bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-semibold">Claude 3.5</span>
-                        <span className="px-2 py-0.5 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300 text-[10px] font-semibold">Gemini 1.5</span>
-                        <span className="px-2 py-0.5 rounded bg-purple-500/15 border border-purple-500/30 text-purple-300 text-[10px] font-semibold">Llama 3.1</span>
-                        <span className="px-2 py-0.5 rounded bg-pink-500/15 border border-pink-500/30 text-pink-300 text-[10px] font-semibold">Mistral</span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold">GPT-4o</span>
+                        <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-semibold">Claude 3.5</span>
+                        <span className="px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/40 text-blue-300 text-[10px] font-semibold">Gemini 1.5</span>
+                        <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/40 text-purple-300 text-[10px] font-semibold">Llama 3.1</span>
+                        <span className="px-2 py-0.5 rounded bg-pink-500/20 border border-pink-500/40 text-pink-300 text-[10px] font-semibold">Mistral</span>
                       </div>
                     </motion.div>
 
@@ -384,13 +408,13 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     className="flex-1 flex flex-col items-start text-left max-w-xl z-30"
                   >
                     {/* Brand Pill */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-widest uppercase mb-4 shadow-sm">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/35 text-cyan-400 text-xs font-mono font-bold tracking-widest uppercase mb-4 shadow-md backdrop-blur-md">
                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                       RESEARCHGRAPH AI
                     </div>
 
                     {/* Massive Punchy Headline */}
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-4">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-4 text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
                       A Universe<br />
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">
                         of Connected
@@ -401,7 +425,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </h1>
 
                     {/* Subtitle Description */}
-                    <p className="text-gray-300/90 text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                    <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-6 max-w-md drop-shadow">
                       RAG-powered research intelligence with knowledge graphs, multi-source data and LLMs to help you discover, connect and understand research like never before.
                     </p>
 
@@ -416,7 +440,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                       <button 
                         onClick={() => setActiveModal('DEMO')}
-                        className="px-5 py-3 rounded-xl bg-[#081026]/80 border border-white/20 hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm transition-all flex items-center gap-2.5 backdrop-blur-md hover:bg-white/10"
+                        className="px-5 py-3 rounded-xl bg-[#060c1d]/90 border border-white/20 hover:border-cyan-400/50 text-gray-200 hover:text-white font-bold text-sm transition-all flex items-center gap-2.5 backdrop-blur-xl hover:bg-white/10 shadow-lg"
                       >
                         <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" />
                         Watch Demo
@@ -424,20 +448,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* 4 Stats Grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full pt-4 border-t border-white/10">
-                      <div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full pt-4 border-t border-white/15">
+                      <div className="bg-[#060c1d]/60 border border-white/10 rounded-xl p-2.5 backdrop-blur-md">
                         <span className="text-lg sm:text-xl font-black text-cyan-400 block tracking-tight">200M+</span>
                         <span className="text-gray-400 text-[11px] leading-tight block">Research Papers</span>
                       </div>
-                      <div>
+                      <div className="bg-[#060c1d]/60 border border-white/10 rounded-xl p-2.5 backdrop-blur-md">
                         <span className="text-lg sm:text-xl font-black text-purple-400 block tracking-tight">45+</span>
                         <span className="text-gray-400 text-[11px] leading-tight block">Data Sources</span>
                       </div>
-                      <div>
+                      <div className="bg-[#060c1d]/60 border border-white/10 rounded-xl p-2.5 backdrop-blur-md">
                         <span className="text-lg sm:text-xl font-black text-emerald-400 block tracking-tight">Multi-LLM</span>
                         <span className="text-gray-400 text-[11px] leading-tight block">AI Intelligence</span>
                       </div>
-                      <div>
+                      <div className="bg-[#060c1d]/60 border border-white/10 rounded-xl p-2.5 backdrop-blur-md">
                         <span className="text-lg sm:text-xl font-black text-sky-400 block tracking-tight">Real-time</span>
                         <span className="text-gray-400 text-[11px] leading-tight block">Knowledge Graph</span>
                       </div>
@@ -445,14 +469,14 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </motion.div>
 
                   {/* CENTER: 3D HOLOGRAPHIC PROJECTION PEDESTAL & INTERACTIVE SPHERE */}
-                  <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[520px] lg:h-[520px] flex items-center justify-center flex-shrink-0 my-2">
+                  <div className="relative w-[340px] h-[360px] sm:w-[460px] sm:h-[480px] lg:w-[520px] lg:h-[540px] flex items-center justify-center flex-shrink-0 my-2">
                     
-                    {/* Concentric Holographic Emitter Rings */}
-                    <div className="absolute inset-0 rounded-full border border-cyan-500/20 animate-spin-slow pointer-events-none"></div>
-                    <div className="absolute inset-6 rounded-full border border-purple-500/20 animate-reverse-spin pointer-events-none"></div>
+                    {/* Concentric Holographic Light Rings */}
+                    <div className="absolute inset-0 rounded-full border border-cyan-500/25 animate-spin-slow pointer-events-none"></div>
+                    <div className="absolute inset-6 rounded-full border border-purple-500/25 animate-reverse-spin pointer-events-none"></div>
                     
                     {/* The Real Interactive WebGL 3D Quantum Neural Core */}
-                    <div className="relative w-full h-full flex items-center justify-center z-10 cursor-grab active:cursor-grabbing">
+                    <div className="relative w-full h-[85%] flex items-center justify-center z-10 cursor-grab active:cursor-grabbing">
                       <ThreeNeuralCore className="w-full h-full" theme="cyan" interactive={true} />
                     </div>
 
@@ -461,124 +485,138 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       initial={{ scale: 0.8, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.7 }}
-                      className="absolute z-20 pointer-events-none flex flex-col items-center justify-center"
+                      className="absolute z-20 pointer-events-none flex flex-col items-center justify-center -translate-y-4"
                     >
-                      <div className="w-11 h-11 rounded-xl bg-blue-600/30 border border-cyan-400/80 backdrop-blur-md flex items-center justify-center shadow-lg shadow-cyan-500/40">
+                      <div className="w-12 h-12 rounded-xl bg-blue-600/40 border-2 border-cyan-400 backdrop-blur-md flex items-center justify-center shadow-lg shadow-cyan-500/50">
                         <Network className="w-6 h-6 text-cyan-300" />
                       </div>
-                      <span className="mt-1 px-2.5 py-0.5 rounded-full bg-[#040816]/90 border border-cyan-500/50 text-[10px] font-extrabold text-cyan-300 uppercase tracking-wider shadow-md">
+                      <span className="mt-1 px-3 py-0.5 rounded-full bg-[#050a1a]/95 border border-cyan-500/60 text-[10px] font-extrabold text-cyan-300 uppercase tracking-wider shadow-lg">
                         Knowledge Graph
                       </span>
                     </motion.div>
 
-                    {/* Orbiting Category Badges (Matching Image Placement) */}
+                    {/* Orbiting Category Badges */}
                     {/* 1. Authors (Top-Left, Amber) */}
-                    <div className="absolute top-[8%] left-[20%] z-20 pointer-events-none animate-float-slow">
-                      <span className="px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/50 text-amber-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-amber-500/20">
+                    <div className="absolute top-[6%] left-[18%] z-20 pointer-events-none animate-float-slow">
+                      <span className="px-3 py-1 rounded-full bg-[#060d20]/90 border border-amber-400/60 text-amber-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-amber-500/25">
                         <User className="w-3 h-3 text-amber-400" />
                         Authors
                       </span>
                     </div>
 
                     {/* 2. Papers (Mid-Left, Blue) */}
-                    <div className="absolute top-[40%] left-[2%] z-20 pointer-events-none animate-float-mid">
-                      <span className="px-2.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/50 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-blue-500/20">
+                    <div className="absolute top-[36%] left-[0%] z-20 pointer-events-none animate-float-mid">
+                      <span className="px-3 py-1 rounded-full bg-[#060d20]/90 border border-blue-400/60 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-blue-500/25">
                         <FileText className="w-3 h-3 text-blue-400" />
                         Papers
                       </span>
                     </div>
 
                     {/* 3. Concepts (Bottom-Left, Purple) */}
-                    <div className="absolute bottom-[16%] left-[10%] z-20 pointer-events-none animate-float-slow">
-                      <span className="px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/50 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-purple-500/20">
+                    <div className="absolute bottom-[22%] left-[8%] z-20 pointer-events-none animate-float-slow">
+                      <span className="px-3 py-1 rounded-full bg-[#060d20]/90 border border-purple-400/60 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-purple-500/25">
                         <Sparkles className="w-3 h-3 text-purple-400" />
                         Concepts
                       </span>
                     </div>
 
                     {/* 4. Datasets (Top-Right, Green) */}
-                    <div className="absolute top-[16%] right-[8%] z-20 pointer-events-none animate-float-mid">
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-emerald-500/20">
+                    <div className="absolute top-[12%] right-[6%] z-20 pointer-events-none animate-float-mid">
+                      <span className="px-3 py-1 rounded-full bg-[#060d20]/90 border border-emerald-400/60 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-emerald-500/25">
                         <Database className="w-3 h-3 text-emerald-400" />
                         Datasets
                       </span>
                     </div>
 
                     {/* 5. Citations (Mid-Right, Coral) */}
-                    <div className="absolute top-[46%] right-[-2%] z-20 pointer-events-none animate-float-slow">
-                      <span className="px-2.5 py-1 rounded-full bg-rose-500/20 border border-rose-400/50 text-rose-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-rose-500/20">
+                    <div className="absolute top-[42%] right-[-2%] z-20 pointer-events-none animate-float-slow">
+                      <span className="px-3 py-1 rounded-full bg-[#060d20]/90 border border-rose-400/60 text-rose-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-rose-500/25">
                         <Share2 className="w-3 h-3 text-rose-400" />
                         Citations
                       </span>
                     </div>
 
                     {/* 6. Research Trends (Bottom-Right, Violet) */}
-                    <div className="absolute bottom-[12%] right-[10%] z-20 pointer-events-none animate-float-mid">
-                      <span className="px-2.5 py-1 rounded-full bg-fuchsia-500/20 border border-fuchsia-400/50 text-fuchsia-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-fuchsia-500/20">
+                    <div className="absolute bottom-[20%] right-[6%] z-20 pointer-events-none animate-float-mid">
+                      <span className="px-3 py-1 rounded-full bg-[#060d20]/90 border border-fuchsia-400/60 text-fuchsia-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-md flex items-center gap-1.5 shadow-lg shadow-fuchsia-500/25">
                         <Activity className="w-3 h-3 text-fuchsia-400" />
                         Research Trends
                       </span>
                     </div>
 
-                    {/* Floating 3D Scientific Paper Card Mockups in Orbit */}
-                    <div className="absolute top-[18%] left-[12%] z-15 pointer-events-none hidden sm:block opacity-75 transform -rotate-12 hover:opacity-100 transition-opacity">
-                      <div className="w-16 h-22 bg-white/90 rounded shadow-md p-1.5 border border-white/50 text-[5px] text-gray-800 flex flex-col justify-between">
-                        <div className="w-full h-1.5 bg-blue-600 rounded-xs mb-1"></div>
-                        <div className="space-y-0.5">
+                    {/* Floating 3D Scientific Paper Cards in Orbit */}
+                    <div className="absolute top-[16%] left-[10%] z-15 pointer-events-none hidden sm:block opacity-85 transform -rotate-12 hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-22 bg-[#0a1228]/90 backdrop-blur-md rounded-lg shadow-xl p-2 border border-cyan-500/40 text-[5px] text-gray-300 flex flex-col justify-between">
+                        <div className="w-full h-1.5 bg-blue-500 rounded mb-1"></div>
+                        <div className="space-y-1">
                           <div className="w-10 h-0.5 bg-gray-400 rounded"></div>
                           <div className="w-12 h-0.5 bg-gray-400 rounded"></div>
                           <div className="w-8 h-0.5 bg-gray-400 rounded"></div>
                         </div>
-                        <div className="w-4 h-1 bg-cyan-500 rounded self-end"></div>
+                        <div className="w-5 h-1 bg-cyan-400 rounded self-end"></div>
                       </div>
                     </div>
 
-                    <div className="absolute top-[28%] right-[14%] z-15 pointer-events-none hidden sm:block opacity-75 transform rotate-6 hover:opacity-100 transition-opacity">
-                      <div className="w-16 h-22 bg-white/90 rounded shadow-md p-1.5 border border-white/50 text-[5px] text-gray-800 flex flex-col justify-between">
-                        <div className="w-full h-1.5 bg-purple-600 rounded-xs mb-1"></div>
-                        <div className="space-y-0.5">
+                    <div className="absolute top-[26%] right-[12%] z-15 pointer-events-none hidden sm:block opacity-85 transform rotate-6 hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-22 bg-[#0a1228]/90 backdrop-blur-md rounded-lg shadow-xl p-2 border border-purple-500/40 text-[5px] text-gray-300 flex flex-col justify-between">
+                        <div className="w-full h-1.5 bg-purple-500 rounded mb-1"></div>
+                        <div className="space-y-1">
                           <div className="w-11 h-0.5 bg-gray-400 rounded"></div>
                           <div className="w-9 h-0.5 bg-gray-400 rounded"></div>
                           <div className="w-12 h-0.5 bg-gray-400 rounded"></div>
                         </div>
-                        <div className="w-5 h-1 bg-emerald-500 rounded self-end"></div>
+                        <div className="w-5 h-1 bg-emerald-400 rounded self-end"></div>
                       </div>
                     </div>
 
-                    <div className="absolute bottom-[24%] right-[22%] z-15 pointer-events-none hidden sm:block opacity-70 transform -rotate-6">
-                      <div className="w-14 h-18 bg-white/85 rounded shadow p-1 border border-white/40 flex flex-col justify-between">
-                        <div className="w-full h-1 bg-amber-500 rounded-xs mb-1"></div>
-                        <div className="space-y-0.5">
-                          <div className="w-8 h-0.5 bg-gray-400 rounded"></div>
-                          <div className="w-10 h-0.5 bg-gray-400 rounded"></div>
+                    {/* ─── 3D COCKPIT EMITTER PEDESTAL UNDER THE MODEL ─── */}
+                    <div className="absolute bottom-[-15px] left-1/2 -translate-x-1/2 w-[380px] sm:w-[460px] h-[90px] pointer-events-none z-10 flex flex-col items-center justify-center">
+                      {/* Vertical Hologram Light Beam Cone */}
+                      <div className="absolute bottom-6 w-52 h-44 bg-gradient-to-t from-cyan-500/25 via-sky-400/10 to-transparent blur-md"></div>
+
+                      {/* Concentric Elliptical Projection Rings with 3D Perspective */}
+                      <div 
+                        className="relative w-full h-[70px] flex items-center justify-center"
+                        style={{ perspective: '800px' }}
+                      >
+                        {/* Outer Tiered Metallic Pedestal Disc */}
+                        <div 
+                          className="w-[340px] sm:w-[420px] h-[85px] rounded-full border-2 border-cyan-400/50 bg-[#060c20]/95 shadow-[0_0_35px_rgba(6,182,212,0.4)] flex items-center justify-center"
+                          style={{ transform: 'rotateX(68deg)' }}
+                        >
+                          {/* Inner Glowing Ring */}
+                          <div className="w-[260px] sm:w-[320px] h-[60px] rounded-full border border-cyan-300/80 bg-cyan-500/15 shadow-[0_0_20px_rgba(6,182,212,0.6)] flex items-center justify-center">
+                            {/* Central Laser Projector Aperture */}
+                            <div className="w-16 h-8 rounded-full bg-cyan-300 shadow-[0_0_15px_#22d3ee] animate-pulse"></div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                   </div>
 
-                  {/* RIGHT: LIVE ANALYTICS HUD DISPLAY (MATCHING IMAGE) */}
+                  {/* RIGHT: LIVE ANALYTICS HUD DISPLAY */}
                   <motion.div 
                     initial={{ opacity: 0, x: 25 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3, duration: 0.6 }}
                     className="hidden lg:flex flex-col gap-3 w-[260px] z-30 flex-shrink-0"
                   >
-                    <div className="rounded-2xl bg-[#060c1d]/90 border border-cyan-500/30 p-4 backdrop-blur-xl shadow-xl shadow-black/60 relative overflow-hidden">
+                    <div className="rounded-2xl bg-[#060c1d]/90 border border-cyan-500/40 p-4 backdrop-blur-2xl shadow-2xl shadow-black relative overflow-hidden">
                       {/* Top Row: Live Analytics + Pulsing indicator */}
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
                           <Activity className="w-3.5 h-3.5 text-cyan-400" />
                           Live Analytics
                         </span>
-                        <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">
+                        <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
                           ● Live
                         </span>
                       </div>
 
                       {/* Equalizer Frequency Bar Graph */}
-                      <div className="flex items-end gap-[3px] h-9 mb-4 px-1 py-1 bg-black/40 rounded-lg border border-white/5">
+                      <div className="flex items-end gap-[3px] h-9 mb-4 px-1 py-1 bg-black/50 rounded-lg border border-white/10">
                         {[45, 75, 60, 90, 100, 80, 65, 85, 95, 70, 85, 60, 78, 92].map((height, i) => (
                           <div 
                             key={i} 
@@ -590,15 +628,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                       {/* Metrics List */}
                       <div className="space-y-2.5 text-xs font-mono">
-                        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
                           <span className="text-gray-400">Papers Indexed</span>
                           <span className="text-cyan-300 font-extrabold text-sm">200M+</span>
                         </div>
-                        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
                           <span className="text-gray-400">Connections</span>
                           <span className="text-purple-300 font-extrabold text-sm">1.2B+</span>
                         </div>
-                        <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
                           <span className="text-gray-400">Concepts</span>
                           <span className="text-emerald-300 font-extrabold text-sm">45K+</span>
                         </div>
@@ -612,7 +650,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     {/* Quick Explore Button */}
                     <button 
                       onClick={() => triggerTraversal('AUTH', 'LOGIN')}
-                      className="w-full py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-400/40 text-xs font-bold text-gray-200 hover:text-white transition-all flex items-center justify-center gap-2"
+                      className="w-full py-2.5 rounded-xl bg-[#060c1d]/90 hover:bg-white/10 border border-white/15 hover:border-cyan-400/50 text-xs font-bold text-gray-200 hover:text-white transition-all flex items-center justify-center gap-2 backdrop-blur-xl shadow-lg"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
                       Open Full Telemetry Grid
@@ -630,8 +668,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 >
                   {/* Central Pedestal Badge Mounting */}
                   <div className="flex justify-center -mb-[1px]">
-                    <div className="px-8 py-2 rounded-t-2xl bg-[#070e24]/95 border border-cyan-500/40 border-b-0 backdrop-blur-2xl text-center shadow-[0_-10px_25px_rgba(6,182,212,0.15)] flex flex-col items-center">
-                      <span className="text-[11px] font-black text-cyan-300 uppercase tracking-[0.25em] block">
+                    <div className="px-8 py-2 rounded-t-2xl bg-[#070e24]/95 border-2 border-cyan-500/50 border-b-0 backdrop-blur-2xl text-center shadow-[0_-12px_30px_rgba(6,182,212,0.25)] flex flex-col items-center">
+                      <span className="text-[11px] font-black text-cyan-300 uppercase tracking-[0.25em] block drop-shadow-[0_0_8px_rgba(6,182,212,0.5)]">
                         RESEARCHGRAPH AI
                       </span>
                       <span className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] block">
@@ -641,16 +679,16 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
 
                   {/* Cockpit Command Deck Bar */}
-                  <div className="w-full bg-[#050a1a]/95 backdrop-blur-2xl border-t border-cyan-500/30 px-4 sm:px-8 py-4 shadow-2xl shadow-black">
+                  <div className="w-full bg-[#050a1a]/95 backdrop-blur-3xl border-t-2 border-cyan-500/40 px-4 sm:px-8 py-4 shadow-[0_-15px_40px_rgba(0,0,0,0.9)]">
                     <div className="max-w-[1550px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
                       
                       {/* Left Console: Multi-Source Retrieval */}
                       <div 
                         onClick={() => scrollToSection(sourcesSectionRef)}
-                        className="hidden sm:flex items-center gap-3.5 flex-shrink-0 cursor-pointer group p-2 rounded-xl hover:bg-white/5 transition-all"
+                        className="hidden sm:flex items-center gap-3.5 flex-shrink-0 cursor-pointer group p-2.5 rounded-xl bg-black/40 border border-white/10 hover:border-cyan-500/40 transition-all shadow-inner"
                       >
                         {/* High-Tech Rotating Radar Grid */}
-                        <div className="relative w-11 h-11 rounded-full border border-cyan-500/40 bg-black/60 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-inner">
+                        <div className="relative w-12 h-12 rounded-full border border-cyan-500/50 bg-[#030612] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
                           <div className="absolute inset-0 rounded-full border border-cyan-400/20"></div>
                           <div className="absolute w-full h-[1px] bg-cyan-500/30 top-1/2 -translate-y-1/2"></div>
                           <div className="absolute h-full w-[1px] bg-cyan-500/30 left-1/2 -translate-x-1/2"></div>
@@ -673,16 +711,16 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         className="flex-1 w-full max-w-2xl"
                       >
                         <div className="flex items-center justify-between mb-1.5 px-1">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                            <BrainCircuit className="w-3 h-3 text-cyan-400" />
+                          <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest flex items-center gap-1.5">
+                            <BrainCircuit className="w-3.5 h-3.5 text-cyan-400" />
                             ASK A RESEARCH QUESTION
                           </span>
-                          <span className="text-[9px] text-cyan-400/80 font-mono hidden sm:inline">
+                          <span className="text-[9px] text-cyan-400 font-mono hidden sm:inline">
                             Direct Natural Language Search
                           </span>
                         </div>
 
-                        <div className="relative h-12 bg-[#091129]/90 border border-cyan-500/40 focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/30 rounded-xl flex items-center px-4 shadow-lg shadow-cyan-950/30 transition-all group">
+                        <div className="relative h-12 bg-[#091129]/95 border-2 border-cyan-500/50 focus-within:border-cyan-300 focus-within:ring-2 focus-within:ring-cyan-500/40 rounded-xl flex items-center px-4 shadow-[0_0_20px_rgba(6,182,212,0.2)] transition-all group">
                           <Search className="w-4 h-4 text-cyan-400 mr-3 flex-shrink-0 group-hover:scale-110 transition-transform" />
                           <input 
                             type="text"
@@ -693,7 +731,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           />
                           <button 
                             type="submit"
-                            className="ml-2 w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/25 transition-all hover:scale-105"
+                            className="ml-2 w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30 transition-all hover:scale-105"
                           >
                             <ArrowRight className="w-4 h-4 text-white" />
                           </button>
@@ -703,10 +741,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       {/* Right Console: AI-Powered Insights */}
                       <div 
                         onClick={() => scrollToSection(pipelineSectionRef)}
-                        className="hidden sm:flex items-center gap-3.5 flex-shrink-0 text-left cursor-pointer group p-2 rounded-xl hover:bg-white/5 transition-all"
+                        className="hidden sm:flex items-center gap-3.5 flex-shrink-0 text-left cursor-pointer group p-2.5 rounded-xl bg-black/40 border border-white/10 hover:border-cyan-500/40 transition-all shadow-inner"
                       >
                         {/* Glowing AI Chip Icon */}
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-600/20 border border-cyan-400/40 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-500/25 to-purple-600/25 border border-cyan-400/50 flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
                           <Cpu className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform" />
                         </div>
                         <div>
@@ -728,7 +766,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   {/* Downward Scroll Prompt */}
                   <div 
                     onClick={() => scrollToSection(topologySectionRef)}
-                    className="w-full py-2 bg-[#030612]/90 border-t border-white/5 flex items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-cyan-400 transition-colors group"
+                    className="w-full py-2 bg-[#02050e]/95 border-t border-white/10 flex items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-cyan-400 transition-colors group"
                   >
                     <span className="text-[10px] font-bold tracking-widest uppercase font-mono group-hover:tracking-wider transition-all">
                       Scroll to explore platform architecture & 3D topology
