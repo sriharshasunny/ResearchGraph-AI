@@ -19,22 +19,22 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     if (isTraversing) return;
     setIsTraversing(true);
     
-    // Halfway through the space travel, switch the actual content and background
+    // Smooth minimalist transition: switch state halfway
     setTimeout(() => {
       setPageState(destination);
       if (mode) setAuthMode(mode);
-    }, 700);
+    }, 400);
 
     // End traversal
     setTimeout(() => {
       setIsTraversing(false);
-    }, 1400);
+    }, 800);
   };
 
   return (
     <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
       
-      {/* --- MASTER BACKGROUND & SPACE TRAVEL EFFECTS --- */}
+      {/* --- MASTER BACKGROUND EFFECTS --- */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712]">
         
         {/* Layer 1: Landing Background */}
@@ -44,13 +44,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           initial={{ opacity: 1 }}
           animate={{ 
             opacity: pageState === 'LANDING' ? 1 : 0,
-            scale: pageState === 'LANDING' ? [1, 1.05, 1] : 1.2,
-            filter: isTraversing ? "brightness(3) blur(10px)" : "brightness(1) blur(0px)"
+            scale: [1, 1.05, 1],
           }}
           transition={{ 
-            opacity: { duration: 0.8 },
-            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" },
-            filter: { duration: 0.7 }
+            opacity: { duration: 1.2, ease: "easeInOut" },
+            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" }
           }}
         />
 
@@ -61,13 +59,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           initial={{ opacity: 0 }}
           animate={{ 
             opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1 : 0,
-            scale: (pageState === 'AUTH' && authMode === 'LOGIN') ? [1, 1.05, 1] : 1.2,
-            filter: isTraversing ? "brightness(3) blur(10px)" : "brightness(1) blur(0px)"
+            scale: [1, 1.05, 1],
           }}
           transition={{ 
-            opacity: { duration: 0.8 },
-            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" },
-            filter: { duration: 0.7 }
+            opacity: { duration: 1.2, ease: "easeInOut" },
+            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" }
           }}
         />
 
@@ -78,48 +74,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           initial={{ opacity: 0 }}
           animate={{ 
             opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1 : 0,
-            scale: (pageState === 'AUTH' && authMode === 'REGISTER') ? [1, 1.05, 1] : 1.2,
-            filter: isTraversing ? "brightness(3) blur(10px)" : "brightness(1) blur(0px)"
+            scale: [1, 1.05, 1],
           }}
           transition={{ 
-            opacity: { duration: 0.8 },
-            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" },
-            filter: { duration: 0.7 }
+            opacity: { duration: 1.2, ease: "easeInOut" },
+            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" }
           }}
         />
 
-        {/* Hyperdrive Starfield Effect (Only visible during traversal) */}
-        <AnimatePresence>
-          {isTraversing && (
-            <motion.div 
-              initial={{ scale: 0.1, opacity: 0 }}
-              animate={{ scale: 15, opacity: [0, 1, 0] }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, ease: "easeInOut" }}
-              className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
-            >
-              {Array.from({ length: 80 }).map((_, i) => (
-                <div 
-                  key={`warp-${i}`} 
-                  className="absolute bg-cyan-100 shadow-[0_0_15px_#fff]" 
-                  style={{ 
-                    width: `${Math.random() * 100 + 50}px`, 
-                    height: '2px', 
-                    transform: `rotate(${Math.random() * 360}deg) translateX(${Math.random() * 300 + 100}px)` 
-                  }} 
-                />
-              ))}
-              <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Normal Ambient Stars */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          {Array.from({ length: 50 }).map((_, i) => (
+          {Array.from({ length: 40 }).map((_, i) => (
             <motion.div key={`ambient-${i}`} className="absolute rounded-full bg-cyan-200"
               style={{ top: Math.random() * 100 + '%', left: Math.random() * 100 + '%', width: Math.random() * 2 + 1 + 'px', height: Math.random() * 2 + 1 + 'px' }}
-              animate={{ opacity: [0.1, 0.8, 0.1] }}
+              animate={{ opacity: [0.1, 0.6, 0.1] }}
               transition={{ duration: Math.random() * 6 + 4, repeat: Infinity, ease: "easeInOut", delay: Math.random() * 3 }}
             />
           ))}
@@ -140,10 +108,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           {pageState === 'LANDING' && (
             <motion.div 
               key="landing-page"
-              initial={{ opacity: 0, scale: 0.8, y: 50 }}
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 2, filter: "blur(20px)" }} // Fly PAST the camera!
-              transition={{ duration: 0.7, ease: "easeInOut" }}
+              exit={{ opacity: 0, scale: 1.02, filter: "blur(5px)" }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
               className="w-full flex flex-col items-center pb-32"
             >
               {/* Navbar */}
@@ -252,10 +220,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           {pageState === 'AUTH' && (
             <motion.div 
               key="auth-page"
-              initial={{ opacity: 0, scale: 0.5, filter: "blur(20px)" }} // Arriving from deep space
+              initial={{ opacity: 0, scale: 0.96, filter: "blur(5px)" }}
               animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, scale: 2, filter: "blur(20px)" }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
+              exit={{ opacity: 0, scale: 1.04, filter: "blur(5px)" }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
               className="w-full min-h-screen flex items-center justify-center relative p-8"
             >
               {/* BACK TO LANDING BUTTON */}
