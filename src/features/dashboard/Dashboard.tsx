@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, ArrowRight, Mic, Sparkles, Network, History, Bookmark, TrendingUp, BookOpen, Clock } from 'lucide-react';
+import { motion } from 'framer-motion';
+import type { Variants } from 'framer-motion';
+import { Search, ArrowRight, Mic, Sparkles, History, TrendingUp, BookOpen, Clock } from 'lucide-react';
 import { mockPapers } from '../../data/mockData';
 import { PaperCard } from '../../components/PaperCard';
 
 export const Dashboard: React.FC = () => {
-  const { setActivePage, setSearchQuery, savedPaperIds } = useApp();
+  const { setActivePage, setSearchQuery } = useApp();
   const [localSearch, setLocalSearch] = useState('');
   const [greeting, setGreeting] = useState('');
 
@@ -49,7 +50,7 @@ export const Dashboard: React.FC = () => {
     { topic: 'Federated Learning', count: '5.1k papers' },
   ];
 
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -60,7 +61,7 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 15 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } }
   };
