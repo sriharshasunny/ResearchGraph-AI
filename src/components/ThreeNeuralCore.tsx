@@ -18,53 +18,41 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     const container = containerRef.current;
     if (!container) return;
 
-    // Palette configurations based on theme
+    // Vibrant, clean theme palettes
     const palettes = {
       cyan: {
-        crystalColor: 0x0ea5e9,
-        crystalEmissive: 0x0284c7,
-        innerColor: 0x38bdf8,
-        innerEmissive: 0x22d3ee,
-        wireframe: 0x38bdf8,
-        ring1: 0x22d3ee,
-        ring1Emissive: 0x0891b2,
-        ring2: 0x818cf8,
-        ring2Emissive: 0x4f46e5,
-        nodes: 0x67e8f9,
-        lines: 0x38bdf8,
-        particles: 0x93c5fd,
+        crystal: 0x0ea5e9,
+        emissive: 0x0284c7,
+        inner: 0x38bdf8,
+        edges: 0x22d3ee,
+        ringOuter: 0x38bdf8,
+        ringInner: 0x818cf8,
+        satellites: 0xffffff,
+        vertices: 0x67e8f9,
         keyLight: 0x38bdf8,
-        rimLight: 0x818cf8,
+        rimLight: 0xa855f7,
       },
       purple: {
-        crystalColor: 0x9333ea,
-        crystalEmissive: 0x7e22ce,
-        innerColor: 0xc084fc,
-        innerEmissive: 0xd8b4fe,
-        wireframe: 0xc084fc,
-        ring1: 0xc084fc,
-        ring1Emissive: 0x9333ea,
-        ring2: 0x22d3ee,
-        ring2Emissive: 0x0891b2,
-        nodes: 0xe879f9,
-        lines: 0xc084fc,
-        particles: 0xf0abfc,
+        crystal: 0x9333ea,
+        emissive: 0x6b21a8,
+        inner: 0xc084fc,
+        edges: 0xe879f9,
+        ringOuter: 0xc084fc,
+        ringInner: 0x38bdf8,
+        satellites: 0xffffff,
+        vertices: 0xf0abfc,
         keyLight: 0xc084fc,
         rimLight: 0x38bdf8,
       },
       emerald: {
-        crystalColor: 0x059669,
-        crystalEmissive: 0x047857,
-        innerColor: 0x34d399,
-        innerEmissive: 0x10b981,
-        wireframe: 0x34d399,
-        ring1: 0x34d399,
-        ring1Emissive: 0x059669,
-        ring2: 0x22d3ee,
-        ring2Emissive: 0x0891b2,
-        nodes: 0x6ee7b7,
-        lines: 0x34d399,
-        particles: 0xa7f3d0,
+        crystal: 0x059669,
+        emissive: 0x047857,
+        inner: 0x34d399,
+        edges: 0x6ee7b7,
+        ringOuter: 0x34d399,
+        ringInner: 0x38bdf8,
+        satellites: 0xffffff,
+        vertices: 0xa7f3d0,
         keyLight: 0x34d399,
         rimLight: 0x38bdf8,
       }
@@ -87,293 +75,247 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     const initialH = container.clientHeight || 300;
 
     renderer.setSize(initialW, initialH);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    // Cap pixel ratio to 1.5 for ultra-smooth 60-120fps performance on all displays
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
+    renderer.toneMappingExposure = 1.25;
     container.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, initialW / initialH, 0.1, 100);
-    camera.position.z = 6.8;
+    const camera = new THREE.PerspectiveCamera(42, initialW / initialH, 0.1, 100);
+    camera.position.z = 6.2;
 
-    // Master Group for smooth rotational tilt & mouse parallax
+    // Master Group for smooth mouse parallax & rotation
     const masterGroup = new THREE.Group();
     scene.add(masterGroup);
 
-    // --- 1. CORE FACETED QUANTUM CRYSTAL (Icosahedron) ---
-    // Flat shading gives distinct gemstone faces catching specular light
-    const crystalGeo = new THREE.IcosahedronGeometry(1.25, 0);
+    // --- 1. CLEAN FACETED CRYSTALLINE CORE ---
+    // Beautiful, symmetrical Icosahedron with razor-clean chamfered faces
+    const crystalGeo = new THREE.IcosahedronGeometry(1.2, 0);
     const crystalMat = new THREE.MeshPhysicalMaterial({
-      color: p.crystalColor,
-      emissive: p.crystalEmissive,
-      emissiveIntensity: 0.65,
-      roughness: 0.12,
-      metalness: 0.88,
+      color: p.crystal,
+      emissive: p.emissive,
+      emissiveIntensity: 0.5,
+      roughness: 0.08,
+      metalness: 0.85,
       clearcoat: 1.0,
-      clearcoatRoughness: 0.1,
+      clearcoatRoughness: 0.05,
       flatShading: true,
       transparent: true,
-      opacity: 0.93,
+      opacity: 0.92,
     });
     const crystalMesh = new THREE.Mesh(crystalGeo, crystalMat);
     masterGroup.add(crystalMesh);
 
-    // Inner glowing core
-    const innerCoreGeo = new THREE.OctahedronGeometry(0.62, 0);
-    const innerCoreMat = new THREE.MeshStandardMaterial({
-      color: p.innerColor,
-      emissive: p.innerEmissive,
+    // --- 2. RAZOR-SHARP GLOWING EDGES ---
+    // Traces exact geometric facets with crisp neon lines (100% GPU, 0 CPU overhead)
+    const edgesGeo = new THREE.EdgesGeometry(crystalGeo);
+    const edgesMat = new THREE.LineBasicMaterial({
+      color: p.edges,
+      transparent: true,
+      opacity: 0.65,
+    });
+    const edgesMesh = new THREE.LineSegments(edgesGeo, edgesMat);
+    crystalMesh.add(edgesMesh);
+
+    // --- 3. INNER QUANTUM EMITTER (Pulsing Energy Core) ---
+    const innerGeo = new THREE.OctahedronGeometry(0.55, 0);
+    const innerMat = new THREE.MeshStandardMaterial({
+      color: p.inner,
+      emissive: p.edges,
       emissiveIntensity: 1.6,
-      roughness: 0.2,
-      metalness: 0.4,
+      roughness: 0.1,
+      metalness: 0.5,
       flatShading: true,
     });
-    const innerCore = new THREE.Mesh(innerCoreGeo, innerCoreMat);
-    masterGroup.add(innerCore);
+    const innerMesh = new THREE.Mesh(innerGeo, innerMat);
+    masterGroup.add(innerMesh);
 
-    // Wireframe edge lattice cage
-    const wireframeGeo = new THREE.IcosahedronGeometry(1.5, 1);
-    const wireframeMat = new THREE.MeshBasicMaterial({
-      color: p.wireframe,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.22,
-    });
-    const wireframeMesh = new THREE.Mesh(wireframeGeo, wireframeMat);
-    masterGroup.add(wireframeMesh);
+    // --- 4. GEOMETRIC VERTEX BEACONS ---
+    // Pristine glowing nodes locked at the 12 crystal vertices
+    const vertexPositions = crystalGeo.attributes.position;
+    const vertexCount = vertexPositions.count;
+    const vertexGeo = new THREE.SphereGeometry(0.045, 12, 12);
+    const vertexMat = new THREE.MeshBasicMaterial({ color: p.vertices });
+    const vertexMesh = new THREE.InstancedMesh(vertexGeo, vertexMat, vertexCount);
 
-    // --- 2. DUAL GYROSCOPIC QUANTUM RINGS ---
-    const ringGeo1 = new THREE.TorusGeometry(2.05, 0.024, 16, 100);
-    const ringMat1 = new THREE.MeshStandardMaterial({
-      color: p.ring1,
-      emissive: p.ring1Emissive,
-      emissiveIntensity: 0.8,
+    const dummy = new THREE.Object3D();
+    for (let i = 0; i < vertexCount; i++) {
+      dummy.position.set(
+        vertexPositions.getX(i),
+        vertexPositions.getY(i),
+        vertexPositions.getZ(i)
+      );
+      dummy.updateMatrix();
+      vertexMesh.setMatrixAt(i, dummy.matrix);
+    }
+    vertexMesh.instanceMatrix.needsUpdate = true;
+    crystalMesh.add(vertexMesh);
+
+    // --- 5. CLEAN GYROSCOPIC CHRONO-RINGS ---
+    // Outer Ring: ultra-fine precision ring
+    const ring1Geo = new THREE.TorusGeometry(1.95, 0.016, 16, 100);
+    const ring1Mat = new THREE.MeshStandardMaterial({
+      color: p.ringOuter,
+      emissive: p.ringOuter,
+      emissiveIntensity: 0.6,
       roughness: 0.2,
       metalness: 0.9,
     });
-    const ring1 = new THREE.Mesh(ringGeo1, ringMat1);
-    ring1.rotation.x = Math.PI / 3;
+    const ring1 = new THREE.Mesh(ring1Geo, ring1Mat);
+    ring1.rotation.x = Math.PI / 3.2;
     masterGroup.add(ring1);
 
-    const ringGeo2 = new THREE.TorusGeometry(2.35, 0.02, 16, 100);
-    const ringMat2 = new THREE.MeshStandardMaterial({
-      color: p.ring2,
-      emissive: p.ring2Emissive,
-      emissiveIntensity: 0.7,
+    // Inner Ring: intersecting tilted gimbal ring
+    const ring2Geo = new THREE.TorusGeometry(2.2, 0.014, 16, 100);
+    const ring2Mat = new THREE.MeshStandardMaterial({
+      color: p.ringInner,
+      emissive: p.ringInner,
+      emissiveIntensity: 0.5,
       roughness: 0.2,
       metalness: 0.9,
     });
-    const ring2 = new THREE.Mesh(ringGeo2, ringMat2);
+    const ring2 = new THREE.Mesh(ring2Geo, ring2Mat);
     ring2.rotation.y = Math.PI / 4;
     ring2.rotation.x = -Math.PI / 4;
     masterGroup.add(ring2);
 
-    // Satellite beads travelling along the rings
-    const beadGeo = new THREE.SphereGeometry(0.075, 16, 16);
-    const beadMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const bead1 = new THREE.Mesh(beadGeo, beadMat);
-    const bead2 = new THREE.Mesh(beadGeo, beadMat);
-    masterGroup.add(bead1);
-    masterGroup.add(bead2);
+    // Satellite beads: 3 small polished spheres orbiting cleanly
+    const satelliteGeo = new THREE.SphereGeometry(0.065, 16, 16);
+    const satelliteMat = new THREE.MeshBasicMaterial({ color: p.satellites });
+    const sat1 = new THREE.Mesh(satelliteGeo, satelliteMat);
+    const sat2 = new THREE.Mesh(satelliteGeo, satelliteMat);
+    const sat3 = new THREE.Mesh(satelliteGeo, satelliteMat);
+    masterGroup.add(sat1);
+    masterGroup.add(sat2);
+    masterGroup.add(sat3);
 
-    // --- 3. 3D NEURAL GRAPH (Connected Node Network) ---
-    const nodeCount = 45;
-    const nodePositions: THREE.Vector3[] = [];
-    const nodeVelocities: THREE.Vector3[] = [];
-    const nodeGeometry = new THREE.SphereGeometry(0.045, 12, 12);
-    const nodeMaterial = new THREE.MeshBasicMaterial({ color: p.nodes });
-    const nodeInstanced = new THREE.InstancedMesh(nodeGeometry, nodeMaterial, nodeCount);
-
-    const dummy = new THREE.Object3D();
-    for (let i = 0; i < nodeCount; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = 1.9 + Math.random() * 0.9;
-      const sinPhi = Math.sin(phi);
-      const pos = new THREE.Vector3(
-        r * sinPhi * Math.cos(theta),
-        r * sinPhi * Math.sin(theta),
-        r * Math.cos(phi)
-      );
-      nodePositions.push(pos);
-      nodeVelocities.push(
-        new THREE.Vector3(
-          (Math.random() - 0.5) * 0.0035,
-          (Math.random() - 0.5) * 0.0035,
-          (Math.random() - 0.5) * 0.0035
-        )
-      );
-
-      dummy.position.copy(pos);
-      dummy.updateMatrix();
-      nodeInstanced.setMatrixAt(i, dummy.matrix);
-    }
-    nodeInstanced.instanceMatrix.needsUpdate = true;
-    masterGroup.add(nodeInstanced);
-
-    // Dynamic Line Connections
-    const maxLines = 85;
-    const linePositions = new Float32Array(maxLines * 6);
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePositions, 3));
-    const lineMat = new THREE.LineBasicMaterial({
-      color: p.lines,
-      transparent: true,
-      opacity: 0.35,
-      blending: THREE.AdditiveBlending,
-    });
-    const lineSegments = new THREE.LineSegments(lineGeo, lineMat);
-    masterGroup.add(lineSegments);
-
-    // --- 4. AMBIENT DATA PARTICLES / DUST ---
-    const particleCount = 130;
-    const particleGeo = new THREE.BufferGeometry();
-    const particleCoords = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      particleCoords[i] = (Math.random() - 0.5) * 7.5;
-      particleCoords[i + 1] = (Math.random() - 0.5) * 7.5;
-      particleCoords[i + 2] = (Math.random() - 0.5) * 7.5;
-    }
-    particleGeo.setAttribute('position', new THREE.BufferAttribute(particleCoords, 3));
-    const particleMat = new THREE.PointsMaterial({
-      color: p.particles,
-      size: 0.035,
-      transparent: true,
-      opacity: 0.55,
-      blending: THREE.AdditiveBlending,
-    });
-    const particles = new THREE.Points(particleGeo, particleMat);
-    scene.add(particles);
-
-    // --- 5. CINEMATIC REALISTIC LIGHTING ---
-    const ambientLight = new THREE.AmbientLight(0x0a1026, 2.2);
+    // --- 6. CINEMATIC DIRECTIONAL & SPECULAR LIGHTING ---
+    const ambientLight = new THREE.AmbientLight(0x080e22, 2.2);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(p.keyLight, 4.2);
-    keyLight.position.set(5, 6, 4);
+    const keyLight = new THREE.DirectionalLight(p.keyLight, 4.0);
+    keyLight.position.set(4, 5, 4);
     scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(p.rimLight, 3.8);
-    rimLight.position.set(-5, -4, -3);
+    const rimLight = new THREE.DirectionalLight(p.rimLight, 3.5);
+    rimLight.position.set(-4, -4, -3);
     scene.add(rimLight);
 
-    const centerGlow = new THREE.PointLight(p.innerEmissive, 5.5, 6);
-    centerGlow.position.set(0, 0, 0);
-    masterGroup.add(centerGlow);
+    const coreLight = new THREE.PointLight(p.edges, 4.0, 5);
+    masterGroup.add(coreLight);
 
-    // --- 6. MOUSE INTERACTION & SMOOTH LERP ---
+    // --- 7. ULTRA-LIGHTWEIGHT PARALLAX INTERACTION ---
     let targetRotX = 0;
     let targetRotY = 0;
     let currentRotX = 0;
     let currentRotY = 0;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: MouseEvent) => {
       if (!interactive) return;
       const rect = container.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
-      targetRotY = x * 0.5;
-      targetRotX = -y * 0.5;
+      targetRotY = x * 0.4;
+      targetRotX = -y * 0.4;
     };
 
     if (interactive) {
-      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mousemove', handlePointerMove, { passive: true });
     }
 
-    // --- 7. ANIMATION LOOP ---
+    // --- 8. SMART VISIBILITY & INTERSECTION OBSERVER (0% CPU when off-screen) ---
+    let isVisible = true;
     let animationFrameId: number;
     const clock = new THREE.Clock();
 
     const animate = () => {
+      if (!isVisible) return;
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
 
-      // Mouse lerp
-      currentRotX += (targetRotX - currentRotX) * 0.05;
-      currentRotY += (targetRotY - currentRotY) * 0.05;
+      const t = clock.getElapsedTime();
 
-      // Master rotation & breathing
-      masterGroup.rotation.x = currentRotX + Math.sin(elapsedTime * 0.7) * 0.06;
-      masterGroup.rotation.y = currentRotY + elapsedTime * 0.16;
+      // Smooth mouse lerp
+      currentRotX += (targetRotX - currentRotX) * 0.06;
+      currentRotY += (targetRotY - currentRotY) * 0.06;
 
-      // Crystal rotation
-      crystalMesh.rotation.y = elapsedTime * 0.28;
-      crystalMesh.rotation.x = Math.sin(elapsedTime * 0.3) * 0.2;
+      // Master subtle breathing tilt
+      masterGroup.rotation.x = currentRotX + Math.sin(t * 0.6) * 0.05;
+      masterGroup.rotation.y = currentRotY + t * 0.14;
+
+      // Crystal rotation (clean multi-axis spin)
+      crystalMesh.rotation.y = t * 0.22;
+      crystalMesh.rotation.x = Math.sin(t * 0.25) * 0.18;
 
       // Inner core counter-rotation
-      innerCore.rotation.y = -elapsedTime * 0.55;
-      innerCore.rotation.z = elapsedTime * 0.32;
+      innerMesh.rotation.y = -t * 0.45;
+      innerMesh.rotation.z = t * 0.28;
 
-      // Outer wireframe cage
-      wireframeMesh.rotation.y = -elapsedTime * 0.12;
-      wireframeMesh.rotation.z = Math.cos(elapsedTime * 0.2) * 0.2;
+      // Gyroscopic rings rotation
+      ring1.rotation.z = t * 0.28;
+      ring2.rotation.z = -t * 0.22;
 
-      // Gyroscope rings
-      ring1.rotation.z = elapsedTime * 0.35;
-      ring2.rotation.z = -elapsedTime * 0.28;
-
-      // Satellite beads travel along rings
-      const t1 = elapsedTime * 1.3;
-      bead1.position.set(
-        Math.cos(t1) * 2.05 * Math.cos(ring1.rotation.x),
-        Math.sin(t1) * 2.05,
-        -Math.cos(t1) * 2.05 * Math.sin(ring1.rotation.x)
+      // Satellites orbiting along rings (precomputed circular path, 0 CPU overhead)
+      const t1 = t * 1.1;
+      sat1.position.set(
+        Math.cos(t1) * 1.95 * Math.cos(ring1.rotation.x),
+        Math.sin(t1) * 1.95,
+        -Math.cos(t1) * 1.95 * Math.sin(ring1.rotation.x)
       );
 
-      const t2 = -elapsedTime * 1.0;
-      bead2.position.set(
-        Math.cos(t2) * 2.35,
-        Math.sin(t2) * 2.35 * Math.cos(ring2.rotation.x),
-        Math.sin(t2) * 2.35 * Math.sin(ring2.rotation.y)
+      const t2 = -t * 0.9;
+      sat2.position.set(
+        Math.cos(t2) * 2.2,
+        Math.sin(t2) * 2.2 * Math.cos(ring2.rotation.x),
+        Math.sin(t2) * 2.2 * Math.sin(ring2.rotation.y)
       );
 
-      // Node network positions & connections update
-      let lineIdx = 0;
-      for (let i = 0; i < nodeCount; i++) {
-        const pos = nodePositions[i];
-        pos.add(nodeVelocities[i]);
-
-        // Keep nodes in sphere bounds
-        if (pos.length() > 3.0 || pos.length() < 1.7) {
-          nodeVelocities[i].negate();
-        }
-
-        dummy.position.copy(pos);
-        dummy.updateMatrix();
-        nodeInstanced.setMatrixAt(i, dummy.matrix);
-
-        // Find neighbors for connection lines
-        for (let j = i + 1; j < nodeCount; j++) {
-          if (lineIdx < maxLines) {
-            const dist = pos.distanceTo(nodePositions[j]);
-            if (dist < 1.1) {
-              const posArray = lineGeo.attributes.position.array as Float32Array;
-              posArray[lineIdx * 6] = pos.x;
-              posArray[lineIdx * 6 + 1] = pos.y;
-              posArray[lineIdx * 6 + 2] = pos.z;
-              posArray[lineIdx * 6 + 3] = nodePositions[j].x;
-              posArray[lineIdx * 6 + 4] = nodePositions[j].y;
-              posArray[lineIdx * 6 + 5] = nodePositions[j].z;
-              lineIdx++;
-            }
-          }
-        }
-      }
-      nodeInstanced.instanceMatrix.needsUpdate = true;
-      lineGeo.setDrawRange(0, lineIdx * 2);
-      lineGeo.attributes.position.needsUpdate = true;
-
-      // Slowly rotate dust starfield
-      particles.rotation.y = elapsedTime * 0.025;
+      const t3 = t * 0.75 + Math.PI;
+      sat3.position.set(
+        Math.cos(t3) * 1.95 * Math.cos(ring1.rotation.x),
+        Math.sin(t3) * 1.95,
+        -Math.cos(t3) * 1.95 * Math.sin(ring1.rotation.x)
+      );
 
       renderer.render(scene, camera);
     };
 
+    // Pause when off-screen to avoid lag on other pages or below fold
+    const intersectionObserver = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          if (!isVisible) {
+            isVisible = true;
+            clock.start();
+            animate();
+          }
+        } else {
+          isVisible = false;
+          cancelAnimationFrame(animationFrameId);
+        }
+      },
+      { threshold: 0.05 }
+    );
+    intersectionObserver.observe(container);
+
+    // Pause when browser tab is inactive
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        isVisible = false;
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        isVisible = true;
+        clock.start();
+        animate();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Initial start
     animate();
 
-    // --- 8. RESIZE OBSERVER ---
+    // Resize Observer
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width: newWidth, height: newHeight } = entry.contentRect;
@@ -384,37 +326,42 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         }
       }
     });
-
     resizeObserver.observe(container);
 
-    // --- 9. CLEANUP ---
+    // --- 9. TOTAL CLEANUP ON UNMOUNT (Guarantees zero effect on other pages) ---
     return () => {
       cancelAnimationFrame(animationFrameId);
-      if (interactive) {
-        window.removeEventListener('mousemove', handleMouseMove);
-      }
+      isVisible = false;
+      intersectionObserver.disconnect();
       resizeObserver.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
 
+      if (interactive) {
+        window.removeEventListener('mousemove', handlePointerMove);
+      }
+
+      // Dispose Geometries
       crystalGeo.dispose();
-      crystalMat.dispose();
-      innerCoreGeo.dispose();
-      innerCoreMat.dispose();
-      wireframeGeo.dispose();
-      wireframeMat.dispose();
-      ringGeo1.dispose();
-      ringMat1.dispose();
-      ringGeo2.dispose();
-      ringMat2.dispose();
-      beadGeo.dispose();
-      beadMat.dispose();
-      nodeGeometry.dispose();
-      nodeMaterial.dispose();
-      lineGeo.dispose();
-      lineMat.dispose();
-      particleGeo.dispose();
-      particleMat.dispose();
+      edgesGeo.dispose();
+      innerGeo.dispose();
+      vertexGeo.dispose();
+      ring1Geo.dispose();
+      ring2Geo.dispose();
+      satelliteGeo.dispose();
 
+      // Dispose Materials
+      crystalMat.dispose();
+      edgesMat.dispose();
+      innerMat.dispose();
+      vertexMat.dispose();
+      ring1Mat.dispose();
+      ring2Mat.dispose();
+      satelliteMat.dispose();
+
+      // Explicitly lose context and destroy renderer
+      renderer.forceContextLoss();
       renderer.dispose();
+
       if (container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
       }

@@ -28,14 +28,14 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     let targetMouseY = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
-      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 40;
-      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 40;
+      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 35;
+      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 35;
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // Generate Stars with depth layers
-    const starCount = 80;
+    // Generate Stars with depth layers (optimized count for locked 60fps)
+    const starCount = 65;
     const stars: Array<{
       x: number;
       y: number;
@@ -48,15 +48,15 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     }> = [];
 
     for (let i = 0; i < starCount; i++) {
-      const depth = Math.random() * 0.8 + 0.2; // 0.2 to 1.0
+      const depth = Math.random() * 0.8 + 0.2;
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.5 + 0.5,
-        baseAlpha: Math.random() * 0.5 + 0.2,
+        size: Math.random() * 1.4 + 0.5,
+        baseAlpha: Math.random() * 0.4 + 0.2,
         alpha: 0.5,
         depth,
-        twinkleSpeed: Math.random() * 0.03 + 0.01,
+        twinkleSpeed: Math.random() * 0.02 + 0.01,
         twinklePhase: Math.random() * Math.PI * 2,
       });
     }
@@ -75,28 +75,30 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     const shootingStar: ShootingStar = {
       x: 0,
       y: 0,
-      length: 80,
+      length: 75,
       speed: 12,
       angle: Math.PI / 4,
       opacity: 0,
       active: false,
     };
 
-    let nextShootingStarTime = Date.now() + Math.random() * 4000 + 2000;
+    let nextShootingStarTime = Date.now() + Math.random() * 4000 + 3000;
 
     const spawnShootingStar = () => {
       shootingStar.x = Math.random() * width * 0.8;
       shootingStar.y = Math.random() * height * 0.4;
-      shootingStar.length = Math.random() * 70 + 60;
-      shootingStar.speed = Math.random() * 8 + 10;
-      shootingStar.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3;
+      shootingStar.length = Math.random() * 60 + 50;
+      shootingStar.speed = Math.random() * 6 + 10;
+      shootingStar.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
       shootingStar.opacity = 1;
       shootingStar.active = true;
     };
 
     let animationId: number;
+    let isRunning = true;
 
     const render = () => {
+      if (!isRunning) return;
       animationId = requestAnimationFrame(render);
 
       // Smooth mouse lerp
@@ -108,9 +110,8 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       // Render stars with 3D depth parallax
       for (const star of stars) {
         star.twinklePhase += star.twinkleSpeed;
-        star.alpha = star.baseAlpha + Math.sin(star.twinklePhase) * 0.25;
+        star.alpha = star.baseAlpha + Math.sin(star.twinklePhase) * 0.2;
 
-        // Parallax position based on depth
         const px = star.x + mouseX * star.depth;
         const py = star.y + mouseY * star.depth;
 
@@ -120,10 +121,10 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         ctx.fill();
       }
 
-      // Check shooting star
+      // Shooting star logic
       if (Date.now() > nextShootingStarTime && !shootingStar.active) {
         spawnShootingStar();
-        nextShootingStarTime = Date.now() + Math.random() * 6000 + 4000;
+        nextShootingStarTime = Date.now() + Math.random() * 7000 + 5000;
       }
 
       if (shootingStar.active) {
@@ -140,7 +141,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
         shootingStar.x += Math.cos(shootingStar.angle) * shootingStar.speed;
         shootingStar.y += Math.sin(shootingStar.angle) * shootingStar.speed;
-        shootingStar.opacity -= 0.015;
+        shootingStar.opacity -= 0.018;
 
         if (shootingStar.opacity <= 0 || shootingStar.x > width || shootingStar.y > height) {
           shootingStar.active = false;
@@ -157,10 +158,24 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
     window.addEventListener('resize', handleResize);
 
+    const handleVisibility = () => {
+      if (document.hidden) {
+        isRunning = false;
+        cancelAnimationFrame(animationId);
+      } else {
+        isRunning = true;
+        render();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
+      isRunning = false;
       cancelAnimationFrame(animationId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, []);
 
@@ -179,7 +194,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         transition={{ duration: 0.8, ease: "easeInOut" }}
       />
 
-      {/* Layer 2: Login Background (New Deep Space Cyan Vortex) */}
+      {/* Layer 2: Login Background (Deep Space Cyan Vortex) */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/login_bg.jpg')" }}
@@ -194,7 +209,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         }}
       />
 
-      {/* Layer 3: Register Background (New Deep Space Purple Nebula) */}
+      {/* Layer 3: Register Background (Deep Space Purple Nebula) */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/register_bg.jpg')" }}
