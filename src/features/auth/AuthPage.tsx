@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Sparkles, ArrowLeft, Zap, Globe, Shield, KeyRound, CheckCircle2, Cpu, Share2 } from 'lucide-react';
+import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Sparkles, ArrowLeft, Zap, Globe, KeyRound, CheckCircle2, Cpu, Share2 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
 
@@ -42,345 +42,374 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           {pageState === 'LANDING' && (
             <motion.div 
               key="landing-page"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="w-full flex flex-col items-center pb-40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
+              className="w-full min-h-screen flex flex-col relative"
             >
-              {/* ============ PREMIUM NAVBAR ============ */}
-              <nav className="w-full px-6 sm:px-10 py-5 flex justify-between items-center max-w-7xl mx-auto relative z-50">
+              {/* ═══════════════ TOP NAVBAR ═══════════════ */}
+              <nav className="w-full px-4 sm:px-6 py-3 flex items-center justify-between bg-[#060a14]/90 backdrop-blur-xl border-b border-white/10 relative z-50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl border border-cyan-500/30 flex items-center justify-center bg-cyan-500/10 backdrop-blur-xl shadow-lg shadow-cyan-500/10">
+                  <div className="w-9 h-9 rounded-lg border border-cyan-500/40 flex items-center justify-center bg-gradient-to-br from-cyan-500/20 to-blue-600/20 shadow-lg shadow-cyan-500/10">
                     <Network className="w-5 h-5 text-cyan-400" />
                   </div>
-                  <span className="font-bold text-xl tracking-wide text-white">ResearchGraph</span>
+                  <span className="font-bold text-lg tracking-wide text-white">ResearchGraph <span className="text-cyan-400">AI</span></span>
                 </div>
                 
-                {/* Nav Links */}
-                <div className="hidden md:flex items-center gap-1">
-                  {['Home', 'Explore', '3D Graph', 'Features', 'Pricing', 'Docs'].map((link, i) => (
+                <div className="hidden lg:flex items-center gap-0.5">
+                  {['Home', 'Explore', '3D Graph', 'Papers', 'LLM Chat', 'Analytics', 'About'].map((link, i) => (
                     <button 
                       key={link}
-                      className={`px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
-                        i === 0 
-                          ? 'text-white bg-white/10 border border-white/10' 
+                      className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-all ${
+                        i === 2 
+                          ? 'text-cyan-300 bg-cyan-500/15 border border-cyan-500/30' 
                           : 'text-gray-400 hover:text-white hover:bg-white/5'
                       }`}
                     >
-                      {i === 0 && <span className="inline-block w-1.5 h-1.5 rounded-full bg-cyan-400 mr-2 align-middle" />}
                       {link}
                     </button>
                   ))}
                 </div>
 
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <button className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all">
-                    <Search className="w-4 h-4 text-gray-400" />
+                <div className="flex items-center gap-3">
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-500 text-xs cursor-pointer hover:bg-white/10 transition-all min-w-[200px]">
+                    <Search className="w-3.5 h-3.5" />
+                    <span>Search papers, authors, concepts...</span>
+                    <span className="ml-auto text-[10px] bg-white/10 px-1.5 py-0.5 rounded font-mono border border-white/10">⌘K</span>
+                  </div>
+                  <button className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all relative">
+                    <span className="text-gray-400 text-sm">🔔</span>
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyan-400"></span>
                   </button>
-                  <button onClick={() => triggerTraversal('AUTH', 'LOGIN')} className="text-sm font-semibold text-gray-300 hover:text-white transition-colors px-4 py-2 rounded-lg hover:bg-white/5">
-                    Log in
-                  </button>
-                  <button onClick={() => triggerTraversal('AUTH', 'REGISTER')} className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-sm transition-all shadow-lg shadow-cyan-600/30 border border-cyan-500/30">
-                    Get Started
+                  <button onClick={() => triggerTraversal('AUTH', 'LOGIN')} className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-cyan-500/20">
+                    S
                   </button>
                 </div>
               </nav>
 
-              {/* ============ HERO SECTION: SPLIT LAYOUT ============ */}
-              <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 pt-10 sm:pt-16 pb-24 relative z-20 flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-14">
-                
-                {/* ---- LEFT: Hero Copy ---- */}
-                <div className="flex-1 flex flex-col items-start text-left max-w-2xl">
-                  <motion.div 
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-6 shadow-sm"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span className="text-xs font-bold text-gray-300 uppercase tracking-widest">ResearchGraph AI v2.0</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 font-mono font-semibold">3D TOPOLOGY</span>
-                  </motion.div>
-                  
-                  <motion.h1 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6"
-                  >
-                    Stop Searching.<br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">
-                      Start Connecting.
-                    </span>
-                  </motion.h1>
-                  
-                  <motion.p 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-base sm:text-lg text-gray-400 max-w-xl leading-relaxed mb-8"
-                  >
-                    Enter any research question. Our neural AI reads millions of academic papers, extracts hidden citations, and constructs an interactive 3D knowledge map in real time.
-                  </motion.p>
-                  
-                  {/* Search Bar */}
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.4 }}
-                    className="w-full max-w-xl relative cursor-text group"
-                    onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                  >
-                    <div className="relative h-16 sm:h-[72px] bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/15 rounded-2xl flex items-center px-5 shadow-2xl hover:border-cyan-500/50 transition-all group-hover:shadow-cyan-500/10">
-                       <Search className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 mr-3.5 flex-shrink-0" />
-                       <div className="flex-1 text-left overflow-hidden">
-                         <span className="text-gray-300 text-sm sm:text-base font-mono whitespace-nowrap">
-                           "Breakthroughs in Quantum Neural Networks"
-                         </span>
-                         <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="inline-block w-[2px] h-4 bg-cyan-400 ml-1 align-middle" />
-                       </div>
-                       <button className="flex px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all items-center gap-2 shadow-lg shadow-cyan-500/20 border border-cyan-400/20">
-                         <Sparkles className="w-4 h-4" /> Explore
-                       </button>
-                    </div>
-                  </motion.div>
+              {/* ═══════════════ MAIN CONTENT AREA ═══════════════ */}
+              <div className="flex-1 flex relative overflow-hidden">
 
-                  {/* Feature Highlights */}
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                    className="flex flex-wrap items-center gap-5 text-xs text-gray-400 mt-7"
-                  >
-                    {[
-                      { icon: Globe, label: '200M+', sub: 'Papers' },
-                      { icon: Zap, label: 'Real-time', sub: 'Synthesis' },
-                      { icon: Network, label: '3D Citation', sub: 'Grid' },
-                      { icon: BrainCircuit, label: 'Multi-domain', sub: 'Knowledge' },
-                    ].map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
-                          <item.icon className="w-3.5 h-3.5 text-cyan-400" />
-                        </div>
-                        <div className="leading-tight">
-                          <span className="text-white font-bold block text-xs">{item.label}</span>
-                          <span className="text-gray-500 text-[10px]">{item.sub}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </motion.div>
-                </div>
-
-                {/* ---- RIGHT: 3D KNOWLEDGE SPHERE PANEL ---- */}
-                <motion.div 
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, duration: 0.6 }}
-                  className="flex-1 w-full max-w-lg lg:max-w-xl flex flex-col items-center justify-center relative"
-                >
-                  {/* Glow backdrop */}
-                  <div className="absolute w-72 sm:w-80 h-72 sm:h-80 rounded-full bg-cyan-500/15 blur-[90px] pointer-events-none -z-10 animate-pulse"></div>
-                  <div className="absolute w-64 h-64 rounded-full bg-purple-500/10 blur-[70px] pointer-events-none -z-10 translate-x-12 translate-y-8"></div>
-                  
-                  {/* 3D Console Card */}
-                  <div className="relative w-full aspect-square max-w-[440px] sm:max-w-[480px] rounded-3xl bg-[#080d1a]/80 border border-white/15 backdrop-blur-xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] flex flex-col items-center justify-center group hover:border-cyan-500/40 transition-all duration-500">
-                    
-                    {/* Top HUD bar */}
-                    <div className="w-full px-5 py-3 border-b border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 text-xs font-mono rounded-t-3xl">
-                      <div className="flex items-center gap-2 text-cyan-400">
-                        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                        <span className="font-bold tracking-wider">3D KNOWLEDGE SPHERE</span>
-                      </div>
-                      <span className="text-gray-400 text-[11px] font-mono">WebGL • 60 FPS</span>
-                    </div>
-
-                    {/* 3D Scene with floating labels */}
-                    <div className="relative w-full flex-1 min-h-[260px] flex items-center justify-center overflow-visible">
-                      <ThreeNeuralCore className="w-full h-full" theme="cyan" interactive={true} />
-                      
-                      {/* Floating Category Labels */}
-                      <div className="absolute top-[12%] left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-                        <span className="px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Paper</span>
-                      </div>
-                      <div className="absolute top-[30%] left-[8%] z-20 pointer-events-none">
-                        <span className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Author</span>
-                      </div>
-                      <div className="absolute top-[30%] right-[6%] z-20 pointer-events-none">
-                        <span className="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Dataset</span>
-                      </div>
-                      <div className="absolute bottom-[28%] left-[10%] z-20 pointer-events-none">
-                        <span className="px-3 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Model</span>
-                      </div>
-                      <div className="absolute bottom-[24%] right-[6%] z-20 pointer-events-none">
-                        <span className="px-3 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm">Algorithm</span>
-                      </div>
-                    </div>
-
-                    {/* Bottom Stats Strip */}
-                    <div className="w-full px-5 py-3 border-t border-white/10 flex items-center justify-between bg-black/40 backdrop-blur-md z-10 text-[11px] font-mono text-gray-400 rounded-b-3xl">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                          <span className="text-cyan-400 font-bold">45,231</span>
-                          <span className="text-gray-500">Nodes</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-                          <span className="text-purple-400 font-bold">128,944</span>
-                          <span className="text-gray-500">Connections</span>
-                        </div>
-                        <div className="hidden sm:flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                          <span className="text-emerald-400 font-bold">12</span>
-                          <span className="text-gray-500">Research Domains</span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                        className="text-cyan-400 hover:text-cyan-300 font-sans font-semibold flex items-center gap-1 hover:underline transition-all"
-                      >
-                        Explore 3D Map <ArrowRight className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-
-              </div>
-
-              {/* ============ HOW IT WORKS SECTION ============ */}
-              <motion.div 
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6 }}
-                className="w-full max-w-6xl mt-4 pt-10"
-              >
-                <div className="text-center mb-16">
-                  <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-200">How ResearchGraph Works</h2>
-                  <p className="text-gray-400 text-sm max-w-lg mx-auto">From raw unstructured paper PDFs to interactive multi-dimensional knowledge graph.</p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-6 sm:px-8">
-                  {[
-                    { icon: Search, color: 'text-blue-400', border: 'hover:border-blue-500/30', title: '1. Semantic Query', desc: 'Our AI understands deep context, moving beyond standard keyword matching to find true relevance.' },
-                    { icon: BrainCircuit, color: 'text-purple-400', border: 'hover:border-purple-500/30', title: '2. Neural Analysis', desc: 'Instantly ingests thousands of papers to extract key findings and hidden connections.' },
-                    { icon: Network, color: 'text-cyan-400', border: 'hover:border-cyan-500/30', title: '3. 3D Exploration', desc: 'Outputs a fully interactive, immersive 3D map of the landscape to navigate knowledge visually.' }
-                  ].map((feat, idx) => (
-                    <motion.div 
-                      key={idx} 
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.15 }}
-                      className={`rounded-2xl bg-[#0a0f1c]/70 border border-white/10 p-8 text-left ${feat.border} transition-all backdrop-blur-md shadow-xl group`}
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                        <feat.icon className={`w-6 h-6 ${feat.color}`} />
-                      </div>
-                      <h3 className="text-xl font-bold mb-3 text-white">{feat.title}</h3>
-                      <p className="text-gray-400 text-sm leading-relaxed">{feat.desc}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* ============ DEEP DIVE SECTION ============ */}
-              <motion.div 
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6 }}
-                className="w-full max-w-6xl mt-28 pt-10 border-t border-white/5"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-16 px-6 sm:px-8 items-center">
-                  <div>
-                    <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-200">Beyond traditional search engines.</h2>
-                    <p className="text-gray-400 text-base sm:text-lg leading-relaxed mb-8">
-                      Traditional academic search gives you a flat list of links. ResearchGraph gives you the actual answers, mapped out in a visual database that lets you trace citations, track methodologies, and discover breakthroughs.
-                    </p>
-                    <ul className="space-y-4">
+                {/* ─── LEFT SIDEBAR ─── */}
+                <aside className="hidden lg:flex flex-col w-[220px] bg-[#060a14]/80 backdrop-blur-xl border-r border-white/10 z-40 flex-shrink-0">
+                  {/* Research Universe Menu */}
+                  <div className="p-4">
+                    <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-3">Research Universe</h3>
+                    <div className="space-y-0.5">
                       {[
-                        { icon: Zap, text: "Lightning-fast RAG generation" },
-                        { icon: Globe, text: "Global database of 200M+ papers" },
-                        { icon: Shield, text: "Unbiased, hallucination-free citations" },
-                        { icon: Cpu, text: "Automated synthesis across cross-domain papers" }
+                        { icon: Network, label: 'Knowledge Graph', active: true },
+                        { icon: Search, label: 'Paper Explorer', active: false },
+                        { icon: Zap, label: 'RAG Pipeline', active: false },
+                        { icon: BrainCircuit, label: 'LLM Assistant', active: false },
+                        { icon: Globe, label: 'Data Sources', active: false },
+                        { icon: Sparkles, label: 'Concept Analysis', active: false },
+                        { icon: Share2, label: 'Citation Network', active: false },
+                        { icon: Cpu, label: 'Research Trends', active: false },
                       ].map((item, idx) => (
-                        <motion.li 
-                          key={idx} 
-                          initial={{ opacity: 0, x: -20 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: idx * 0.1 }}
-                          className="flex items-center gap-4 text-gray-300 font-medium"
+                        <button 
+                          key={idx}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                            item.active 
+                              ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25' 
+                              : 'text-gray-400 hover:text-white hover:bg-white/5'
+                          }`}
                         >
-                          <div className="w-8 h-8 rounded-full bg-cyan-500/10 flex items-center justify-center">
-                            <item.icon className="w-4 h-4 text-cyan-400" />
-                          </div>
-                          {item.text}
-                        </motion.li>
+                          <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                          {item.label}
+                        </button>
                       ))}
-                    </ul>
+                    </div>
                   </div>
-                  
-                  {/* Capabilities Showcase Panel */}
+
+                  {/* Research Sources Panel */}
+                  <div className="mt-auto p-4 border-t border-white/10">
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-3">Research Sources</h3>
+                    <div className="space-y-1.5">
+                      {[
+                        { name: 'arXiv', count: '13.4M papers', color: 'bg-red-500' },
+                        { name: 'PubMed', count: '36.2M papers', color: 'bg-blue-500' },
+                        { name: 'IEEE', count: '8.1M papers', color: 'bg-sky-500' },
+                        { name: 'Semantic Scholar', count: '203M papers', color: 'bg-yellow-500' },
+                        { name: 'CrossRef', count: '140M papers', color: 'bg-green-500' },
+                        { name: 'OpenAlex', count: '250M papers', color: 'bg-purple-500' },
+                        { name: 'Custom Sources', count: 'Configure...', color: 'bg-gray-500' },
+                      ].map((src, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-[11px]">
+                          <span className={`w-2 h-2 rounded-full ${src.color} flex-shrink-0`}></span>
+                          <span className="text-gray-300 font-medium truncate">{src.name}</span>
+                          <span className="text-gray-600 ml-auto text-[10px] whitespace-nowrap">{src.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <button className="mt-3 w-full py-1.5 rounded-lg border border-dashed border-white/15 text-gray-500 text-[11px] font-medium hover:text-cyan-400 hover:border-cyan-500/30 transition-all">
+                      + Add Source
+                    </button>
+                  </div>
+                </aside>
+
+                {/* ─── CENTER MAIN AREA ─── */}
+                <div className="flex-1 relative flex flex-col overflow-hidden">
+
+                  {/* Hero Overlay Content */}
+                  <div className="relative flex-1 flex items-center justify-center p-6 sm:p-10">
+                    
+                    {/* LEFT HERO TEXT */}
+                    <div className="absolute left-6 sm:left-10 top-6 sm:top-10 z-30 max-w-md">
+                      <motion.div 
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-4 text-[10px] uppercase tracking-widest text-gray-400 font-bold"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                        ResearchGraph AI
+                      </motion.div>
+
+                      <motion.h1 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.1] mb-4"
+                      >
+                        A Universe<br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">
+                          of Connected
+                        </span><br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-fuchsia-400">
+                          Knowledge
+                        </span>
+                      </motion.h1>
+
+                      <motion.p 
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-6 max-w-sm"
+                      >
+                        RAG-powered research intelligence with knowledge graphs, multi-source data and LLMs to help you discover, connect and understand research like never before.
+                      </motion.p>
+
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="flex items-center gap-3 mb-8"
+                      >
+                        <button 
+                          onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2 border border-cyan-400/20"
+                        >
+                          Explore 3D Graph <ArrowRight className="w-4 h-4" />
+                        </button>
+                        <button className="px-4 py-2.5 rounded-xl bg-white/5 border border-white/15 text-gray-300 font-medium text-xs sm:text-sm hover:bg-white/10 transition-all flex items-center gap-2 backdrop-blur-sm">
+                          <span className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[8px]">▶</span>
+                          Watch Demo
+                        </button>
+                      </motion.div>
+
+                      {/* Stats Row */}
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="flex flex-wrap gap-4 text-[11px]"
+                      >
+                        {[
+                          { value: '200M+', label: 'Research Papers' },
+                          { value: '45+', label: 'Data Sources' },
+                          { value: 'Multi-LLM', label: 'AI Intelligence' },
+                          { value: 'Real-time', label: 'Knowledge Graph' },
+                        ].map((stat, idx) => (
+                          <div key={idx}>
+                            <span className="text-white font-bold block">{stat.value}</span>
+                            <span className="text-gray-500">{stat.label}</span>
+                          </div>
+                        ))}
+                      </motion.div>
+                    </div>
+
+                    {/* ═══ CENTER 3D KNOWLEDGE SPHERE ═══ */}
+                    <motion.div 
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.3, duration: 0.8 }}
+                      className="relative w-[340px] h-[340px] sm:w-[420px] sm:h-[420px] lg:w-[480px] lg:h-[480px] flex items-center justify-center"
+                    >
+                      {/* Glow aura */}
+                      <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-cyan-500/10 blur-[100px] pointer-events-none animate-pulse"></div>
+                      <div className="absolute w-60 h-60 rounded-full bg-purple-500/8 blur-[80px] pointer-events-none translate-x-8 translate-y-10"></div>
+
+                      <ThreeNeuralCore className="w-full h-full" theme="cyan" interactive={true} />
+
+                      {/* Floating Category Labels */}
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="absolute top-[5%] left-[35%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-400"></span> Authors
+                        </span>
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }} className="absolute top-[40%] left-[-5%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Papers
+                        </span>
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0 }} className="absolute bottom-[20%] left-[5%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-orange-500/20 border border-orange-400/30 text-orange-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span> Concepts
+                        </span>
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.85 }} className="absolute top-[25%] right-[-8%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Knowledge Graph
+                        </span>
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.95 }} className="absolute top-[50%] right-[-12%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span> Datasets
+                        </span>
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.05 }} className="absolute bottom-[25%] right-[-5%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400"></span> Citations
+                        </span>
+                      </motion.div>
+                      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.1 }} className="absolute bottom-[5%] right-[15%] z-20 pointer-events-none">
+                        <span className="px-2.5 py-1 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-300 text-[9px] font-bold uppercase tracking-wider backdrop-blur-sm flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-pink-400"></span> Research Trends
+                        </span>
+                      </motion.div>
+                    </motion.div>
+
+                    {/* ═══ RIGHT FLOATING PANELS ═══ */}
+                    <div className="hidden xl:flex flex-col gap-3 absolute right-4 top-6 z-30 w-[210px]">
+                      
+                      {/* Research Databases Panel */}
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+                        className="rounded-xl bg-[#0a0f1c]/90 border border-white/10 p-3 backdrop-blur-xl"
+                      >
+                        <h4 className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider mb-2">Research Databases</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {['PubMed', 'IEEE', 'Semantic Scholar', 'CrossRef'].map(db => (
+                            <span key={db} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] text-gray-400 font-medium">{db}</span>
+                          ))}
+                        </div>
+                      </motion.div>
+
+                      {/* RAG Pipeline Panel */}
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.7 }}
+                        className="rounded-xl bg-[#0a0f1c]/90 border border-white/10 p-3 backdrop-blur-xl"
+                      >
+                        <h4 className="text-[10px] font-bold text-purple-400 uppercase tracking-wider mb-2">RAG Pipeline</h4>
+                        <div className="flex items-center gap-1 text-[9px]">
+                          <span className="px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 text-blue-300">Retrieve</span>
+                          <span className="text-gray-600">→</span>
+                          <span className="px-2 py-1 rounded-md bg-purple-500/10 border border-purple-500/20 text-purple-300">Augment</span>
+                          <span className="text-gray-600">→</span>
+                          <span className="px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">Generate</span>
+                        </div>
+                      </motion.div>
+
+                      {/* Large Language Models Panel */}
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.8 }}
+                        className="rounded-xl bg-[#0a0f1c]/90 border border-white/10 p-3 backdrop-blur-xl"
+                      >
+                        <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2">Large Language Models</h4>
+                        <div className="flex flex-wrap gap-1.5">
+                          {['GPT-4', 'Claude', 'Gemini', 'Llama', 'Mistral'].map(llm => (
+                            <span key={llm} className="px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-[9px] text-gray-400 font-medium">{llm}</span>
+                          ))}
+                        </div>
+                      </motion.div>
+
+                      {/* Live Analytics Panel */}
+                      <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.9 }}
+                        className="rounded-xl bg-[#0a0f1c]/90 border border-white/10 p-3 backdrop-blur-xl"
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-[10px] font-bold text-white uppercase tracking-wider">Live Analytics</h4>
+                          <span className="flex items-center gap-1 text-[9px] text-emerald-400 font-mono">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Live
+                          </span>
+                        </div>
+                        {/* Mini bar chart */}
+                        <div className="flex items-end gap-[3px] h-8 mb-2">
+                          {[60, 85, 45, 70, 90, 55, 75, 95, 65, 80].map((h, i) => (
+                            <div key={i} className="flex-1 bg-gradient-to-t from-cyan-500/40 to-cyan-400/80 rounded-sm" style={{ height: `${h}%` }} />
+                          ))}
+                        </div>
+                        <div className="space-y-1 text-[9px]">
+                          <div className="flex justify-between"><span className="text-gray-500">Papers Indexed</span><span className="text-cyan-400 font-bold">200M+</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Connections</span><span className="text-purple-400 font-bold">1.2B+</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Concepts</span><span className="text-emerald-400 font-bold">45K+</span></div>
+                          <div className="flex justify-between"><span className="text-gray-500">Research Domains</span><span className="text-sky-400 font-bold">120+</span></div>
+                        </div>
+                      </motion.div>
+                    </div>
+
+                  </div>
+
+                  {/* ═══════════════ COCKPIT BOTTOM SECTION ═══════════════ */}
                   <motion.div 
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    className="rounded-3xl bg-[#080d1a]/80 border border-white/10 p-8 backdrop-blur-xl shadow-2xl space-y-6"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="relative z-30 w-full"
                   >
-                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                      <span className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                        <Share2 className="w-4 h-4 text-cyan-400" /> Graph Intelligence
-                      </span>
-                      <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
-                        Operational
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/20 transition-all">
-                        <span className="text-2xl font-bold text-cyan-400 block font-mono">99.4%</span>
-                        <span className="text-xs text-gray-400">Citation Accuracy</span>
-                      </div>
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-purple-500/20 transition-all">
-                        <span className="text-2xl font-bold text-purple-400 block font-mono">3.2x</span>
-                        <span className="text-xs text-gray-400">Faster Synthesis</span>
-                      </div>
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-sky-500/20 transition-all">
-                        <span className="text-2xl font-bold text-sky-400 block font-mono">100%</span>
-                        <span className="text-xs text-gray-400">Grounded Citations</span>
-                      </div>
-                      <div className="p-4 rounded-xl bg-white/5 border border-white/5 hover:border-emerald-500/20 transition-all">
-                        <span className="text-2xl font-bold text-emerald-400 block font-mono">204M</span>
-                        <span className="text-xs text-gray-400">Scientific Papers</span>
+                    {/* Center Badge */}
+                    <div className="flex justify-center mb-3">
+                      <div className="px-6 py-2 rounded-t-xl bg-[#0a0f1c]/95 border border-white/10 border-b-0 backdrop-blur-xl text-center">
+                        <span className="text-[11px] font-bold text-cyan-400 uppercase tracking-[0.2em] block">ResearchGraph AI</span>
+                        <span className="text-[9px] text-gray-500 uppercase tracking-widest">Integrating Global Knowledge</span>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-gradient-to-r from-cyan-950/40 to-blue-950/40 border border-cyan-500/20 text-xs text-gray-300 leading-relaxed italic">
-                      "ResearchGraph allowed our quantum physics lab to synthesize 1,200 papers in 30 minutes, identifying three unlinked experimental correlations."
+                    {/* Bottom Bar */}
+                    <div className="w-full bg-[#060a14]/95 backdrop-blur-xl border-t border-white/10 px-4 sm:px-8 py-4">
+                      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-4">
+                        
+                        {/* Multi-Source Retrieval */}
+                        <div className="hidden sm:block flex-shrink-0">
+                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider block mb-1">Multi-Source Retrieval</span>
+                          <div className="flex gap-1">
+                            {['arXiv', 'PubMed', 'IEEE'].map(s => (
+                              <span key={s} className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[8px] text-gray-500">{s}</span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Central Search Bar */}
+                        <div 
+                          className="flex-1 w-full max-w-lg cursor-text"
+                          onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                        >
+                          <span className="text-[9px] font-bold text-gray-500 uppercase tracking-wider block mb-1.5 text-center">Ask a Research Question</span>
+                          <div className="relative h-11 bg-[#0a0f1c]/80 border border-white/15 rounded-xl flex items-center px-4 hover:border-cyan-500/40 transition-all group">
+                            <Search className="w-4 h-4 text-gray-600 mr-2 flex-shrink-0" />
+                            <span className="text-gray-500 text-xs font-mono truncate">
+                              E.g., "How does graph neural networks improve drug discovery?"
+                            </span>
+                            <button className="ml-auto w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/20">
+                              <ArrowRight className="w-3.5 h-3.5 text-white" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* AI-Powered Insights */}
+                        <div className="hidden sm:block flex-shrink-0 text-right">
+                          <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider block mb-1">AI-Powered Insights</span>
+                          <div className="space-y-0.5 text-[9px] text-gray-500">
+                            <div className="flex items-center gap-1 justify-end"><BrainCircuit className="w-2.5 h-2.5 text-purple-400" /> Summarize</div>
+                            <div className="flex items-center gap-1 justify-end"><Network className="w-2.5 h-2.5 text-cyan-400" /> Connect concepts</div>
+                            <div className="flex items-center gap-1 justify-end"><Search className="w-2.5 h-2.5 text-emerald-400" /> Find related work</div>
+                            <div className="flex items-center gap-1 justify-end"><Sparkles className="w-2.5 h-2.5 text-yellow-400" /> Generate insights</div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </motion.div>
-                </div>
-              </motion.div>
 
-              {/* ============ BOTTOM CTA ============ */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-4xl mx-auto mt-28 text-center px-8"
-              >
-                <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to accelerate your research?</h2>
-                <p className="text-gray-400 text-sm mb-8 max-w-lg mx-auto">Join 140,000+ researchers already mapping the frontiers of scientific knowledge.</p>
-                <button 
-                  onClick={() => triggerTraversal('AUTH', 'REGISTER')} 
-                  className="px-8 py-4 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-base sm:text-lg transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-3 mx-auto border border-cyan-400/20"
-                >
-                  Join the Network <ArrowRight className="w-5 h-5" />
-                </button>
-              </motion.div>
+                </div>
+              </div>
 
             </motion.div>
           )}
