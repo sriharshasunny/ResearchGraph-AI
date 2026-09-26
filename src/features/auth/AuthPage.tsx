@@ -135,83 +135,61 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* Centered Hero Content */}
               <div className="w-full max-w-5xl mx-auto px-8 flex flex-col items-center text-center pt-24 pb-32 relative z-20">
                 
-                {/* Floating HUD Elements for Futuristic Vibe */}
-                <div className="absolute top-10 left-0 text-cyan-500/50 font-mono text-xs hidden md:block tracking-widest text-left">
-                  <motion.div animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 2, repeat: Infinity }}>
-                    SYS.CORE // ACTIVE
-                    <br/>
-                    LOC: SECTOR_7
-                  </motion.div>
-                </div>
-                <div className="absolute bottom-10 right-0 text-blue-500/50 font-mono text-xs hidden md:block tracking-widest text-right">
-                   <motion.div animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 3, repeat: Infinity, delay: 1 }}>
-                    DATA.STREAM [OK]
-                    <br/>
-                    {">"} INITIALIZING...
-                  </motion.div>
-                </div>
-
-                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-cyan-500/5 border border-cyan-500/30 backdrop-blur-md mb-10 relative overflow-hidden group shadow-[0_0_30px_rgba(34,211,238,0.15)]">
-                  <motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" animate={{ x: ['-100%', '200%'] }} transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }} />
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#22d3ee]"></span>
-                  <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest relative z-10">Neural Engine v2.0 Active</span>
+                <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-10 shadow-lg relative overflow-hidden">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  <span className="text-xs font-bold text-gray-300 uppercase tracking-widest relative z-10">ResearchGraph AI v2.0</span>
                 </div>
                 
-                <h1 className="text-6xl md:text-[6.5rem] font-extrabold tracking-tighter drop-shadow-[0_0_30px_rgba(34,211,238,0.2)] leading-[1.05] mb-8 relative">
-                  <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>Stop Searching.</motion.span><br/>
-                  <motion.span initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-500 to-purple-600 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] relative inline-block pb-2">
+                <h1 className="text-6xl md:text-[6.5rem] font-extrabold tracking-tighter drop-shadow-xl leading-[1.05] mb-8">
+                  Stop Searching.<br/>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 pb-2">
                     Start Connecting.
-                    <motion.div className="absolute bottom-0 left-0 h-[3px] bg-gradient-to-r from-cyan-400 via-purple-500 to-transparent" animate={{ width: ['0%', '100%', '0%'] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} />
-                  </motion.span>
+                  </span>
                 </h1>
                 
                 <p className="text-xl md:text-2xl text-gray-300 max-w-3xl leading-relaxed drop-shadow-md mb-14 font-medium">
                   Enter a research question. Our AI instantly reads millions of academic papers, finds the hidden patterns, and builds a stunning 3D interactive knowledge map for you.
                 </p>
                 
-                {/* Sleek Floating Search Bar */}
+                {/* Sleek Floating Search Bar - CLEAN & SIMPLE */}
                 <div 
                   className="w-full max-w-4xl relative group cursor-pointer"
                   onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                 >
-                  {/* Glowing backdrop */}
-                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-80 transition duration-1000 group-hover:duration-300"></div>
+                  {/* Subtle Glowing backdrop */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition duration-500"></div>
                   
-                  <div className="relative h-24 bg-black/60 backdrop-blur-3xl border border-cyan-500/40 rounded-2xl flex items-center px-6 md:px-8 shadow-[0_0_50px_rgba(34,211,238,0.2)] group-hover:border-cyan-400/80 transition-colors overflow-hidden">
-                     {/* Scanning laser */}
-                     <motion.div className="absolute top-0 bottom-0 left-0 w-[2px] bg-cyan-400 shadow-[0_0_20px_#22d3ee]" animate={{ x: [0, 900, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "linear" }} />
+                  <div className="relative h-24 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center px-6 md:px-8 shadow-2xl group-hover:border-cyan-400/50 transition-colors">
                      
-                     <Search className="w-8 h-8 md:w-10 md:h-10 text-cyan-400 mr-6 flex-shrink-0 drop-shadow-[0_0_10px_#22d3ee]" />
+                     <Search className="w-8 h-8 text-cyan-400 mr-6 flex-shrink-0" />
                      <motion.div className="overflow-hidden flex flex-1" initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 4, repeat: Infinity, repeatType: "reverse", repeatDelay: 5 }}>
-                       <span className="text-gray-100 text-xl md:text-2xl font-mono whitespace-nowrap drop-shadow-md">
+                       <span className="text-gray-200 text-xl md:text-2xl font-mono whitespace-nowrap">
                          "Latest breakthroughs in LLMs"
                        </span>
                      </motion.div>
-                     <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-[4px] h-10 md:h-12 bg-cyan-400 ml-1 flex-shrink-0 shadow-[0_0_10px_#22d3ee]" />
+                     <motion.div animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} className="w-[3px] h-8 bg-cyan-400 ml-1 flex-shrink-0" />
                      
-                     <button className="hidden md:flex ml-8 px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-lg shadow-[0_0_30px_rgba(34,211,238,0.5)] hover:shadow-[0_0_50px_rgba(34,211,238,0.8)] transition-all items-center gap-3 flex-shrink-0 group-hover:scale-105 border border-cyan-300/50">
+                     <button className="hidden md:flex ml-8 px-8 py-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-lg shadow-lg transition-all items-center gap-3 flex-shrink-0">
                        <Sparkles className="w-6 h-6" /> Initialize
                      </button>
                   </div>
                 </div>
 
-                {/* Floating Decorative 3D Icons & Orbital Rings in the background */}
+                {/* Floating Decorative 3D Icons - NO LAGGY RINGS */}
                 <div className="absolute inset-0 w-full h-full pointer-events-none -z-10 flex items-center justify-center">
-                   {/* Giant Orbital Rings */}
-                   <motion.div animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }} className="absolute w-[600px] h-[600px] rounded-full border border-cyan-500/20 border-dashed" />
-                   <motion.div animate={{ rotate: -360 }} transition={{ duration: 80, repeat: Infinity, ease: "linear" }} className="absolute w-[900px] h-[900px] rounded-full border border-purple-500/10 border-dashed" />
-
-                   <motion.div animate={{ y: [-30, 30, -30], rotate: [0, 15, 0] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[10%] left-[10%] w-20 h-20 rounded-2xl bg-purple-500/10 border border-purple-500/40 backdrop-blur-xl flex items-center justify-center shadow-[0_0_40px_rgba(168,85,247,0.4)]">
-                      <BookOpen className="w-10 h-10 text-purple-300 drop-shadow-[0_0_15px_#a855f7]" />
+                   
+                   <motion.div animate={{ y: [-15, 15, -15] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[10%] left-[10%] w-20 h-20 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl flex items-center justify-center shadow-2xl">
+                      <BookOpen className="w-10 h-10 text-purple-400" />
                    </motion.div>
                    
-                   <motion.div animate={{ y: [30, -30, 30], rotate: [0, -15, 0] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-[20%] right-[5%] w-24 h-24 rounded-2xl bg-blue-500/10 border border-blue-500/40 backdrop-blur-xl flex items-center justify-center shadow-[0_0_40px_rgba(59,130,246,0.4)]">
-                      <Layers className="w-12 h-12 text-blue-300 drop-shadow-[0_0_15px_#3b82f6]" />
+                   <motion.div animate={{ y: [15, -15, 15] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }} className="absolute bottom-[20%] right-[5%] w-24 h-24 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl flex items-center justify-center shadow-2xl">
+                      <Layers className="w-12 h-12 text-blue-400" />
                    </motion.div>
 
-                   <motion.div animate={{ y: [-20, 20, -20], rotate: [0, 10, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[20%] right-[20%] w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/40 backdrop-blur-xl flex items-center justify-center shadow-[0_0_40px_rgba(16,185,129,0.4)]">
-                      <Database className="w-8 h-8 text-emerald-300 drop-shadow-[0_0_15px_#10b981]" />
+                   <motion.div animate={{ y: [-10, 10, -10] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }} className="absolute top-[20%] right-[20%] w-16 h-16 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl flex items-center justify-center shadow-2xl">
+                      <Database className="w-8 h-8 text-emerald-400" />
                    </motion.div>
+                   
                 </div>
               </div>
 
