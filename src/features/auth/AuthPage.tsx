@@ -31,33 +31,61 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     }, 1400);
   };
 
-  // Determine which background to show based on the current logical state
-  const bgImage = pageState === 'LANDING' 
-    ? "url('/epic_launch_bg.jpg')" 
-    : (authMode === 'LOGIN' ? "url('/login_bg.jpg')" : "url('/register_bg.jpg')");
-
   return (
     <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
       
       {/* --- MASTER BACKGROUND & SPACE TRAVEL EFFECTS --- */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712]">
         
-        {/* Dynamic Background Image */}
+        {/* Layer 1: Landing Background */}
         <motion.div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
-          style={{ backgroundImage: bgImage }}
-          animate={isTraversing ? {
-            scale: [1, 4],
-            filter: ["brightness(1) blur(0px)", "brightness(4) blur(30px)"],
-            opacity: [1, 0.5]
-          } : {
-            scale: [1, 1.05, 1],
-            filter: "brightness(1) blur(0px)",
-            opacity: 1,
-            backgroundPosition: ["50% 50%", "51% 49%", "50% 50%"]
+          style={{ backgroundImage: "url('/epic_launch_bg.jpg')" }}
+          initial={{ opacity: 1 }}
+          animate={{ 
+            opacity: pageState === 'LANDING' ? 1 : 0,
+            scale: pageState === 'LANDING' ? [1, 1.05, 1] : 1.2,
+            filter: isTraversing ? "brightness(3) blur(10px)" : "brightness(1) blur(0px)"
           }}
-          transition={isTraversing ? { duration: 0.7, ease: "easeIn" } : { duration: 40, repeat: Infinity, ease: "easeInOut" }}
-          key={pageState + authMode + "-bg"} // Force re-render to capture entrance
+          transition={{ 
+            opacity: { duration: 0.8 },
+            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" },
+            filter: { duration: 0.7 }
+          }}
+        />
+
+        {/* Layer 2: Login Background */}
+        <motion.div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
+          style={{ backgroundImage: "url('/login_bg.jpg')" }}
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 1 : 0,
+            scale: (pageState === 'AUTH' && authMode === 'LOGIN') ? [1, 1.05, 1] : 1.2,
+            filter: isTraversing ? "brightness(3) blur(10px)" : "brightness(1) blur(0px)"
+          }}
+          transition={{ 
+            opacity: { duration: 0.8 },
+            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" },
+            filter: { duration: 0.7 }
+          }}
+        />
+
+        {/* Layer 3: Register Background */}
+        <motion.div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
+          style={{ backgroundImage: "url('/register_bg.jpg')" }}
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 1 : 0,
+            scale: (pageState === 'AUTH' && authMode === 'REGISTER') ? [1, 1.05, 1] : 1.2,
+            filter: isTraversing ? "brightness(3) blur(10px)" : "brightness(1) blur(0px)"
+          }}
+          transition={{ 
+            opacity: { duration: 0.8 },
+            scale: { duration: 40, repeat: Infinity, ease: "easeInOut" },
+            filter: { duration: 0.7 }
+          }}
         />
 
         {/* Hyperdrive Starfield Effect (Only visible during traversal) */}
@@ -65,16 +93,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           {isTraversing && (
             <motion.div 
               initial={{ scale: 0.1, opacity: 0 }}
-              animate={{ scale: 20, opacity: [0, 1, 0] }}
+              animate={{ scale: 15, opacity: [0, 1, 0] }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.4, ease: "easeInOut" }}
               className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
             >
-              {/* Warp Lines */}
               {Array.from({ length: 80 }).map((_, i) => (
                 <div 
                   key={`warp-${i}`} 
-                  className="absolute bg-cyan-200/80 shadow-[0_0_10px_#fff]" 
+                  className="absolute bg-cyan-100 shadow-[0_0_15px_#fff]" 
                   style={{ 
                     width: `${Math.random() * 100 + 50}px`, 
                     height: '2px', 
@@ -82,7 +109,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   }} 
                 />
               ))}
-              <div className="absolute inset-0 bg-cyan-400/20 mix-blend-overlay"></div>
+              <div className="absolute inset-0 bg-white/10 mix-blend-overlay"></div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -98,9 +125,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           ))}
         </div>
         
-        {/* Darkening Gradients */}
-        <div className="absolute inset-0 bg-black/40 z-0"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#030712]/80 via-transparent to-[#030712] z-0"></div>
+        {/* Dynamic Darkening Gradients - Lightened severely during AUTH so images pop! */}
+        <div className={`absolute inset-0 transition-colors duration-1000 ease-in-out z-0 ${pageState === 'LANDING' ? 'bg-black/50' : 'bg-transparent'}`}></div>
+        <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-1000 ease-in-out z-0 ${pageState === 'LANDING' ? 'from-[#030712]/90 via-black/20 to-[#030712] opacity-100' : 'from-[#030712]/20 via-transparent to-[#030712]/20 opacity-100'}`}></div>
       </div>
 
       {/* --- PAGE CONTENT CONTAINER --- */}
@@ -244,7 +271,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="w-full min-h-screen flex items-center justify-center relative p-8"
             >
-              {/* BACK TO LANDING BUTTON (The "Wrong Button") */}
+              {/* BACK TO LANDING BUTTON */}
               <button 
                 onClick={() => triggerTraversal('LANDING')} 
                 className="absolute top-8 left-8 z-[110] px-6 py-3 rounded-full bg-black/60 border border-white/20 flex items-center gap-3 hover:bg-white/10 hover:border-white/40 transition-all backdrop-blur-md shadow-2xl group"
@@ -254,7 +281,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               </button>
 
               {/* AUTH BOX */}
-              <div className="w-full max-w-[460px] bg-[#060B14]/80 backdrop-blur-3xl border border-cyan-500/40 rounded-3xl p-10 shadow-[0_0_100px_rgba(0,0,0,0.9)] relative overflow-hidden">
+              <div className="w-full max-w-[460px] bg-[#060B14]/60 backdrop-blur-3xl border border-cyan-500/40 rounded-3xl p-10 shadow-[0_0_100px_rgba(0,0,0,0.9)] relative overflow-hidden">
                 <div className={`absolute -top-20 -right-20 w-56 h-56 rounded-full blur-[60px] animate-pulse ${authMode === 'LOGIN' ? 'bg-purple-500/30' : 'bg-orange-500/30'}`}></div>
                 <div className={`absolute -bottom-20 -left-20 w-56 h-56 rounded-full blur-[60px] animate-pulse ${authMode === 'LOGIN' ? 'bg-cyan-500/30' : 'bg-yellow-500/30'}`}></div>
 
@@ -265,10 +292,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                      </div>
                   </div>
 
-                  <h2 className="text-4xl font-extrabold text-center text-white mb-2 tracking-tight">
+                  <h2 className="text-4xl font-extrabold text-center text-white mb-2 tracking-tight drop-shadow-md">
                     {authMode === 'LOGIN' ? 'Welcome Back' : 'Create Account'}
                   </h2>
-                  <p className="text-gray-400 text-center mb-10">
+                  <p className="text-gray-300 text-center mb-10 drop-shadow-md font-medium">
                     {authMode === 'LOGIN' ? 'Access your research universe.' : 'Join the academic network.'}
                   </p>
 
@@ -276,19 +303,19 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     <AnimatePresence mode="wait">
                       {authMode === 'REGISTER' && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="relative group overflow-hidden">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-cyan-400 transition-colors" />
                           <input type="text" placeholder="Full Name" required className="w-full bg-black/60 border border-gray-700/80 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all shadow-inner" />
                         </motion.div>
                       )}
                     </AnimatePresence>
 
                     <div className="relative group">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
+                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-cyan-400 transition-colors" />
                       <input type="email" placeholder="Email Address" required className="w-full bg-black/60 border border-gray-700/80 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all shadow-inner" />
                     </div>
 
                     <div className="relative group">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-cyan-400 transition-colors" />
                       <input type="password" placeholder="Password" required className="w-full bg-black/60 border border-gray-700/80 rounded-xl py-4 pl-12 pr-4 text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all shadow-inner" />
                     </div>
 
@@ -303,7 +330,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </button>
                   </form>
 
-                  <div className="mt-8 text-center text-sm font-medium text-gray-400 border-t border-gray-800 pt-6">
+                  <div className="mt-8 text-center text-sm font-medium text-gray-300 border-t border-gray-800/80 pt-6 drop-shadow-md">
                     {authMode === 'LOGIN' ? "Don't have an account? " : "Already have an account? "}
                     <button 
                       onClick={() => triggerTraversal('AUTH', authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
