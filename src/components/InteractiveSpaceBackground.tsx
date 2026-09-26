@@ -192,11 +192,11 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         style={{ 
           backgroundImage: "url('/user_custom_bg.jpg')",
           transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
-          filter: pageState === 'LANDING' ? 'brightness(0.9) contrast(1.1)' : 'none'
+          filter: pageState === 'LANDING' ? 'brightness(1.1) contrast(1.15)' : 'none'
         }}
         initial={false}
         animate={{ 
-          opacity: pageState === 'LANDING' ? 0.85 : 0,
+          opacity: pageState === 'LANDING' ? 1.0 : 0,
           scale: pageState === 'LANDING' ? 1.02 : 1.0
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
@@ -247,13 +247,13 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       {/* Atmospheric Gradients: Soft vignettes that preserve cockpit space visibility while maintaining UI clarity */}
       <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'bg-gradient-to-b from-[#01020a]/80 via-[#030818]/60 to-[#01020a]/90' 
+          ? 'bg-black/10' 
           : 'bg-black/25'
       }`}></div>
 
       <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'from-black/70 via-transparent to-black/90 opacity-80' 
+          ? 'from-black/40 via-transparent to-black/40 opacity-50' 
           : 'from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90'
       }`}></div>
 
@@ -261,7 +261,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-10 ${
         pageState === 'AUTH' 
           ? 'opacity-80 bg-[radial-gradient(ellipse_at_center,transparent_20%,#030712_85%)]' 
-          : 'opacity-70 bg-[radial-gradient(ellipse_at_center,transparent_30%,#01020a_95%)]'
+          : 'opacity-40 bg-[radial-gradient(ellipse_at_center,transparent_40%,#01020a_95%)]'
       }`}></div>
     </div>
   );
