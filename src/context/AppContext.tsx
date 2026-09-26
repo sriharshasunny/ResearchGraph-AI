@@ -34,7 +34,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [savedPaperIds, setSavedPaperIds] = useState<string[]>(['p1', 'p3']);
   const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>(['p1', 'p2', 'p4']);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 

@@ -18,12 +18,12 @@ export const Sidebar: React.FC = () => {
     <motion.aside 
       initial={false}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
-      className="h-full bg-white border-r border-brand-border flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden"
+      className="h-full bg-white/60 backdrop-blur-3xl border-r border-white/60 flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden shadow-[4px_0_24px_rgba(0,0,0,0.02)] relative z-20"
     >
       
       {/* Brand */}
       <div 
-        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-brand-border transition-all duration-300`} 
+        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-white/40 transition-all duration-300`} 
       >
         <button 
           onClick={toggleSidebar}
@@ -51,7 +51,7 @@ export const Sidebar: React.FC = () => {
         {isSidebarOpen ? (
           <div className="px-3 mb-3 text-[11px] font-bold text-brand-textMuted uppercase tracking-widest transition-opacity duration-300">Main Menu</div>
         ) : (
-          <div className="h-[1px] w-8 mx-auto bg-brand-border mb-3 mt-1 rounded-full"></div>
+          <div className="h-[1px] w-8 mx-auto bg-gray-200 mb-3 mt-1 rounded-full"></div>
         )}
         
         {navItems.map(item => (
@@ -61,8 +61,8 @@ export const Sidebar: React.FC = () => {
             onClick={() => setActivePage(item.id)}
             className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl transition-all font-semibold text-[13px] group ${
               activePage === item.id 
-                ? 'bg-blue-50 text-brand-accent shadow-sm' 
-                : 'text-brand-textSoft hover:bg-gray-50 hover:text-brand-text'
+                ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-brand-accent shadow-[inset_0_1px_3px_rgba(255,255,255,0.5)] border border-white/60' 
+                : 'text-brand-textSoft hover:bg-white/60 hover:text-brand-text border border-transparent'
             }`}
           >
             <div className={`shrink-0 transition-transform duration-300 ${activePage === item.id ? 'scale-110' : 'group-hover:scale-110'}`}>
@@ -86,13 +86,13 @@ export const Sidebar: React.FC = () => {
         {isSidebarOpen ? (
           <div className="px-3 mt-8 mb-3 text-[11px] font-bold text-brand-textMuted uppercase tracking-widest transition-opacity duration-300">Library</div>
         ) : (
-          <div className="h-[1px] w-8 mx-auto bg-brand-border mt-8 mb-3 rounded-full"></div>
+          <div className="h-[1px] w-8 mx-auto bg-gray-200 mt-8 mb-3 rounded-full"></div>
         )}
         
         <button
           title={!isSidebarOpen ? "Saved Papers" : undefined}
           onClick={() => setActivePage('search')}
-          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl text-brand-textSoft hover:bg-gray-50 hover:text-brand-text transition-all font-semibold text-[13px] group`}
+          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl text-brand-textSoft hover:bg-white/60 hover:text-brand-text border border-transparent transition-all font-semibold text-[13px] group`}
         >
           <div className="shrink-0 transition-transform duration-300 group-hover:scale-110"><Bookmark className="w-5 h-5" /></div>
           <AnimatePresence>
@@ -111,8 +111,8 @@ export const Sidebar: React.FC = () => {
       </div>
 
       {/* Profile */}
-      <div className={`p-4 border-t border-brand-border ${isSidebarOpen ? '' : 'flex justify-center'}`}>
-        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-gray-50 transition-colors cursor-pointer group`}>
+      <div className={`p-4 border-t border-white/40 ${isSidebarOpen ? '' : 'flex justify-center'}`}>
+        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-white/60 hover:shadow-sm border border-transparent hover:border-white/60 transition-all cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
             <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-brand-accent to-brand-violet p-[2px]">
               <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
