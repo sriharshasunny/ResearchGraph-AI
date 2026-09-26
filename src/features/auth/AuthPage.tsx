@@ -309,12 +309,12 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     
                     {/* Top-Left: Research Databases 3D Holographic Card */}
                     <motion.div 
-                      initial={{ opacity: 0, y: -20, rotateX: 15 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 8 }}
+                      initial={{ opacity: 0, y: -20, rotateX: 25 }}
+                      animate={{ opacity: 1, y: 0, rotateX: 15 }}
                       transition={{ delay: 0.2, duration: 0.7 }}
                       onClick={() => setActiveModal('SOURCES')}
-                      style={{ perspective: 900, transformStyle: 'preserve-3d' }}
-                      className="hidden md:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c20]/95 border-2 border-cyan-500/40 backdrop-blur-2xl shadow-[0_12px_30px_rgba(0,0,0,0.8),_0_0_15px_rgba(6,182,212,0.2)] hover:border-cyan-300 hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all cursor-pointer group rotate-x-6 hover:rotate-x-0"
+                      style={{ perspective: 1200, transform: 'rotateX(12deg)', transformStyle: 'preserve-3d' }}
+                      className="hidden md:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c20]/95 border-2 border-cyan-500/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_15px_rgba(6,182,212,0.2)] hover:border-cyan-300 hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all cursor-pointer group hover:-translate-y-2 hover:rotate-x-0"
                     >
                       <div className="flex items-center justify-between gap-4 border-b border-cyan-500/20 pb-1.5">
                         <span className="text-[10px] font-extrabold text-cyan-300 uppercase tracking-widest flex items-center gap-1.5">
@@ -336,12 +336,12 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     {/* Top-Center: RAG Pipeline 3D Holographic Card */}
                     <motion.div 
-                      initial={{ opacity: 0, y: -20, rotateX: 15 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 8 }}
+                      initial={{ opacity: 0, y: -20, rotateX: 25 }}
+                      animate={{ opacity: 1, y: 0, rotateX: 15 }}
                       transition={{ delay: 0.3, duration: 0.7 }}
                       onClick={() => setActiveModal('HOW_IT_WORKS')}
-                      style={{ perspective: 900, transformStyle: 'preserve-3d' }}
-                      className="hidden lg:flex flex-col gap-1.5 px-5 py-2.5 rounded-2xl bg-[#080c24]/95 border-2 border-purple-500/40 backdrop-blur-2xl shadow-[0_12px_30px_rgba(0,0,0,0.8),_0_0_15px_rgba(168,85,247,0.2)] hover:border-purple-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-all cursor-pointer group rotate-x-6 hover:rotate-x-0"
+                      style={{ perspective: 1200, transform: 'rotateX(12deg)', transformStyle: 'preserve-3d' }}
+                      className="hidden lg:flex flex-col gap-1.5 px-5 py-2.5 rounded-2xl bg-[#080c24]/95 border-2 border-purple-500/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_15px_rgba(168,85,247,0.2)] hover:border-purple-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-all cursor-pointer group hover:-translate-y-2 hover:rotate-x-0"
                     >
                       <div className="flex items-center justify-between gap-4 border-b border-purple-500/20 pb-1.5">
                         <span className="text-[10px] font-extrabold text-purple-300 uppercase tracking-widest flex items-center gap-1.5">
@@ -372,11 +372,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     {/* Top-Right: Large Language Models 3D Holographic Card */}
                     <motion.div 
-                      initial={{ opacity: 0, y: -20, rotateX: 15 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 8 }}
+                      initial={{ opacity: 0, y: -20, rotateX: 25 }}
+                      animate={{ opacity: 1, y: 0, rotateX: 15 }}
                       transition={{ delay: 0.4, duration: 0.7 }}
-                      style={{ perspective: 900, transformStyle: 'preserve-3d' }}
-                      className="hidden xl:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c20]/95 border-2 border-emerald-500/40 backdrop-blur-2xl shadow-[0_12px_30px_rgba(0,0,0,0.8),_0_0_15px_rgba(16,185,129,0.2)] hover:border-emerald-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all rotate-x-6 hover:rotate-x-0"
+                      style={{ perspective: 1200, transform: 'rotateX(12deg)', transformStyle: 'preserve-3d' }}
+                      className="hidden xl:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c20]/95 border-2 border-emerald-500/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_15px_rgba(16,185,129,0.2)] hover:border-emerald-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all group hover:-translate-y-2 hover:rotate-x-0"
                     >
                       <div className="flex items-center justify-between gap-4 border-b border-emerald-500/20 pb-1.5">
                         <span className="text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest flex items-center gap-1.5">
@@ -501,7 +501,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     {/* ─── CLEAN, SPACED OUT ORBITING BADGES (NO OVERLAPPING) ─── */}
                     {/* 1. Authors (Upper-Left Orbit) */}
-                    <div className="absolute top-[2%] left-[10%] z-20 pointer-events-none animate-float-slow">
+                    <div className="absolute top-[12%] left-[16%] z-20 pointer-events-none animate-float-slow">
                       <span className="px-3.5 py-1.5 rounded-full bg-[#060d24]/95 border border-amber-400/70 text-amber-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(251,191,36,0.35)]">
                         <span className="w-2 h-2 rounded-full bg-amber-400"></span>
                         <User className="w-3.5 h-3.5 text-amber-400" />
@@ -510,7 +510,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* 2. Papers (Mid-Left Orbit) */}
-                    <div className="absolute top-[50%] left-[-5%] z-20 pointer-events-none animate-float-mid">
+                    <div className="absolute top-[50%] left-[2%] -translate-y-1/2 z-20 pointer-events-none animate-float-mid">
                       <span className="px-3.5 py-1.5 rounded-full bg-[#060d24]/95 border border-blue-400/70 text-blue-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(96,165,250,0.35)]">
                         <span className="w-2 h-2 rounded-full bg-blue-400"></span>
                         <FileText className="w-3.5 h-3.5 text-blue-400" />
@@ -519,7 +519,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* 3. Concepts (Bottom-Left Orbit) */}
-                    <div className="absolute bottom-[2%] left-[12%] z-20 pointer-events-none animate-float-slow">
+                    <div className="absolute bottom-[14%] left-[18%] z-20 pointer-events-none animate-float-slow">
                       <span className="px-3.5 py-1.5 rounded-full bg-[#060d24]/95 border border-purple-400/70 text-purple-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(192,132,252,0.35)]">
                         <span className="w-2 h-2 rounded-full bg-purple-400"></span>
                         <Sparkles className="w-3.5 h-3.5 text-purple-400" />
@@ -528,7 +528,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* 4. Datasets (Upper-Right Orbit) */}
-                    <div className="absolute top-[2%] right-[10%] z-20 pointer-events-none animate-float-mid">
+                    <div className="absolute top-[12%] right-[16%] z-20 pointer-events-none animate-float-mid">
                       <span className="px-3.5 py-1.5 rounded-full bg-[#060d24]/95 border border-emerald-400/70 text-emerald-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(52,211,153,0.35)]">
                         <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
                         <Database className="w-3.5 h-3.5 text-emerald-400" />
@@ -537,7 +537,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* 5. Citations (Mid-Right Orbit) */}
-                    <div className="absolute top-[50%] right-[-5%] z-20 pointer-events-none animate-float-slow">
+                    <div className="absolute top-[50%] right-[2%] -translate-y-1/2 z-20 pointer-events-none animate-float-slow">
                       <span className="px-3.5 py-1.5 rounded-full bg-[#060d24]/95 border border-rose-400/70 text-rose-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(251,113,133,0.35)]">
                         <span className="w-2 h-2 rounded-full bg-rose-400"></span>
                         <Share2 className="w-3.5 h-3.5 text-rose-400" />
@@ -546,7 +546,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* 6. Research Trends (Bottom-Right Orbit) */}
-                    <div className="absolute bottom-[2%] right-[12%] z-20 pointer-events-none animate-float-mid">
+                    <div className="absolute bottom-[14%] right-[18%] z-20 pointer-events-none animate-float-mid">
                       <span className="px-3.5 py-1.5 rounded-full bg-[#060d24]/95 border border-fuchsia-400/70 text-fuchsia-300 text-[10px] font-bold uppercase tracking-wider backdrop-blur-xl flex items-center gap-1.5 shadow-[0_0_15px_rgba(232,121,249,0.35)]">
                         <span className="w-2 h-2 rounded-full bg-fuchsia-400"></span>
                         <Activity className="w-3.5 h-3.5 text-fuchsia-400" />
@@ -555,7 +555,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* Floating 3D Scientific Paper Preview Cards (Offset, Non-colliding) */}
-                    <div className="absolute top-[20%] left-[1%] z-15 pointer-events-none hidden sm:block opacity-90 transform -rotate-6 hover:scale-105 transition-transform">
+                    <div className="absolute top-[30%] left-[8%] z-15 pointer-events-none hidden sm:block opacity-90 transform -rotate-6 hover:scale-105 transition-transform">
                       <div className="w-20 h-24 bg-[#060d22]/95 backdrop-blur-xl rounded-xl shadow-2xl p-2 border border-cyan-500/40 text-[6px] text-gray-300 flex flex-col justify-between">
                         <div className="w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-sm mb-1"></div>
                         <div className="font-bold text-white text-[7px] truncate">Nature Biotech</div>
@@ -568,7 +568,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       </div>
                     </div>
 
-                    <div className="absolute top-[20%] right-[1%] z-15 pointer-events-none hidden sm:block opacity-90 transform rotate-6 hover:scale-105 transition-transform">
+                    <div className="absolute top-[30%] right-[8%] z-15 pointer-events-none hidden sm:block opacity-90 transform rotate-6 hover:scale-105 transition-transform">
                       <div className="w-20 h-24 bg-[#060d22]/95 backdrop-blur-xl rounded-xl shadow-2xl p-2 border border-purple-500/40 text-[6px] text-gray-300 flex flex-col justify-between">
                         <div className="w-full h-1 bg-gradient-to-r from-purple-500 to-pink-400 rounded-sm mb-1"></div>
                         <div className="font-bold text-white text-[7px] truncate">Cell Genomics</div>
