@@ -5,6 +5,38 @@ import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
 
+const IsometricCube = ({ size, color, duration, reverse, blur }: { size: number, color: string, duration: number, reverse?: boolean, blur?: boolean }) => {
+  const faces = [
+    { name: 'front', transform: `translateZ(${size/2}px)` },
+    { name: 'back', transform: `rotateY(180deg) translateZ(${size/2}px)` },
+    { name: 'right', transform: `rotateY(90deg) translateZ(${size/2}px)` },
+    { name: 'left', transform: `rotateY(-90deg) translateZ(${size/2}px)` },
+    { name: 'top', transform: `rotateX(90deg) translateZ(${size/2}px)` },
+    { name: 'bottom', transform: `rotateX(-90deg) translateZ(${size/2}px)` },
+  ];
+
+  return (
+    <motion.div 
+      animate={{ rotateX: reverse ? [360, 0] : [0, 360], rotateY: reverse ? [360, 0] : [0, 360] }}
+      transition={{ duration, repeat: Infinity, ease: "linear" }}
+      className="absolute preserve-3d"
+      style={{ width: size, height: size, left: '50%', top: '50%', marginLeft: -size/2, marginTop: -size/2 }}
+    >
+      {faces.map((face) => (
+        <div 
+          key={face.name} 
+          className={`absolute inset-0 border-[1.5px] ${color} ${blur ? 'backdrop-blur-[2px] bg-black/10' : 'bg-transparent'}`}
+          style={{ transform: face.transform, boxShadow: `inset 0 0 ${size/4}px rgba(34,211,238,0.1)` }}
+        >
+          {/* Inner sci-fi crosshair details */}
+          <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/10"></div>
+          <div className="absolute left-1/2 top-0 w-[1px] h-full bg-white/10"></div>
+        </div>
+      ))}
+    </motion.div>
+  );
+};
+
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
@@ -234,19 +266,19 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
                   
                   {/* Decorative element replacing image */}
-                  <div className="relative h-80 rounded-3xl bg-[#0a0f1c]/80 border border-white/10 overflow-hidden flex items-center justify-center">
+                  <div className="relative h-80 rounded-3xl bg-[#0a0f1c]/80 border border-white/10 overflow-hidden flex items-center justify-center perspective-1000">
                      <div className="absolute inset-0 bg-graph-pattern opacity-10"></div>
                      <motion.div 
-                       animate={{ rotate: 360 }} 
-                       transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                       className="relative w-48 h-48 border border-cyan-500/20 rounded-full flex items-center justify-center"
+                       animate={{ rotateX: [0, -360], rotateY: [0, 360] }}
+                       transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                       className="relative w-48 h-48 preserve-3d"
                      >
-                       <motion.div 
-                         animate={{ rotate: -720 }} 
-                         transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-                         className="absolute w-32 h-32 border border-purple-500/30 rounded-full"
-                       />
-                       <Network className="w-12 h-12 text-cyan-400" />
+                       <IsometricCube size={160} color="border-cyan-500/20" duration={30} blur />
+                       <IsometricCube size={100} color="border-purple-500/30" duration={20} reverse />
+                       <div className="absolute inset-0 flex items-center justify-center translate-z-0">
+                         <div className="w-16 h-16 bg-cyan-500/20 rounded-full blur-xl animate-pulse"></div>
+                         <Database className="w-8 h-8 text-cyan-400 drop-shadow-[0_0_10px_rgba(34,211,238,0.8)] z-10" />
+                       </div>
                      </motion.div>
                   </div>
                 </div>
@@ -295,44 +327,23 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
               <div className="w-full max-w-5xl flex gap-12 items-center justify-center">
                 
-                {/* 3D FLOATING ELEMENT (Desktop Only) */}
+                {/* 3D FLOATING TESSERACT (Desktop Only) */}
                 <div className="hidden lg:flex flex-1 flex-col items-center justify-center perspective-1000">
-                  <motion.div 
-                    animate={{ 
-                      rotateX: [0, 10, -10, 0],
-                      rotateY: [0, -15, 15, 0],
-                    }}
-                    transition={{ 
-                      duration: 10, 
-                      repeat: Infinity, 
-                      ease: "linear" 
-                    }}
-                    className="relative w-80 h-80 preserve-3d"
-                  >
-                    {/* Outer Rings */}
-                    <motion.div 
-                      className="absolute inset-0 border-2 border-cyan-500/20 rounded-full"
-                      animate={{ rotateZ: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    />
-                    <motion.div 
-                      className="absolute inset-4 border border-purple-500/30 rounded-full"
-                      animate={{ rotateZ: -360, rotateX: 60 }}
-                      transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-                    />
-                    <motion.div 
-                      className="absolute inset-8 border border-blue-500/30 rounded-full"
-                      animate={{ rotateZ: 360, rotateY: 60 }}
-                      transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-                    />
-                    
-                    {/* Core */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-24 h-24 bg-[#0a0f1c]/90 backdrop-blur-xl border border-white/10 rounded-2xl flex items-center justify-center shadow-[0_0_50px_rgba(34,211,238,0.2)]">
-                        <Network className="w-12 h-12 text-cyan-400" />
-                      </div>
+                  
+                  <div className="relative w-80 h-80 flex items-center justify-center preserve-3d">
+                    {/* The Outer Cube */}
+                    <IsometricCube size={240} color="border-cyan-500/30" duration={25} />
+                    {/* The Inner Cube */}
+                    <IsometricCube size={140} color="border-purple-500/50" duration={15} reverse />
+                    {/* The Core Cube */}
+                    <IsometricCube size={70} color="border-blue-400/80" duration={8} />
+
+                    {/* Quantum Core Light */}
+                    <div className="absolute inset-0 flex items-center justify-center translate-z-0">
+                      <div className="w-12 h-12 bg-cyan-300 rounded-full blur-[25px] animate-pulse"></div>
+                      <Network className="absolute w-10 h-10 text-white z-10 drop-shadow-[0_0_15px_rgba(34,211,238,1)]" />
                     </div>
-                  </motion.div>
+                  </div>
                   
                   <div className="mt-12 text-center max-w-md">
                     <h3 className="text-2xl font-bold text-white mb-4">Secure Neural Uplink</h3>
