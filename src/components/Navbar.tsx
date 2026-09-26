@@ -1,71 +1,61 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Search, Bell, User, Mic, Hexagon } from 'lucide-react';
+import { Bell, Command, Search, Sparkles } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { searchQuery, setSearchQuery, setActivePage } = useApp();
+  const { activePage, setSearchQuery, setActivePage } = useApp();
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
+  const handleGlobalSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+      setSearchQuery(e.currentTarget.value);
       setActivePage('search');
     }
   };
 
+  const getPageTitle = () => {
+    switch(activePage) {
+      case 'dashboard': return 'Dashboard Overview';
+      case 'chat': return 'AI Research Assistant';
+      case 'graph': return 'Knowledge Graph Explorer';
+      case 'search': return 'Discover Papers';
+      case 'details': return 'Paper Analysis';
+      default: return 'ResearchGraph';
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-20 flex h-24 w-full items-center justify-between bg-brand-bg/80 backdrop-blur-xl px-10 transition-all border-b border-brand-border">
-      {/* Left: Logo Mobile Only */}
-      <div className="flex items-center gap-3 md:hidden">
-         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-accent to-blue-600 text-white shadow-sm">
-            <Hexagon className="h-6 w-6" />
-         </div>
+    <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-brand-border flex items-center justify-between px-8 z-40 sticky top-0">
+      <div className="flex items-center gap-4">
+        <h1 className="text-[18px] font-extrabold text-brand-text tracking-tight">{getPageTitle()}</h1>
       </div>
 
-      {/* Center: Command Bar */}
-      <div className="flex-1 flex justify-center max-w-3xl mx-auto px-4 w-full hidden md:flex">
-        <form onSubmit={handleSearchSubmit} className="relative w-full group">
-          <div className="absolute inset-0 bg-brand-accent/5 rounded-2xl blur-xl transition-all duration-500 opacity-0 group-focus-within:opacity-100 group-hover:opacity-50"></div>
-          <div className="relative flex items-center bg-white border border-brand-border rounded-2xl px-5 py-3 shadow-subtle transition-all duration-300 focus-within:border-brand-accent/50 focus-within:ring-4 focus-within:ring-brand-accent/10 focus-within:shadow-md">
-            <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-blue-50 text-brand-accent mr-4 group-focus-within:bg-blue-100 transition-all">
-              <Search className="h-5 w-5" />
-            </div>
-            <input
-              type="text"
-              placeholder="Ask anything about academic research..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent text-[16px] text-brand-text placeholder-brand-textMuted/60 focus:outline-none"
-            />
-            <div className="flex items-center gap-3 ml-2 shrink-0">
-               <span className="hidden lg:flex text-[11px] font-medium tracking-wide text-brand-textMuted px-2.5 py-1.5 rounded-lg bg-gray-50 border border-brand-border shadow-sm">⌘ K</span>
-               <button type="button" className="p-2.5 text-brand-textMuted hover:text-brand-accent transition-all rounded-xl hover:bg-blue-50">
-                 <Mic className="h-5 w-5" />
-               </button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      {/* Right: Actions & Status */}
-      <div className="flex items-center gap-6 shrink-0">
-        <div className="hidden lg:flex items-center gap-3 px-4 py-2 rounded-full border border-brand-border bg-white shadow-sm">
-          <div className="relative flex h-2 w-2 items-center justify-center">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-accent opacity-75"></span>
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-accent"></span>
-          </div>
-          <span className="text-[11px] font-bold text-brand-textMuted uppercase tracking-widest">System Online</span>
+      <div className="flex items-center gap-6">
+        {/* Command Bar */}
+        <div className="hidden md:flex items-center relative group">
+           <Search className="absolute left-3 w-4 h-4 text-brand-textMuted group-focus-within:text-brand-accent transition-colors" />
+           <input 
+             type="text" 
+             placeholder="Search papers, authors, topics..." 
+             onKeyDown={handleGlobalSearch}
+             className="w-72 h-10 pl-10 pr-12 rounded-xl bg-gray-50 border border-brand-border text-[13px] text-brand-text placeholder-brand-textMuted focus:outline-none focus:bg-white focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
+           />
+           <div className="absolute right-2 flex items-center gap-1 opacity-50">
+             <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-white border border-brand-border rounded shadow-sm text-brand-textMuted"><Command className="w-3 h-3 inline-block" /> K</kbd>
+           </div>
         </div>
 
+        {/* Action Icons */}
         <div className="flex items-center gap-3">
-          <button className="relative p-3 rounded-xl border border-brand-border bg-white hover:bg-gray-50 text-brand-textMuted hover:text-brand-text transition-all shadow-sm">
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-red-500"></span>
+          <button className="relative p-2 rounded-xl text-brand-textMuted hover:bg-gray-50 hover:text-brand-text transition-all">
+            <Bell className="w-5 h-5" />
+            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
           </button>
           
-          <button className="p-1 rounded-xl border border-brand-border bg-white hover:border-brand-accent/50 transition-all overflow-hidden group shadow-sm">
-            <div className="h-10 w-10 rounded-lg bg-brand-bg flex items-center justify-center group-hover:bg-blue-50 transition-colors">
-              <User className="h-5 w-5 text-brand-textMuted group-hover:text-brand-accent" />
-            </div>
+          <div className="h-6 w-[1px] bg-brand-border mx-1"></div>
+          
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 text-brand-accent hover:bg-blue-100 transition-colors font-bold text-[12px] uppercase tracking-wider">
+            <Sparkles className="w-3.5 h-3.5" />
+            Upgrade Plan
           </button>
         </div>
       </div>

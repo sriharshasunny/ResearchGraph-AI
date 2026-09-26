@@ -4,65 +4,31 @@
 
 @layer base {
   body {
-    @apply bg-brand-bg text-brand-text transition-colors duration-300 antialiased;
-    font-family: 'Inter', sans-serif;
+    @apply bg-brand-bg text-brand-text font-sans antialiased selection:bg-brand-accent selection:text-white;
   }
 }
 
-/* Subtle background pattern for Home page */
-.bg-graph-pattern {
-  background-size: 40px 40px;
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-}
-
-/* Custom scrollbars */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-/* Custom animations for React Flow container */
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
+@layer utilities {
+  .shadow-subtle {
+    box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
   }
-  to {
-    transform: translateX(0);
+  .shadow-float {
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
   }
-}
-
-.animate-slide-in {
-  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes spinSlow {
-  from {
-    transform: rotate(0deg);
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-  to {
-    transform: rotate(360deg);
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
   }
-}
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-brand-border rounded-full hover:bg-gray-300 transition-colors;
+  }
 
-.animate-spin-slow {
-  animation: spinSlow 30s linear infinite;
-}
-
-/* Premium Glassmorphism Utilities (Light Theme) */
-.glass-panel {
-  @apply bg-white/70 backdrop-blur-xl border border-brand-border/60 shadow-subtle;
-}
-
-.glass-panel-hover {
-  @apply hover:bg-white/90 hover:border-brand-accent/30 hover:shadow-float transition-all duration-300;
+  .bg-graph-pattern {
+    background-image: radial-gradient(circle at center, #e2e8f0 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
 }
