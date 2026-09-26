@@ -6,10 +6,21 @@ import { Dashboard } from './features/dashboard/Dashboard';
 import { ChatPage } from './features/chat/ChatPage';
 import { KnowledgeGraphPage } from './features/graph/KnowledgeGraphPage';
 import { LaunchSequence } from './features/auth/LaunchSequence';
+import { AuthPage } from './features/auth/AuthPage';
 
 export const App: React.FC = () => {
   const { activePage } = useApp();
-  const [showLaunch, setShowLaunch] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showLaunch, setShowLaunch] = useState(false);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    setShowLaunch(true);
+  };
+
+  if (!isAuthenticated) {
+    return <AuthPage onAuthComplete={handleLogin} />;
+  }
 
   if (showLaunch) {
     return <LaunchSequence onComplete={() => setShowLaunch(false)} />;
