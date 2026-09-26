@@ -23,19 +23,22 @@ export const Sidebar: React.FC = () => {
       
       {/* Brand */}
       <div 
-        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-brand-border cursor-pointer transition-all duration-300`} 
-        onClick={() => setActivePage('dashboard')}
+        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-brand-border transition-all duration-300`} 
       >
-        <div className={`h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm shrink-0 ${isSidebarOpen ? 'mr-3' : ''}`}>
-          <LayoutGrid className="w-4 h-4 text-brand-accent" />
-        </div>
+        <button 
+          onClick={toggleSidebar}
+          className={`h-9 w-9 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100 shadow-sm shrink-0 hover:bg-blue-100 transition-colors ${isSidebarOpen ? 'mr-3' : ''}`}
+        >
+          <LayoutGrid className="w-4.5 h-4.5 text-brand-accent" />
+        </button>
         <AnimatePresence>
           {isSidebarOpen && (
             <motion.span 
+              onClick={() => setActivePage('dashboard')}
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
-              className="text-[16px] font-extrabold text-brand-text tracking-tight whitespace-nowrap overflow-hidden"
+              className="text-[16px] font-extrabold text-brand-text tracking-tight whitespace-nowrap overflow-hidden cursor-pointer hover:text-brand-accent transition-colors"
             >
               ResearchGraph<span className="text-brand-accent">.</span>
             </motion.span>
