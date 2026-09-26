@@ -5,7 +5,7 @@ import type { PageType } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Sidebar: React.FC = () => {
-  const { activePage, setActivePage, isSidebarOpen } = useApp();
+  const { activePage, setActivePage, isSidebarOpen, toggleSidebar } = useApp();
 
   const navItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: <Home className="w-5 h-5" /> },
