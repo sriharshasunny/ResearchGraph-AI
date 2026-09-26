@@ -31,4 +31,18 @@
     background-image: radial-gradient(circle at center, #e2e8f0 1px, transparent 1px);
     background-size: 24px 24px;
   }
+
+  .animate-gradient-x {
+    animation: gradient-x 5s ease infinite;
+    background-size: 200% 200%;
+  }
+}
+
+@keyframes gradient-x {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
