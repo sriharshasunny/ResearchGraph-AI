@@ -1,9 +1,9 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Command, Search, Sparkles } from 'lucide-react';
+import { Bell, Command, Search, Sparkles, Menu } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { activePage, setSearchQuery, setActivePage } = useApp();
+  const { activePage, setSearchQuery, setActivePage, toggleSidebar } = useApp();
 
   const handleGlobalSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && e.currentTarget.value.trim()) {
@@ -26,6 +26,13 @@ export const Navbar: React.FC = () => {
   return (
     <header className="h-20 bg-white/80 backdrop-blur-xl border-b border-brand-border flex items-center justify-between px-8 z-40 sticky top-0">
       <div className="flex items-center gap-4">
+        <button 
+          onClick={toggleSidebar}
+          className="p-2 -ml-2 rounded-xl text-brand-textMuted hover:bg-gray-50 hover:text-brand-text transition-all"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="h-6 w-[1px] bg-brand-border mx-2"></div>
         <h1 className="text-[18px] font-extrabold text-brand-text tracking-tight">{getPageTitle()}</h1>
       </div>
 

@@ -16,6 +16,8 @@ interface AppContextType {
   setSelectedPaperId: (id: string | null) => void;
   recentlyViewed: string[];
   addToRecentlyViewed: (id: string) => void;
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -32,6 +34,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [savedPaperIds, setSavedPaperIds] = useState<string[]>(['p1', 'p3']);
   const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>(['p1', 'p2', 'p4']);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
   const addChatMessage = (msg: ChatMessage) => {
     setChatMessages((prev) => [...prev, msg]);
@@ -75,6 +80,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setSelectedPaperId,
         recentlyViewed,
         addToRecentlyViewed,
+        isSidebarOpen,
+        toggleSidebar,
       }}
     >
       {children}
