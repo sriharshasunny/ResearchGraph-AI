@@ -208,7 +208,7 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     const coreLight = new THREE.PointLight(p.edges, 4.5, 6);
     masterGroup.add(coreLight);
 
-    // --- 7. RICH INTERACTION: DRAG TO ROTATE & HOVER SPEEDUP ---
+    // --- 7. RICH INTERACTION: CURSOR-FOLLOW + DRAG ROTATE ---
     let isDragging = false;
     let prevMouseX = 0;
     let prevMouseY = 0;
@@ -217,7 +217,12 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
     let userRotX = 0;
     let userRotY = 0;
     let isHovered = false;
-    let pulseScale = 1.0;
+
+    // Cursor-follow tracking (normalised -1…+1 coords relative to container)
+    let targetFollowX = 0;
+    let targetFollowY = 0;
+    let currentFollowX = 0;
+    let currentFollowY = 0;
 
     const onPointerDown = (e: PointerEvent) => {
       if (!interactive) return;
@@ -229,6 +234,12 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
 
     const onPointerMove = (e: PointerEvent) => {
       if (!interactive) return;
+
+      // Update cursor-follow target (works whether dragging or not)
+      const rect = container.getBoundingClientRect();
+      targetFollowX = ((e.clientX - rect.left) / rect.width) * 2 - 1;  // -1 to +1
+      targetFollowY = ((e.clientY - rect.top) / rect.height) * 2 - 1;  // -1 to +1
+
       if (isDragging) {
         const deltaX = e.clientX - prevMouseX;
         const deltaY = e.clientY - prevMouseY;
@@ -251,26 +262,27 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
 
     const onMouseEnter = () => {
       isHovered = true;
-      pulseScale = 1.08;
     };
 
     const onMouseLeave = () => {
       isHovered = false;
       isDragging = false;
-      pulseScale = 1.0;
+      // Ease the object back to centre when cursor leaves
+      targetFollowX = 0;
+      targetFollowY = 0;
       if (container) {
         container.style.cursor = 'grab';
       }
     };
 
     const onClick = () => {
-      // Trigger brief luminous energy pulse
-      pulseScale = 1.15;
-      coreLight.intensity = 8.0;
+      // Brief luminous energy flash (light only, no scale change)
+      coreLight.intensity = 9.0;
+      edgesMat.opacity = 1.0;
       setTimeout(() => {
-        pulseScale = isHovered ? 1.08 : 1.0;
         coreLight.intensity = 4.5;
-      }, 250);
+        edgesMat.opacity = 0.75;
+      }, 200);
     };
 
     if (interactive) {
@@ -303,18 +315,23 @@ export const ThreeNeuralCore: React.FC<ThreeNeuralCoreProps> = ({
         userRotX += dragVelocityY;
       }
 
-      // Smooth scale interpolation for hover pulse
-      const currentScale = masterGroup.scale.x;
-      const targetScale = pulseScale;
-      const newScale = currentScale + (targetScale - currentScale) * 0.1;
-      masterGroup.scale.set(newScale, newScale, newScale);
+      // Smooth cursor-follow with lerp (positional offset + tilt)
+      const lerpFactor = 0.06;
+      currentFollowX += (targetFollowX - currentFollowX) * lerpFactor;
+      currentFollowY += (targetFollowY - currentFollowY) * lerpFactor;
+
+      // Translate the whole object toward the cursor (max ~0.6 units offset)
+      const followStrength = 0.6;
+      masterGroup.position.x = currentFollowX * followStrength;
+      masterGroup.position.y = -currentFollowY * followStrength;
 
       // Speed multiplier when hovered
-      const speed = isHovered ? 1.8 : 1.0;
+      const speed = isHovered ? 1.5 : 1.0;
 
-      // Master rotation combining user drag and gentle cosmic drift
-      masterGroup.rotation.x = userRotX + Math.sin(t * 0.5) * 0.05;
-      masterGroup.rotation.y = userRotY + t * 0.12 * speed;
+      // Master rotation combining user drag, cursor tilt, and gentle cosmic drift
+      const tiltStrength = 0.15;
+      masterGroup.rotation.x = userRotX + Math.sin(t * 0.5) * 0.05 + currentFollowY * tiltStrength;
+      masterGroup.rotation.y = userRotY + t * 0.12 * speed - currentFollowX * tiltStrength;
 
       // Crystal rotation
       crystalMesh.rotation.y += delta * 0.3 * speed;
