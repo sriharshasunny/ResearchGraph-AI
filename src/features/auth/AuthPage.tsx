@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Database, BookOpen, Layers, Sparkles, ArrowLeft } from 'lucide-react';
 
 type PageState = 'LANDING' | 'AUTH';
@@ -9,9 +9,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
 
-  // Scroll Parallax logic
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ container: scrollContainerRef });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
