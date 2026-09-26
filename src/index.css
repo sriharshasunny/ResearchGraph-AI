@@ -4,15 +4,16 @@
 
 @layer base {
   body {
-    @apply bg-[#FAFAFA] text-[#111111] transition-colors duration-300 antialiased;
+    @apply bg-brand-bg text-brand-text transition-colors duration-300 antialiased;
     font-family: 'Inter', sans-serif;
+    color-scheme: dark;
   }
 }
 
 /* Subtle background pattern for Home page */
 .bg-graph-pattern {
   background-size: 40px 40px;
-  background-image: radial-gradient(circle, #E5E5E5 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 /* Custom scrollbars */
@@ -24,11 +25,11 @@
   background: transparent;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Custom animations for React Flow container */

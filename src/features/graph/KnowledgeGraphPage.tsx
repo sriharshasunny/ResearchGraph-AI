@@ -33,17 +33,17 @@ const CustomNode: React.FC<any> = ({ data }) => {
   const colorStyles = useMemo(() => {
     switch (category) {
       case 'Paper':
-        return 'border-brand-accent/30 bg-brand-accent/5 text-brand-accent';
+        return 'border-brand-accent/50 bg-brand-accent/10 text-brand-accent shadow-[0_0_15px_rgba(0,209,255,0.2)] hover:shadow-[0_0_25px_rgba(0,209,255,0.4)] transition-shadow';
       case 'Author':
-        return 'border-purple-500/30 bg-purple-500/5 text-purple-600';
+        return 'border-purple-500/50 bg-purple-500/10 text-purple-600 shadow-[0_0_15px_rgba(168,85,247,0.2)] hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-shadow';
       case 'Dataset':
-        return 'border-emerald-500/30 bg-emerald-500/5 text-emerald-600';
+        return 'border-emerald-500/50 bg-emerald-500/10 text-emerald-600 shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-shadow';
       case 'Method':
-        return 'border-amber-500/30 bg-amber-500/5 text-amber-600';
+        return 'border-amber-500/50 bg-amber-500/10 text-amber-600 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_25px_rgba(245,158,11,0.4)] transition-shadow';
       case 'Model':
-        return 'border-blue-500/30 bg-blue-500/5 text-blue-600';
+        return 'border-blue-500/50 bg-blue-500/10 text-blue-600 shadow-[0_0_15px_rgba(59,130,246,0.2)] hover:shadow-[0_0_25px_rgba(59,130,246,0.4)] transition-shadow';
       default:
-        return 'border-brand-border bg-brand-bg text-brand-text';
+        return 'border-brand-border bg-brand-bg text-brand-text shadow-sm hover:shadow-md transition-shadow';
     }
   }, [category]);
 
