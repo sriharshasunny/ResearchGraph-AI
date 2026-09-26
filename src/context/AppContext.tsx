@@ -39,6 +39,7 @@ interface AppContextType {
   comparePaperIds: string[];
   addToCompare: (id: string) => void;
   removeFromCompare: (id: string) => void;
+  toggleComparePaper: (id: string) => void;
   clearCompare: () => void;
   recentlyViewedIds: string[];
   addToRecentlyViewed: (id: string) => void;
@@ -148,6 +149,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+  const toggleComparePaper = (id: string) => {
+    setComparePaperIds((prev) => {
+      const exists = prev.includes(id);
+      if (exists) {
+        showToast('Paper removed from comparison list', 'info');
+        return prev.filter((pId) => pId !== id);
+      } else {
+        if (prev.length >= 3) {
+          showToast('Comparison is limited to 3 papers max', 'warning');
+          return prev;
+        }
+        showToast('Paper added to comparison list', 'success');
+        return [...prev, id];
+      }
+    });
+  };
+
   const clearCompare = () => {
     setComparePaperIds([]);
     showToast('Comparison list cleared', 'info');
@@ -205,6 +223,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         comparePaperIds,
         addToCompare,
         removeFromCompare,
+        toggleComparePaper,
         clearCompare,
         recentlyViewedIds,
         addToRecentlyViewed,

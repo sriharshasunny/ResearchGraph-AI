@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { searchPapers } from '../../services/api';
 import type { ChatMessage, Paper } from '../../types';
-import { Send, Sparkles, BookOpen, ChevronRight, HelpCircle, Terminal, Trash2, ListFilter, BrainCircuit, Network, BookMarked, MessageSquare } from 'lucide-react';
+import { Send, Sparkles, HelpCircle, Terminal, Trash2, ListFilter, BrainCircuit, Network, BookMarked, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const ChatPage: React.FC = () => {

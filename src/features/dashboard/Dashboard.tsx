@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { motion } from 'framer-motion';
-import { Search, Hexagon, ArrowRight, Mic, Sparkles } from 'lucide-react';
+import { Search, ArrowRight, Mic, Sparkles } from 'lucide-react';
 import { mockPapers } from '../../data/mockData';
 import { PaperCard } from '../../components/PaperCard';
 

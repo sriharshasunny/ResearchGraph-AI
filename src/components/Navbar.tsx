@@ -1,7 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Search, Bell, Sparkles, User, Mic, Hexagon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Bell, User, Mic, Hexagon } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { searchQuery, setSearchQuery, setActivePage } = useApp();
