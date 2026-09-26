@@ -18,6 +18,11 @@ export const App: React.FC = () => {
     setShowLaunch(true);
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setShowLaunch(false);
+  };
+
   if (!isAuthenticated) {
     return <AuthPage onAuthComplete={handleLogin} />;
   }
@@ -34,9 +39,9 @@ export const App: React.FC = () => {
       </div>
 
       <div className="relative z-10 flex h-full w-full">
-        <Sidebar />
+        <Sidebar onLogout={handleLogout} />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-          <Navbar />
+          <Navbar onLogout={handleLogout} />
           <main className="flex-1 overflow-x-hidden overflow-y-auto relative z-0">
             {activePage === 'dashboard' && <Dashboard />}
             {activePage === 'chat' && <ChatPage />}

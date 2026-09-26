@@ -1,8 +1,8 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Command, Search, Sparkles } from 'lucide-react';
+import { Bell, Command, Search, Sparkles, LogOut } from 'lucide-react';
 
-export const Navbar: React.FC = () => {
+export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const { activePage, setSearchQuery, setActivePage } = useApp();
 
   const handleGlobalSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -61,6 +61,17 @@ export const Navbar: React.FC = () => {
             <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
             <span>Pro Lab</span>
           </button>
+
+          {onLogout && (
+            <button 
+              onClick={onLogout}
+              title="Log Out & Return to Landing Page"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-rose-500/30 text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all text-xs font-semibold"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden lg:inline">Log Out</span>
+            </button>
+          )}
         </div>
       </div>
     </header>

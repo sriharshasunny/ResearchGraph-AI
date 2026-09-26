@@ -1,10 +1,10 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Home, MessageSquare, Network, Search, Bookmark, Settings, LayoutGrid } from 'lucide-react';
+import { Home, MessageSquare, Network, Search, Bookmark, Settings, LayoutGrid, LogOut } from 'lucide-react';
 import type { PageType } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export const Sidebar: React.FC = () => {
+export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const { activePage, setActivePage, isSidebarOpen, toggleSidebar } = useApp();
 
   const navItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
@@ -110,8 +110,8 @@ export const Sidebar: React.FC = () => {
         </button>
       </div>
 
-      {/* Profile */}
-      <div className={`p-4 border-t border-brand-border ${isSidebarOpen ? '' : 'flex justify-center'}`}>
+      {/* Profile & Logout */}
+      <div className={`p-4 border-t border-brand-border space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
         <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
             <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/20">
@@ -137,6 +137,29 @@ export const Sidebar: React.FC = () => {
             <Settings className="w-4 h-4 text-brand-textMuted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
           )}
         </div>
+
+        {/* Log Out Button */}
+        <button
+          onClick={onLogout}
+          title="Log Out & Return to Landing Page"
+          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all font-semibold text-[13px] group`}
+        >
+          <div className="shrink-0 transition-transform duration-300 group-hover:scale-110">
+            <LogOut className="w-4.5 h-4.5 text-gray-400 group-hover:text-rose-400 transition-colors" />
+          </div>
+          <AnimatePresence>
+            {isSidebarOpen && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                className="whitespace-nowrap overflow-hidden"
+              >
+                Log Out
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </button>
       </div>
     </motion.aside>
   );
