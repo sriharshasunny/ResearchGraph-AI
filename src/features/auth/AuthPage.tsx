@@ -6,11 +6,29 @@ type AuthMode = 'LOGIN' | 'REGISTER';
 
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
   const [mode, setMode] = useState<AuthMode>('LOGIN');
+  const [isWarping, setIsWarping] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAuthComplete();
   };
+
+  const handleToggleMode = (newMode: AuthMode) => {
+    if (isWarping || newMode === mode) return;
+    setIsWarping(true);
+    
+    // Halfway through the warp transition, switch the mode (which switches background and form)
+    setTimeout(() => {
+      setMode(newMode);
+    }, 600);
+
+    // End warp
+    setTimeout(() => {
+      setIsWarping(false);
+    }, 1200);
+  };
+
+  const bgImage = mode === 'LOGIN' ? "url('/login_bg.jpg')" : "url('/register_bg.jpg')";
 
   return (
     <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30">
@@ -18,20 +36,40 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
       {/* Hero Section (100vh) */}
       <div className="relative min-h-screen w-full flex flex-col overflow-hidden">
         
-        {/* Dynamic Animated Background Layer */}
-        <div className="absolute inset-0 z-0">
+        {/* Dynamic Animated Background Layer with Warp Capability */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
           <motion.div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url('/login_bg.jpg')" }}
-            animate={{ 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
+            style={{ backgroundImage: bgImage }}
+            animate={isWarping ? {
+              scale: [1, 5],
+              filter: ["brightness(1) blur(0px)", "brightness(3) blur(20px)"],
+              opacity: [1, 0]
+            } : {
               scale: [1, 1.05, 1],
+              filter: "brightness(1) blur(0px)",
+              opacity: 1,
               backgroundPosition: ["50% 50%", "52% 48%", "50% 50%"]
             }}
-            transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+            transition={isWarping ? { duration: 0.6, ease: "easeIn" } : { duration: 30, repeat: Infinity, ease: "easeInOut" }}
+            key={mode + "-bg"} // Force re-render on mode change to play entrance if needed
           />
-          <div className="absolute inset-0 bg-black/40"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-[#030712]/95"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#030712]/60 to-[#030712]"></div>
+          {/* Warp Flash Overlay */}
+          <AnimatePresence>
+            {isWarping && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute inset-0 bg-cyan-200 z-10 mix-blend-overlay"
+              />
+            )}
+          </AnimatePresence>
+
+          <div className="absolute inset-0 bg-black/40 z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-[#030712]/95 z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#030712]/60 to-[#030712] z-0"></div>
         </div>
 
         {/* Floating Stars / Particles for depth */}
@@ -47,11 +85,16 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 height: Math.random() * 2 + 1 + 'px',
                 opacity: Math.random() * 0.5 + 0.1
               }}
-              animate={{
+              animate={isWarping ? {
+                scale: [1, 20],
+                x: (Math.random() - 0.5) * 1000,
+                y: (Math.random() - 0.5) * 1000,
+                opacity: 0
+              } : {
                 y: [0, -30, 0],
                 opacity: [0.1, 0.6, 0.1]
               }}
-              transition={{
+              transition={isWarping ? { duration: 0.6 } : {
                 duration: Math.random() * 5 + 3,
                 repeat: Infinity,
                 ease: "easeInOut",
@@ -100,11 +143,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               Enter a research question. Our AI instantly reads millions of academic papers, finds the hidden patterns, and builds a 3D interactive knowledge map specifically for your query.
             </p>
             
-            {/* Live Interactive Demo Widget */}
-            <div className="mt-4 w-full max-w-lg h-[260px] relative bg-black/30 backdrop-blur-xl border border-cyan-500/20 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(34,211,238,0.1)]">
+            {/* Live Interactive Demo Widget (Fixed orbital design) */}
+            <div className="mt-4 w-full max-w-lg h-[260px] relative bg-black/40 backdrop-blur-xl border border-cyan-500/30 rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(34,211,238,0.15)]">
                
                {/* Demo Search Bar */}
-               <div className="absolute top-4 left-4 right-4 h-12 bg-black/60 border border-gray-700/80 rounded-xl flex items-center px-4 z-30 shadow-lg">
+               <div className="absolute top-4 left-4 right-4 h-12 bg-[#060B14]/80 border border-gray-700/80 rounded-xl flex items-center px-4 z-30 shadow-lg">
                  <Search className="w-5 h-5 text-cyan-400 mr-3" />
                  <motion.div 
                     className="overflow-hidden flex"
@@ -123,8 +166,14 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                  />
                </div>
 
-               {/* Demo Graph Animation */}
-               <div className="absolute inset-0 pt-16 flex items-center justify-center z-10">
+               {/* Clean Orbital Graph Animation */}
+               <div className="absolute inset-0 pt-16 flex items-center justify-center z-10 overflow-hidden">
+                  
+                  {/* Orbit Rings */}
+                  <div className="absolute w-[120px] h-[120px] rounded-full border border-purple-500/30 border-dashed"></div>
+                  <div className="absolute w-[180px] h-[180px] rounded-full border border-blue-500/30 border-dashed"></div>
+                  <div className="absolute w-[240px] h-[240px] rounded-full border border-emerald-500/30 border-dashed"></div>
+
                   {/* Central Node */}
                   <motion.div 
                     animate={{ scale: [1, 1.15, 1], filter: ["drop-shadow(0 0 10px #22d3ee)", "drop-shadow(0 0 30px #22d3ee)", "drop-shadow(0 0 10px #22d3ee)"] }} 
@@ -134,59 +183,47 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     <BrainCircuit className="w-7 h-7 text-cyan-300" />
                   </motion.div>
 
-                  {/* Orbiting Papers */}
-                  <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }} 
-                    className="w-full h-full absolute inset-0 flex items-center justify-center"
-                  >
-                     {/* Paper 1 */}
-                     <div className="absolute top-[15%] left-[15%] flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-400 flex items-center justify-center z-20 shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                          <BookOpen className="w-5 h-5 text-purple-300" />
-                        </div>
-                        {/* Connecting Line */}
-                        <svg className="absolute w-[200px] h-[200px] top-5 left-5 -z-10 overflow-visible">
-                           <motion.line x1="0" y1="0" x2="80" y2="80" stroke="rgba(168,85,247,0.6)" strokeWidth="2" strokeDasharray="4 4" animate={{ strokeDashoffset: [0, 20] }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
-                        </svg>
-                     </div>
-                     
-                     {/* Paper 2 */}
-                     <div className="absolute bottom-[20%] right-[15%] flex flex-col items-center">
-                        <div className="w-10 h-10 rounded-full bg-blue-500/20 border border-blue-400 flex items-center justify-center z-20 shadow-[0_0_20px_rgba(59,130,246,0.4)]">
-                          <Layers className="w-5 h-5 text-blue-300" />
-                        </div>
-                        <svg className="absolute w-[200px] h-[200px] bottom-5 right-5 -z-10 overflow-visible">
-                           <motion.line x1="0" y1="0" x2="-80" y2="-80" stroke="rgba(59,130,246,0.6)" strokeWidth="2" strokeDasharray="4 4" animate={{ strokeDashoffset: [0, -20] }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
-                        </svg>
-                     </div>
-
-                     {/* Paper 3 */}
-                     <div className="absolute top-[30%] right-[10%] flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center z-20 shadow-[0_0_20px_rgba(16,185,129,0.4)]">
-                          <Database className="w-4 h-4 text-emerald-300" />
-                        </div>
-                        <svg className="absolute w-[200px] h-[200px] top-4 right-4 -z-10 overflow-visible">
-                           <motion.line x1="0" y1="0" x2="-80" y2="80" stroke="rgba(16,185,129,0.6)" strokeWidth="1.5" strokeDasharray="4 4" animate={{ strokeDashoffset: [0, -20] }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }} />
-                        </svg>
+                  {/* Orbiting Nodes */}
+                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
+                     <div className="absolute top-[calc(50%-60px)] left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-purple-500/20 border border-purple-400 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.5)]">
+                       <motion.div animate={{ rotate: -360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }}>
+                         <BookOpen className="w-3.5 h-3.5 text-purple-300" />
+                       </motion.div>
                      </div>
                   </motion.div>
+                  
+                  <motion.div animate={{ rotate: -360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
+                     <div className="absolute top-[calc(50%-90px)] left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-blue-500/20 border border-blue-400 flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                       <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
+                         <Layers className="w-3.5 h-3.5 text-blue-300" />
+                       </motion.div>
+                     </div>
+                  </motion.div>
+
+                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="absolute inset-0 origin-center">
+                     <div className="absolute top-[calc(50%-120px)] left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-400 flex items-center justify-center shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                       <motion.div animate={{ rotate: -360 }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }}>
+                         <Database className="w-3.5 h-3.5 text-emerald-300" />
+                       </motion.div>
+                     </div>
+                  </motion.div>
+
                </div>
             </div>
           </motion.div>
 
-          {/* Right Column: Login Box */}
+          {/* Right Column: Auth Box with Warp Out Transition */}
           <motion.div 
             initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="lg:col-span-5 flex justify-center lg:justify-end pb-20 lg:pb-0"
+            animate={{ opacity: isWarping ? 0 : 1, x: isWarping ? 100 : 0, scale: isWarping ? 0.9 : 1 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="lg:col-span-5 flex justify-center lg:justify-end pb-20 lg:pb-0 relative z-20"
           >
             <div className="w-full max-w-[420px] bg-[#060B14]/80 backdrop-blur-2xl border border-cyan-500/30 rounded-3xl p-8 shadow-[0_0_60px_rgba(0,0,0,0.8)] relative overflow-hidden">
               
-              {/* Corner glows inside card */}
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-[50px] animate-pulse"></div>
-              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/20 rounded-full blur-[50px] animate-pulse"></div>
+              {/* Corner glows inside card dynamically colored based on mode */}
+              <div className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[50px] animate-pulse ${mode === 'LOGIN' ? 'bg-purple-500/20' : 'bg-orange-500/20'}`}></div>
+              <div className={`absolute -bottom-20 -left-20 w-40 h-40 rounded-full blur-[50px] animate-pulse ${mode === 'LOGIN' ? 'bg-cyan-500/20' : 'bg-yellow-500/20'}`}></div>
 
               <div className="relative z-10">
                 <h2 className="text-3xl font-extrabold text-white mb-2 tracking-tight">
@@ -203,7 +240,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         initial={{ opacity: 0, height: 0 }} 
                         animate={{ opacity: 1, height: 'auto' }} 
                         exit={{ opacity: 0, height: 0 }}
-                        className="relative group"
+                        className="relative group overflow-hidden"
                       >
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
                         <input 
@@ -242,8 +279,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
                   )}
 
-                  <button type="submit" className="w-full relative group overflow-hidden rounded-xl p-[1px] mt-4 block shadow-[0_0_20px_rgba(34,211,238,0.2)]">
-                    <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  <button type="submit" className={`w-full relative group overflow-hidden rounded-xl p-[1px] mt-4 block shadow-[0_0_20px_rgba(34,211,238,0.2)]`}>
+                    <span className={`absolute inset-0 rounded-xl opacity-70 group-hover:opacity-100 transition-opacity duration-300 ${mode === 'LOGIN' ? 'bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500' : 'bg-gradient-to-r from-orange-400 via-red-500 to-purple-500'}`}></span>
                     <div className="relative flex items-center justify-center gap-2 bg-[#060B14] group-hover:bg-transparent rounded-xl py-3.5 px-4 transition-all duration-300">
                       <span className="font-bold text-white tracking-wide text-sm">
                         {mode === 'LOGIN' ? 'Launch Platform' : 'Start Researching'}
@@ -256,8 +293,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 <div className="mt-8 text-center text-sm font-medium text-gray-400">
                   {mode === 'LOGIN' ? "Don't have an account? " : "Already have an account? "}
                   <button 
-                    onClick={() => setMode(mode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
-                    className="text-cyan-400 hover:text-cyan-300 transition-colors font-bold ml-1"
+                    onClick={() => handleToggleMode(mode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
+                    className="text-cyan-400 hover:text-cyan-300 transition-colors font-bold ml-1 relative"
                   >
                     {mode === 'LOGIN' ? 'Sign up' : 'Login'}
                   </button>
