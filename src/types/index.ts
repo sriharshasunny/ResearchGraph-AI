@@ -9,6 +9,10 @@ export interface Paper {
   doi?: string;
   url?: string;
   pdfUrl?: string;
+  field?: string;
+  tldr?: string;
+  keyFindings?: string[];
+  bibtex?: string;
 }
 
 export interface ChatMessage {

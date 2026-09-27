@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { ChatMessage, PageType } from '../types';
+import type { ChatMessage, PageType, Paper } from '../types';
+import { mockPapers } from '../data/mockData';
+
+export type ReadingStatus = 'to_read' | 'reading' | 'completed';
 
 interface AppContextType {
   activePage: PageType;
@@ -18,6 +21,23 @@ interface AppContextType {
   addToRecentlyViewed: (id: string) => void;
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
+
+  // Rich Interactive Workspace State
+  paperReadingStatus: Record<string, ReadingStatus>;
+  setPaperReadingStatus: (id: string, status: ReadingStatus) => void;
+  paperNotes: Record<string, string>;
+  setPaperNote: (id: string, note: string) => void;
+  comparisonPaperIds: string[];
+  toggleComparisonPaper: (id: string) => void;
+  clearComparison: () => void;
+  activeProject: string;
+  setActiveProject: (p: string) => void;
+  scratchpad: string;
+  setScratchpad: (notes: string) => void;
+  chatScope: string;
+  setChatScope: (scope: string) => void;
+  allPapers: Paper[];
+  addCustomPaper: (paper: Paper) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -25,16 +45,57 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activePage, setActivePage] = useState<PageType>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
+  const [allPapers, setAllPapers] = useState<Paper[]>(mockPapers);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{
     id: 'welcome',
     sender: 'assistant',
-    content: 'Welcome to ResearchGraph AI. I can help you find papers, compare models, generate literature reviews, and explore the knowledge graph. What would you like to research today?',
+    content: 'Welcome to your ResearchGraph AI Copilot. I can synthesize literature across foundational papers, construct comparative benchmarks, extract methodology trade-offs, and map citations. Ground me in your saved library or query indexed papers directly.',
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }]);
-  const [savedPaperIds, setSavedPaperIds] = useState<string[]>(['p1', 'p3']);
+  const [savedPaperIds, setSavedPaperIds] = useState<string[]>(['p1', 'p2', 'p5', 'p8']);
   const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
-  const [recentlyViewed, setRecentlyViewed] = useState<string[]>(['p1', 'p2', 'p4']);
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>(['p1', 'p2', 'p3', 'p5', 'p6']);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // Reading status
+  const [paperReadingStatus, setPaperReadingStatusState] = useState<Record<string, ReadingStatus>>({
+    p1: 'completed',
+    p2: 'reading',
+    p5: 'reading',
+    p8: 'to_read'
+  });
+
+  // Paper personal notes
+  const [paperNotes, setPaperNotes] = useState<Record<string, string>>({
+    p1: 'Essential reference for self-attention scaling. Key equations 1 & 2 on scaled dot-product.',
+    p2: 'Patch projection layer implementation in Section 3.1 is remarkably simple. Need to benchmark against ConvNeXt.',
+    p5: 'GRPO algorithm bypasses value model memory overhead. Critical for test-time scaling experiments.'
+  });
+
+  // Comparison list
+  const [comparisonPaperIds, setComparisonPaperIds] = useState<string[]>(['p2', 'p3']);
+
+  // Active research project
+  const [activeProject, setActiveProject] = useState('Vision-Language Scaling & Reasoning');
+
+  // Scratchpad
+  const [scratchpad, setScratchpadState] = useState(() => {
+    return localStorage.getItem('researchgraph_scratchpad') || 
+`# Working Hypothesis
+- Exploring whether self-distillation (DINOv2) visual embeddings retain spatial compositionality better than contrastive text-image pairs (CLIP) when injected into cross-attention multimodal decoders.
+
+# Key References To Revisit:
+- Dosovitskiy et al. (ViT) patch resolution trade-offs
+- Radford et al. (CLIP) zero-shot robustness
+- DeepSeek-R1 test-time computation steps`;
+  });
+
+  const [chatScope, setChatScope] = useState<string>('all');
+
+  const setScratchpad = (text: string) => {
+    setScratchpadState(text);
+    localStorage.setItem('researchgraph_scratchpad', text);
+  };
 
   const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
 
@@ -46,7 +107,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setChatMessages([{
       id: 'welcome',
       sender: 'assistant',
-      content: 'Chat cleared. How else can I assist your research?',
+      content: 'Workspace chat cleared. How would you like to direct the research copilot next?',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }]);
   };
@@ -62,6 +123,31 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       const filtered = prev.filter((p) => p !== id);
       return [id, ...filtered].slice(0, 10);
     });
+  };
+
+  const setPaperReadingStatus = (id: string, status: ReadingStatus) => {
+    setPaperReadingStatusState(prev => ({ ...prev, [id]: status }));
+  };
+
+  const setPaperNote = (id: string, note: string) => {
+    setPaperNotes(prev => ({ ...prev, [id]: note }));
+  };
+
+  const toggleComparisonPaper = (id: string) => {
+    setComparisonPaperIds(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 3) return [...prev.slice(1), id]; // Max 3
+      return [...prev, id];
+    });
+  };
+
+  const clearComparison = () => {
+    setComparisonPaperIds([]);
+  };
+
+  const addCustomPaper = (paper: Paper) => {
+    setAllPapers(prev => [paper, ...prev]);
+    setSavedPaperIds(prev => [paper.id, ...prev]);
   };
 
   return (
@@ -82,6 +168,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addToRecentlyViewed,
         isSidebarOpen,
         toggleSidebar,
+        paperReadingStatus,
+        setPaperReadingStatus,
+        paperNotes,
+        setPaperNote,
+        comparisonPaperIds,
+        toggleComparisonPaper,
+        clearComparison,
+        activeProject,
+        setActiveProject,
+        scratchpad,
+        setScratchpad,
+        chatScope,
+        setChatScope,
+        allPapers,
+        addCustomPaper
       }}
     >
       {children}
