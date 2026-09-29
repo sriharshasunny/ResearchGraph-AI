@@ -40,7 +40,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
     // Dynamic Starfield with 3D Depth
-    const starCount = 75;
+    const starCount = 120;
     const stars: Array<{
       x: number;
       y: number;
@@ -192,7 +192,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         style={{ 
           backgroundImage: "url('/user_custom_bg.jpg')",
           transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
-          filter: pageState === 'LANDING' ? 'brightness(1.1) contrast(1.15)' : 'none'
+          filter: pageState === 'LANDING' ? 'brightness(1.25) contrast(1.2) saturate(1.3)' : 'none'
         }}
         initial={false}
         animate={{ 
@@ -247,13 +247,13 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       {/* Atmospheric Gradients: Soft vignettes that preserve cockpit space visibility while maintaining UI clarity */}
       <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'bg-black/10' 
+          ? 'bg-black/5' 
           : 'bg-black/25'
       }`}></div>
 
       <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-10 ${
         pageState === 'LANDING' 
-          ? 'from-black/40 via-transparent to-black/40 opacity-50' 
+          ? 'from-black/30 via-transparent to-black/35 opacity-40' 
           : 'from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90'
       }`}></div>
 

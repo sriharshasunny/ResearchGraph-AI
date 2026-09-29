@@ -358,104 +358,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 {/* Ambient Radial Nebula Glow behind 3D sphere */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full bg-gradient-to-br from-cyan-500/10 via-purple-500/5 to-transparent blur-[120px] pointer-events-none z-0"></div>
                 
-                {/* ─── TOP SECTION: 3D FLOATING HOLOGRAPHIC HUD CARDS (3D VIEW) ─── */}
-                <div className="relative z-20 w-full max-w-[1550px] mx-auto px-4 sm:px-8 pt-5 pb-1">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    
-                    {/* Top-Left: Research Databases 3D Holographic Card */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: -20, rotateX: 25 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 15 }}
-                      transition={{ delay: 0.2, duration: 0.7 }}
-                      onClick={() => setActiveModal('SOURCES')}
-                      style={{ perspective: 1200, transform: 'rotateX(12deg)', transformStyle: 'preserve-3d' }}
-                      className="hidden md:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c20]/95 border-2 border-cyan-500/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_15px_rgba(6,182,212,0.2)] hover:border-cyan-300 hover:shadow-[0_0_25px_rgba(6,182,212,0.4)] transition-all cursor-pointer group hover:-translate-y-2 hover:rotate-x-0"
-                    >
-                      <div className="flex items-center justify-between gap-4 border-b border-cyan-500/20 pb-1.5">
-                        <span className="text-[10px] font-extrabold text-cyan-300 uppercase tracking-widest flex items-center gap-1.5">
-                          <Database className="w-3.5 h-3.5 text-cyan-400" />
-                          Research Databases
-                        </span>
-                        <span className="text-[9px] text-cyan-400 group-hover:text-cyan-200 font-mono transition-colors">
-                          + more sources ↗
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 pt-0.5">
-                        <span className="px-2 py-0.5 rounded-md bg-red-500/25 border border-red-500/50 text-red-300 text-[10px] font-bold shadow-sm">arXiv</span>
-                        <span className="px-2 py-0.5 rounded-md bg-blue-500/25 border border-blue-500/50 text-blue-300 text-[10px] font-bold shadow-sm">PubMed</span>
-                        <span className="px-2 py-0.5 rounded-md bg-sky-500/25 border border-sky-500/50 text-sky-300 text-[10px] font-bold shadow-sm">IEEE</span>
-                        <span className="px-2 py-0.5 rounded-md bg-cyan-500/25 border border-cyan-500/50 text-cyan-300 text-[10px] font-bold shadow-sm">Semantic Scholar</span>
-                        <span className="px-2 py-0.5 rounded-md bg-amber-500/25 border border-amber-500/50 text-amber-300 text-[10px] font-bold shadow-sm">CrossRef</span>
-                      </div>
-                    </motion.div>
 
-                    {/* Top-Center: RAG Pipeline 3D Holographic Card */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: -20, rotateX: 25 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 15 }}
-                      transition={{ delay: 0.3, duration: 0.7 }}
-                      onClick={() => setActiveModal('HOW_IT_WORKS')}
-                      style={{ perspective: 1200, transform: 'rotateX(12deg)', transformStyle: 'preserve-3d' }}
-                      className="hidden lg:flex flex-col gap-1.5 px-5 py-2.5 rounded-2xl bg-[#080c24]/95 border-2 border-purple-500/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_15px_rgba(168,85,247,0.2)] hover:border-purple-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-all cursor-pointer group hover:-translate-y-2 hover:rotate-x-0"
-                    >
-                      <div className="flex items-center justify-between gap-4 border-b border-purple-500/20 pb-1.5">
-                        <span className="text-[10px] font-extrabold text-purple-300 uppercase tracking-widest flex items-center gap-1.5">
-                          <Zap className="w-3.5 h-3.5 text-purple-400" />
-                          RAG Pipeline
-                        </span>
-                        <span className="text-[9px] text-purple-300 group-hover:text-purple-100 font-mono transition-colors">
-                          Live Architecture ↗
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-[10px] pt-0.5">
-                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/20 border border-blue-500/50 text-blue-300 font-semibold shadow-sm">
-                          <Database className="w-3 h-3 text-blue-400" />
-                          <span>Retrieve</span>
-                        </div>
-                        <span className="text-gray-400 font-bold">→</span>
-                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-purple-500/20 border border-purple-500/50 text-purple-300 font-semibold shadow-sm">
-                          <FileText className="w-3 h-3 text-purple-400" />
-                          <span>Augment</span>
-                        </div>
-                        <span className="text-gray-400 font-bold">→</span>
-                        <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-semibold shadow-sm">
-                          <BrainCircuit className="w-3 h-3 text-emerald-400" />
-                          <span>Generate</span>
-                        </div>
-                      </div>
-                    </motion.div>
 
-                    {/* Top-Right: Large Language Models 3D Holographic Card */}
-                    <motion.div 
-                      initial={{ opacity: 0, y: -20, rotateX: 25 }}
-                      animate={{ opacity: 1, y: 0, rotateX: 15 }}
-                      transition={{ delay: 0.4, duration: 0.7 }}
-                      style={{ perspective: 1200, transform: 'rotateX(12deg)', transformStyle: 'preserve-3d' }}
-                      className="hidden xl:flex flex-col gap-1.5 px-4 py-2.5 rounded-2xl bg-[#060c20]/95 border-2 border-emerald-500/40 backdrop-blur-2xl shadow-[0_20px_40px_rgba(0,0,0,0.9),_0_0_15px_rgba(16,185,129,0.2)] hover:border-emerald-300 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] transition-all group hover:-translate-y-2 hover:rotate-x-0"
-                    >
-                      <div className="flex items-center justify-between gap-4 border-b border-emerald-500/20 pb-1.5">
-                        <span className="text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest flex items-center gap-1.5">
-                          <Cpu className="w-3.5 h-3.5 text-emerald-400" />
-                          Large Language Models
-                        </span>
-                        <span className="text-[9px] text-emerald-400/80 font-mono">
-                          + custom models
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 pt-0.5">
-                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 text-[10px] font-semibold">GPT-4o</span>
-                        <span className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/50 text-amber-300 text-[10px] font-semibold">Claude 3.5</span>
-                        <span className="px-2 py-0.5 rounded bg-blue-500/20 border border-blue-500/50 text-blue-300 text-[10px] font-semibold">Gemini 1.5</span>
-                        <span className="px-2 py-0.5 rounded bg-purple-500/20 border border-purple-500/50 text-purple-300 text-[10px] font-semibold">Llama 3.1</span>
-                        <span className="px-2 py-0.5 rounded bg-pink-500/20 border border-pink-500/50 text-pink-300 text-[10px] font-semibold">Mistral</span>
-                      </div>
-                    </motion.div>
-
-                  </div>
-                </div>
-
-                {/* ─── MIDDLE HERO STAGE: LEFT HERO COPY + CENTER 3D KNOWLEDGE SPHERE + RIGHT LIVE ANALYTICS ─── */}
-                <div className="relative z-20 w-full max-w-[1550px] mx-auto px-4 sm:px-8 py-1 flex-1 flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-6">
+                {/* ─── HERO STAGE: LEFT HERO COPY + CENTER 3D KNOWLEDGE SPHERE ─── */}
+                <div className="relative z-20 w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-8 sm:pt-14 lg:pt-16 pb-4 flex-1 flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10">
                   
                   {/* LEFT: HERO COPY & CALL TO ACTIONS */}
                   <motion.div 
@@ -471,7 +377,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* Massive Punchy Headline */}
-                    <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.08] mb-3 text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
+                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-4 text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
                       A Universe<br />
                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">
                         of Connected
@@ -482,7 +388,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </h1>
 
                     {/* Subtitle Description */}
-                    <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 max-w-md drop-shadow">
+                    <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-5 max-w-md drop-shadow">
                       RAG-powered research intelligence with knowledge graphs, multi-source data and LLMs to help you discover, connect and understand research like never before.
                     </p>
 
@@ -526,7 +432,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </motion.div>
 
                   {/* ─── CENTER: 3D KNOWLEDGE SPHERE & NON-OVERLAPPING SPACED ORBITS ─── */}
-                  <div className="relative w-[340px] h-[340px] sm:w-[440px] sm:h-[440px] lg:w-[480px] lg:h-[480px] flex items-center justify-center flex-shrink-0 my-1">
+                  <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[520px] lg:h-[520px] flex items-center justify-center flex-shrink-0 my-1">
                     
                     {/* Radiant Atmospheric Halo Aura Behind the 3D Sphere */}
                     <div className="absolute w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.3)_0%,rgba(99,102,241,0.18)_45%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
@@ -638,67 +544,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                   </div>
 
-                  {/* RIGHT: LIVE ANALYTICS HUD DISPLAY */}
-                  <motion.div 
-                    initial={{ opacity: 0, x: 25 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.6 }}
-                    className="hidden lg:flex flex-col gap-3 w-[260px] z-30 flex-shrink-0"
-                  >
-                    <div className="rounded-2xl bg-[#060c20]/95 border-2 border-cyan-500/40 p-4 backdrop-blur-2xl shadow-[0_15px_35px_rgba(0,0,0,0.8),_0_0_15px_rgba(6,182,212,0.25)] relative overflow-hidden">
-                      {/* Top Row: Live Analytics + Pulsing indicator */}
-                      <div className="flex items-center justify-between mb-3 border-b border-cyan-500/20 pb-2">
-                        <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                          <Activity className="w-3.5 h-3.5 text-cyan-400" />
-                          Live Analytics
-                        </span>
-                        <span className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 shadow-sm">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-                          ● Live
-                        </span>
-                      </div>
 
-                      {/* Equalizer Frequency Bar Graph */}
-                      <div className="flex items-end gap-[3px] h-9 mb-4 px-1.5 py-1 bg-black/60 rounded-lg border border-white/10 shadow-inner">
-                        {[45, 75, 60, 90, 100, 80, 65, 85, 95, 70, 85, 60, 78, 92].map((height, i) => (
-                          <div 
-                            key={i} 
-                            className="flex-1 bg-gradient-to-t from-cyan-600 via-sky-400 to-cyan-200 rounded-xs transition-all duration-300" 
-                            style={{ height: `${height}%` }}
-                          />
-                        ))}
-                      </div>
-
-                      {/* Metrics List */}
-                      <div className="space-y-2.5 text-xs font-mono">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-                          <span className="text-gray-400">Papers Indexed</span>
-                          <span className="text-cyan-300 font-extrabold text-sm">200M+</span>
-                        </div>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-                          <span className="text-gray-400">Connections</span>
-                          <span className="text-purple-300 font-extrabold text-sm">1.2B+</span>
-                        </div>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-1.5">
-                          <span className="text-gray-400">Concepts</span>
-                          <span className="text-emerald-300 font-extrabold text-sm">45K+</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Research Domains</span>
-                          <span className="text-sky-300 font-extrabold text-sm">120+</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quick Explore Button */}
-                    <button 
-                      onClick={() => triggerTraversal('AUTH', 'LOGIN')}
-                      className="w-full py-2.5 rounded-xl bg-[#060c20]/90 hover:bg-white/10 border border-white/15 hover:border-cyan-400/50 text-xs font-bold text-gray-200 hover:text-white transition-all flex items-center justify-center gap-2 backdrop-blur-xl shadow-lg"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                      Open Full Telemetry Grid
-                    </button>
-                  </motion.div>
 
                 </div>
 
