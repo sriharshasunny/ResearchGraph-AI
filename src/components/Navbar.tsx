@@ -24,52 +24,51 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   };
 
   return (
-    <header className="h-20 shrink-0 bg-[#080d1a]/80 backdrop-blur-2xl border-b border-white/10 flex items-center justify-between px-6 sm:px-8 z-40 sticky top-0 relative shadow-lg shadow-black/40">
+    <header className="h-14 shrink-0 bg-[#09090b] border-b border-zinc-800/60 flex items-center justify-between px-4 sm:px-6 z-40 sticky top-0 relative">
       <div className="flex items-center gap-3">
-        <h1 className="text-[18px] font-extrabold text-white tracking-tight">{getPageTitle()}</h1>
-        <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-[10px] font-mono font-semibold text-cyan-300">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-          ENGINE ONLINE
+        <h1 className="text-[15px] font-semibold text-zinc-100 tracking-tight">{getPageTitle()}</h1>
+        <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/10 text-[10px] font-medium text-emerald-400">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+          ONLINE
         </span>
       </div>
 
       <div className="flex items-center gap-4 sm:gap-6">
         {/* Command Bar */}
         <div className="hidden md:flex items-center relative group">
-           <Search className="absolute left-3 w-4 h-4 text-gray-400 group-focus-within:text-cyan-400 transition-colors" />
+           <Search className="absolute left-2.5 w-3.5 h-3.5 text-zinc-500 group-focus-within:text-zinc-300 transition-colors" />
            <input 
              type="text" 
              placeholder="Search papers, authors, topics..." 
              onKeyDown={handleGlobalSearch}
-             className="w-72 lg:w-80 h-10 pl-10 pr-12 rounded-xl bg-[#0a0f1c]/90 border border-white/15 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition-all backdrop-blur-md shadow-inner"
+             className="w-64 lg:w-72 h-8 pl-8 pr-10 rounded-md bg-zinc-900 border border-zinc-800 text-[12px] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700 transition-all shadow-sm"
            />
-           <div className="absolute right-2.5 flex items-center gap-1 opacity-60">
-             <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-white/5 border border-white/15 rounded shadow-sm text-gray-400 flex items-center gap-0.5"><Command className="w-2.5 h-2.5" />K</kbd>
+           <div className="absolute right-1.5 flex items-center gap-1 opacity-60">
+             <kbd className="px-1.5 py-0.5 text-[9px] font-mono bg-zinc-800 border border-zinc-700 rounded text-zinc-400 flex items-center gap-0.5"><Command className="w-2.5 h-2.5" />K</kbd>
            </div>
         </div>
 
         {/* Action Icons */}
-        <div className="flex items-center gap-3">
-          <button className="relative p-2.5 rounded-xl text-gray-400 hover:bg-white/5 hover:text-white border border-transparent hover:border-white/10 transition-all">
-            <Bell className="w-4.5 h-4.5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+        <div className="flex items-center gap-2">
+          <button className="relative p-2 rounded-md text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-all">
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
           </button>
           
-          <div className="h-6 w-[1px] bg-white/10 mx-0.5"></div>
+          <div className="h-4 w-[1px] bg-zinc-800 mx-1"></div>
           
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 border border-cyan-500/40 text-cyan-300 hover:text-white hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.25)] transition-all font-bold text-[12px] uppercase tracking-wider">
-            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Pro Lab</span>
+          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-100 transition-all font-medium text-[12px]">
+            <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+            <span>Pro</span>
           </button>
 
           {onLogout && (
             <button 
               onClick={onLogout}
               title="Log Out & Return to Landing Page"
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-rose-500/30 text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 transition-all text-xs font-semibold"
+              className="flex items-center gap-1.5 px-2 py-1.5 rounded-md text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all text-xs font-medium ml-1"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline">Log Out</span>
             </button>
           )}
         </div>

@@ -17,19 +17,19 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   return (
     <motion.aside 
       initial={false}
-      animate={{ width: isSidebarOpen ? 256 : 80 }}
-      className="h-full bg-[#070b14]/50 backdrop-blur-2xl border-r border-white/10 flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
+      animate={{ width: isSidebarOpen ? 240 : 72 }}
+      className="h-full bg-[#09090b] border-r border-zinc-800/60 flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
     >
       
       {/* Brand */}
       <div 
-        className={`h-20 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-white/10 transition-all duration-300`} 
+        className={`h-16 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-zinc-800/60 transition-all duration-300`} 
       >
         <button 
           onClick={toggleSidebar}
-          className={`h-9 w-9 rounded-xl bg-brand-accent/10 flex items-center justify-center border border-brand-accent/30 shadow-[0_0_15px_rgba(59,130,246,0.2)] shrink-0 hover:bg-brand-accent/20 transition-all ${isSidebarOpen ? 'mr-3' : ''}`}
+          className={`h-8 w-8 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800 hover:bg-zinc-800 transition-all shrink-0 ${isSidebarOpen ? 'mr-3' : ''}`}
         >
-          <LayoutGrid className="w-4.5 h-4.5 text-brand-accent drop-shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
+          <LayoutGrid className="w-4 h-4 text-zinc-300" />
         </button>
         <AnimatePresence>
           {isSidebarOpen && (
@@ -49,9 +49,9 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
       {/* Nav */}
       <div className={`flex-1 py-6 ${isSidebarOpen ? 'px-4' : 'px-2'} space-y-1.5 overflow-y-auto scrollbar-thin`}>
         {isSidebarOpen ? (
-          <div className="px-3 mb-3 text-[11px] font-bold text-brand-textMuted uppercase tracking-widest transition-opacity duration-300">Main Menu</div>
+          <div className="px-3 mb-2 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest transition-opacity duration-300">Main Menu</div>
         ) : (
-          <div className="h-[1px] w-8 mx-auto bg-white/10 mb-3 mt-1 rounded-full"></div>
+          <div className="h-[1px] w-6 mx-auto bg-zinc-800 mb-3 mt-1 rounded-full"></div>
         )}
         
         {navItems.map(item => (
@@ -59,13 +59,13 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
             key={item.id}
             title={!isSidebarOpen ? item.label : undefined}
             onClick={() => setActivePage(item.id)}
-            className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl transition-all font-semibold text-[13px] group ${
+            className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2' : 'justify-center p-2.5'} rounded-lg transition-all font-medium text-[13px] group ${
               activePage === item.id 
-                ? 'bg-brand-accent/10 text-brand-accent border border-brand-accent/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]' 
-                : 'text-brand-textSoft hover:bg-white/5 hover:text-brand-text border border-transparent'
+                ? 'bg-zinc-800/80 text-zinc-100' 
+                : 'text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200'
             }`}
           >
-            <div className={`shrink-0 transition-transform duration-300 ${activePage === item.id ? 'scale-110' : 'group-hover:scale-110'}`}>
+            <div className={`shrink-0 transition-transform duration-300 ${activePage === item.id ? 'scale-105' : 'group-hover:scale-105'}`}>
               {item.icon}
             </div>
             <AnimatePresence>
@@ -84,17 +84,17 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         ))}
         
         {isSidebarOpen ? (
-          <div className="px-3 mt-8 mb-3 text-[11px] font-bold text-brand-textMuted uppercase tracking-widest transition-opacity duration-300">Library</div>
+          <div className="px-3 mt-6 mb-2 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest transition-opacity duration-300">Library</div>
         ) : (
-          <div className="h-[1px] w-8 mx-auto bg-white/10 mt-8 mb-3 rounded-full"></div>
+          <div className="h-[1px] w-6 mx-auto bg-zinc-800 mt-6 mb-3 rounded-full"></div>
         )}
         
         <button
           title={!isSidebarOpen ? "Saved Papers" : undefined}
           onClick={() => setActivePage('search')}
-          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-3'} rounded-xl text-brand-textSoft hover:bg-white/5 hover:text-brand-text transition-all border border-transparent font-semibold text-[13px] group`}
+          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2' : 'justify-center p-2.5'} rounded-lg text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200 transition-all font-medium text-[13px] group`}
         >
-          <div className="shrink-0 transition-transform duration-300 group-hover:scale-110"><Bookmark className="w-5 h-5" /></div>
+          <div className="shrink-0 transition-transform duration-300 group-hover:scale-105"><Bookmark className="w-5 h-5" /></div>
           <AnimatePresence>
             {isSidebarOpen && (
               <motion.span
@@ -111,13 +111,11 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
       </div>
 
       {/* Profile & Logout */}
-      <div className={`p-4 border-t border-white/10 space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
-        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-3' : 'justify-center p-1.5'} rounded-xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-colors cursor-pointer group`}>
+      <div className={`p-4 border-t border-zinc-800/60 space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
+        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-2' : 'justify-center p-1.5'} rounded-lg hover:bg-zinc-800/50 transition-colors cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
-            <div className="w-9 h-9 shrink-0 rounded-full bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 p-[1.5px] shadow-lg shadow-cyan-500/20">
-              <div className="w-full h-full rounded-full bg-[#0a0f1c] flex items-center justify-center">
-                <span className="text-[11px] font-extrabold text-cyan-300">JD</span>
-              </div>
+            <div className="w-8 h-8 shrink-0 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
+              <span className="text-[11px] font-bold text-zinc-300">JD</span>
             </div>
             <AnimatePresence>
               {isSidebarOpen && (
@@ -127,14 +125,14 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                   exit={{ opacity: 0, width: 0 }}
                   className="flex flex-col overflow-hidden whitespace-nowrap"
                 >
-                  <span className="text-[13px] font-bold text-brand-text leading-tight">Jane Doe</span>
-                  <span className="text-[11px] text-brand-textMuted">Researcher</span>
+                  <span className="text-[13px] font-medium text-zinc-200 leading-tight">Jane Doe</span>
+                  <span className="text-[11px] text-zinc-500">Researcher</span>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           {isSidebarOpen && (
-            <Settings className="w-4 h-4 text-brand-textMuted opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <Settings className="w-4 h-4 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
           )}
         </div>
 
@@ -142,10 +140,10 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
         <button
           onClick={onLogout}
           title="Log Out & Return to Landing Page"
-          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl text-gray-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all font-semibold text-[13px] group`}
+          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2' : 'justify-center p-2.5'} rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all font-medium text-[13px] group`}
         >
-          <div className="shrink-0 transition-transform duration-300 group-hover:scale-110">
-            <LogOut className="w-4.5 h-4.5 text-gray-400 group-hover:text-rose-400 transition-colors" />
+          <div className="shrink-0 transition-transform duration-300 group-hover:scale-105">
+            <LogOut className="w-4 h-4 text-zinc-400 group-hover:text-red-400 transition-colors" />
           </div>
           <AnimatePresence>
             {isSidebarOpen && (

@@ -249,20 +249,20 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
   const currentConcepts = latestContextMsg?.relatedConcepts || [];
 
   return (
-    <div className="flex h-[calc(100vh-80px)] w-full overflow-hidden bg-[#070b14] relative">
+    <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden bg-[#09090b] relative">
 
       {/* ── LEFT PANEL: RESEARCH SESSIONS ──────────────────────────── */}
-      <aside className="w-64 border-r border-white/10 flex flex-col justify-between hidden lg:flex shrink-0 bg-[#090d18]">
+      <aside className="w-64 border-r border-zinc-800/60 flex flex-col justify-between hidden lg:flex shrink-0 bg-[#09090b]">
         <div>
-          <div className="p-4 border-b border-white/8 flex items-center justify-between">
-            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-              <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="p-4 border-b border-zinc-800/60 flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+              <MessageSquare className="w-3.5 h-3.5 text-zinc-400" />
               Inquiry Sessions
             </span>
             <button
               onClick={clearChat}
               title="Clear Session"
-              className="text-gray-500 hover:text-rose-400 p-1 rounded-md hover:bg-white/5 transition-colors"
+              className="text-zinc-500 hover:text-red-400 p-1 rounded-md hover:bg-zinc-800 transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
@@ -273,16 +273,16 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
               <button
                 key={idx}
                 onClick={() => setActiveSession(idx)}
-                className={`w-full text-left px-3 py-2.5 rounded-xl text-[12px] font-medium transition-all flex items-center gap-2.5 ${
+                className={`w-full text-left px-3 py-2.5 rounded-lg text-[12px] font-medium transition-all flex items-center gap-2.5 ${
                   activeSession === idx
-                    ? 'bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-bold'
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-zinc-800 text-zinc-100'
+                    : 'text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200 border border-transparent'
                 }`}
               >
-                <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                <MessageSquare className="w-3.5 h-3.5 shrink-0 opacity-60" />
                 <div className="flex-1 min-w-0">
                   <p className="truncate leading-tight">{s.title}</p>
-                  <p className="text-[10px] text-gray-500 font-mono mt-0.5">{s.date}</p>
+                  <p className="text-[10px] text-zinc-500 font-mono mt-0.5">{s.date}</p>
                 </div>
               </button>
             ))}
@@ -290,10 +290,10 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
         </div>
 
         {/* Export / Quick helper */}
-        <div className="p-3 border-t border-white/8 bg-black/20">
+        <div className="p-3 border-t border-zinc-800/60 bg-zinc-900/30">
           <button
             onClick={handleExportChat}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-[11px] font-medium transition-all"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-[11px] font-medium transition-all"
           >
             <Download className="w-3.5 h-3.5" />
             Export Chat as Markdown
@@ -308,7 +308,7 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
         <div className="pt-4 px-5 flex items-center justify-end z-10 shrink-0">
           <div className="flex items-center gap-3">
             {/* Grounding Scope Selector */}
-            <div className="hidden sm:flex items-center gap-1 bg-white/5 p-1 rounded-lg ml-2">
+            <div className="hidden sm:flex items-center gap-1 bg-zinc-900 border border-zinc-800/80 p-0.5 rounded-md ml-2">
               {[
                 { id: 'all', label: `Global (${allPapers.length})` },
                 { id: 'saved', label: `My Library (${savedPaperIds.length})` },
@@ -316,10 +316,10 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
                 <button
                   key={scope.id}
                   onClick={() => setGroundingScope(scope.id as any)}
-                  className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all ${
+                  className={`px-3 py-1 rounded text-[11px] font-medium transition-all ${
                     groundingScope === scope.id
-                      ? 'bg-cyan-500/20 text-cyan-300'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'bg-zinc-800 text-zinc-100 shadow-sm'
+                      : 'text-zinc-500 hover:text-zinc-300'
                   }`}
                 >
                   {scope.label}
@@ -332,7 +332,7 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
                 setPrompt('Generate a comprehensive literature matrix comparing architectures, benchmarks, and training schemes across all my saved papers.');
                 inputRef.current?.focus();
               }}
-              className="text-[11px] font-bold text-gray-400 hover:text-cyan-300 px-3 py-1 rounded bg-white/5 hover:bg-white/10 transition-all hidden md:flex items-center gap-1.5"
+              className="text-[11px] font-medium text-zinc-400 hover:text-zinc-200 px-3 py-1.5 rounded-md border border-zinc-800 hover:bg-zinc-800 transition-all hidden md:flex items-center gap-1.5"
             >
               <Layers className="w-3.5 h-3.5" />
               Generate Comparison Matrix
@@ -353,12 +353,12 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
                       animate={{ opacity: 1, y: 0 }}
                       className="flex justify-end"
                     >
-                      <div className="max-w-[85%] bg-[#0e172a] border border-cyan-500/30 rounded-2xl rounded-tr-sm px-4 py-3 shadow-lg shadow-cyan-500/5">
+                      <div className="max-w-[85%] bg-zinc-800 rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
                         <div className="flex items-center justify-between gap-3 mb-1">
-                          <span className="text-[10px] font-bold text-cyan-400 uppercase tracking-wider">Researcher</span>
-                          <span className="text-[9px] text-gray-500 font-mono">{msg.timestamp}</span>
+                          <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">You</span>
+                          <span className="text-[9px] text-zinc-500 font-mono">{msg.timestamp}</span>
                         </div>
-                        <p className="text-[13px] text-white leading-relaxed font-medium">
+                        <p className="text-[13px] text-zinc-100 leading-relaxed font-medium">
                           {msg.content}
                         </p>
                       </div>
@@ -373,16 +373,16 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
                       className="flex flex-col gap-2"
                     >
                       <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-sm">
+                        <div className="w-6 h-6 rounded-md bg-blue-600 flex items-center justify-center text-white shadow-sm">
                           <Sparkles className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-[11px] font-bold text-gray-300">ResearchGraph AI</span>
-                        <span className="text-[9px] text-gray-600 font-mono">{msg.timestamp}</span>
+                        <span className="text-[11px] font-semibold text-zinc-300">ResearchGraph AI</span>
+                        <span className="text-[9px] text-zinc-600 font-mono">{msg.timestamp}</span>
                       </div>
 
                       <div className="pl-8 flex flex-col gap-3">
                         {/* Message Content with Markdown Formatting */}
-                        <div className="text-[13px] text-gray-200 leading-relaxed whitespace-pre-line bg-[#090e1c] border border-white/8 rounded-2xl p-4 shadow-md">
+                        <div className="text-[13px] text-zinc-300 leading-relaxed whitespace-pre-line">
                           {msg.content}
                         </div>
 
@@ -484,7 +484,7 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
         </div>
 
         {/* Input Bar */}
-        <div className="p-4 border-t border-white/10 bg-[#080d19]/90 backdrop-blur-md">
+        <div className="p-4 bg-zinc-950">
           <form
             onSubmit={e => { e.preventDefault(); handleSend(prompt); }}
             className="max-w-3xl mx-auto relative flex items-center"
@@ -495,12 +495,12 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
               placeholder="Ask a research inquiry (e.g. Compare DINOv2 vs CLIP, explain DeepSeek-R1 GRPO)..."
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
-              className="w-full h-12 pl-4 pr-14 rounded-xl border border-white/15 bg-[#050811] text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition-all shadow-lg"
+              className="w-full h-12 pl-4 pr-14 rounded-xl border border-zinc-800 bg-zinc-900 text-[13px] text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700 focus:ring-1 focus:ring-zinc-700 transition-all shadow-sm"
             />
             <button
               type="submit"
               disabled={!prompt.trim()}
-              className="absolute right-1.5 top-1.5 h-9 w-9 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 text-white flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:from-cyan-400 hover:to-blue-500 shadow-md shadow-cyan-500/20"
+              className="absolute right-1.5 top-1.5 h-9 w-9 rounded-lg bg-zinc-800 text-zinc-300 flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed hover:bg-zinc-700 hover:text-white"
             >
               <Send className="w-3.5 h-3.5" />
             </button>
@@ -509,13 +509,13 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
       </div>
 
       {/* ── RIGHT PANEL: GROUNDED SOURCES & CITATIONS ──────────────── */}
-      <aside className="w-80 border-l border-white/10 hidden xl:flex flex-col bg-[#090d18] shrink-0">
-        <div className="p-4 border-b border-white/8 flex items-center justify-between">
-          <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-            <BookMarked className="w-3.5 h-3.5 text-cyan-400" />
+      <aside className="w-80 border-l border-zinc-800/60 hidden xl:flex flex-col bg-[#09090b] shrink-0">
+        <div className="p-4 border-b border-zinc-800/60 flex items-center justify-between">
+          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider flex items-center gap-2">
+            <BookMarked className="w-3.5 h-3.5 text-zinc-400" />
             Grounded Citations
           </span>
-          <span className="text-[10px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+          <span className="text-[10px] font-medium text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-zinc-800">
             {currentSources.length} Papers
           </span>
         </div>
@@ -527,32 +527,30 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
               return (
                 <div
                   key={paper.id}
-                  className="p-3 rounded-xl border border-white/8 bg-[#050811] hover:border-cyan-500/40 transition-all flex flex-col gap-2 group"
+                  className="p-3 rounded-lg border border-zinc-800/80 bg-zinc-900/50 hover:bg-zinc-800/80 transition-all flex flex-col gap-2 group cursor-pointer"
+                  onClick={() => handlePaperClick(paper.id)}
                 >
                   <div>
                     <div className="flex items-center gap-1.5 mb-1">
-                      <span className="px-1.5 py-0.2 rounded bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 font-mono text-[9px] font-black">
+                      <span className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-mono text-[9px] font-semibold">
                         [{idx + 1}] {paper.venue} {paper.year}
                       </span>
-                      <span className="text-[9px] text-amber-400 font-mono flex items-center gap-0.5">
+                      <span className="text-[9px] text-yellow-500 font-mono flex items-center gap-0.5">
                         <Star className="w-2.5 h-2.5" fill="currentColor" /> {(paper.citations / 1000).toFixed(1)}k
                       </span>
                     </div>
 
-                    <h4
-                      onClick={() => handlePaperClick(paper.id)}
-                      className="text-[12px] font-bold text-gray-200 group-hover:text-white cursor-pointer line-clamp-2 leading-snug"
-                    >
+                    <h4 className="text-[12px] font-semibold text-zinc-200 group-hover:text-white line-clamp-2 leading-snug">
                       {paper.title}
                     </h4>
-                    <p className="text-[10px] text-gray-500 mt-0.5 line-clamp-1">{paper.authors.join(', ')}</p>
+                    <p className="text-[10px] text-zinc-500 mt-0.5 line-clamp-1">{paper.authors.join(', ')}</p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                  <div className="flex items-center justify-between pt-2 border-t border-zinc-800/80">
                     <button
-                      onClick={() => toggleSavedPaper(paper.id)}
-                      className={`text-[10px] font-bold flex items-center gap-1 ${
-                        isSaved ? 'text-cyan-400' : 'text-gray-400 hover:text-white'
+                      onClick={(e) => { e.stopPropagation(); toggleSavedPaper(paper.id); }}
+                      className={`text-[10px] font-semibold flex items-center gap-1 ${
+                        isSaved ? 'text-blue-400' : 'text-zinc-500 hover:text-zinc-200'
                       }`}
                     >
                       <Bookmark className="w-3 h-3" fill={isSaved ? 'currentColor' : 'none'} />
@@ -560,8 +558,8 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
                     </button>
 
                     <button
-                      onClick={() => { setSelectedPaperId(paper.id); setActivePage('graph'); }}
-                      className="text-[10px] font-bold text-gray-400 hover:text-cyan-300 flex items-center gap-1"
+                      onClick={(e) => { e.stopPropagation(); setSelectedPaperId(paper.id); setActivePage('graph'); }}
+                      className="text-[10px] font-semibold text-zinc-500 hover:text-zinc-200 flex items-center gap-1"
                     >
                       Graph <ArrowRight className="w-2.5 h-2.5" />
                     </button>
