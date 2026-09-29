@@ -22,9 +22,9 @@ const MainAppLayout = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.02 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="flex h-screen w-full bg-[#09090b] text-zinc-100 overflow-hidden font-sans relative"
+      className="flex h-screen w-full bg-[#F4F7FB] text-gray-900 overflow-hidden font-sans relative"
     >
-      <div className="absolute inset-0 pointer-events-none z-0 bg-[#09090b]">
+      <div className="absolute inset-0 pointer-events-none z-0 bg-[#F4F7FB]">
       </div>
       <div className="relative z-10 flex h-full w-full">
         <Sidebar onLogout={handleLogout} />

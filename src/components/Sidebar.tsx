@@ -1,35 +1,41 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Home, MessageSquare, Network, Search, Bookmark, Settings, LayoutGrid, LogOut } from 'lucide-react';
+import { Home, MessageSquare, Network, Search, Bookmark, Settings, LogOut, FileText, GitCompare, BookOpen, Clock, Activity } from 'lucide-react';
 import type { PageType } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const { activePage, setActivePage, isSidebarOpen, toggleSidebar } = useApp();
 
-  const navItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
-    { id: 'dashboard', label: 'Dashboard', icon: <Home className="w-5 h-5" /> },
-    { id: 'search', label: 'Discover', icon: <Search className="w-5 h-5" /> },
+  const navItems = [
+    { id: 'dashboard', label: 'Home', icon: <Home className="w-5 h-5" /> },
+    { id: 'search', label: 'Search', icon: <Search className="w-5 h-5" /> },
     { id: 'chat', label: 'AI Assistant', icon: <MessageSquare className="w-5 h-5" /> },
+    { id: 'papers', label: 'Papers', icon: <FileText className="w-5 h-5" /> },
+    { id: 'saved', label: 'Saved Papers', icon: <Bookmark className="w-5 h-5" /> },
+    { id: 'compare', label: 'Compare', icon: <GitCompare className="w-5 h-5" /> },
     { id: 'graph', label: 'Knowledge Graph', icon: <Network className="w-5 h-5" /> },
+    { id: 'literature', label: 'Literature Review', icon: <BookOpen className="w-5 h-5" /> },
+    { id: 'gaps', label: 'Research Gaps', icon: <Activity className="w-5 h-5" /> },
+    { id: 'history', label: 'History', icon: <Clock className="w-5 h-5" /> },
   ];
 
   return (
     <motion.aside 
       initial={false}
-      animate={{ width: isSidebarOpen ? 240 : 72 }}
-      className="h-full bg-[#09090b] border-r border-zinc-800/60 flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20"
+      animate={{ width: isSidebarOpen ? 260 : 72 }}
+      className="h-full bg-[#0D1326] border-r border-[#1C263A] flex flex-col justify-between hidden md:flex shrink-0 overflow-hidden relative z-20 text-white"
     >
       
       {/* Brand */}
       <div 
-        className={`h-16 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-zinc-800/60 transition-all duration-300`} 
+        className={`h-16 flex items-center ${isSidebarOpen ? 'px-6' : 'justify-center'} border-b border-[#1C263A] transition-all duration-300`} 
       >
         <button 
           onClick={toggleSidebar}
-          className={`h-8 w-8 rounded-lg bg-zinc-900 flex items-center justify-center border border-zinc-800 hover:bg-zinc-800 transition-all shrink-0 ${isSidebarOpen ? 'mr-3' : ''}`}
+          className={`h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center hover:bg-blue-500 transition-all shrink-0 ${isSidebarOpen ? 'mr-3' : ''}`}
         >
-          <LayoutGrid className="w-4 h-4 text-zinc-300" />
+          <Network className="w-4 h-4 text-white" />
         </button>
         <AnimatePresence>
           {isSidebarOpen && (
@@ -38,31 +44,25 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
               initial={{ opacity: 0, width: 0 }}
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
-              className="text-[16px] font-extrabold text-brand-text tracking-tight whitespace-nowrap overflow-hidden cursor-pointer hover:text-brand-accent transition-colors"
+              className="text-[16px] font-bold text-white tracking-tight whitespace-nowrap overflow-hidden cursor-pointer hover:text-blue-400 transition-colors"
             >
-              ResearchGraph<span className="text-brand-accent">.</span>
+              ResearchGraph AI
             </motion.span>
           )}
         </AnimatePresence>
       </div>
 
       {/* Nav */}
-      <div className={`flex-1 py-6 ${isSidebarOpen ? 'px-4' : 'px-2'} space-y-1.5 overflow-y-auto scrollbar-thin`}>
-        {isSidebarOpen ? (
-          <div className="px-3 mb-2 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest transition-opacity duration-300">Main Menu</div>
-        ) : (
-          <div className="h-[1px] w-6 mx-auto bg-zinc-800 mb-3 mt-1 rounded-full"></div>
-        )}
-        
+      <div className={`flex-1 py-4 ${isSidebarOpen ? 'px-4' : 'px-2'} space-y-1 overflow-y-auto scrollbar-thin`}>
         {navItems.map(item => (
           <button
             key={item.id}
             title={!isSidebarOpen ? item.label : undefined}
-            onClick={() => setActivePage(item.id)}
-            className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2' : 'justify-center p-2.5'} rounded-lg transition-all font-medium text-[13px] group ${
-              activePage === item.id 
-                ? 'bg-zinc-800/80 text-zinc-100' 
-                : 'text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200'
+            onClick={() => setActivePage(item.id as any)}
+            className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl transition-all font-medium text-[13px] group ${
+              activePage === item.id || (activePage === 'details' && item.id === 'papers')
+                ? 'bg-blue-600 text-white shadow-md' 
+                : 'text-gray-400 hover:bg-[#1C263A] hover:text-white'
             }`}
           >
             <div className={`shrink-0 transition-transform duration-300 ${activePage === item.id ? 'scale-105' : 'group-hover:scale-105'}`}>
@@ -82,40 +82,14 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
             </AnimatePresence>
           </button>
         ))}
-        
-        {isSidebarOpen ? (
-          <div className="px-3 mt-6 mb-2 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest transition-opacity duration-300">Library</div>
-        ) : (
-          <div className="h-[1px] w-6 mx-auto bg-zinc-800 mt-6 mb-3 rounded-full"></div>
-        )}
-        
-        <button
-          title={!isSidebarOpen ? "Saved Papers" : undefined}
-          onClick={() => setActivePage('search')}
-          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2' : 'justify-center p-2.5'} rounded-lg text-zinc-400 hover:bg-zinc-800/40 hover:text-zinc-200 transition-all font-medium text-[13px] group`}
-        >
-          <div className="shrink-0 transition-transform duration-300 group-hover:scale-105"><Bookmark className="w-5 h-5" /></div>
-          <AnimatePresence>
-            {isSidebarOpen && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                className="whitespace-nowrap overflow-hidden"
-              >
-                Saved Papers
-              </motion.span>
-            )}
-          </AnimatePresence>
-        </button>
       </div>
 
       {/* Profile & Logout */}
-      <div className={`p-4 border-t border-zinc-800/60 space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
-        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-2' : 'justify-center p-1.5'} rounded-lg hover:bg-zinc-800/50 transition-colors cursor-pointer group`}>
+      <div className={`p-4 border-t border-[#1C263A] space-y-2 ${isSidebarOpen ? '' : 'flex flex-col items-center'}`}>
+        <div className={`flex items-center ${isSidebarOpen ? 'justify-between p-2' : 'justify-center p-1.5'} rounded-xl hover:bg-[#1C263A] transition-colors cursor-pointer group`}>
           <div className={`flex items-center ${isSidebarOpen ? 'gap-3' : 'justify-center'}`}>
-            <div className="w-8 h-8 shrink-0 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center">
-              <span className="text-[11px] font-bold text-zinc-300">JD</span>
+            <div className="w-8 h-8 shrink-0 rounded-full bg-indigo-500 flex items-center justify-center shadow-md">
+              <span className="text-[11px] font-bold text-white">JD</span>
             </div>
             <AnimatePresence>
               {isSidebarOpen && (
@@ -125,25 +99,25 @@ export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
                   exit={{ opacity: 0, width: 0 }}
                   className="flex flex-col overflow-hidden whitespace-nowrap"
                 >
-                  <span className="text-[13px] font-medium text-zinc-200 leading-tight">Jane Doe</span>
-                  <span className="text-[11px] text-zinc-500">Researcher</span>
+                  <span className="text-[13px] font-bold text-white leading-tight">Jane Doe</span>
+                  <span className="text-[11px] text-gray-400">Researcher</span>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           {isSidebarOpen && (
-            <Settings className="w-4 h-4 text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+            <Settings className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
           )}
         </div>
 
         {/* Log Out Button */}
         <button
           onClick={onLogout}
-          title="Log Out & Return to Landing Page"
-          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2' : 'justify-center p-2.5'} rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-all font-medium text-[13px] group`}
+          title="Log Out"
+          className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl text-gray-400 hover:text-white hover:bg-rose-500/80 transition-all font-medium text-[13px] group`}
         >
           <div className="shrink-0 transition-transform duration-300 group-hover:scale-105">
-            <LogOut className="w-4 h-4 text-zinc-400 group-hover:text-red-400 transition-colors" />
+            <LogOut className="w-4 h-4 text-gray-400 group-hover:text-white transition-colors" />
           </div>
           <AnimatePresence>
             {isSidebarOpen && (

@@ -107,73 +107,69 @@ export const SearchPage: React.FC = () => {
   const comparisonPapers = allPapers.filter(p => comparisonPaperIds.includes(p.id));
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-80px)] overflow-x-hidden p-4 sm:p-6 pb-20">
-      {/* Background mesh */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_40%_at_50%_-10%,rgba(6,182,212,0.06),transparent)]" />
-      </div>
+    <div className="relative w-full min-h-[calc(100vh-80px)] overflow-x-hidden p-4 sm:p-6 pb-20 bg-[#F4F7FB]">
 
       <div className="relative z-10 max-w-[1360px] mx-auto flex flex-col gap-5">
 
         {/* ── TOP HEADER & SEARCH ──────────────────────────────────── */}
-        <div className="rounded-2xl border border-white/10 bg-[#090d18]/90 backdrop-blur-xl p-5 shadow-xl">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActivePage('dashboard')}
-                className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-all border border-transparent hover:border-white/10"
+                className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all border border-transparent hover:border-gray-200"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-[17px] font-black text-white flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-cyan-400" />
-                  Academic Literature Discovery
+                <h1 className="text-[17px] font-bold text-gray-900 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  Search Academic Research
                 </h1>
-                <p className="text-[11px] text-gray-400">
-                  Semantic index of foundational &amp; emerging AI research papers
+                <p className="text-[12px] text-gray-500">
+                  Find relevant papers from global and private research libraries.
                 </p>
               </div>
             </div>
 
-            <div className="text-[12px] font-mono text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-xl border border-cyan-500/20 font-bold">
-              {filteredPapers.length} Papers Matched
+            <div className="text-[12px] font-medium text-gray-600">
+              {filteredPapers.length} papers found
             </div>
           </div>
 
           {/* Search bar */}
-          <div className="relative flex items-center gap-2.5 bg-[#050811]/90 border border-white/12 rounded-xl px-3.5 py-2.5 focus-within:border-cyan-500/50 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all">
+          <div className="relative flex items-center gap-2.5 bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2.5 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
             <Search className="w-4 h-4 text-gray-400 shrink-0" />
             <input
               type="text"
-              placeholder="Search by keywords, architecture, author (e.g. Attention, ViT, GRPO, Radford)..."
+              placeholder="Search by keywords, architecture, author (e.g. self-supervised learning for plant disease detection)..."
               value={localQuery}
               onChange={e => {
                 setLocalQuery(e.target.value);
                 setSearchQuery(e.target.value);
               }}
-              className="flex-1 bg-transparent text-[13px] text-white placeholder-gray-500 focus:outline-none"
+              className="flex-1 bg-transparent text-[14px] text-gray-900 placeholder-gray-500 focus:outline-none"
             />
             {localQuery && (
-              <button onClick={() => { setLocalQuery(''); setSearchQuery(''); }} className="text-gray-500 hover:text-gray-300">
+              <button onClick={() => { setLocalQuery(''); setSearchQuery(''); }} className="text-gray-500 hover:text-gray-900">
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
           {/* Faceted Filters */}
-          <div className="mt-4 pt-4 border-t border-white/8 flex flex-col gap-3">
+          <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3">
             {/* Field Pills */}
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mr-1">Field:</span>
+              <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mr-1">Field:</span>
               {fields.map(f => (
                 <button
                   key={f}
                   onClick={() => setSelectedField(f)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${
                     selectedField === f
-                      ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm shadow-cyan-500/10'
-                      : 'bg-white/4 hover:bg-white/8 text-gray-400 hover:text-white border border-transparent'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
+                      : 'bg-white hover:bg-gray-50 text-gray-600 border border-gray-200'
                   }`}
                 >
                   {f}
@@ -182,29 +178,29 @@ export const SearchPage: React.FC = () => {
             </div>
 
             {/* Dropdown filters and sorting */}
-            <div className="flex items-center justify-between gap-3 flex-wrap pt-1">
+            <div className="flex items-center justify-between gap-3 flex-wrap pt-2">
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Venue filter */}
-                <div className="flex items-center gap-1.5 bg-white/4 px-2.5 py-1 rounded-lg border border-white/8">
-                  <span className="text-[10px] text-gray-500 font-semibold">Venue:</span>
+                <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                  <span className="text-[12px] text-gray-500 font-medium">Venue:</span>
                   <select
                     value={selectedVenue}
                     onChange={e => setSelectedVenue(e.target.value)}
-                    className="bg-transparent text-[11px] text-gray-200 outline-none cursor-pointer"
+                    className="bg-transparent text-[12px] font-medium text-gray-900 outline-none cursor-pointer"
                   >
-                    {venues.map(v => <option key={v} value={v} className="bg-[#0b1222]">{v}</option>)}
+                    {venues.map(v => <option key={v} value={v}>{v}</option>)}
                   </select>
                 </div>
 
                 {/* Year filter */}
-                <div className="flex items-center gap-1.5 bg-white/4 px-2.5 py-1 rounded-lg border border-white/8">
-                  <span className="text-[10px] text-gray-500 font-semibold">Year:</span>
+                <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200">
+                  <span className="text-[12px] text-gray-500 font-medium">Year:</span>
                   <select
                     value={selectedYear}
                     onChange={e => setSelectedYear(e.target.value)}
-                    className="bg-transparent text-[11px] text-gray-200 outline-none cursor-pointer"
+                    className="bg-transparent text-[12px] font-medium text-gray-900 outline-none cursor-pointer"
                   >
-                    {years.map(y => <option key={y} value={y} className="bg-[#0b1222]">{y}</option>)}
+                    {years.map(y => <option key={y} value={y}>{y}</option>)}
                   </select>
                 </div>
 
@@ -217,7 +213,7 @@ export const SearchPage: React.FC = () => {
                       setLocalQuery('');
                       setSearchQuery('');
                     }}
-                    className="text-[10px] text-cyan-400 hover:underline px-2 py-1 font-bold"
+                    className="text-[12px] text-blue-600 hover:underline px-2 py-1 font-medium"
                   >
                     Reset Filters
                   </button>
@@ -225,7 +221,7 @@ export const SearchPage: React.FC = () => {
               </div>
 
               {/* Sort buttons */}
-              <div className="flex items-center gap-1 bg-white/4 p-1 rounded-xl border border-white/8">
+              <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-xl border border-gray-200">
                 {(['citations', 'year', 'title'] as SortKey[]).map(key => (
                   <button
                     key={key}
@@ -233,14 +229,14 @@ export const SearchPage: React.FC = () => {
                       if (sortBy === key) setSortDesc(!sortDesc);
                       else { setSortBy(key); setSortDesc(true); }
                     }}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${
                       sortBy === key
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/25'
-                        : 'text-gray-400 hover:text-white'
+                        ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                        : 'text-gray-500 hover:text-gray-900'
                     }`}
                   >
                     {key === 'citations' ? 'Most Cited' : key === 'year' ? 'Latest' : 'Title'}
-                    {sortBy === key && (sortDesc ? <SortDesc className="w-3 h-3" /> : <SortAsc className="w-3 h-3" />)}
+                    {sortBy === key && (sortDesc ? <SortDesc className="w-3.5 h-3.5" /> : <SortAsc className="w-3.5 h-3.5" />)}
                   </button>
                 ))}
               </div>
@@ -301,13 +297,13 @@ export const SearchPage: React.FC = () => {
         </AnimatePresence>
 
         {/* ── PAPERS RESULTS LIST ──────────────────────────────────── */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredPapers.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-[#090d18]/90 p-12 flex flex-col items-center justify-center text-center">
-              <Search className="w-10 h-10 text-gray-600 mb-3" />
-              <h3 className="text-[15px] font-black text-white">No research papers match your query</h3>
-              <p className="text-[12px] text-gray-400 mt-1 max-w-md">
-                Try searching for broader terms like "Transformers", "Self-Attention", "Contrastive", or reset your active filters.
+            <div className="rounded-2xl border border-gray-200 bg-white p-12 flex flex-col items-center justify-center text-center">
+              <Search className="w-10 h-10 text-gray-400 mb-3" />
+              <h3 className="text-[16px] font-bold text-gray-900">No research papers match your query</h3>
+              <p className="text-[13px] text-gray-500 mt-1 max-w-md">
+                Try searching for broader terms or reset your active filters.
               </p>
               <button
                 onClick={() => {
@@ -316,7 +312,7 @@ export const SearchPage: React.FC = () => {
                   setSelectedYear('All');
                   setLocalQuery('');
                 }}
-                className="mt-4 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 rounded-xl text-[11px] font-bold hover:bg-cyan-500/30 transition-all"
+                className="mt-4 px-4 py-2 bg-gray-100 border border-gray-200 text-gray-900 rounded-xl text-[12px] font-bold hover:bg-gray-200 transition-all"
               >
                 Reset Search Filters
               </button>
@@ -330,7 +326,7 @@ export const SearchPage: React.FC = () => {
               return (
                 <div
                   key={paper.id}
-                  className="rounded-2xl border border-white/10 bg-[#090d18]/90 backdrop-blur-xl p-5 hover:border-cyan-500/30 transition-all shadow-md group flex flex-col gap-3"
+                  className="rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md transition-all flex flex-col gap-3"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3.5 flex-1 min-w-0">
@@ -338,117 +334,74 @@ export const SearchPage: React.FC = () => {
                       <button
                         onClick={() => toggleComparisonPaper(paper.id)}
                         title={isChecked ? 'Remove from compare' : 'Select for comparison'}
-                        className={`mt-1 w-4 h-4 rounded border flex items-center justify-center transition-all shrink-0 ${
+                        className={`mt-1 w-5 h-5 rounded border flex items-center justify-center transition-all shrink-0 ${
                           isChecked
-                            ? 'bg-indigo-600 border-indigo-500 text-white'
-                            : 'border-white/20 hover:border-indigo-400 bg-white/5'
+                            ? 'bg-blue-600 border-blue-500 text-white'
+                            : 'border-gray-300 hover:border-blue-400 bg-gray-50'
                         }`}
                       >
-                        {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                        {isChecked && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                       </button>
 
                       {/* Paper Main Header */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                          <span className="px-2 py-0.5 rounded-lg bg-cyan-500/15 border border-cyan-500/25 text-cyan-300 font-mono font-black text-[10px]">
-                            {paper.venue || 'ArXiv'} {paper.year}
-                          </span>
-
-                          {paper.field && (
-                            <span className="px-2 py-0.5 rounded-lg bg-purple-500/15 border border-purple-500/25 text-purple-300 text-[10px] font-semibold">
-                              {paper.field}
-                            </span>
-                          )}
-
-                          <span className="flex items-center gap-1 text-[11px] text-amber-400 font-mono font-bold">
-                            <Star className="w-3 h-3" fill="currentColor" />
-                            {paper.citations.toLocaleString()} citations
+                        <div className="flex items-center justify-between mb-2">
+                          <h3
+                            onClick={() => handleSelectPaper(paper.id)}
+                            className="text-[16px] font-bold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors leading-snug pr-4"
+                          >
+                            {paper.title}
+                          </h3>
+                          <span className="text-[16px] font-bold text-gray-900 whitespace-nowrap">
+                            92% {/* Mock relevance score from image */}
                           </span>
                         </div>
 
-                        <h3
-                          onClick={() => handleSelectPaper(paper.id)}
-                          className="text-[15px] font-black text-white hover:text-cyan-300 cursor-pointer transition-colors leading-snug"
-                        >
-                          {paper.title}
-                        </h3>
-
-                        <p className="text-[12px] text-gray-400 mt-1">
-                          {paper.authors.join(' · ')}
+                        <p className="text-[13px] text-gray-500 mb-3">
+                          {paper.authors.join(', ')} • {paper.year} • {paper.venue || 'ArXiv'}
                         </p>
 
-                        {/* TLDR Badge */}
-                        {paper.tldr && (
-                          <div className="mt-2.5 p-2 rounded-xl bg-cyan-500/5 border border-cyan-500/15 text-[12px] text-cyan-300/90 leading-relaxed">
-                            <span className="font-black uppercase tracking-wider text-[9px] text-cyan-400 mr-2">Key Takeaway:</span>
-                            {paper.tldr}
+                        <div className="flex items-center justify-between flex-wrap gap-4">
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-3 py-1 rounded bg-gray-100 text-gray-700 text-[12px] font-medium border border-gray-200">
+                              {paper.field || 'General AI'}
+                            </span>
+                            {paper.keyFindings?.[0] && (
+                              <span className="px-3 py-1 rounded bg-gray-100 text-gray-700 text-[12px] font-medium border border-gray-200">
+                                {paper.keyFindings[0].substring(0, 30)}...
+                              </span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Actions Column */}
-                    <div className="flex flex-col items-end gap-2 shrink-0">
-                      <button
-                        onClick={() => toggleSavedPaper(paper.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all ${
-                          isSaved
-                            ? 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300'
-                            : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'
-                        }`}
-                      >
-                        <Bookmark className="w-3.5 h-3.5" fill={isSaved ? 'currentColor' : 'none'} />
-                        {isSaved ? 'Saved' : 'Save'}
-                      </button>
-
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() => {
-                            setSearchQuery(`Analyze "${paper.title}" and explain its architecture, empirical results, and limitations.`);
-                            setActivePage('chat');
-                          }}
-                          title="Chat with AI about this paper"
-                          className="p-2 rounded-xl bg-white/5 hover:bg-purple-500/15 text-gray-400 hover:text-purple-300 border border-white/8 hover:border-purple-500/30 transition-all"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          onClick={() => { setSelectedPaperId(paper.id); setActivePage('graph'); }}
-                          title="Explore Citation Topology"
-                          className="p-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 text-gray-400 hover:text-cyan-300 border border-white/8 hover:border-cyan-500/30 transition-all"
-                        >
-                          <Network className="w-3.5 h-3.5" />
-                        </button>
-
-                        <button
-                          onClick={() => handleCopyBibtex(paper)}
-                          title="Copy BibTeX Citation"
-                          className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/8 hover:border-white/20 transition-all"
-                        >
-                          {copiedBibtexId === paper.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-
-                        {paper.pdfUrl && (
-                          <a
-                            href={paper.pdfUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            title="Open Open-Access PDF"
-                            className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white border border-white/8 hover:border-white/20 transition-all"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                          
+                          {/* Actions Column inline */}
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              onClick={() => {
+                                setSearchQuery(`Analyze "${paper.title}" and explain its architecture, empirical results, and limitations.`);
+                                setActivePage('chat');
+                              }}
+                              className="px-4 py-1.5 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold text-[13px] transition-all"
+                            >
+                              Open
+                            </button>
+                            <button
+                              onClick={() => toggleSavedPaper(paper.id)}
+                              className={`p-1.5 rounded-lg transition-all ${
+                                isSaved
+                                  ? 'text-blue-600 hover:bg-blue-50'
+                                  : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'
+                              }`}
+                            >
+                              <Bookmark className="w-5 h-5" fill={isSaved ? 'currentColor' : 'none'} />
+                            </button>
+                          </div>
+                        </div>
 
                   {/* Expandable Abstract & Key Findings */}
-                  <div className="pt-2 border-t border-white/5 flex flex-col gap-2">
+                  <div className="pt-2 flex flex-col gap-2">
                     <button
                       onClick={() => setExpandedPaperId(isExpanded ? null : paper.id)}
-                      className="self-start text-[11px] font-bold text-gray-400 hover:text-cyan-300 transition-colors flex items-center gap-1.5"
+                      className="self-start text-[11px] font-semibold text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1.5"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       {isExpanded ? 'Hide Abstract & Findings' : 'Show Full Abstract & Key Findings'}
@@ -461,14 +414,14 @@ export const SearchPage: React.FC = () => {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="mt-2 p-4 rounded-xl bg-[#060913] border border-white/8 flex flex-col gap-3 text-[12px]"
+                          className="mt-2 p-4 rounded-xl bg-gray-50 border border-gray-100 flex flex-col gap-3 text-[13px]"
                         >
                           {paper.keyFindings && paper.keyFindings.length > 0 && (
                             <div>
-                              <h5 className="text-[10px] font-black uppercase tracking-wider text-purple-400 mb-1.5">
+                              <h5 className="text-[11px] font-bold uppercase tracking-wider text-gray-700 mb-1.5">
                                 Key Empirical Findings:
                               </h5>
-                              <ul className="list-disc list-inside space-y-1 text-gray-300">
+                              <ul className="list-disc list-inside space-y-1 text-gray-600">
                                 {paper.keyFindings.map((kf, i) => (
                                   <li key={i}>{kf}</li>
                                 ))}
@@ -477,10 +430,10 @@ export const SearchPage: React.FC = () => {
                           )}
 
                           <div>
-                            <h5 className="text-[10px] font-black uppercase tracking-wider text-gray-500 mb-1">
+                            <h5 className="text-[11px] font-bold uppercase tracking-wider text-gray-700 mb-1">
                               Abstract:
                             </h5>
-                            <p className="text-gray-300 leading-relaxed">
+                            <p className="text-gray-600 leading-relaxed">
                               {paper.abstract}
                             </p>
                           </div>
@@ -510,13 +463,13 @@ export const SearchPage: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-4 sm:inset-10 z-50 rounded-2xl border border-white/15 bg-[#0a0f1d] shadow-2xl flex flex-col overflow-hidden"
+              className="fixed inset-4 sm:inset-10 z-50 rounded-2xl border border-gray-200 bg-white shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Header */}
-              <div className="p-5 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+              <div className="p-5 border-b border-gray-200 flex items-center justify-between bg-gray-50">
                 <div className="flex items-center gap-2">
-                  <GitCompare className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-[16px] font-black text-white">
+                  <GitCompare className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-[16px] font-bold text-gray-900">
                     Side-by-Side Paper Comparison ({comparisonPapers.length} Papers)
                   </h3>
                 </div>
@@ -528,14 +481,14 @@ export const SearchPage: React.FC = () => {
                       setIsCompareModalOpen(false);
                       setActivePage('chat');
                     }}
-                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-[11px] shadow-md flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-[12px] shadow-sm hover:bg-blue-700 flex items-center gap-1.5 transition-all"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     Synthesize with AI
                   </button>
                   <button
                     onClick={() => setIsCompareModalOpen(false)}
-                    className="p-1.5 text-gray-500 hover:text-white rounded-lg"
+                    className="p-1.5 text-gray-400 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-all"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -543,33 +496,33 @@ export const SearchPage: React.FC = () => {
               </div>
 
               {/* Grid content */}
-              <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-white/10">
+              <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 divide-y md:divide-y-0 md:divide-x divide-gray-200">
                 {comparisonPapers.map(p => (
                   <div key={p.id} className="flex flex-col gap-4 pt-4 md:pt-0 md:px-4 first:pl-0 last:pr-0">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono text-[10px] font-black">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700 font-medium text-[11px]">
                           {p.venue} {p.year}
                         </span>
-                        <span className="text-amber-400 text-[11px] font-mono font-bold flex items-center gap-0.5">
-                          <Star className="w-3 h-3" fill="currentColor" /> {p.citations.toLocaleString()}
+                        <span className="text-amber-500 text-[12px] font-bold flex items-center gap-0.5">
+                          <Star className="w-3.5 h-3.5" fill="currentColor" /> {p.citations.toLocaleString()}
                         </span>
                       </div>
-                      <h4 className="text-[15px] font-black text-white leading-snug">{p.title}</h4>
-                      <p className="text-[11px] text-gray-400 mt-1">{p.authors.join(', ')}</p>
+                      <h4 className="text-[15px] font-bold text-gray-900 leading-snug">{p.title}</h4>
+                      <p className="text-[12px] text-gray-500 mt-1">{p.authors.join(', ')}</p>
                     </div>
 
                     {p.tldr && (
-                      <div className="p-3 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-[12px] text-cyan-200">
-                        <span className="font-bold block text-[10px] text-cyan-400 uppercase mb-1">TL;DR:</span>
+                      <div className="p-3 rounded-xl bg-blue-50 border border-blue-100 text-[13px] text-blue-900 leading-relaxed">
+                        <span className="font-bold block text-[10px] text-blue-600 uppercase mb-1 tracking-wider">TL;DR:</span>
                         {p.tldr}
                       </div>
                     )}
 
                     {p.keyFindings && p.keyFindings.length > 0 && (
                       <div>
-                        <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Key Findings</h5>
-                        <ul className="list-disc list-inside space-y-1 text-[11px] text-gray-300">
+                        <h5 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Key Findings</h5>
+                        <ul className="list-disc list-inside space-y-1 text-[12px] text-gray-700 leading-relaxed">
                           {p.keyFindings.map((kf, i) => (
                             <li key={i}>{kf}</li>
                           ))}
@@ -578,8 +531,8 @@ export const SearchPage: React.FC = () => {
                     )}
 
                     <div>
-                      <h5 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Abstract</h5>
-                      <p className="text-[11px] text-gray-300 leading-relaxed">{p.abstract}</p>
+                      <h5 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Abstract</h5>
+                      <p className="text-[12px] text-gray-600 leading-relaxed">{p.abstract}</p>
                     </div>
                   </div>
                 ))}
