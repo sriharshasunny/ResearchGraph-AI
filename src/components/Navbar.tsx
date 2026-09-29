@@ -24,7 +24,7 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   };
 
   return (
-    <header className="h-20 bg-[#080d1a]/80 backdrop-blur-2xl border-b border-white/10 flex items-center justify-between px-6 sm:px-8 z-40 sticky top-0 relative shadow-lg shadow-black/40">
+    <header className="h-20 shrink-0 bg-[#080d1a]/80 backdrop-blur-2xl border-b border-white/10 flex items-center justify-between px-6 sm:px-8 z-40 sticky top-0 relative shadow-lg shadow-black/40">
       <div className="flex items-center gap-3">
         <h1 className="text-[18px] font-extrabold text-white tracking-tight">{getPageTitle()}</h1>
         <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/25 text-[10px] font-mono font-semibold text-cyan-300">
