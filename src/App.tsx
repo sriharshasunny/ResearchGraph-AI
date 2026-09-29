@@ -10,6 +10,11 @@ import { LaunchSequence } from './features/auth/LaunchSequence';
 import { AuthPage } from './features/auth/AuthPage';
 import { SearchPage } from './features/search/SearchPage';
 import { PaperDetailsPage } from './features/details/PaperDetailsPage';
+import { SavedPage } from './features/saved/SavedPage';
+import { ComparePage } from './features/compare/ComparePage';
+import { LiteratureReviewPage } from './features/literature/LiteratureReviewPage';
+import { ResearchGapsPage } from './features/gaps/ResearchGapsPage';
+import { HistoryPage } from './features/history/HistoryPage';
 
 const MainAppLayout = () => {
   const { activePage } = useApp();
@@ -22,20 +27,25 @@ const MainAppLayout = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.02 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="flex h-screen w-full bg-[#F4F7FB] text-gray-900 overflow-hidden font-sans relative"
+      className="flex h-screen w-full bg-[#F7FAFC] text-gray-900 overflow-hidden font-sans relative"
     >
-      <div className="absolute inset-0 pointer-events-none z-0 bg-[#F4F7FB]">
+      <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC]">
       </div>
       <div className="relative z-10 flex h-full w-full">
         <Sidebar onLogout={handleLogout} />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
           <Navbar onLogout={handleLogout} />
           <main className="flex-1 overflow-x-hidden overflow-y-auto relative z-0">
-            {activePage === 'dashboard' && <Dashboard />}
-            {(activePage === 'chat' || activePage === 'compare' || activePage === 'literature' || activePage === 'gaps' || activePage === 'history') && <ChatPage />}
-            {activePage === 'graph'     && <KnowledgeGraphPage />}
-            {(activePage === 'search' || activePage === 'papers' || activePage === 'saved') && <SearchPage />}
-            {activePage === 'details'   && <PaperDetailsPage />}
+            {activePage === 'dashboard'  && <Dashboard />}
+            {activePage === 'chat'       && <ChatPage />}
+            {activePage === 'graph'      && <KnowledgeGraphPage />}
+            {(activePage === 'search' || activePage === 'papers') && <SearchPage />}
+            {activePage === 'details'    && <PaperDetailsPage />}
+            {activePage === 'saved'      && <SavedPage />}
+            {activePage === 'compare'    && <ComparePage />}
+            {activePage === 'literature' && <LiteratureReviewPage />}
+            {activePage === 'gaps'       && <ResearchGapsPage />}
+            {activePage === 'history'    && <HistoryPage />}
           </main>
         </div>
       </div>

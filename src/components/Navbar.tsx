@@ -19,7 +19,12 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
       case 'graph': return 'Knowledge Graph Explorer';
       case 'search': return 'Discover Papers';
       case 'details': return 'Paper Analysis';
-      default: return 'ResearchGraph';
+      case 'saved': return 'Your Research Library';
+      case 'compare': return 'Paper Comparison Matrix';
+      case 'literature': return 'Literature Review Generator';
+      case 'gaps': return 'Discover Potential Research Gaps';
+      case 'history': return 'Research Activity Timeline';
+      default: return 'ResearchGraph AI';
     }
   };
 

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Sparkles, Bookmark, BookOpen, GitCompare, Activity, MessageSquare } from 'lucide-react';
+import { 
+  Search, ArrowRight, BookOpen, MessageSquare, 
+  GitCompare, Network, Bookmark, Sparkles, Activity, Clock 
+} from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
 export const Dashboard: React.FC = () => {
   const { setActivePage, setSearchQuery, savedPaperIds } = useApp();
@@ -23,130 +27,283 @@ export const Dashboard: React.FC = () => {
     "Find papers about RAG",
     "Compare DINOv2 and MAE",
     "Research gaps in GNNs",
-    "Vision Transformers in agriculture",
-    "Self-supervised learning"
+    "Latest Vision Transformer research",
+    "Self-supervised learning in agriculture"
+  ];
+
+  const quickActions = [
+    { 
+      label: 'Search Papers', 
+      desc: 'Semantic exploration across indexed literature',
+      icon: <Search className="w-5 h-5 text-blue-600" />,
+      onClick: () => setActivePage('search') 
+    },
+    { 
+      label: 'Ask AI', 
+      desc: 'Inquire, synthesize & test research hypotheses',
+      icon: <MessageSquare className="w-5 h-5 text-purple-600" />,
+      onClick: () => setActivePage('chat') 
+    },
+    { 
+      label: 'Compare Papers', 
+      desc: 'Structured side-by-side empirical benchmarking',
+      icon: <GitCompare className="w-5 h-5 text-emerald-600" />,
+      onClick: () => setActivePage('compare') 
+    },
+    { 
+      label: 'Explore Graph', 
+      desc: 'Topological citation & methodology mapping',
+      icon: <Network className="w-5 h-5 text-cyan-600" />,
+      onClick: () => setActivePage('graph') 
+    },
   ];
 
   const recentSessions = [
-    { title: "DINOv2 vs MAE comparison", time: "2 hours ago", type: "Research Session", icon: <GitCompare className="w-4 h-4 text-blue-500" /> },
-    { title: "RAG in Education", time: "4 hours ago", type: "Literature Review", icon: <BookOpen className="w-4 h-4 text-emerald-500" /> },
-    { title: "Plant disease detection literature review", time: "1 day ago", type: "Saved Search", icon: <Bookmark className="w-4 h-4 text-amber-500" /> },
-    { title: "Self-supervised learning gaps", time: "3 days ago", type: "Research Gaps", icon: <Activity className="w-4 h-4 text-purple-500" /> }
+    { 
+      title: "DINOv2 vs MAE comparison", 
+      time: "2 hours ago", 
+      category: "Comparative Benchmark",
+      target: 'compare' as const
+    },
+    { 
+      title: "RAG in Education", 
+      time: "4 hours ago", 
+      category: "AI Literature Review",
+      target: 'literature' as const
+    },
+    { 
+      title: "Plant Disease Detection Literature Review", 
+      time: "1 day ago", 
+      category: "Literature Review",
+      target: 'literature' as const
+    },
+    { 
+      title: "Graph Neural Network Research Gaps", 
+      time: "3 days ago", 
+      category: "Research Gaps Discovery",
+      target: 'gaps' as const
+    }
   ];
 
   return (
-    <div className="flex-1 w-full overflow-y-auto bg-[#F4F7FB] p-4 lg:p-8 scrollbar-thin pb-20">
-      <div className="max-w-[1200px] mx-auto space-y-8">
+    <div className="flex-1 w-full overflow-y-auto bg-[#F7FAFC] p-4 sm:p-6 lg:p-8 scrollbar-thin pb-24">
+      <div className="max-w-[1360px] mx-auto space-y-8">
         
-        {/* HERO SECTION */}
+        {/* ── HERO SECTION: 2-ZONE ENVIRONMENT ── */}
         <motion.div 
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative w-full h-[400px] rounded-3xl overflow-hidden shadow-sm flex flex-col items-center justify-center text-center p-6 bg-blue-900"
+          transition={{ duration: 0.6 }}
+          className="relative w-full rounded-3xl overflow-hidden shadow-xl border border-[#0B1A38]/30 bg-gradient-to-br from-[#06111F] via-[#09152E] to-[#0A1733] text-white p-6 sm:p-8 lg:p-10"
         >
-          {/* We will use a soft space background here, assuming heroImage exists or fallback to a gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 via-blue-900 to-indigo-950">
-            {/* Soft decorative elements to mimic the space background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/20 rounded-full blur-[100px]"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-[80px]"></div>
+          {/* Layered Subtle Space Background Elements */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-blue-600/10 blur-[120px]" />
+            <div className="absolute -bottom-32 right-1/4 w-96 h-96 rounded-full bg-indigo-500/10 blur-[130px]" />
+            <div className="absolute top-1/2 left-1/3 w-80 h-80 rounded-full bg-cyan-500/5 blur-[100px]" />
+            
+            {/* Fine Orbital Curves in Background */}
+            <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
+              <path d="M-100,200 Q400,-50 900,250 T1900,100" fill="none" stroke="#38BDF8" strokeWidth="1" strokeDasharray="6 6" />
+              <path d="M100,500 Q700,100 1300,450" fill="none" stroke="#818CF8" strokeWidth="0.75" />
+            </svg>
           </div>
-          
-          <div className="relative z-10 w-full max-w-3xl flex flex-col items-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
-              What are you<br />researching today?
-            </h1>
-            <p className="text-[15px] text-blue-100 mb-8 font-medium max-w-lg">
-              Explore research. Connect knowledge. Discover new insights.
-            </p>
 
-            <form onSubmit={handleSearch} className="w-full relative group">
-              <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-400 group-focus-within:text-blue-300 transition-colors" />
-              <input
-                type="text"
-                placeholder="Ask anything about academic research..."
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                className="w-full h-14 pl-12 pr-14 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-blue-200/70 focus:outline-none focus:border-white/40 focus:bg-white/20 transition-all text-[15px] shadow-lg"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-2 bottom-2 aspect-square rounded-full bg-blue-500 hover:bg-blue-400 text-white flex items-center justify-center transition-colors"
-              >
-                <Search className="w-5 h-5" />
-              </button>
-            </form>
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* LEFT ZONE: SEARCH & PROMPT CHIPS (7 Cols) */}
+            <div className="lg:col-span-7 flex flex-col justify-center">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold text-cyan-300 mb-4 w-fit backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Next-Gen Academic Research OS</span>
+              </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleQuickTopic(s)}
-                  className="px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 text-[12px] font-medium text-blue-50 hover:text-white transition-colors"
-                >
-                  {s}
-                </button>
-              ))}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15] mb-3">
+                What are you<br />researching today?
+              </h1>
+              
+              <p className="text-[14px] sm:text-[15px] text-gray-300 font-medium mb-7 max-w-xl leading-relaxed">
+                Explore research. Connect knowledge. Discover what's next.
+              </p>
+
+              {/* Large Search Box */}
+              <form onSubmit={handleSearch} className="relative w-full max-w-xl group">
+                <div className="relative flex items-center bg-[#06111F]/90 border border-white/20 group-focus-within:border-cyan-400/80 group-focus-within:ring-2 group-focus-within:ring-cyan-500/20 rounded-2xl p-1.5 shadow-2xl backdrop-blur-xl transition-all">
+                  <div className="pl-3.5 pr-2 text-gray-400 group-focus-within:text-cyan-400 transition-colors">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Ask anything about academic research..."
+                    value={localSearch}
+                    onChange={(e) => setLocalSearch(e.target.value)}
+                    className="flex-1 bg-transparent py-3 pr-3 text-[14px] sm:text-[15px] text-white placeholder-gray-400 focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    title="Search Academic Literature"
+                    className="w-11 h-11 rounded-xl bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-all shadow-md shrink-0 group-hover:scale-[1.02]"
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </form>
+
+              {/* Research Prompt Chips */}
+              <div className="flex flex-wrap items-center gap-2 mt-5 max-w-xl">
+                {suggestions.map((topic, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleQuickTopic(topic)}
+                    className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/12 border border-white/10 hover:border-cyan-400/40 text-[11px] font-medium text-gray-300 hover:text-white transition-all text-left"
+                  >
+                    {topic}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* RIGHT ZONE: RESEARCH KNOWLEDGE CORE (5 Cols) */}
+            <div className="lg:col-span-5 flex items-center justify-center">
+              <ResearchKnowledgeCore />
+            </div>
+
           </div>
         </motion.div>
 
-        {/* STATS & RECENT */}
-        <div className="grid grid-cols-1 gap-8">
+        {/* ── HOME QUICK ACTIONS (4 COMPACT ELEVATED ACTIONS) ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ y: -3, scale: 1.01 }}
+              transition={{ duration: 0.2 }}
+              onClick={action.onClick}
+              className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex items-center gap-3.5"
+            >
+              <div className="w-11 h-11 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0">
+                {action.icon}
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-[14px] font-bold text-gray-900 truncate">{action.label}</h3>
+                <p className="text-[11px] text-gray-500 truncate mt-0.5">{action.desc}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* ── SECTION: RESEARCH OVERVIEW & CONTINUE YOUR RESEARCH ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Research Overview */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4 px-2 tracking-tight">Your Research Overview</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                <Bookmark className="w-6 h-6 text-emerald-500 mb-2" />
-                <span className="text-2xl font-bold text-gray-900">{savedPaperIds.length}</span>
-                <span className="text-[12px] font-medium text-gray-500 mt-1">Saved Papers</span>
+          {/* RESEARCH OVERVIEW (Compact Indicators - 4 Cols) */}
+          <div className="lg:col-span-4 space-y-4">
+            <h2 className="text-[15px] font-bold text-gray-900 tracking-tight flex items-center gap-2">
+              <Activity className="w-4 h-4 text-blue-600" />
+              Research Overview
+            </h2>
+
+            <div className="grid grid-cols-2 gap-3.5">
+              <div 
+                onClick={() => setActivePage('saved')}
+                className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-emerald-300 transition-all cursor-pointer"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <Bookmark className="w-5 h-5 text-emerald-600" />
+                  <span className="text-[10px] font-bold font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">LIBRARY</span>
+                </div>
+                <div className="text-2xl font-black text-gray-900">{savedPaperIds.length || 24}</div>
+                <div className="text-[12px] font-medium text-gray-500 mt-0.5">Saved Papers</div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                <MessageSquare className="w-6 h-6 text-blue-500 mb-2" />
-                <span className="text-2xl font-bold text-gray-900">8</span>
-                <span className="text-[12px] font-medium text-gray-500 mt-1">Research Sessions</span>
+
+              <div 
+                onClick={() => setActivePage('chat')}
+                className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-blue-300 transition-all cursor-pointer"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <MessageSquare className="w-5 h-5 text-blue-600" />
+                  <span className="text-[10px] font-bold font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">ACTIVE</span>
+                </div>
+                <div className="text-2xl font-black text-gray-900">8</div>
+                <div className="text-[12px] font-medium text-gray-500 mt-0.5">Research Sessions</div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                <GitCompare className="w-6 h-6 text-purple-500 mb-2" />
-                <span className="text-2xl font-bold text-gray-900">5</span>
-                <span className="text-[12px] font-medium text-gray-500 mt-1">Comparisons</span>
+
+              <div 
+                onClick={() => setActivePage('compare')}
+                className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-purple-300 transition-all cursor-pointer"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <GitCompare className="w-5 h-5 text-purple-600" />
+                  <span className="text-[10px] font-bold font-mono text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded">MATRIX</span>
+                </div>
+                <div className="text-2xl font-black text-gray-900">5</div>
+                <div className="text-[12px] font-medium text-gray-500 mt-0.5">Comparisons</div>
               </div>
-              <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col items-center justify-center text-center">
-                <BookOpen className="w-6 h-6 text-amber-500 mb-2" />
-                <span className="text-2xl font-bold text-gray-900">3</span>
-                <span className="text-[12px] font-medium text-gray-500 mt-1">Literature Reviews</span>
+
+              <div 
+                onClick={() => setActivePage('literature')}
+                className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-amber-300 transition-all cursor-pointer"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <BookOpen className="w-5 h-5 text-amber-600" />
+                  <span className="text-[10px] font-bold font-mono text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">SYNTHESIS</span>
+                </div>
+                <div className="text-2xl font-black text-gray-900">3</div>
+                <div className="text-[12px] font-medium text-gray-500 mt-0.5">Literature Reviews</div>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Continue Your Research */}
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4 px-2 tracking-tight">Continue Your Research</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* CONTINUE YOUR RESEARCH (Recent Activity List - 8 Cols) */}
+          <div className="lg:col-span-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[15px] font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <Clock className="w-4 h-4 text-blue-600" />
+                Continue Your Research
+              </h2>
+              <button 
+                onClick={() => setActivePage('history')}
+                className="text-[12px] font-medium text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                View All Activity →
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden">
               {recentSessions.map((session, idx) => (
                 <div 
                   key={idx}
-                  className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:border-blue-300 hover:shadow-md transition-all cursor-pointer flex items-center gap-4"
-                  onClick={() => setActivePage('chat')}
+                  onClick={() => setActivePage(session.target)}
+                  className="p-4 hover:bg-gray-50/80 transition-colors cursor-pointer flex items-center justify-between gap-4 group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center border border-gray-100 shrink-0">
-                    {session.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-semibold text-gray-900 truncate">{session.title}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[11px] font-medium text-gray-500">{session.type}</span>
-                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                      <span className="text-[11px] font-medium text-gray-400">{session.time}</span>
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+                      {session.target === 'compare' ? <GitCompare className="w-4 h-4" /> :
+                       session.target === 'literature' ? <BookOpen className="w-4 h-4" /> :
+                       <Activity className="w-4 h-4" />}
                     </div>
+                    <div className="min-w-0">
+                      <h3 className="text-[13px] sm:text-[14px] font-semibold text-gray-900 group-hover:text-blue-600 transition-colors truncate">
+                        {session.title}
+                      </h3>
+                      <div className="flex items-center gap-2 text-[11px] text-gray-500 mt-0.5">
+                        <span className="font-medium text-gray-600">{session.category}</span>
+                        <span>•</span>
+                        <span>{session.time}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all shrink-0">
+                    <span className="text-[12px] font-medium hidden sm:inline">Resume</span>
+                    <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
         </div>
+
       </div>
     </div>
   );
