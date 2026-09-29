@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Sparkles, Bookmark, BookOpen, GitCompare, Activity, MessageSquare, History } from 'lucide-react';
+import { Search, Sparkles, Bookmark, BookOpen, GitCompare, Activity, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
-import heroImage from '../../assets/hero-bg.jpg';
 
 export const Dashboard: React.FC = () => {
   const { setActivePage, setSearchQuery, savedPaperIds } = useApp();

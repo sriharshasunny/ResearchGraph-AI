@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export const Sidebar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const { activePage, setActivePage, isSidebarOpen, toggleSidebar } = useApp();
 
-  const navItems = [
+  const navItems: { id: PageType; label: string; icon: React.ReactNode }[] = [
     { id: 'dashboard', label: 'Home', icon: <Home className="w-5 h-5" /> },
     { id: 'search', label: 'Search', icon: <Search className="w-5 h-5" /> },
     { id: 'chat', label: 'AI Assistant', icon: <MessageSquare className="w-5 h-5" /> },

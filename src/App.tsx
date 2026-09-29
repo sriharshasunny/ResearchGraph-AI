@@ -32,9 +32,9 @@ const MainAppLayout = () => {
           <Navbar onLogout={handleLogout} />
           <main className="flex-1 overflow-x-hidden overflow-y-auto relative z-0">
             {activePage === 'dashboard' && <Dashboard />}
-            {activePage === 'chat'      && <ChatPage />}
+            {(activePage === 'chat' || activePage === 'compare' || activePage === 'literature' || activePage === 'gaps' || activePage === 'history') && <ChatPage />}
             {activePage === 'graph'     && <KnowledgeGraphPage />}
-            {activePage === 'search'    && <SearchPage />}
+            {(activePage === 'search' || activePage === 'papers' || activePage === 'saved') && <SearchPage />}
             {activePage === 'details'   && <PaperDetailsPage />}
           </main>
         </div>

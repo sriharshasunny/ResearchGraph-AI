@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, SortAsc, SortDesc, Bookmark, Network,
-  MessageSquare, ExternalLink, Star, X, BookOpen, ArrowLeft,
-  Check, Copy, Sparkles, GitCompare, ChevronDown, ChevronUp,
+  Search, SortAsc, SortDesc, Bookmark,
+  Star, X, BookOpen, ArrowLeft,
+  Check, Sparkles, GitCompare, ChevronDown, ChevronUp,
   FileText, Download
 } from 'lucide-react';
-import type { Paper } from '../../types';
 
 type SortKey = 'citations' | 'year' | 'title';
 
@@ -32,7 +31,6 @@ export const SearchPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortKey>('citations');
   const [sortDesc, setSortDesc] = useState(true);
   const [expandedPaperId, setExpandedPaperId] = useState<string | null>(null);
-  const [copiedBibtexId, setCopiedBibtexId] = useState<string | null>(null);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   // Sync from context when searchQuery changes
@@ -75,14 +73,6 @@ export const SearchPage: React.FC = () => {
     }
     return sortDesc ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title);
   });
-
-  const handleCopyBibtex = (paper: Paper) => {
-    if (paper.bibtex) {
-      navigator.clipboard.writeText(paper.bibtex);
-      setCopiedBibtexId(paper.id);
-      setTimeout(() => setCopiedBibtexId(null), 2000);
-    }
-  };
 
   const handleSelectPaper = (id: string) => {
     setSelectedPaperId(id);
@@ -396,6 +386,9 @@ export const SearchPage: React.FC = () => {
                             </button>
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* Expandable Abstract & Key Findings */}
                   <div className="pt-2 flex flex-col gap-2">

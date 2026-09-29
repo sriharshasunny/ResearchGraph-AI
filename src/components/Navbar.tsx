@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Command, Search, Sparkles, LogOut } from 'lucide-react';
+import { Bell, Command, Search, Settings, LogOut } from 'lucide-react';
 
 export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
   const { activePage, setSearchQuery, setActivePage } = useApp();
@@ -54,6 +54,16 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
           <button className="relative p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-900 transition-all">
             <Settings className="w-4 h-4" />
           </button>
+
+          {onLogout && (
+            <button 
+              onClick={onLogout}
+              title="Log out"
+              className="relative p-2 rounded-full text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          )}
           
           <div className="h-4 w-[1px] bg-gray-200 mx-1"></div>
           

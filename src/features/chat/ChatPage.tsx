@@ -290,13 +290,20 @@ Would you like me to construct a deeper comparative benchmark or extract mathema
         </div>
 
         {/* Export / Quick helper */}
-        <div className="p-3 border-t border-gray-100 bg-gray-50/50 rounded-b-xl">
+        <div className="p-3 border-t border-gray-100 bg-gray-50/50 rounded-b-xl flex items-center gap-2">
           <button
             onClick={handleExportChat}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 text-[12px] font-medium transition-all"
+            className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-900 text-[12px] font-medium transition-all"
           >
             <Download className="w-3.5 h-3.5" />
-            Export Chat
+            Export
+          </button>
+          <button
+            onClick={clearChat}
+            title="Clear Chat"
+            className="p-2 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-all"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </aside>
