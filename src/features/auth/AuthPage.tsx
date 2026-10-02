@@ -47,7 +47,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [authError, setAuthError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [bgIndex, setBgIndex] = useState(0);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topologySectionRef = useRef<HTMLDivElement>(null);
@@ -165,7 +164,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
       
       {/* --- INTERACTIVE 3D SPACE BACKGROUND --- */}
-      <InteractiveSpaceBackground pageState={pageState} authMode={authMode} bgIndex={bgIndex} />
+      <InteractiveSpaceBackground pageState={pageState} authMode={authMode} />
 
       {/* --- PAGE CONTENT CONTAINER --- */}
       <div 
@@ -254,14 +253,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                 {/* Right Action Buttons: Log In & Sign Up */}
                 <div className="flex items-center gap-2.5 sm:gap-3">
-                  <button 
-                    onClick={() => setBgIndex(prev => prev === 0 ? 1 : 0)} 
-                    className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all px-2.5 sm:px-3 py-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10 flex items-center gap-1.5"
-                    title="Toggle Background"
-                  >
-                    <Layers className="w-4 h-4" />
-                    <span className="hidden sm:inline">BG</span>
-                  </button>
                   <button 
                     onClick={() => triggerTraversal('AUTH', 'LOGIN')} 
                     className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all px-3.5 sm:px-4 py-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10"

@@ -4,13 +4,11 @@ import { motion } from 'framer-motion';
 interface InteractiveSpaceBackgroundProps {
   pageState: 'LANDING' | 'AUTH';
   authMode: 'LOGIN' | 'REGISTER';
-  bgIndex?: number;
 }
 
 export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProps> = ({
   pageState,
-  authMode,
-  bgIndex = 0
+  authMode
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [parallax, setParallax] = useState({ x: 0, y: 0 });
@@ -188,11 +186,11 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712] pointer-events-none select-none">
       
-      {/* Layer 1: Space Background */}
+      {/* Layer 1: Previous Space Background (Subdued/Dulled for optimal UI clarity and depth) */}
       <motion.div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: `url('/user_custom_bg${bgIndex === 1 ? '_2' : ''}.jpg')`,
+          backgroundImage: "url('/user_custom_bg.jpg')",
           transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
           filter: 'none'
         }}
