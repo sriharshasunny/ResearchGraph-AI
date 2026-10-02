@@ -438,8 +438,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     <div className="absolute w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.3)_0%,rgba(99,102,241,0.18)_45%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
 
                     {/* Knowledge Globe Iframe */}
-                    <div className="absolute inset-[-20%] z-10">
-                      <iframe src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto" style={{ background: 'transparent' }} title="Knowledge Globe" />
+                    <div className="absolute inset-[-30%] z-10">
+                      <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto" style={{ background: 'transparent' }} title="Knowledge Globe" />
                     </div>
                   </div>
 

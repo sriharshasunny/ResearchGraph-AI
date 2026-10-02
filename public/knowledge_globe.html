@@ -4,7 +4,7 @@
 <title>ResearchGraph AI – Knowledge Globe</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 html,body{height:100%;margin:0;background:transparent;overflow:hidden;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:#eaf2ff}
 #stage{position:relative;width:100%;height:100%;cursor:grab;touch-action:none;overflow:hidden;cursor:grab;touch-action:none;overflow:hidden}
@@ -47,7 +47,7 @@ html,body{height:100%;margin:0;background:transparent;overflow:hidden;font-famil
 const stage=document.getElementById('stage'),ui=document.getElementById('ui'),lines=document.getElementById('lines'),tint=document.getElementById('tint');
 const W=()=>stage.clientWidth,H=()=>stage.clientHeight,R=2.4,ADD=THREE.AdditiveBlending,DPR=Math.min(devicePixelRatio||1,2),T20=Math.tan(.34907);
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(DPR);stage.insertBefore(renderer.domElement,lines);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setClearColor(0x000000, 0);renderer.setPixelRatio(DPR);stage.insertBefore(renderer.domElement,lines);
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,300);
 const UN={time:{value:0},ps:{value:1},tm:{value:0},tc:{value:new THREE.Color(0x22d3ee)}};
 const world=new THREE.Group(),globe=new THREE.Group();scene.add(world);world.add(globe);world.scale.setScalar(.86);globe.rotation.x=0;
@@ -100,7 +100,7 @@ tags.forEach(([n,c,dx,dy,ct,ic],i)=>{const e=document.createElement('div');e.cla
  els.push({e,dx,dy,ln,dt,off:12});});
 cards.forEach(([n,dx,dy,m,tg,s,a],i)=>{const e=document.createElement('div');e.className='a '+s;e.innerHTML=`<div class="f" style="animation-delay:${-i*1.7}s"><div class="card"><h4>${n}</h4><div class="r">${spark(a,i)}${thumb(i+1)}</div><div class="st">${m}</div><span class="tg">${tg}</span></div></div>`;ui.appendChild(e);els.push({e,dx,dy,off:0});});
 els.forEach((o,i)=>o.e.style.setProperty('--d',(.5+i*.12)+'s'));
-function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Math.min(w*(w<760?.2:.158),h*.235);cx=w/2;cy=h*.47;
+function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Math.min(w*(w<760?.15:.12),h*.18);cx=w/2;cy=h*.47;
  const q=R*(h/2)/(Rpx*T20),d=Math.sqrt(q*q+R*R);cam.position.set(0,0,d);cam.setViewOffset(w,h,w/2-cx,h/2-cy,w,h);cam.updateProjectionMatrix();
  const ts=Rpx*2.6;tint.style.cssText=`width:${ts}px;height:${ts}px;left:${cx-ts/2}px;top:${cy-ts/2}px`;
  els.forEach(o=>{const x=cx+o.dx*Rpx,y=cy+o.dy*Rpx+o.off;o.e.style.left=x+'px';o.e.style.top=y+'px';
