@@ -192,7 +192,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         style={{ 
           backgroundImage: "url('/user_custom_bg.jpg')",
           transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
-          filter: 'none'
+          filter: 'brightness(0.4) saturate(1.2)'
         }}
         initial={false}
         animate={{ 
