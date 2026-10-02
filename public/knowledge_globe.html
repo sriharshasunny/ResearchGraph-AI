@@ -299,10 +299,10 @@ function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Mat
 addEventListener('resize',layout);layout();setTimeout(()=>stage.classList.add('on'),80);
 stage.addEventListener('pointerdown',e=>{if(e.target.closest('.pill,.card'))return;drag=true;lx=e.clientX;ly=e.clientY;});
 addEventListener('pointerup',()=>drag=false);
-stage.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-lx,dy=e.clientY-ly;globe.rotation.y+=dx*.006;globe.rotation.x=Math.max(-.9,Math.min(.9,globe.rotation.x+dy*.006));vyaw=dx*.0045;lx=e.clientX;ly=e.clientY;}else{tx=e.clientX/W()*2-1;ty=e.clientY/H()*2-1;}});
+stage.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-lx,dy=e.clientY-ly;globe.rotation.y=Math.max(-0.6,Math.min(0.6,globe.rotation.y+dx*.006));globe.rotation.x=Math.max(-.9,Math.min(.9,globe.rotation.x+dy*.006));vyaw=dx*.0045;lx=e.clientX;ly=e.clientY;}else{tx=e.clientX/W()*2-1;ty=e.clientY/H()*2-1;}});
 // stage.addEventListener('wheel',e=>{e.preventDefault();zt=Math.max(.8,Math.min(1.5,zt-e.deltaY*.001));},{passive:false});
 (function loop(){requestAnimationFrame(loop);if(!reduce)t+=.016;UN.time.value=t;
- if(!drag){globe.rotation.y+=vyaw;vyaw+=((reduce?0:.0016)-vyaw)*.03;globe.rotation.x+=(0-globe.rotation.x)*.01;}
+ if(!drag){vyaw*=0.95;let tY=tx*0.2+Math.sin(t*0.3)*0.25;globe.rotation.y+=vyaw+(tY-globe.rotation.y)*0.04;let tX=ty*0.15;globe.rotation.x+=(tX-globe.rotation.x)*0.04;globe.rotation.z=Math.sin(t*0.2)*0.06;}
  
  k+=(1-k)*.04;world.scale.setScalar(k);
  sats.forEach(s=>{s.a+=s.v;s.pv.rotation.y=s.a;});
