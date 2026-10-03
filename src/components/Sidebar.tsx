@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { 
   Home, Search, MessageSquare, FileText, Bookmark, 
   GitCompare, Network, BookOpen, Activity, Clock, 
-  ChevronLeft, ChevronRight, LayoutDashboard
+  ChevronLeft, ChevronRight, LayoutDashboard, Settings
 } from 'lucide-react';
 import type { PageType } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -44,9 +44,12 @@ export const Sidebar: React.FC = () => {
     }
   ];
 
+  // On dashboard, force sidebar closed to match exact UI request
+  const effectiveSidebarOpen = activePage === 'dashboard' ? false : isSidebarOpen;
+
   return (
     <motion.aside
-      animate={{ width: isSidebarOpen ? 250 : 76 }}
+      animate={{ width: effectiveSidebarOpen ? 250 : 76 }}
       transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       className="h-full shrink-0 bg-[#06111F] text-white flex flex-col justify-between border-r border-[#0B1A38] z-30 select-none relative transition-all"
     >
@@ -62,7 +65,7 @@ export const Sidebar: React.FC = () => {
               <Network className="w-4 h-4 text-white" />
             </div>
             <AnimatePresence>
-              {isSidebarOpen && (
+              {effectiveSidebarOpen && (
                 <motion.div
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: 'auto' }}
@@ -77,13 +80,15 @@ export const Sidebar: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          <button
-            onClick={toggleSidebar}
-            className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:block"
-            title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-          >
-            {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-          </button>
+          {activePage !== 'dashboard' && (
+            <button
+              onClick={toggleSidebar}
+              className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:block"
+              title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+            >
+              {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            </button>
+          )}
         </div>
 
         {/* ── NAVIGATION GROUPS ── */}
@@ -91,7 +96,7 @@ export const Sidebar: React.FC = () => {
           {navGroups.map((group, groupIdx) => (
             <div key={groupIdx} className="space-y-1">
               <AnimatePresence>
-                {isSidebarOpen && (
+                {effectiveSidebarOpen && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -111,9 +116,9 @@ export const Sidebar: React.FC = () => {
                   return (
                     <button
                       key={item.id}
-                      title={!isSidebarOpen ? item.label : undefined}
+                      title={!effectiveSidebarOpen ? item.label : undefined}
                       onClick={() => setActivePage(item.id as PageType)}
-                      className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl transition-all font-semibold text-[13px] group ${
+                      className={`w-full flex items-center ${effectiveSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl transition-all font-semibold text-[13px] group ${
                         isActive
                           ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
                           : 'text-gray-400 hover:bg-[#0B1A38]/90 hover:text-white'
@@ -123,7 +128,7 @@ export const Sidebar: React.FC = () => {
                         {item.icon}
                       </div>
                       <AnimatePresence>
-                        {isSidebarOpen && (
+                        {effectiveSidebarOpen && (
                           <motion.span
                             initial={{ opacity: 0, width: 0 }}
                             animate={{ opacity: 1, width: 'auto' }}
@@ -145,13 +150,15 @@ export const Sidebar: React.FC = () => {
       
       {/* ── BOTTOM BRAND MARK ── */}
       <div className="p-4 border-t border-[#0B1A38] text-center">
-        {!isSidebarOpen ? (
-          <div className="w-full flex justify-center text-gray-600">
-            <LayoutDashboard className="w-4 h-4" />
+        {!effectiveSidebarOpen ? (
+          <div className="w-full flex flex-col items-center gap-4 text-gray-500">
+            <div title="Dashboard"><LayoutDashboard className="w-5 h-5 hover:text-white transition-colors cursor-pointer" /></div>
+            <div title="Settings"><Settings className="w-5 h-5 hover:text-white transition-colors cursor-pointer" /></div>
           </div>
         ) : (
-          <div className="text-[10px] font-mono text-gray-600 uppercase tracking-widest">
-            v1.0.2 / Enterprise
+          <div className="text-[10px] font-mono text-gray-600 uppercase tracking-widest flex items-center justify-between">
+            <span>v1.0.2 / Enterprise</span>
+            <div title="Settings"><Settings className="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition-colors" /></div>
           </div>
         )}
       </div>

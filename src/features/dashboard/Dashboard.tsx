@@ -94,19 +94,11 @@ export const Dashboard: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full rounded-3xl overflow-hidden shadow-xl border border-[#0B1A38]/30 bg-gradient-to-br from-[#06111F] via-[#09152E] to-[#0A1733] text-white p-6 sm:p-8 lg:p-10"
+          className="relative w-full rounded-3xl overflow-hidden shadow-xl border border-[#0B1A38]/30 bg-[#06111F] text-white p-6 sm:p-8 lg:p-10 bg-cover bg-center"
+          style={{ backgroundImage: "url('/user_custom_bg.jpg')" }}
         >
           {/* Layered Subtle Space Background Elements */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-blue-600/10 blur-[120px]" />
-            <div className="absolute -bottom-32 right-1/4 w-96 h-96 rounded-full bg-indigo-500/10 blur-[130px]" />
-            <div className="absolute top-1/2 left-1/3 w-80 h-80 rounded-full bg-cyan-500/5 blur-[100px]" />
-            
-            {/* Fine Orbital Curves in Background */}
-            <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-              <path d="M-100,200 Q400,-50 900,250 T1900,100" fill="none" stroke="#38BDF8" strokeWidth="1" strokeDasharray="6 6" />
-              <path d="M100,500 Q700,100 1300,450" fill="none" stroke="#818CF8" strokeWidth="0.75" />
-            </svg>
+          <div className="absolute inset-0 pointer-events-none overflow-hidden bg-black/20">
           </div>
 
           <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
@@ -119,7 +111,8 @@ export const Dashboard: React.FC = () => {
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15] mb-3">
-                What are you<br />researching today?
+                What are you<br />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">researching today?</span>
               </h1>
               
               <p className="text-[14px] sm:text-[15px] text-gray-300 font-medium mb-7 max-w-xl leading-relaxed">
