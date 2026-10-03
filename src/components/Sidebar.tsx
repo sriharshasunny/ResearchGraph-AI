@@ -44,12 +44,9 @@ export const Sidebar: React.FC = () => {
     }
   ];
 
-  // On dashboard, force sidebar closed to match exact UI request
-  const effectiveSidebarOpen = activePage === 'dashboard' ? false : isSidebarOpen;
-
   return (
     <motion.aside
-      animate={{ width: effectiveSidebarOpen ? 250 : 76 }}
+      animate={{ width: isSidebarOpen ? 250 : 76 }}
       transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
       className="h-full shrink-0 bg-[#06111F] text-white flex flex-col justify-between border-r border-[#0B1A38] z-30 select-none relative transition-all"
     >
@@ -59,13 +56,13 @@ export const Sidebar: React.FC = () => {
           <div 
             onClick={toggleSidebar}
             className="flex items-center gap-2.5 cursor-pointer overflow-hidden"
-            title={effectiveSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
+            title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
           >
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 hover:bg-blue-500 transition-colors">
               <Network className="w-4 h-4 text-white" />
             </div>
             <AnimatePresence>
-              {effectiveSidebarOpen && (
+              {isSidebarOpen && (
                 <motion.div
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: 'auto' }}
@@ -86,7 +83,7 @@ export const Sidebar: React.FC = () => {
           {navGroups.map((group, groupIdx) => (
             <div key={groupIdx} className="space-y-1">
               <AnimatePresence>
-                {effectiveSidebarOpen && (
+                {isSidebarOpen && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -106,9 +103,9 @@ export const Sidebar: React.FC = () => {
                   return (
                     <button
                       key={item.id}
-                      title={!effectiveSidebarOpen ? item.label : undefined}
+                      title={!isSidebarOpen ? item.label : undefined}
                       onClick={() => setActivePage(item.id as PageType)}
-                      className={`w-full flex items-center ${effectiveSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl transition-all font-semibold text-[13px] group ${
+                      className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl transition-all font-semibold text-[13px] group ${
                         isActive
                           ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
                           : 'text-gray-400 hover:bg-[#0B1A38]/90 hover:text-white'
@@ -118,7 +115,7 @@ export const Sidebar: React.FC = () => {
                         {item.icon}
                       </div>
                       <AnimatePresence>
-                        {effectiveSidebarOpen && (
+                        {isSidebarOpen && (
                           <motion.span
                             initial={{ opacity: 0, width: 0 }}
                             animate={{ opacity: 1, width: 'auto' }}
@@ -140,7 +137,7 @@ export const Sidebar: React.FC = () => {
       
       {/* ── BOTTOM BRAND MARK ── */}
       <div className="p-4 border-t border-[#0B1A38] text-center">
-        {!effectiveSidebarOpen ? (
+        {!isSidebarOpen ? (
           <div className="w-full flex flex-col items-center gap-4 text-gray-500">
             <div title="Dashboard"><LayoutDashboard className="w-5 h-5 hover:text-white transition-colors cursor-pointer" /></div>
             <div title="Settings"><Settings className="w-5 h-5 hover:text-white transition-colors cursor-pointer" /></div>
