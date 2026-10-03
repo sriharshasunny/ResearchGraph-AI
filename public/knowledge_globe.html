@@ -121,7 +121,7 @@ tags.forEach(([n,c,dx,dy,ct,ic],i)=>{const e=document.createElement('div');e.cla
 const KP=[['12.4K','+18%',5],['8.1K','+24%',-3],['18.2K','+31%',-8],['6.1K','+12%',3]];
 cards.forEach(([n,dx,dy,m,tg,s,a],i)=>{const e=document.createElement('div');e.className='a '+s;e.innerHTML=`<div class="f" style="animation-delay:${-i*1.7}s"><div class="card" style="--rz:${KP[i][2]}deg"><div class="bd"><div class="hd"><i></i><h4>${n}</h4><span>2024</span></div><div class="r">${spark(a,i)}${thumb(i+1)}</div><div class="kp"><b>${KP[i][0]}</b><span>cites</span><em>▲ ${KP[i][1]}</em></div><span class="tg">${tg}</span></div></div></div>`;ui.appendChild(e);els.push({e,dx,dy,off:0});});
 els.forEach((o,i)=>o.e.style.setProperty('--d',(.5+i*.12)+'s'));
-function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Math.min(w*(w<760?.17:.146),h*.235);cx=w/2;cy=h*.47;stage.style.setProperty('--s',Math.max(w<400?.6:.7,Rpx/190));
+function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Math.min(w*(w<760?.11:.095),h*.15);cx=w/2;cy=h*.47;stage.style.setProperty('--s',Math.max(w<400?.45:.5,Rpx/190));
  const q=R*(h/2)/(Rpx*T20),d=Math.sqrt(q*q+R*R);cam.position.set(0,0,d);cam.setViewOffset(w,h,w/2-cx,h/2-cy,w,h);cam.updateProjectionMatrix();
  const ts=Rpx*2.6;tint.style.cssText=`width:${ts}px;height:${ts}px;left:${cx-ts/2}px;top:${cy-ts/2}px`;
  const MB=[[-.9,-1.55],[.9,-1.55],[-.95,1.5],[1,1.5],[-1.05,2.1],[1.15,2.1],[0,2.7]];els.forEach((o,ix)=>{if(ix<7){o.dx=w<760?MB[ix][0]:o.dx0;o.dy=w<760?MB[ix][1]:o.dy0}const x=cx+o.dx*Rpx,y=cy+o.dy*Rpx+o.off;o.e.style.left=x+'px';o.e.style.top=y+'px';
