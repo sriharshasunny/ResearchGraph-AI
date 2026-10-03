@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { 
   Home, Search, MessageSquare, FileText, Bookmark, 
   GitCompare, Network, BookOpen, Activity, Clock, 
-  ChevronLeft, ChevronRight, LayoutDashboard, Settings
+  LayoutDashboard, Settings
 } from 'lucide-react';
 import type { PageType } from '../types';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,11 +57,11 @@ export const Sidebar: React.FC = () => {
       <div>
         <div className="h-14 flex items-center justify-between px-4 border-b border-[#0B1A38]">
           <div 
-            onClick={() => setActivePage('dashboard')}
+            onClick={toggleSidebar}
             className="flex items-center gap-2.5 cursor-pointer overflow-hidden"
-            title="Home"
+            title={effectiveSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
           >
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30">
+            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 hover:bg-blue-500 transition-colors">
               <Network className="w-4 h-4 text-white" />
             </div>
             <AnimatePresence>
@@ -79,16 +79,6 @@ export const Sidebar: React.FC = () => {
               )}
             </AnimatePresence>
           </div>
-
-          {activePage !== 'dashboard' && (
-            <button
-              onClick={toggleSidebar}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors hidden sm:block"
-              title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-            >
-              {isSidebarOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-            </button>
-          )}
         </div>
 
         {/* ── NAVIGATION GROUPS ── */}
