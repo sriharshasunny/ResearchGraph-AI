@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Key, Sliders, Download, Check, User, Monitor, Eye, Shield, Bell } from 'lucide-react';
+import { X, Key, Sliders, Check, User, Monitor } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {

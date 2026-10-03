@@ -32,7 +32,7 @@ const MainAppLayout = () => {
       <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC]">
       </div>
       <div className="relative z-10 flex h-full w-full">
-        <Sidebar onLogout={handleLogout} />
+        <Sidebar />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
           <Navbar onLogout={handleLogout} />
           <main className="flex-1 overflow-x-hidden overflow-y-auto relative z-0">

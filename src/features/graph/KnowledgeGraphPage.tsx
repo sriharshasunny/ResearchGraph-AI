@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
-  Network, Search, ZoomIn, ZoomOut, Maximize2, 
+  Network, Search, 
   ExternalLink, MessageSquare, ArrowLeft, X, Filter, Download, PlusCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,15 +14,14 @@ import {
   useEdgesState,
   Handle,
   Position,
-  MarkerType,
   useReactFlow,
   ReactFlowProvider,
   Panel,
-  EdgeProps,
   BaseEdge,
   getBezierPath,
   EdgeLabelRenderer
 } from '@xyflow/react';
+import type { EdgeProps } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import * as d3 from 'd3-force';
 
@@ -108,7 +107,7 @@ const EntityNode = ({ data, selected }: any) => {
 
 // --- CUSTOM EDGE ---
 const RelationEdge = ({
-  id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd, data
+  sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, style = {}, markerEnd, data
 }: EdgeProps) => {
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX, sourceY, sourcePosition, targetPosition, targetX, targetY,
@@ -131,7 +130,7 @@ const RelationEdge = ({
             }}
             className="nodrag nopan bg-[#09152E]/90 border border-blue-500/30 text-blue-400 px-2 py-0.5 rounded text-[9px] font-mono font-bold tracking-wider backdrop-blur-md shadow-lg"
           >
-            {labelText}
+            {labelText as string}
           </div>
         </EdgeLabelRenderer>
       )}
@@ -145,10 +144,10 @@ const edgeTypes = { relation: RelationEdge };
 // --- GRAPH COMPONENT ---
 const GraphCanvas = () => {
   const { setActivePage, setSelectedPaperId, setSearchQuery, uiMode, theme } = useApp();
-  const { fitView, getNodes, setNodes: setRfNodes } = useReactFlow();
+  const { fitView } = useReactFlow();
   
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<any>([]);
   
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('All');
@@ -225,7 +224,7 @@ const GraphCanvas = () => {
     }));
   }, [selectedNodeId, filterType]);
 
-  const onNodeClick = (e: React.MouseEvent, node: any) => {
+  const onNodeClick = (_e: React.MouseEvent, node: any) => {
     setSelectedNodeId(node.id === selectedNodeId ? null : node.id);
   };
 
