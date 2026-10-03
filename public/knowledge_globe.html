@@ -6,8 +6,8 @@
 <style>
 :root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--mono:"JetBrains Mono",ui-monospace,Menlo,monospace}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html,body{height:100%;margin:0;background:#030615;overflow:hidden;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:#eaf2ff}
-#stage{position:relative;width:100%;height:100%;background:radial-gradient(ellipse 60% 55% at 50% 47%,#0b1a4c 0%,#060c2a 55%,#030615 90%);cursor:grab;touch-action:none;overflow:hidden}
+html,body{height:100%;margin:0;background:transparent;overflow:hidden;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:#eaf2ff}
+#stage{position:relative;width:100%;height:100%;cursor:grab;touch-action:none;overflow:hidden}
 #stage:active{cursor:grabbing}
 #stage canvas{position:absolute;inset:0;pointer-events:none}
 #tint{position:absolute;pointer-events:none;border-radius:50%;mix-blend-mode:screen;opacity:0;transition:opacity .4s;background:radial-gradient(circle,color-mix(in srgb,var(--g,#22d3ee) 55%,transparent) 0,transparent 66%)}
@@ -49,19 +49,19 @@ html,body{height:100%;margin:0;background:#030615;overflow:hidden;font-family:In
 #lines .fw{stroke-width:2;stroke-linecap:round;stroke-dasharray:2 13;stroke-opacity:.85;animation:dsh 1.2s linear infinite}@keyframes dsh{to{stroke-dashoffset:-30}}
 #lines .pr{fill:none;stroke-width:1.3;transform-box:fill-box;transform-origin:center;animation:pr 2.2s ease-out infinite}@keyframes pr{from{transform:scale(.5);opacity:.9}to{transform:scale(2.4);opacity:0}}
 .a{transform:translate(-50%,-50%) scale(var(--s,1))}
-@media (max-width:1000px){.card{display:none}}@media (max-width:760px){.hud,#lines{display:none}}
+@media (max-width:760px){.card{display:none}}@media (max-width:760px){.hud,#lines{display:none}}
 @media (prefers-reduced-motion:reduce){.f{animation:none}}
 </style></head>
 <body>
-<div id="stage"><div class="hz"></div><div id="tint"></div><svg id="lines"></svg><div id="ui"></div>
-<div class="hud"><span>CANOPY PRESSURIZED</span><span>GRAPH TOPOLOGY: ACTIVE</span><span>45 SOURCES SYNCHRONIZED</span><span>LIVE</span></div><div class="sc">DRAG TO ROTATE · CLICK A LABEL</div></div>
+<div id="stage"><div id="tint"></div><svg id="lines"></svg><div id="ui"></div>
+<div class="sc">DRAG TO ROTATE · CLICK A LABEL</div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
 const stage=document.getElementById('stage'),ui=document.getElementById('ui'),lines=document.getElementById('lines'),tint=document.getElementById('tint');
 const W=()=>stage.clientWidth,H=()=>stage.clientHeight,R=2.4,ADD=THREE.AdditiveBlending,DPR=Math.min(devicePixelRatio||1,2),T20=Math.tan(.261799);
 const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(DPR);stage.insertBefore(renderer.domElement,lines);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setClearColor(0x000000, 0);renderer.setPixelRatio(DPR);stage.insertBefore(renderer.domElement,lines);
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(30,1,.1,300);
 const UN={time:{value:0},ps:{value:1},tm:{value:0},tc:{value:new THREE.Color(0x22d3ee)}};
 const world=new THREE.Group(),globe=new THREE.Group();scene.add(world);world.add(globe);world.scale.setScalar(.86);globe.rotation.x=0;
