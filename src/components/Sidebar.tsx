@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   Home, Search, MessageSquare, FileText, Bookmark, 
@@ -6,7 +6,6 @@ import {
   LayoutDashboard, Settings
 } from 'lucide-react';
 import type { PageType } from '../types';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export const Sidebar: React.FC = () => {
   const { activePage, setActivePage, isSidebarOpen, toggleSidebar } = useApp();
@@ -44,117 +43,151 @@ export const Sidebar: React.FC = () => {
     }
   ];
 
+  const handleNavClick = useCallback((id: string) => {
+    setActivePage(id as PageType);
+    // Auto-close sidebar after navigation for clean UX
+    if (isSidebarOpen) toggleSidebar();
+  }, [setActivePage, isSidebarOpen, toggleSidebar]);
+
+  // Flatten items to compute stagger delay index
+  let globalItemIndex = 0;
+
   return (
     <div className="w-[76px] shrink-0 relative z-[9999]">
-      <motion.aside
-        animate={{ width: isSidebarOpen ? 250 : 76 }}
-        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute inset-y-0 left-0 bg-[#06111F] text-white flex flex-col justify-between border-r border-[#0B1A38] select-none transition-all shadow-2xl"
+      {/* ── BACKDROP OVERLAY (visible when open) ── */}
+      <div 
+        onClick={toggleSidebar}
+        className={`fixed inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity duration-300 ${
+          isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ zIndex: 9998 }}
+      />
+
+      {/* ── SIDEBAR PANEL ── */}
+      <aside
+        style={{
+          width: isSidebarOpen ? 250 : 76,
+          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          zIndex: 9999,
+        }}
+        className="absolute inset-y-0 left-0 bg-[#06111F] text-white flex flex-col justify-between border-r border-[#0B1A38] select-none overflow-hidden"
       >
         {/* ── TOP BRAND & TOGGLE ── */}
-        <div>
-          <div className="h-14 flex items-center justify-between px-4 border-b border-[#0B1A38]">
+        <div className="flex flex-col flex-1 min-h-0">
+          <div className="h-14 flex items-center px-4 border-b border-[#0B1A38] shrink-0">
             <div 
               onClick={toggleSidebar}
-              className="flex items-center gap-2.5 cursor-pointer overflow-hidden"
+              className="flex items-center gap-3 cursor-pointer group"
               title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
             >
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 hover:bg-blue-500 transition-colors">
-                <Network className="w-4 h-4 text-white" />
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 group-hover:bg-blue-500 group-hover:shadow-blue-500/40 transition-all duration-200 group-hover:scale-105">
+                <Network className="w-[18px] h-[18px] text-white" />
               </div>
-              <AnimatePresence>
-                {isSidebarOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    className="whitespace-nowrap overflow-hidden"
-                  >
-                    <span className="font-extrabold text-[14px] tracking-tight text-white block">
-                      ResearchGraph
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <span 
+                className="font-extrabold text-[14px] tracking-tight text-white whitespace-nowrap overflow-hidden transition-all duration-300"
+                style={{
+                  maxWidth: isSidebarOpen ? 160 : 0,
+                  opacity: isSidebarOpen ? 1 : 0,
+                }}
+              >
+                ResearchGraph
+              </span>
             </div>
           </div>
 
           {/* ── NAVIGATION GROUPS ── */}
-          <nav className={`py-6 px-3 overflow-y-auto max-h-[calc(100vh-60px)] scrollbar-thin flex flex-col ${isSidebarOpen ? 'gap-6' : 'gap-2 items-center'}`}>
-            {navGroups.map((group, groupIdx) => (
-              <div key={groupIdx} className={`flex flex-col ${isSidebarOpen ? 'gap-1' : 'gap-2 w-full'}`}>
-                <AnimatePresence>
-                  {isSidebarOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="px-2 pb-1 overflow-hidden"
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden py-5 px-3 scrollbar-thin">
+            <div className="flex flex-col gap-5">
+              {navGroups.map((group, groupIdx) => {
+                return (
+                  <div key={groupIdx} className="flex flex-col gap-0.5">
+                    {/* Group Title */}
+                    <div 
+                      className="h-5 flex items-center px-2 mb-1 overflow-hidden transition-all duration-300"
+                      style={{
+                        maxHeight: isSidebarOpen ? 20 : 0,
+                        opacity: isSidebarOpen ? 1 : 0,
+                        marginBottom: isSidebarOpen ? 4 : 0,
+                      }}
                     >
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
                         {group.title}
                       </span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-                
-                <div className={`flex flex-col ${isSidebarOpen ? 'gap-1' : 'gap-2 items-center w-full'}`}>
-                  {group.items.map((item) => {
-                    const isActive = activePage === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        title={!isSidebarOpen ? item.label : undefined}
-                        onClick={() => setActivePage(item.id as PageType)}
-                        className={`relative flex items-center rounded-xl transition-all font-semibold text-[13px] group overflow-hidden ${
-                          isSidebarOpen 
-                            ? 'w-full gap-3 px-3 py-2.5' 
-                            : 'justify-center w-11 h-11 shrink-0'
-                        } ${
-                          isActive
-                            ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
-                            : 'text-gray-400 hover:bg-[#0B1A38]/90 hover:text-white'
-                        }`}
-                      >
-                        <div className={`shrink-0 transition-transform duration-200 ${isActive ? 'scale-105 text-white' : 'group-hover:scale-110'}`}>
-                          {item.icon}
-                        </div>
-                        <AnimatePresence>
-                          {isSidebarOpen && (
-                            <motion.span
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
-                              className="whitespace-nowrap text-left flex-1"
+                    </div>
+
+                    {/* Nav Items */}
+                    <div className="flex flex-col gap-0.5">
+                      {group.items.map((item) => {
+                        const isActive = activePage === item.id;
+                        const itemDelay = globalItemIndex * 0.03;
+                        globalItemIndex++;
+                        return (
+                          <button
+                            key={item.id}
+                            title={!isSidebarOpen ? item.label : undefined}
+                            onClick={() => handleNavClick(item.id)}
+                            className={`
+                              relative flex items-center rounded-xl transition-all duration-200 font-semibold text-[13px] group
+                              ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center py-2.5 mx-auto w-[50px]'}
+                              ${isActive
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                              }
+                            `}
+                          >
+                            <div className={`shrink-0 transition-all duration-200 ${isActive ? 'text-white scale-105' : 'group-hover:scale-110 group-hover:text-white'}`}>
+                              {item.icon}
+                            </div>
+                            <span
+                              className="whitespace-nowrap text-left flex-1 overflow-hidden transition-all duration-300"
+                              style={{
+                                maxWidth: isSidebarOpen ? 180 : 0,
+                                opacity: isSidebarOpen ? 1 : 0,
+                                transitionDelay: isSidebarOpen ? `${itemDelay}s` : '0s',
+                              }}
                             >
                               {item.label}
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </nav>
         </div>
         
-        {/* ── BOTTOM BRAND MARK ── */}
-        <div className="p-4 border-t border-[#0B1A38] text-center">
+        {/* ── BOTTOM FOOTER ── */}
+        <div className="p-3 border-t border-[#0B1A38] shrink-0">
           {!isSidebarOpen ? (
-            <div className="w-full flex flex-col items-center gap-4 text-gray-500">
-              <div title="Dashboard"><LayoutDashboard className="w-5 h-5 hover:text-white transition-colors cursor-pointer" /></div>
-              <div title="Settings"><Settings className="w-5 h-5 hover:text-white transition-colors cursor-pointer" /></div>
+            <div className="flex flex-col items-center gap-3 text-gray-500">
+              <div className="p-2 rounded-lg hover:bg-white/[0.06] hover:text-white transition-all duration-200 cursor-pointer" title="Dashboard">
+                <LayoutDashboard className="w-[18px] h-[18px]" />
+              </div>
+              <div className="p-2 rounded-lg hover:bg-white/[0.06] hover:text-white transition-all duration-200 cursor-pointer" title="Settings">
+                <Settings className="w-[18px] h-[18px]" />
+              </div>
             </div>
           ) : (
-            <div className="text-[10px] font-mono text-gray-600 uppercase tracking-widest flex items-center justify-between">
-              <span>v1.0.2 / Enterprise</span>
-              <div title="Settings"><Settings className="w-4 h-4 text-gray-400 hover:text-white cursor-pointer transition-colors" /></div>
+            <div className="flex items-center justify-between px-2">
+              <span
+                className="text-[10px] font-mono text-gray-600 uppercase tracking-widest whitespace-nowrap overflow-hidden transition-all duration-300"
+                style={{
+                  maxWidth: isSidebarOpen ? 150 : 0,
+                  opacity: isSidebarOpen ? 1 : 0,
+                }}
+              >
+                v1.0.2 / Enterprise
+              </span>
+              <div className="p-1.5 rounded-lg hover:bg-white/[0.06] transition-all duration-200 cursor-pointer" title="Settings">
+                <Settings className="w-4 h-4 text-gray-500 hover:text-white transition-colors" />
+              </div>
             </div>
           )}
         </div>
-      </motion.aside>
+      </aside>
     </div>
   );
 };
