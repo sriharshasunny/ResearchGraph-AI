@@ -133,7 +133,6 @@ function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Mat
    x=cx+o.dx*Rpx; y=cy+o.dy*Rpx+o.off;
    bw=120*sv; bh=40*sv;
   }else{
-   if(w<1000){o.e.style.display='none'; return;}
    o.e.style.display='';
    bw=222*sv; bh=120*sv;
    x=o.dx0<0 ? 24+bw/2 : w-24-bw/2;
@@ -160,7 +159,7 @@ function layout(){const w=W(),h=H();renderer.setSize(w,h);cam.aspect=w/h;Rpx=Mat
   }
  }
  els.forEach((o,ix)=>{
-  if(ix>=7 && w<1000) return;
+  
   o.e.style.left=o.tx+'px'; o.e.style.top=o.ty+'px';
   if(o.ln){
    const L=Math.hypot(o.tx-cx,o.ty-cy)/Rpx, q2=.86/L, x2=cx+(o.tx-cx)*q2, y2=cy+(o.ty-cy)*q2, y0=o.ty-o.off;
