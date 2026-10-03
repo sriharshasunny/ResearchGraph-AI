@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { GitCompare, ArrowLeft, Plus, X, Sparkles, Download, Search, CheckCircle2, AlertTriangle, LayoutPanelLeft } from 'lucide-react';
+import { GitCompare, ArrowLeft, Plus, X, Sparkles, Download, Search, CheckCircle2, AlertTriangle, LayoutPanelLeft, MessageSquare } from 'lucide-react';
 
 export const ComparePage: React.FC = () => {
   const {
@@ -180,10 +180,19 @@ export const ComparePage: React.FC = () => {
         {/* ── AI SUMMARY BOX ── */}
         {selectedPapers.length >= 2 && (
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm shrink-0">
-            <h2 className="text-[14px] font-bold text-gray-900 flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-blue-600" />
-              AI Summary: Which should I use?
-            </h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[14px] font-bold text-gray-900 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-blue-600" />
+                AI Summary: Which should I use?
+              </h2>
+              <button
+                onClick={handleAskAIAboutComparison}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-[12px] font-semibold transition-colors shadow-sm"
+              >
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Ask AI About Comparison</span>
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[13px] text-gray-700">
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
@@ -196,7 +205,10 @@ export const ComparePage: React.FC = () => {
                 </div>
               </div>
               <div className="bg-white/60 p-3 rounded-xl border border-white">
-                <p className="font-medium text-gray-900 mb-1">Key Conflict:</p>
+                <p className="font-medium text-gray-900 mb-1 flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Key Conflict:</span>
+                </p>
                 <p>The papers disagree on the necessity of <span className="font-mono text-xs bg-gray-200 px-1 rounded">reconstruction</span> vs <span className="font-mono text-xs bg-gray-200 px-1 rounded">distillation</span>. MAE argues pixel reconstruction forces holistic understanding, while DINOv2 claims it wastes capacity on high-frequency noise.</p>
               </div>
             </div>

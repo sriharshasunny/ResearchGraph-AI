@@ -48,9 +48,9 @@ export const ResearchKnowledgeCore: React.FC = () => {
   ];
 
   return (
-    <div className="relative w-full h-[380px] lg:h-[420px] flex items-center justify-center select-none overflow-hidden">
+    <div className="relative w-full h-[420px] lg:h-[460px] flex items-center justify-center select-none">
       
-      <div className="absolute transform scale-[0.6] sm:scale-75 md:scale-90 lg:scale-100 flex items-center justify-center pointer-events-none">
+      <div className="absolute transform scale-90 sm:scale-95 md:scale-100 lg:scale-100 flex items-center justify-center pointer-events-none">
         
         {/* Ambient Celestial Glow Behind Core */}
         <div className="absolute w-[340px] h-[340px] rounded-full bg-blue-600/15 blur-[90px] pointer-events-none" />

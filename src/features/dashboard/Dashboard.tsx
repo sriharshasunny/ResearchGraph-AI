@@ -324,6 +324,13 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* ── GROUNDING & VERIFICATION NOTICE ── */}
+        <div className="pt-4 border-t border-gray-200 text-center">
+          <p className="text-[12px] text-gray-500 font-medium">
+            Answers and graph relationships are grounded in indexed peer-reviewed literature. Always verify critical findings with primary citations.
+          </p>
+        </div>
+
       </div>
     </div>
   );
