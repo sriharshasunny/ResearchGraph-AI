@@ -23,7 +23,7 @@ import {
 } from '@xyflow/react';
 import type { EdgeProps } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import * as d3 from 'd3-force';
+import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force';
 
 // --- DATA TYPES ---
 interface EntityData {
@@ -160,11 +160,11 @@ const GraphCanvas = () => {
     const simulationNodes = rawNodes.map(n => ({ ...n, x: Math.random() * 500, y: Math.random() * 500 }));
     const simulationLinks = rawEdges.map(e => ({ source: e.source, target: e.target, relation: e.relation, verb: e.verb }));
 
-    const simulation = d3.forceSimulation(simulationNodes as any)
-      .force('link', d3.forceLink(simulationLinks).id((d: any) => d.id).distance(150))
-      .force('charge', d3.forceManyBody().strength(-800))
-      .force('center', d3.forceCenter(400, 300))
-      .force('collide', d3.forceCollide().radius(60))
+    const simulation = forceSimulation(simulationNodes as any)
+      .force('link', forceLink(simulationLinks).id((d: any) => d.id).distance(150))
+      .force('charge', forceManyBody().strength(-800))
+      .force('center', forceCenter(400, 300))
+      .force('collide', forceCollide().radius(60))
       .stop();
 
     // Run simulation synchronously for initial layout
