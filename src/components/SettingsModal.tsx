@@ -1,100 +1,151 @@
 import React, { useState, useEffect } from 'react';
-import { X, Key, Sliders, Check, User, Monitor } from 'lucide-react';
+import { 
+  X, Key, Sliders, Check, User, Monitor, 
+  Keyboard, Shield, Database, Eye, EyeOff, 
+  Download, Trash2
+} from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
 export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { theme, setTheme, uiMode, setUIMode } = useApp();
-  const [activeTab, setActiveTab] = useState('appearance');
+  const [activeTab, setActiveTab] = useState<'appearance' | 'preferences' | 'integrations' | 'account' | 'privacy' | 'shortcuts'>('appearance');
   
-  // States
-  const [openAlexKey, setOpenAlexKey] = useState('');
-  const [semanticScholarKey, setSemanticScholarKey] = useState('');
+  // Appearance states
+  const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable');
+  const [textSize, setTextSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [graphLabelSize, setGraphLabelSize] = useState(12);
+
+  // Preferences states
   const [exportFormat, setExportFormat] = useState('bibtex');
-  
-  // Auto-save toast
+  const [groundingStrictness, setGroundingStrictness] = useState<'strict' | 'exploratory'>('strict');
+  const [autoSyncLibrary, setAutoSyncLibrary] = useState(true);
+
+  // Integrations states
+  const [openAlexKey, setOpenAlexKey] = useState('sk-alex-••••••••••••••••');
+  const [semanticScholarKey, setSemanticScholarKey] = useState('sk-sem-••••••••••••••••');
+  const [showAlexKey, setShowAlexKey] = useState(false);
+  const [showSemanticKey, setShowSemanticKey] = useState(false);
+  const [zoteroConnected, setZoteroConnected] = useState(true);
+  const [mendeleyConnected, setMendeleyConnected] = useState(false);
+
+  // Account states
+  const [email] = useState('jane.doe@stanford.edu');
+  const [name, setName] = useState('Dr. Jane Doe');
+
+  // Auto-save toast & Undo State
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [lastChangedSetting, setLastChangedSetting] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
-    
-    // Simulate auto-save on value change
+    setSaveStatus('saving');
     const timer = setTimeout(() => {
-      if (openAlexKey || semanticScholarKey) {
-        setSaveStatus('saving');
-        setTimeout(() => setSaveStatus('saved'), 600);
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      }
-    }, 1000);
+      setSaveStatus('saved');
+      const reset = setTimeout(() => setSaveStatus('idle'), 2000);
+      return () => clearTimeout(reset);
+    }, 400);
     return () => clearTimeout(timer);
-  }, [openAlexKey, semanticScholarKey, exportFormat, theme, uiMode, isOpen]);
+  }, [theme, uiMode, density, textSize, reducedMotion, graphLabelSize, exportFormat, groundingStrictness, autoSyncLibrary, openAlexKey, semanticScholarKey, name, isOpen]);
 
   if (!isOpen) return null;
 
   const tabs = [
     { id: 'appearance', label: 'Appearance', icon: <Monitor className="w-4 h-4" /> },
-    { id: 'integrations', label: 'Integrations', icon: <Key className="w-4 h-4" /> },
-    { id: 'preferences', label: 'Preferences', icon: <Sliders className="w-4 h-4" /> },
+    { id: 'preferences', label: 'Research Preferences', icon: <Sliders className="w-4 h-4" /> },
+    { id: 'integrations', label: 'Integrations & API', icon: <Key className="w-4 h-4" /> },
     { id: 'account', label: 'Account', icon: <User className="w-4 h-4" /> },
-  ];
+    { id: 'privacy', label: 'Privacy & Data', icon: <Shield className="w-4 h-4" /> },
+    { id: 'shortcuts', label: 'Shortcuts & A11y', icon: <Keyboard className="w-4 h-4" /> },
+  ] as const;
+
+  const handleExportData = () => {
+    const data = {
+      theme,
+      uiMode,
+      exportFormat,
+      groundingStrictness,
+      exportDate: new Date().toISOString()
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ResearchGraph-Settings-Backup.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-3xl h-[600px] flex bg-white dark:bg-[#0B1A38] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden text-gray-900 dark:text-gray-100">
+    <div className="fixed inset-0 z-50 bg-black/60 dark:bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="w-full max-w-4xl h-[640px] flex flex-col sm:flex-row bg-white dark:bg-[#0B1A38] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden text-gray-900 dark:text-gray-100">
         
         {/* Sidebar Tabs */}
-        <div className="w-64 bg-gray-50 dark:bg-[#06111F] border-r border-gray-200 dark:border-gray-800 flex flex-col">
+        <div className="w-full sm:w-64 bg-gray-50 dark:bg-[#06111F] border-r border-gray-200 dark:border-gray-800 flex flex-col shrink-0">
           <div className="p-6 pb-2">
             <h2 className="text-lg font-bold flex items-center gap-2 text-gray-900 dark:text-white">
               <Sliders className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               Settings
             </h2>
           </div>
-          <nav className="flex-1 px-4 py-4 space-y-1">
+          <nav className="flex-1 px-4 py-3 space-y-1 overflow-y-auto scrollbar-thin">
             {tabs.map(tab => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs sm:text-[13px] font-semibold transition-all ${
                   activeTab === tab.id 
-                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-400' 
+                    ? 'bg-blue-100 text-blue-700 dark:bg-blue-600/20 dark:text-blue-400 shadow-xs' 
                     : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800'
                 }`}
               >
                 {tab.icon}
-                {tab.label}
+                <span>{tab.label}</span>
               </button>
             ))}
           </nav>
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
-            <h3 className="font-bold text-lg capitalize">{activeTab}</h3>
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-800">
+            <h3 className="font-bold text-base capitalize">{activeTab}</h3>
             <div className="flex items-center gap-4">
-              {/* Auto-save toast inline */}
-              <span className={`text-xs font-semibold flex items-center gap-1 transition-opacity duration-300 ${saveStatus === 'idle' ? 'opacity-0' : 'opacity-100'} ${saveStatus === 'saved' ? 'text-emerald-500' : 'text-gray-500'}`}>
+              {/* Auto-save toast indicator */}
+              <span className={`text-xs font-semibold flex items-center gap-1 transition-opacity duration-300 ${saveStatus === 'idle' ? 'opacity-0' : 'opacity-100'} ${saveStatus === 'saved' ? 'text-emerald-600' : 'text-gray-400'}`}>
                 {saveStatus === 'saved' && <Check className="w-3.5 h-3.5" />}
-                {saveStatus === 'saving' ? 'Saving...' : 'Saved'}
+                {saveStatus === 'saving' ? 'Autosaving...' : `${lastChangedSetting || 'Settings'} saved`}
               </span>
-              <button onClick={onClose} className="p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <button 
+                onClick={onClose} 
+                className="p-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
           </div>
           
-          <div className="p-6 overflow-y-auto flex-1 space-y-8">
+          <div className="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-thin">
             
+            {/* ── APPEARANCE TAB ── */}
             {activeTab === 'appearance' && (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">Theme Preference</h4>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Color Theme</h4>
+                  <p className="text-xs text-gray-500 mb-3">Live system adaptation with zero flash.</p>
                   <div className="grid grid-cols-3 gap-3">
                     {['light', 'dark', 'system'].map(t => (
                       <button 
                         key={t}
-                        onClick={() => setTheme(t as any)}
-                        className={`p-3 rounded-xl border text-sm font-semibold capitalize transition-all ${theme === t ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'}`}
+                        onClick={() => {
+                          setTheme(t as any);
+                          setLastChangedSetting('Theme');
+                        }}
+                        className={`p-3 rounded-xl border text-xs font-bold uppercase transition-all ${
+                          theme === t 
+                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 shadow-xs' 
+                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                        }`}
                       >
                         {t}
                       </button>
@@ -103,88 +154,343 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                 </div>
 
                 <div>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Interface Density</h4>
+                  <p className="text-xs text-gray-500 mb-3">Adjust row heights and padding across views.</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button 
+                      onClick={() => setDensity('comfortable')}
+                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                        density === 'comfortable' ? 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300' : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <div className="font-bold text-xs">Comfortable</div>
+                      <div className="text-[11px] text-gray-500 mt-0.5">Generous spacing, optimal readability.</div>
+                    </button>
+                    <button 
+                      onClick={() => setDensity('compact')}
+                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                        density === 'compact' ? 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300' : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <div className="font-bold text-xs">Compact</div>
+                      <div className="text-[11px] text-gray-500 mt-0.5">High information density for large displays.</div>
+                    </button>
+                  </div>
+                </div>
+
+                <div>
                   <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">UI Mode</h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Toggle between simple reading mode and expert analytical mode.</p>
+                  <p className="text-xs text-gray-500 mb-3">Toggle simple intuition vs expert mathematical rigor.</p>
                   <div className="grid grid-cols-2 gap-3">
                     <button 
                       onClick={() => setUIMode('simple')}
-                      className={`p-4 rounded-xl border text-left transition-all ${uiMode === 'simple' ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'border-gray-200 dark:border-gray-700'}`}
+                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                        uiMode === 'simple' ? 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300' : 'border-gray-200 dark:border-gray-700'
+                      }`}
                     >
-                      <div className="font-bold text-sm">Simple Mode</div>
-                      <div className="text-xs mt-1 opacity-80">Clean interface, fewer technical details.</div>
+                      <div className="font-bold text-xs">Simple Mode</div>
+                      <div className="text-[11px] text-gray-500 mt-0.5">Intuitive layman summaries and accessible metaphors.</div>
                     </button>
                     <button 
-                      onClick={() => setUIMode('expert')}
-                      className={`p-4 rounded-xl border text-left transition-all ${uiMode === 'expert' ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'border-gray-200 dark:border-gray-700'}`}
+                      onClick={() => {
+                        setUIMode('expert');
+                        setLastChangedSetting('UI Mode');
+                      }}
+                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                        uiMode === 'expert' ? 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/30 dark:text-blue-300' : 'border-gray-200 dark:border-gray-700'
+                      }`}
                     >
-                      <div className="font-bold text-sm">Expert Mode</div>
-                      <div className="text-xs mt-1 opacity-80">Full database schemas, advanced graph algorithms.</div>
+                      <div className="font-bold text-xs">Expert Mode</div>
+                      <div className="text-[11px] text-gray-500 mt-0.5">Full equations and parameters.</div>
                     </button>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Text Size</h4>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['small', 'medium', 'large'] as const).map(sz => (
+                      <button
+                        key={sz}
+                        onClick={() => {
+                          setTextSize(sz);
+                          setLastChangedSetting('Text Size');
+                        }}
+                        className={`p-2.5 rounded-xl border text-xs font-semibold capitalize transition-all ${
+                          textSize === sz ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'border-gray-200 dark:border-gray-700'
+                        }`}
+                      >
+                        {sz}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-xs text-gray-900 dark:text-gray-100">Reduced Motion</h5>
+                    <p className="text-[11px] text-gray-500">Minimize animations and transition effects.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={reducedMotion}
+                    onChange={(e) => {
+                      setReducedMotion(e.target.checked);
+                      setLastChangedSetting('Reduced Motion');
+                    }}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
+
+                {/* Graph Label Size Slider */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">Knowledge Graph Node Label Size</h4>
+                    <span className="font-mono text-xs text-blue-600 font-bold">{graphLabelSize}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={10}
+                    max={18}
+                    value={graphLabelSize}
+                    onChange={(e) => setGraphLabelSize(parseInt(e.target.value))}
+                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-400">
+                    <span>10px (Dense)</span>
+                    <span>14px (Standard)</span>
+                    <span>18px (High Visibility)</span>
                   </div>
                 </div>
               </div>
             )}
 
-            {activeTab === 'integrations' && (
-              <div className="space-y-6">
-                <div>
-                  <label className="text-sm font-bold text-gray-900 dark:text-gray-100 block mb-1">OpenAlex API Key</label>
-                  <input
-                    type="password"
-                    placeholder="Enter OpenAlex token..."
-                    value={openAlexKey}
-                    onChange={(e) => setOpenAlexKey(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-bold text-gray-900 dark:text-gray-100 block mb-1">Semantic Scholar API Key</label>
-                  <input
-                    type="password"
-                    placeholder="Enter Semantic Scholar key..."
-                    value={semanticScholarKey}
-                    onChange={(e) => setSemanticScholarKey(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 focus:bg-white dark:focus:bg-gray-900 focus:outline-none focus:border-blue-500 transition-colors text-sm"
-                  />
-                </div>
-              </div>
-            )}
-
+            {/* ── PREFERENCES TAB ── */}
             {activeTab === 'preferences' && (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">Default Citation Format</h4>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['bibtex', 'apa', 'ris'].map(fmt => (
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Default Citation Format</h4>
+                  <p className="text-xs text-gray-500 mb-3">Applied automatically when copying paper citations.</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {['bibtex', 'apa', 'mla', 'ris'].map(fmt => (
                       <button 
                         key={fmt}
                         onClick={() => setExportFormat(fmt)}
-                        className={`p-2.5 rounded-xl border text-sm font-bold uppercase transition-all ${exportFormat === fmt ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'}`}
+                        className={`p-2.5 rounded-xl border text-xs font-bold uppercase transition-all ${
+                          exportFormat === fmt ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 shadow-xs' : 'border-gray-200 dark:border-gray-700'
+                        }`}
                       >
                         {fmt}
                       </button>
                     ))}
                   </div>
                 </div>
+
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">AI Grounding Strictness</h4>
+                  <div className="grid grid-cols-2 gap-3 mt-2">
+                    <button
+                      onClick={() => setGroundingStrictness('strict')}
+                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                        groundingStrictness === 'strict' ? 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <div className="font-bold text-xs">Strict Attribution</div>
+                      <div className="text-[11px] text-gray-500 mt-0.5">Only cite verified publications in the active corpus.</div>
+                    </button>
+                    <button
+                      onClick={() => setGroundingStrictness('exploratory')}
+                      className={`p-3.5 rounded-xl border text-left transition-all ${
+                        groundingStrictness === 'exploratory' ? 'border-blue-500 bg-blue-50 text-blue-900 dark:bg-blue-900/30' : 'border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <div className="font-bold text-xs">Exploratory Synthesis</div>
+                      <div className="text-[11px] text-gray-500 mt-0.5">Allow cross-disciplinary hypotheses generation.</div>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-xs text-gray-900 dark:text-gray-100">Auto-sync library with cloud</h5>
+                    <p className="text-[11px] text-gray-500">Keep saved papers synchronized across your devices.</p>
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={autoSyncLibrary}
+                    onChange={(e) => setAutoSyncLibrary(e.target.checked)}
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500"
+                  />
+                </div>
               </div>
             )}
 
+            {/* ── INTEGRATIONS TAB ── */}
+            {activeTab === 'integrations' && (
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">OpenAlex Academic API Key</label>
+                    <div className="relative">
+                      <input
+                        type={showAlexKey ? 'text' : 'password'}
+                        value={openAlexKey}
+                        onChange={(e) => setOpenAlexKey(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-mono text-xs pr-10 focus:outline-none focus:border-blue-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowAlexKey(!showAlexKey)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showAlexKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-500 block mb-1">Semantic Scholar API Key</label>
+                    <div className="relative">
+                      <input
+                        type={showSemanticKey ? 'text' : 'password'}
+                        value={semanticScholarKey}
+                        onChange={(e) => setSemanticScholarKey(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 font-mono text-xs pr-10 focus:outline-none focus:border-blue-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSemanticKey(!showSemanticKey)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showSemanticKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Reference Managers:</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs">
+                      <span className="font-bold">Zotero Web API</span>
+                      <button
+                        onClick={() => setZoteroConnected(!zoteroConnected)}
+                        className={`px-3 py-1 rounded-lg font-semibold ${zoteroConnected ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
+                      >
+                        {zoteroConnected ? 'Connected' : 'Connect'}
+                      </button>
+                    </div>
+
+                    <div className="p-3 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs">
+                      <span className="font-bold">Mendeley</span>
+                      <button
+                        onClick={() => setMendeleyConnected(!mendeleyConnected)}
+                        className={`px-3 py-1 rounded-lg font-semibold ${mendeleyConnected ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}`}
+                      >
+                        {mendeleyConnected ? 'Connected' : 'Connect'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── ACCOUNT TAB ── */}
             {activeTab === 'account' && (
               <div className="space-y-6">
-                 <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between">
-                   <div>
-                     <h4 className="font-bold text-sm">Dr. Jane Doe</h4>
-                     <p className="text-xs text-gray-500 dark:text-gray-400">jane.doe@stanford.edu</p>
-                   </div>
-                   <button className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg text-xs font-semibold shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">Edit Profile</button>
-                 </div>
-                 
-                 <div>
-                   <h4 className="text-sm font-bold text-red-600 mb-2">Danger Zone</h4>
-                   <button className="px-4 py-2 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-lg text-sm font-semibold hover:bg-red-50 dark:hover:bg-red-900/20 w-full text-left">
-                     Delete Account & Data
-                   </button>
-                 </div>
+                <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-sm text-gray-900 dark:text-white">{name}</h4>
+                      <p className="text-xs text-gray-500 font-mono">{email}</p>
+                    </div>
+                    <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                      PRO RESEARCHER TIER
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-gray-500 pt-1">
+                    Indexed citations: 14,200 · Workspace storage: 12.4 MB / 5 GB used
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block">Account Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* ── PRIVACY & DATA TAB ── */}
+            {activeTab === 'privacy' && (
+              <div className="space-y-6">
+                <div className="p-4 rounded-2xl border border-gray-200 dark:border-gray-700 space-y-3">
+                  <h4 className="font-bold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                    <Database className="w-4 h-4 text-blue-600" />
+                    Export Local Data Backup
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Download a full JSON backup of your saved paper collections, history traces, and configuration preferences.
+                  </p>
+                  <button
+                    onClick={handleExportData}
+                    className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs flex items-center gap-1.5 transition-colors shadow-xs"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download JSON Backup</span>
+                  </button>
+                </div>
+
+                <div className="p-4 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/40 dark:bg-red-900/10 space-y-3">
+                  <h4 className="font-bold text-sm text-red-600 dark:text-red-400">Danger Zone</h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    Permanently delete all indexed citations, cache directories, and local history.
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to clear all local data? This action cannot be undone.')) {
+                        localStorage.clear();
+                        window.location.reload();
+                      }
+                    }}
+                    className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition-colors shadow-xs flex items-center gap-1.5"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear All Local Workspace Data</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ── SHORTCUTS & A11Y TAB ── */}
+            {activeTab === 'shortcuts' && (
+              <div className="space-y-4">
+                <h4 className="text-sm font-bold text-gray-900 dark:text-gray-100">Keyboard Shortcuts</h4>
+                <div className="divide-y divide-gray-100 dark:divide-gray-800 text-xs">
+                  {[
+                    { action: 'Toggle Sidebar Navigation', keys: ['Ctrl', 'B'] },
+                    { action: 'Focus Global Literature Search', keys: ['Ctrl', 'K'] },
+                    { action: 'Send Inquiry in AI Assistant', keys: ['Enter'] },
+                    { action: 'Insert New Line in Prompt', keys: ['Shift', 'Enter'] },
+                    { action: 'Close Modal / Cancel Drawer', keys: ['Escape'] },
+                    { action: 'Toggle Dark / Light Theme', keys: ['Ctrl', 'Shift', 'T'] }
+                  ].map((s, idx) => (
+                    <div key={idx} className="py-2.5 flex items-center justify-between">
+                      <span className="text-gray-700 dark:text-gray-300 font-medium">{s.action}</span>
+                      <div className="flex items-center gap-1">
+                        {s.keys.map((k, i) => (
+                          <kbd key={i} className="px-2 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md font-mono text-[11px] text-gray-800 dark:text-gray-200 font-bold shadow-2xs">
+                            {k}
+                          </kbd>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
