@@ -80,16 +80,16 @@ export const Sidebar: React.FC = () => {
           </div>
 
           {/* ── NAVIGATION GROUPS ── */}
-          <nav className="py-4 px-3 space-y-6 overflow-y-auto max-h-[calc(100vh-60px)] scrollbar-thin">
+          <nav className={`py-6 px-3 overflow-y-auto max-h-[calc(100vh-60px)] scrollbar-thin flex flex-col ${isSidebarOpen ? 'gap-6' : 'gap-2 items-center'}`}>
             {navGroups.map((group, groupIdx) => (
-              <div key={groupIdx} className="space-y-1">
+              <div key={groupIdx} className={`flex flex-col ${isSidebarOpen ? 'gap-1' : 'gap-2 w-full'}`}>
                 <AnimatePresence>
                   {isSidebarOpen && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={{ opacity: 0, height: 0 }}
-                      className="px-2 pb-1"
+                      className="px-2 pb-1 overflow-hidden"
                     >
                       <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                         {group.title}
@@ -98,7 +98,7 @@ export const Sidebar: React.FC = () => {
                   )}
                 </AnimatePresence>
                 
-                <div className="space-y-1">
+                <div className={`flex flex-col ${isSidebarOpen ? 'gap-1' : 'gap-2 items-center w-full'}`}>
                   {group.items.map((item) => {
                     const isActive = activePage === item.id;
                     return (
@@ -106,22 +106,26 @@ export const Sidebar: React.FC = () => {
                         key={item.id}
                         title={!isSidebarOpen ? item.label : undefined}
                         onClick={() => setActivePage(item.id as PageType)}
-                        className={`w-full flex items-center ${isSidebarOpen ? 'gap-3 px-3 py-2.5' : 'justify-center p-2.5'} rounded-xl transition-all font-semibold text-[13px] group ${
+                        className={`relative flex items-center rounded-xl transition-all font-semibold text-[13px] group overflow-hidden ${
+                          isSidebarOpen 
+                            ? 'w-full gap-3 px-3 py-2.5' 
+                            : 'justify-center w-11 h-11 shrink-0'
+                        } ${
                           isActive
                             ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25'
                             : 'text-gray-400 hover:bg-[#0B1A38]/90 hover:text-white'
                         }`}
                       >
-                        <div className={`shrink-0 transition-transform duration-200 ${isActive ? 'scale-105 text-white' : 'group-hover:scale-105'}`}>
+                        <div className={`shrink-0 transition-transform duration-200 ${isActive ? 'scale-105 text-white' : 'group-hover:scale-110'}`}>
                           {item.icon}
                         </div>
                         <AnimatePresence>
                           {isSidebarOpen && (
                             <motion.span
-                              initial={{ opacity: 0, width: 0 }}
-                              animate={{ opacity: 1, width: 'auto' }}
-                              exit={{ opacity: 0, width: 0 }}
-                              className="whitespace-nowrap overflow-hidden text-left flex-1"
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -10, transition: { duration: 0.1 } }}
+                              className="whitespace-nowrap text-left flex-1"
                             >
                               {item.label}
                             </motion.span>
