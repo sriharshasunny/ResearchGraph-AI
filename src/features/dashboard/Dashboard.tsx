@@ -186,7 +186,7 @@ export const Dashboard: React.FC = () => {
               </div>
               <div className="min-w-0">
                 <h3 className="text-[14px] font-bold text-gray-900 truncate">{action.label}</h3>
-                <p className="text-[11px] text-gray-500 truncate mt-0.5">{action.desc}</p>
+                <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5" title={action.desc}>{action.desc}</p>
               </div>
             </motion.div>
           ))}
@@ -302,6 +302,26 @@ export const Dashboard: React.FC = () => {
             </div>
           </div>
 
+        </div>
+
+        {/* ── SECTION: SUGGESTED FOR YOU ── */}
+        <div className="space-y-4 pt-4 border-t border-gray-200">
+          <h2 className="text-[15px] font-bold text-gray-900 tracking-tight flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            Suggested for You
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {[
+              { title: 'Top AI Conferences 2026', type: 'Collection' },
+              { title: 'Graph Neural Networks Tutorial', type: 'Literature Review' },
+              { title: 'State of LLMs Benchmark', type: 'Comparison' }
+            ].map((item, idx) => (
+              <div key={idx} className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer group">
+                <div className="text-[10px] font-bold font-mono text-gray-500 uppercase mb-1">{item.type}</div>
+                <h3 className="text-[14px] font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{item.title}</h3>
+              </div>
+            ))}
+          </div>
         </div>
 
       </div>
