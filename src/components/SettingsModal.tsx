@@ -154,7 +154,6 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                 </div>
 
               </div>
-              </div>
             )}
 
             {/* ── PREFERENCES TAB ── */}
