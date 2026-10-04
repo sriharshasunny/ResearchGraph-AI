@@ -6,9 +6,8 @@
 <style>
 :root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html,body{height:100%;margin:0;background:#04061a;overflow:hidden;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:#eaf2ff}
-#stage{user-select:none;-webkit-user-select:none;--u:1px;--s:1;position:relative;width:100%;height:100%;overflow:hidden;cursor:grab;touch-action:pan-y;
- background:radial-gradient(ellipse 22% 26% at 30% 13%,rgba(150,90,235,.5),transparent 70%),radial-gradient(ellipse 30% 30% at 88% 14%,rgba(120,80,235,.45),transparent 70%),radial-gradient(ellipse 60% 55% at 72% 50%,#1a1b66 0%,#0b0d3c 55%,#04061a 100%)}
+html,body{height:100%;margin:0;background:transparent !important;overflow:hidden;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:#eaf2ff}
+#stage{user-select:none;-webkit-user-select:none;--u:1px;--s:1;position:relative;width:100%;height:100%;overflow:hidden;cursor:grab;touch-action:pan-y;}
 #stage:active{cursor:grabbing}
 #stage canvas{position:absolute;inset:0;pointer-events:none}
 #mt{position:absolute;left:0;bottom:4.5%;width:100%;height:26%;pointer-events:none}
@@ -116,7 +115,7 @@ els.forEach((o,i)=>o.e.style.setProperty('--d',(.4+i*.1)+'s'));
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{const q=document.getElementById('q');q.value=b.textContent;q.focus();});
 document.getElementById('go').onclick=()=>{vyaw=.05;ripple('#6aa7ff');};document.getElementById('q').onkeydown=e=>{if(e.key==='Enter')document.getElementById('go').click();};
 function layout(){const w=W(),h=H(),wide=w>900;
- Rpx=wide?Math.min(w*.1056,h*.245):Math.min(w*.2,h*.17);cx=wide?w*.715:w/2;cy=wide?h*.486:h*.72;const S=Rpx/127;
+ Rpx=Math.min(w*.35,h*.35);cx=w/2;cy=h/2;const S=Rpx/127;
  stage.style.setProperty('--s',Math.max(.5,S));stage.style.setProperty('--u',(wide?S:Math.min(1.1,w/520))+'px');
  renderer.setSize(w,h);cam.aspect=w/h;const q=R*(h/2)/(Rpx*T20),d=Math.sqrt(q*q+R*R);cam.position.set(0,0,d);cam.setViewOffset(w,h,w/2-cx,h/2-cy,w,h);cam.updateProjectionMatrix();
  const ts=Rpx*2.6;tint.style.cssText=`width:${ts}px;height:${ts}px;left:${cx-ts/2}px;top:${cy-ts/2}px`;core.style.cssText=`left:${cx}px;top:${cy}px;font-size:${Rpx*.115}px`;
