@@ -112,8 +112,8 @@ tags.forEach(([n,ic,dx,dy,c,g1,g2],i)=>{const e=document.createElement('div');e.
  const pl=e.querySelector('.pill');pl.onpointerenter=()=>{tint.style.setProperty('--g',c);tint.style.opacity=.7;tc=new THREE.Color(c)};pl.onpointerleave=()=>{tint.style.opacity=0;tc=null};pl.onclick=()=>{vyaw=.05;ripple(c)};els.push({e,dx,dy});});
 decor.forEach(([dx,dy,r,c],i)=>{const e=document.createElement('div');e.className='a dc';e.innerHTML=`<div class="f ${c}" style="animation-delay:${-i*1.3}s"></div>`;ui.appendChild(e);if(c==='gxy')galaxy(e.firstChild.appendChild(document.createElement('canvas')));els.push({e,dx,dy,r});});
 els.forEach((o,i)=>o.e.style.setProperty('--d',(.4+i*.1)+'s'));
-document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{const q=document.getElementById('q');q.value=b.textContent;q.focus();});
-document.getElementById('go').onclick=()=>{vyaw=.05;ripple('#6aa7ff');};document.getElementById('q').onkeydown=e=>{if(e.key==='Enter')document.getElementById('go').click();};
+
+
 function layout(){const w=W(),h=H(),wide=w>900;
  Rpx=Math.min(w*.35,h*.35);cx=w/2;cy=h/2;const S=Rpx/127;
  stage.style.setProperty('--s',Math.max(.5,S));stage.style.setProperty('--u',(wide?S:Math.min(1.1,w/520))+'px');
