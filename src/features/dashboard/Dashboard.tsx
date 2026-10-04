@@ -81,7 +81,7 @@ export const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div ref={scrollContainerRef} className="flex-1 w-full overflow-y-auto bg-[#F7FAFC] dark:bg-transparent p-4 sm:p-6 lg:p-8 scrollbar-thin pb-24">
+    <div ref={scrollContainerRef} className="flex-1 w-full overflow-y-auto bg-transparent dark:bg-transparent p-4 sm:p-6 lg:p-8 scrollbar-thin pb-24">
       <div className="max-w-[1360px] mx-auto space-y-8">
         
         {/* ── HERO SECTION: FULL WIDTH IFRAME ── */}

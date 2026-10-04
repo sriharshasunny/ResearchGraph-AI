@@ -32,7 +32,7 @@ export const PaperDetailsPage: React.FC = () => {
 
   if (!paper) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-[#F7FAFC]">
+      <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-transparent">
         <FileText className="w-12 h-12 text-gray-400 mb-3" />
         <h2 className="text-lg font-bold text-gray-800">No paper selected</h2>
         <button
@@ -112,7 +112,7 @@ export const PaperDetailsPage: React.FC = () => {
   ] as const;
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC]">
+    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-transparent">
       <div className="max-w-[1360px] mx-auto space-y-6">
 
         {/* ── BREADCRUMB HEADER ── */}

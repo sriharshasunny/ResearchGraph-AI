@@ -105,7 +105,7 @@ export const ComparePage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-full min-h-[calc(100vh-60px)] flex flex-col p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC] dark:bg-[#0B1426]">
+    <div className="relative w-full h-full min-h-[calc(100vh-60px)] flex flex-col p-4 sm:p-6 lg:p-8 pb-24 bg-transparent">
       <div className="max-w-[1440px] w-full mx-auto space-y-6 flex-1 flex flex-col">
 
         {/* ── HEADER ── */}

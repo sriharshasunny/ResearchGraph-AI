@@ -190,7 +190,7 @@ export const LiteratureReviewPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC]">
+    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-transparent">
       <div className="max-w-[1140px] mx-auto space-y-6">
 
         {/* ── TOP HEADER ── */}
@@ -219,14 +219,14 @@ export const LiteratureReviewPage: React.FC = () => {
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setIsEditingOutline(!isEditingOutline)}
-                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:hover:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:hover:bg-white dark:bg-[#111D35]/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5 text-blue-600" />
                   <span>{isEditingOutline ? 'View Rendered' : 'Edit Sections'}</span>
                 </button>
                 <button
                   onClick={handleCopyReview}
-                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:hover:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:hover:bg-white dark:bg-[#111D35]/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -269,7 +269,7 @@ export const LiteratureReviewPage: React.FC = () => {
                 className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
                   step === s.num
                     ? 'bg-blue-50/80 border-blue-300 text-blue-900 shadow-xs ring-1 ring-blue-300/50'
-                    : 'bg-gray-50 dark:bg-white/[0.04]/50 border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 hover:border-gray-300'
+                    : 'bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04]/50 border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 hover:border-gray-300'
                 }`}
               >
                 <div className="text-[13px] font-bold flex items-center justify-between">
@@ -298,7 +298,7 @@ export const LiteratureReviewPage: React.FC = () => {
                     placeholder="Search by title, author, or keyword..."
                     value={searchFilter}
                     onChange={(e) => setSearchFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] focus:bg-white dark:bg-[#111D35] text-[13px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04] focus:bg-white dark:bg-[#111D35] text-[13px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                   />
                 </div>
 
@@ -330,13 +330,13 @@ export const LiteratureReviewPage: React.FC = () => {
                   {/* Select All / None */}
                   <button
                     onClick={handleSelectAll}
-                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-[11px] font-bold text-gray-700 dark:text-gray-200 transition-colors"
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04] hover:bg-gray-100 text-[11px] font-bold text-gray-700 dark:text-gray-200 transition-colors"
                   >
                     Select All
                   </button>
                   <button
                     onClick={handleSelectNone}
-                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-[11px] font-bold text-gray-700 dark:text-gray-200 transition-colors"
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04] hover:bg-gray-100 text-[11px] font-bold text-gray-700 dark:text-gray-200 transition-colors"
                   >
                     Select None
                   </button>
@@ -366,7 +366,7 @@ export const LiteratureReviewPage: React.FC = () => {
                         key={paper.id}
                         onClick={() => togglePaper(paper.id)}
                         className={`py-3.5 px-3 rounded-xl transition-all cursor-pointer flex items-start gap-3.5 ${
-                          isSelected ? 'bg-blue-50/50 dark:bg-blue-500/20 hover:bg-blue-50 dark:hover:bg-blue-500/30 text-blue-900 dark:text-blue-300' : 'hover:bg-gray-50 dark:bg-white/[0.04]'
+                          isSelected ? 'bg-blue-50/50 dark:bg-blue-500/20 hover:bg-blue-50 dark:hover:bg-blue-500/30 text-blue-900 dark:text-blue-300' : 'hover:bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04]'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-lg border mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
@@ -413,7 +413,7 @@ export const LiteratureReviewPage: React.FC = () => {
                   {selectedPapers.map((paper, index) => (
                     <div
                       key={paper.id}
-                      className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] text-[12px] flex items-center justify-between gap-2"
+                      className="p-3 rounded-xl bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04] border border-gray-200 dark:border-white/[0.06] text-[12px] flex items-center justify-between gap-2"
                     >
                       <div className="min-w-0">
                         <h5 className="font-bold text-gray-900 dark:text-white truncate">{paper.title}</h5>
@@ -470,7 +470,7 @@ export const LiteratureReviewPage: React.FC = () => {
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] focus:bg-white dark:bg-[#111D35] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 font-semibold"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04] focus:bg-white dark:bg-[#111D35] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 font-semibold"
               />
 
               <div className="space-y-1.5 pt-1">
@@ -488,7 +488,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       className={`px-3 py-1.5 rounded-xl text-[12px] font-medium border transition-colors ${
                         topic === t
                           ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                          : 'bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-white/[0.06]'
+                          : 'bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-white/[0.06]'
                       }`}
                     >
                       {t}
@@ -513,7 +513,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setScope(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        scope === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
+                        scope === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
@@ -536,7 +536,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setStructure(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        structure === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
+                        structure === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
@@ -560,7 +560,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setCitationStyle(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        citationStyle === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
+                        citationStyle === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
@@ -641,7 +641,7 @@ export const LiteratureReviewPage: React.FC = () => {
                     </div>
 
                     {reviewSections.map((sec, idx) => (
-                      <div key={idx} className="p-4 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]/50 space-y-3">
+                      <div key={idx} className="p-4 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white dark:bg-[#111D35]/[0.04]/50 space-y-3">
                         <input
                           type="text"
                           value={sec.title}
@@ -666,7 +666,7 @@ export const LiteratureReviewPage: React.FC = () => {
                               return arr;
                             });
                           }}
-                          className="w-full text-[13px] bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl p-3 text-gray-800 leading-relaxed font-sans"
+                          className="w-full text-[13px] bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl p-3 text-gray-800 dark:text-gray-200 leading-relaxed font-sans"
                         />
                         <div className="flex justify-end">
                           <button
@@ -682,7 +682,7 @@ export const LiteratureReviewPage: React.FC = () => {
                   </div>
                 ) : (
                   /* RENDERED REVIEW VIEW */
-                  <div className="space-y-8 text-gray-800">
+                  <div className="space-y-8 text-gray-800 dark:text-gray-200">
                     <div className="border-b border-gray-200 dark:border-white/[0.06] pb-4">
                       <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">
                         {topic}
@@ -749,7 +749,7 @@ export const LiteratureReviewPage: React.FC = () => {
                                 setSelectedPaperId(paper.id);
                                 setActivePage('details');
                               }}
-                              className="font-semibold text-gray-800 hover:text-blue-600 cursor-pointer underline decoration-gray-300"
+                              className="font-semibold text-gray-800 dark:text-gray-200 hover:text-blue-600 cursor-pointer underline decoration-gray-300"
                             >
                               {paper.title}
                             </span>. {paper.authors.join(', ')} ({paper.year}). <em>{paper.venue || 'arXiv'}</em>.

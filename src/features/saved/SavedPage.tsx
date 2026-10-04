@@ -51,7 +51,7 @@ export const SavedPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC]">
+    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-transparent">
       <div className="max-w-[1240px] mx-auto space-y-6">
 
         {/* ── TOP HEADER ── */}

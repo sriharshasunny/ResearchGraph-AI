@@ -303,7 +303,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
   ];
 
   return (
-    <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden bg-[#F7FAFC]">
+    <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden bg-transparent">
       
       {/* ── LEFT PANEL: RESEARCH SESSIONS (260px) ── */}
       <aside className="w-64 shrink-0 bg-white dark:bg-[#111D35] border-r border-gray-200 dark:border-white/[0.06] flex flex-col justify-between hidden md:flex">
@@ -446,7 +446,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
       </aside>
 
       {/* ── CENTER PANEL: CONVERSATION AREA (Flex-1) ── */}
-      <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#F7FAFC] relative">
+      <main className="flex-1 flex flex-col h-full overflow-hidden bg-transparent relative">
         
         {/* Chat Header */}
         <div className="px-6 py-3.5 bg-white dark:bg-[#111D35] border-b border-gray-200 dark:border-white/[0.06] flex items-center justify-between shrink-0">
