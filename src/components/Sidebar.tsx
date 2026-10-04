@@ -106,7 +106,7 @@ export const Sidebar: React.FC = () => {
                               relative flex items-center rounded-xl font-medium text-[13px] group overflow-hidden mx-3
                               ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center py-2.5 mx-auto w-[46px]'}
                               ${isActive
-                                ? 'bg-blue-50 text-blue-600 dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600 dark:text-white dark:shadow-lg dark:shadow-blue-600/20'
+                                ? 'bg-blue-50 text-blue-600 dark:bg-gradient-to-r dark:from-[#3B28CC] dark:to-[#6938F5] dark:text-white dark:shadow-[0_0_15px_rgba(105,56,245,0.4)] dark:border-t dark:border-white/20'
                                 : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-white'
                               }
                             `}
@@ -142,23 +142,23 @@ export const Sidebar: React.FC = () => {
         {/* Bottom Footer — Upgrade to Pro */}
         <div className="p-4 shrink-0 border-t border-gray-200 dark:border-white/[0.06]">
           {isSidebarOpen ? (
-            <div className="bg-blue-50 dark:bg-gradient-to-r dark:from-[#111D35] dark:to-[#1A2A4A] rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-blue-100/60 dark:hover:from-[#152340] dark:hover:to-[#213460]">
+            <div className="bg-blue-50 dark:bg-gradient-to-r dark:from-[#21115C] dark:to-[#3F1C99] dark:border-t dark:border-white/10 dark:shadow-[0_0_15px_rgba(105,56,245,0.2)] rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-blue-100/60 dark:hover:from-[#2B1770] dark:hover:to-[#4D23B0] transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white dark:bg-blue-600/20 flex items-center justify-center shrink-0 shadow-sm dark:shadow-none text-blue-600 dark:text-blue-400">
+                <div className="w-8 h-8 rounded-full bg-white dark:bg-[#FBBC05]/20 flex items-center justify-center shrink-0 shadow-sm dark:shadow-none text-blue-600 dark:text-[#FBBC05]">
                   <Crown className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[12px] font-bold text-gray-900 dark:text-white">Upgrade to Pro</span>
-                  <span className="text-[10px] text-gray-500 dark:text-gray-400">Unlock advanced features</span>
+                  <span className="text-[10px] text-gray-500 dark:text-indigo-200">Unlock advanced features</span>
                 </div>
               </div>
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center shrink-0">
-                <ArrowRight className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-white/10 flex items-center justify-center shrink-0">
+                <ArrowRight className="w-3 h-3 text-blue-600 dark:text-white" />
               </div>
             </div>
           ) : (
-            <div className="w-10 h-10 mx-auto rounded-full bg-blue-50 dark:bg-[#111D35] flex items-center justify-center cursor-pointer hover:bg-blue-100/60 dark:hover:bg-[#1A2A4A] shadow-sm dark:shadow-none">
-               <Crown className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 mx-auto rounded-full bg-blue-50 dark:bg-gradient-to-br dark:from-[#21115C] dark:to-[#3F1C99] dark:border-t dark:border-white/10 dark:shadow-[0_0_10px_rgba(105,56,245,0.3)] flex items-center justify-center cursor-pointer hover:bg-blue-100/60 transition-colors shadow-sm dark:shadow-none">
+               <Crown className="w-5 h-5 text-blue-600 dark:text-[#FBBC05]" />
             </div>
           )}
         </div>
