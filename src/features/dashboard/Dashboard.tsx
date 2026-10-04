@@ -16,10 +16,14 @@ export const Dashboard: React.FC = () => {
       if (e.data && e.data.type === 'globe_wheel' && scrollContainerRef.current) {
         scrollContainerRef.current.scrollBy({ top: e.data.deltaY, behavior: 'auto' });
       }
+      if (e.data && e.data.type === 'hero_search' && e.data.query) {
+        setSearchQuery(e.data.query);
+        setActivePage('search');
+      }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [setSearchQuery, setActivePage]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,84 +103,19 @@ export const Dashboard: React.FC = () => {
     <div ref={scrollContainerRef} className="flex-1 w-full overflow-y-auto bg-[#F7FAFC] p-4 sm:p-6 lg:p-8 scrollbar-thin pb-24">
       <div className="max-w-[1360px] mx-auto space-y-8">
         
-        {/* ── HERO SECTION: 2-ZONE ENVIRONMENT ── */}
+        {/* ── HERO SECTION: FULL WIDTH IFRAME ── */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full rounded-3xl overflow-hidden shadow-xl border border-[#0B1A38]/30 bg-[#06111F] text-white p-6 sm:p-8 lg:p-10 bg-cover bg-center"
-          style={{ backgroundImage: "url('/user_custom_bg.jpg')" }}
+          className="relative w-full h-[400px] sm:h-[480px] lg:h-[540px] rounded-3xl overflow-hidden shadow-xl border border-blue-900/30 bg-[#04061a]"
         >
-          {/* Layered Subtle Space Background Elements */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden bg-black/20">
-          </div>
-
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            {/* LEFT ZONE: SEARCH & PROMPT CHIPS (7 Cols) */}
-            <div className="lg:col-span-7 flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-semibold text-cyan-300 mb-4 w-fit backdrop-blur-md">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Next-Gen Academic Research OS</span>
-              </div>
-
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-[1.15] mb-3">
-                What are you<br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">researching today?</span>
-              </h1>
-              
-              <p className="text-[14px] sm:text-[15px] text-gray-300 font-medium mb-7 max-w-xl leading-relaxed">
-                Explore research. Connect knowledge. Discover what's next.
-              </p>
-
-              {/* Large Search Box */}
-              <form onSubmit={handleSearch} className="relative w-full max-w-xl group">
-                <div className="relative flex items-center bg-[#06111F]/90 border border-white/20 group-focus-within:border-cyan-400/80 group-focus-within:ring-2 group-focus-within:ring-cyan-500/20 rounded-2xl p-1.5 shadow-2xl backdrop-blur-xl transition-all">
-                  <div className="pl-3.5 pr-2 text-gray-400 group-focus-within:text-cyan-400 transition-colors">
-                    <Search className="w-5 h-5" />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="Ask anything about academic research..."
-                    value={localSearch}
-                    onChange={(e) => setLocalSearch(e.target.value)}
-                    className="flex-1 bg-transparent py-3 pr-3 text-[14px] sm:text-[15px] text-white placeholder-gray-400 focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    title="Search Academic Literature"
-                    className="w-11 h-11 rounded-xl bg-blue-600 hover:bg-blue-500 text-white flex items-center justify-center transition-all shadow-md shrink-0 group-hover:scale-[1.02]"
-                  >
-                    <ArrowRight className="w-5 h-5" />
-                  </button>
-                </div>
-              </form>
-
-              {/* Research Prompt Chips */}
-              <div className="flex flex-wrap items-center gap-2 mt-5 max-w-xl">
-                {suggestions.map((topic, i) => (
-                  <button
-                    key={i}
-                    onClick={() => handleQuickTopic(topic)}
-                    className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/12 border border-white/10 hover:border-cyan-400/40 text-[11px] font-medium text-gray-300 hover:text-white transition-all text-left"
-                  >
-                    {topic}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* RIGHT ZONE: RESEARCH KNOWLEDGE CORE (5 Cols) */}
-            <div className="lg:col-span-5 flex items-center justify-center relative w-full h-[380px] lg:h-[460px] overflow-hidden rounded-2xl border border-white/5 bg-[#04061a] shadow-inner">
-              <iframe 
-                src="/home_globe.html"
-                className="absolute inset-0 w-full h-full border-none outline-none scale-[1.25]"
-                title="Dashboard Globe"
-                sandbox="allow-scripts allow-same-origin"
-              />
-            </div>
-
-          </div>
+          <iframe 
+            src="/home_hero.html"
+            className="absolute inset-0 w-full h-full border-none outline-none"
+            title="Dashboard Hero"
+            sandbox="allow-scripts allow-same-origin"
+          />
         </motion.div>
 
         {/* ── HOME QUICK ACTIONS (4 COMPACT ELEVATED ACTIONS) ── */}
