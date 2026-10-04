@@ -89,7 +89,7 @@ export const Dashboard: React.FC = () => {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative w-full h-[400px] sm:h-[480px] lg:h-[540px] rounded-3xl overflow-hidden shadow-xl border border-blue-100 bg-[#f7f9fd]"
+          className="relative w-full h-[400px] sm:h-[480px] lg:h-[540px]"
         >
           <iframe 
             src="/home_hero.html"
