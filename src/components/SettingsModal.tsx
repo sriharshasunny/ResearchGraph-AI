@@ -7,8 +7,8 @@ import {
 import { useApp } from '../context/AppContext';
 
 export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  const { theme, setTheme, uiMode } = useApp();
-  const [activeTab, setActiveTab] = useState<'appearance' | 'preferences' | 'integrations' | 'account' | 'privacy' | 'shortcuts'>('appearance');
+  const { uiMode } = useApp();
+  const [activeTab, setActiveTab] = useState<'preferences' | 'integrations' | 'account' | 'privacy' | 'shortcuts'>('preferences');
 
   // Preferences states
   const [exportFormat, setExportFormat] = useState('bibtex');
@@ -40,12 +40,11 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
       return () => clearTimeout(reset);
     }, 400);
     return () => clearTimeout(timer);
-  }, [theme, uiMode, exportFormat, groundingStrictness, autoSyncLibrary, openAlexKey, semanticScholarKey, name, isOpen]);
+  }, [uiMode, exportFormat, groundingStrictness, autoSyncLibrary, openAlexKey, semanticScholarKey, name, isOpen]);
 
   if (!isOpen) return null;
 
   const tabs = [
-    { id: 'appearance', label: 'Appearance', icon: <Monitor className="w-4 h-4" /> },
     { id: 'preferences', label: 'Research Preferences', icon: <Sliders className="w-4 h-4" /> },
     { id: 'integrations', label: 'Integrations & API', icon: <Key className="w-4 h-4" /> },
     { id: 'account', label: 'Account', icon: <User className="w-4 h-4" /> },
@@ -55,7 +54,6 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
 
   const handleExportData = () => {
     const data = {
-      theme,
       uiMode,
       exportFormat,
       groundingStrictness,
@@ -121,34 +119,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
           
           <div className="p-6 overflow-y-auto flex-1 space-y-6 scrollbar-thin">
             
-            {/* ── APPEARANCE TAB ── */}
-            {activeTab === 'appearance' && (
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900 dark:text-white dark:text-gray-100 mb-1">Color Theme</h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Live system adaptation with zero flash.</p>
-                  <div className="grid grid-cols-3 gap-3">
-                    {['light', 'dark', 'system'].map(t => (
-                      <button 
-                        key={t}
-                        onClick={() => {
-                          setTheme(t as any);
-                          setLastChangedSetting('Theme');
-                        }}
-                        className={`p-3 rounded-xl border text-xs font-bold uppercase transition-all ${
-                          theme === t 
-                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 shadow-xs' 
-                            : 'border-gray-200 dark:border-white/[0.06] dark:border-gray-700 hover:border-blue-300'
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
-              </div>
-            )}
 
             {/* ── PREFERENCES TAB ── */}
             {activeTab === 'preferences' && (
@@ -361,8 +332,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                     { action: 'Focus Global Literature Search', keys: ['Ctrl', 'K'] },
                     { action: 'Send Inquiry in AI Assistant', keys: ['Enter'] },
                     { action: 'Insert New Line in Prompt', keys: ['Shift', 'Enter'] },
-                    { action: 'Close Modal / Cancel Drawer', keys: ['Escape'] },
-                    { action: 'Toggle Dark / Light Theme', keys: ['Ctrl', 'Shift', 'T'] }
+                    { action: 'Close Modal / Cancel Drawer', keys: ['Escape'] }
                   ].map((s, idx) => (
                     <div key={idx} className="py-2.5 flex items-center justify-between">
                       <span className="text-gray-700 dark:text-gray-200 dark:text-gray-300 font-medium">{s.action}</span>

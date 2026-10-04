@@ -5,7 +5,6 @@ import { mockPapers } from '../data/mockData';
 
 export type ReadingStatus = 'to_read' | 'reading' | 'completed';
 
-export type Theme = 'light' | 'dark' | 'system';
 export type UIMode = 'simple' | 'expert';
 
 interface AppContextType {
@@ -25,9 +24,7 @@ interface AppContextType {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   
-  // Theme and UI Mode
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
+  // UI Mode
   uiMode: UIMode;
   setUIMode: (mode: UIMode) => void;
 
@@ -66,30 +63,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>(['p1', 'p2', 'p3', 'p5', 'p6']);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // Theme and UI Mode
-  const [theme, setThemeState] = useState<Theme>(() => (localStorage.getItem('rg_theme') as Theme) || 'system');
+  // UI Mode
   const [uiMode, setUIModeState] = useState<UIMode>(() => (localStorage.getItem('rg_uiMode') as UIMode) || 'simple');
-
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem('rg_theme', newTheme);
-    // Apply theme to document
-    if (newTheme === 'dark' || (newTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
 
   const setUIMode = (mode: UIMode) => {
     setUIModeState(mode);
     localStorage.setItem('rg_uiMode', mode);
   };
 
-  // Run initial theme application
+  // Run initial setup to force light mode
   React.useEffect(() => {
-    setTheme(theme);
+    document.documentElement.classList.remove('dark');
   }, []);
+
+
 
   // Reading status
   const [paperReadingStatus, setPaperReadingStatusState] = useState<Record<string, ReadingStatus>>({
@@ -202,8 +189,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addToRecentlyViewed,
         isSidebarOpen,
         toggleSidebar,
-        theme,
-        setTheme,
         uiMode,
         setUIMode,
         paperReadingStatus,

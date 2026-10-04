@@ -5,7 +5,7 @@ import { ProfileModal } from './ProfileModal';
 import { SettingsModal } from './SettingsModal';
 
 export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
-  const { setSearchQuery, setActivePage, toggleSidebar, theme, setTheme } = useApp();
+  const { setSearchQuery, setActivePage, toggleSidebar } = useApp();
   
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const [isBellOpen, setIsBellOpen] = useState(false);
@@ -82,14 +82,7 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
           {/* Action Icons */}
           <div className="flex items-center gap-1 sm:gap-1.5">
-            {/* Theme Toggle */}
-            <button 
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="p-2 mr-1 rounded-full transition-all text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-white dark:bg-indigo-600/20 dark:hover:bg-indigo-500/30"
-              title="Toggle Theme"
-            >
-              {theme === 'dark' ? <Moon className="w-5 h-5 text-indigo-400" /> : <Sun className="w-5 h-5" />}
-            </button>
+
 
             {/* Bell */}
             <div className="relative" ref={bellRef}>
