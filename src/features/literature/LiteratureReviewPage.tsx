@@ -219,14 +219,14 @@ export const LiteratureReviewPage: React.FC = () => {
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setIsEditingOutline(!isEditingOutline)}
-                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:hover:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5 text-blue-600" />
                   <span>{isEditingOutline ? 'View Rendered' : 'Edit Sections'}</span>
                 </button>
                 <button
                   onClick={handleCopyReview}
-                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:hover:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -366,11 +366,11 @@ export const LiteratureReviewPage: React.FC = () => {
                         key={paper.id}
                         onClick={() => togglePaper(paper.id)}
                         className={`py-3.5 px-3 rounded-xl transition-all cursor-pointer flex items-start gap-3.5 ${
-                          isSelected ? 'bg-blue-50/50 hover:bg-blue-50' : 'hover:bg-gray-50 dark:bg-white/[0.04]'
+                          isSelected ? 'bg-blue-50/50 dark:bg-blue-500/20 hover:bg-blue-50 dark:hover:bg-blue-500/30 text-blue-900 dark:text-blue-300' : 'hover:bg-gray-50 dark:bg-white/[0.04]'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-lg border mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
-                          isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 bg-white dark:bg-[#111D35]'
+                          isSelected ? 'bg-blue-600 dark:bg-blue-500 border-blue-600 dark:border-blue-500 text-white' : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-[#111D35]'
                         }`}>
                           {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
@@ -513,7 +513,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setScope(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        scope === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
+                        scope === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
@@ -536,7 +536,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setStructure(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        structure === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
+                        structure === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
@@ -560,7 +560,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setCitationStyle(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        citationStyle === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
+                        citationStyle === item.id ? 'bg-blue-50 dark:bg-blue-500/20 border-blue-300 dark:border-blue-500/50 text-blue-900 dark:text-blue-300 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>

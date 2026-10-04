@@ -105,33 +105,33 @@ export const ComparePage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-full min-h-[calc(100vh-60px)] flex flex-col p-4 sm:p-6 lg:p-8 pb-24 bg-[var(--surface-bg,#F7FAFC)]">
+    <div className="relative w-full h-full min-h-[calc(100vh-60px)] flex flex-col p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC] dark:bg-[#0B1426]">
       <div className="max-w-[1440px] w-full mx-auto space-y-6 flex-1 flex flex-col">
 
         {/* ── HEADER ── */}
-        <div className="bg-[var(--surface,#ffffff)] rounded-2xl p-6 border border-[var(--border,#e5e7eb)] shadow-sm space-y-4 shrink-0">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4 shrink-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActivePage('dashboard')}
-                className="p-2 rounded-xl text-[var(--text-muted,#9ca3af)] hover:text-[var(--text,#111827)] hover:bg-[var(--surface-raised,#f3f4f6)] transition-colors"
+                className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:bg-white/[0.04] transition-colors"
                 title="Return to Home"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-[var(--text,#111827)] tracking-tight flex items-center gap-2">
-                  <GitCompare className="w-5 h-5 text-[var(--accent,#2563eb)]" />
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
+                  <GitCompare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   Compare Papers
                 </h1>
-                <p className="text-[13px] text-[var(--text-muted,#6b7280)] mt-0.5">
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">
                   Structured side-by-side empirical benchmarking (up to 10 papers).
                 </p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 mr-4 text-[13px] font-medium text-[var(--text,#374151)]">
+              <div className="flex items-center gap-2 mr-4 text-[13px] font-medium text-gray-700 dark:text-gray-200">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" checked={showDiffOnly} onChange={(e) => setShowDiffOnly(e.target.checked)} className="rounded text-blue-600 focus:ring-blue-500 bg-gray-100 border-gray-300" />
                   Show differences only
@@ -140,12 +140,12 @@ export const ComparePage: React.FC = () => {
 
               <button
                 onClick={() => setIsAddOpen(!isAddOpen)}
-                className="px-3.5 py-1.5 rounded-xl border border-[var(--border,#e5e7eb)] text-[var(--text,#374151)] bg-[var(--surface,#ffffff)] hover:bg-[var(--surface-raised,#f9fafb)] font-semibold text-[12px] flex items-center gap-1.5 shadow-sm transition-all"
+                className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 shadow-sm transition-all"
               >
-                <Plus className="w-3.5 h-3.5 text-[var(--accent,#2563eb)]" />
+                <Plus className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Add ({selectedPapers.length}/10)</span>
               </button>
-              <button className="px-3.5 py-1.5 rounded-xl border border-[var(--border,#e5e7eb)] text-[var(--text,#374151)] bg-[var(--surface,#ffffff)] hover:bg-[var(--surface-raised,#f9fafb)] font-semibold text-[12px] flex items-center gap-1.5 shadow-sm transition-all">
+              <button className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 shadow-sm transition-all">
                 <Download className="w-3.5 h-3.5" />
                 <span>Export</span>
               </button>
@@ -154,20 +154,20 @@ export const ComparePage: React.FC = () => {
 
           {/* Add Paper Quick Selector Dropdown */}
           {isAddOpen && (
-            <div className="pt-3 border-t border-[var(--border,#f3f4f6)] flex flex-col gap-3">
+            <div className="pt-3 border-t border-gray-100 dark:border-white/[0.04] flex flex-col gap-3">
               <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input type="text" placeholder="Search the index to add papers..." className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
               </div>
               <div className="flex flex-wrap gap-2 items-center">
-                <span className="text-[11px] font-bold text-[var(--text-muted,#9ca3af)] uppercase tracking-wider">Suggested:</span>
+                <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Suggested:</span>
                 {allPapers.filter(p => !selectedPapers.some(sp => sp.id === p.id)).map(p => (
                   <button
                     key={p.id}
                     onClick={() => {
                       toggleComparisonPaper(p.id);
                     }}
-                    className="px-3 py-1 bg-[var(--surface-raised,#f9fafb)] hover:bg-blue-50 hover:text-blue-700 border border-[var(--border,#e5e7eb)] rounded-lg text-[11px] font-medium transition-colors"
+                    className="px-3 py-1 bg-gray-50 dark:bg-white/[0.04] hover:bg-blue-50 hover:text-blue-700 border border-gray-200 dark:border-white/[0.06] rounded-lg text-[11px] font-medium transition-colors"
                   >
                     + {p.title.slice(0, 35)}...
                   </button>
@@ -179,7 +179,7 @@ export const ComparePage: React.FC = () => {
 
         {/* ── AI SUMMARY BOX ── */}
         {selectedPapers.length >= 2 && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm shrink-0">
+          <div className="bg-gradient-to-r from-blue-50 dark:from-blue-900/20 to-indigo-50 dark:to-indigo-900/20 rounded-2xl p-6 border border-blue-100 dark:border-blue-900/30 shadow-sm shrink-0">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-[14px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-blue-600" />
@@ -216,28 +216,28 @@ export const ComparePage: React.FC = () => {
         )}
 
         {/* ── STRUCTURED COMPARISON TABLE ── */}
-        <div className="bg-[var(--surface,#ffffff)] rounded-2xl border border-[var(--border,#e5e7eb)] shadow-sm flex-1 overflow-hidden flex flex-col">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl border border-gray-200 dark:border-white/[0.06] shadow-sm flex-1 overflow-hidden flex flex-col">
           <div className="overflow-auto flex-1 relative">
             <table className="w-full text-left border-collapse min-w-max">
-              <thead className="sticky top-0 z-20 bg-[var(--surface,#ffffff)] shadow-[0_1px_0_0_var(--border,#e5e7eb)]">
+              <thead className="sticky top-0 z-20 bg-white dark:bg-[#111D35] shadow-[0_1px_0_0_var(--border,#e5e7eb)]">
                 <tr>
-                  <th className="p-4 sm:p-5 w-48 min-w-[200px] text-[12px] font-bold uppercase tracking-wider text-[var(--text-muted,#6b7280)] sticky left-0 z-30 bg-[var(--surface,#ffffff)] border-r border-[var(--border,#f3f4f6)] shadow-[1px_0_0_0_var(--border,#e5e7eb)]">
+                  <th className="p-4 sm:p-5 w-48 min-w-[200px] text-[12px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 sticky left-0 z-30 bg-white dark:bg-[#111D35] border-r border-gray-100 dark:border-white/[0.04] shadow-[1px_0_0_0_var(--border,#e5e7eb)]">
                     Evaluation Aspect
                   </th>
                   {selectedPapers.map((paper, idx) => (
-                    <th key={paper.id} className="p-4 sm:p-5 w-72 min-w-[280px] max-w-[320px] text-[14px] font-bold text-[var(--text,#111827)] border-l border-[var(--border,#e5e7eb)] align-top relative bg-[var(--surface,#ffffff)] group">
+                    <th key={paper.id} className="p-4 sm:p-5 w-72 min-w-[280px] max-w-[320px] text-[14px] font-bold text-gray-900 dark:text-white border-l border-gray-200 dark:border-white/[0.06] align-top relative bg-white dark:bg-[#111D35] group">
                       <div className="flex flex-col h-full justify-between gap-3">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex items-center gap-2">
                             <div className={`w-3 h-3 rounded-full ${['bg-blue-500', 'bg-emerald-500', 'bg-purple-500', 'bg-amber-500', 'bg-pink-500', 'bg-cyan-500', 'bg-rose-500'][idx % 7]}`} />
-                            <span className="text-[10px] font-mono font-bold text-[var(--accent,#2563eb)] uppercase bg-blue-50 px-2 py-0.5 rounded">
+                            <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 uppercase bg-blue-50 px-2 py-0.5 rounded">
                               {paper.venue || 'arXiv'}
                             </span>
                           </div>
                           {selectedPapers.length > 2 && (
                             <button
                               onClick={() => toggleComparisonPaper(paper.id)}
-                              className="text-[var(--text-muted,#9ca3af)] hover:text-red-600 p-1"
+                              className="text-gray-400 dark:text-gray-500 hover:text-red-600 p-1"
                               title="Remove from comparison"
                             >
                               <X className="w-4 h-4" />
@@ -246,7 +246,7 @@ export const ComparePage: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="leading-snug line-clamp-2 text-[14px]">{paper.title}</h3>
-                          <p className="text-[12px] font-normal text-[var(--text-muted,#6b7280)] mt-1">{paper.authors[0]} et al.</p>
+                          <p className="text-[12px] font-normal text-gray-500 dark:text-gray-400 mt-1">{paper.authors[0]} et al.</p>
                         </div>
                         <button 
                           onClick={() => setBaselineId(baselineId === paper.id ? null : paper.id)}
@@ -259,12 +259,12 @@ export const ComparePage: React.FC = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border,#f3f4f6)] text-[13px] text-[var(--text,#374151)] relative z-0">
+              <tbody className="divide-y divide-[var(--border,#f3f4f6)] text-[13px] text-gray-700 dark:text-gray-200 relative z-0">
                 {aspects.filter(a => !showDiffOnly || hasDifferencesInRow(a.key)).map(aspect => (
-                  <tr key={aspect.key} className="hover:bg-[var(--surface-raised,#f9fafb)] transition-colors group/row">
-                    <td className="p-4 sm:p-5 font-bold text-[var(--text,#111827)] bg-[var(--surface,#ffffff)] border-r border-[var(--border,#f3f4f6)] text-[12px] uppercase tracking-wider sticky left-0 z-10 shadow-[1px_0_0_0_var(--border,#e5e7eb)] group-hover/row:bg-[var(--surface-raised,#f9fafb)] transition-colors">
+                  <tr key={aspect.key} className="hover:bg-gray-50 dark:bg-white/[0.04] transition-colors group/row">
+                    <td className="p-4 sm:p-5 font-bold text-gray-900 dark:text-white bg-white dark:bg-[#111D35] border-r border-gray-100 dark:border-white/[0.04] text-[12px] uppercase tracking-wider sticky left-0 z-10 shadow-[1px_0_0_0_var(--border,#e5e7eb)] group-hover/row:bg-gray-50 dark:bg-white/[0.04] transition-colors">
                       <div className="flex flex-col gap-1">
-                        <span className="text-[9px] text-[var(--text-muted,#9ca3af)] font-mono">{aspect.group}</span>
+                        <span className="text-[9px] text-gray-400 dark:text-gray-500 font-mono">{aspect.group}</span>
                         <span>{aspect.label}</span>
                       </div>
                     </td>
@@ -273,7 +273,7 @@ export const ComparePage: React.FC = () => {
                       const isDiff = isDifferentFromBaseline(paper.id, aspect.key);
                       
                       return (
-                        <td key={paper.id} className={`p-4 sm:p-5 border-l border-[var(--border,#f3f4f6)] leading-relaxed font-sans relative group/cell ${isDiff ? 'bg-amber-50/30' : ''}`}>
+                        <td key={paper.id} className={`p-4 sm:p-5 border-l border-gray-100 dark:border-white/[0.04] leading-relaxed font-sans relative group/cell ${isDiff ? 'bg-amber-50/30' : ''}`}>
                           <div className="flex flex-col gap-2">
                             <span>{val}</span>
                             <button className="hidden group-hover/cell:flex items-center gap-1 text-[11px] font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded w-fit mt-1 absolute bottom-2 right-2 shadow-sm">
