@@ -33,7 +33,7 @@ html,body{height:100%;margin:0;background:transparent !important;overflow:hidden
 .L .card:hover,.R .card:hover{transform:perspective(900px) rotateY(0) translateY(-5px);border-color:rgba(110,231,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 18px 48px rgba(0,0,0,.55),0 0 30px rgba(80,200,255,.28)}
 .hud{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:24px;display:flex;gap:22px;font:400 11px var(--mono);letter-spacing:.08em;color:#a9c3ee;pointer-events:none}
 .hud span:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#34f5a0;box-shadow:0 0 8px #34f5a0;margin-right:8px}
-.hz{position:absolute;left:-25%;width:150%;bottom:-32%;height:42%;border-radius:50%;background:radial-gradient(ellipse at 50% 0,#0b3a7a 0,#051233 55%,#030615 80%);border-top:2px solid #6fe8ff;box-shadow:0 -4px 40px #2aa8ff,0 -1px 120px rgba(42,168,255,.5);pointer-events:none}
+.hz{display:none;}
 .sc{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font:400 11px var(--mono);letter-spacing:.12em;color:#6ee7ff;pointer-events:none}
 
 .pill{gap:10px;-webkit-font-smoothing:antialiased;backface-visibility:hidden;height:42px;padding:0 20px 0 7px;border:1.5px solid transparent;background:linear-gradient(180deg,#16244f,#080d26) padding-box,linear-gradient(90deg,var(--c),color-mix(in srgb,var(--c) 30%,#fff)) border-box;backdrop-filter:none;font-weight:700;box-shadow:0 8px 22px rgba(0,0,0,.5),0 0 18px color-mix(in srgb,var(--c) 38%,transparent)}
@@ -98,8 +98,7 @@ const sats=[],rg=[],rm=[],pg=[];
 const gim=[[1.16,.35,0x5ee7ff,0x5ee7ff,.04],[1.34,-.5,0xa78bfa,0xf472b6,-.03]].map(([sc,tl,ca,cb,sp])=>{const t=new THREE.Mesh(new THREE.TorusGeometry(R*sc,.008,6,360),rmat(ca,cb,3,1)),g=new THREE.Group();t.rotation.x=Math.PI/2;g.rotation.z=tl;g.add(t);world.add(g);return{g,sp}});
 const scan=new THREE.Mesh(new THREE.TorusGeometry(1,.01,6,240),new THREE.MeshBasicMaterial({color:0x7ff0ff,transparent:true,opacity:.6,blending:ADD,depthWrite:false}));scan.rotation.x=Math.PI/2;scan.renderOrder=6;world.add(scan);
 // ---- stars
-const sp=new Float32Array(3600);for(let i=0;i<1200;i++){const r=40+Math.random()*60,t=Math.random()*6.28,u=Math.acos(2*Math.random()-1);sp.set([r*Math.sin(u)*Math.cos(t),r*Math.sin(u)*Math.sin(t)*.6,r*Math.cos(u)],i*3);}
-const sg=new THREE.BufferGeometry();sg.setAttribute('position',new THREE.BufferAttribute(sp,3));const stars=new THREE.Points(sg,new THREE.PointsMaterial({size:.22,sizeAttenuation:true,transparent:true,opacity:.65,depthWrite:false,blending:ADD,color:0xa9c4ff}));scene.add(stars);
+
 
 // ---- labels & cards (positions measured from the reference image)
 const IC={user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/>',db:'<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/>',doc:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',con:'<circle cx="12" cy="12" r="2.5"/><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="20" r="2"/><path d="M6.5 7.5l4 3M17.5 7.5l-4 3M12 14.5V18"/>',tr:'<path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/>',kg:'<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5V13M12 13l-5.5 4.5M12 13l5.5 4.5"/>'};
@@ -183,7 +182,7 @@ stage.addEventListener('wheel', e => {
  sats.forEach(q=>{q.a+=q.v;q.pv.rotation.y=q.a;});rm.forEach(q=>{q.m.uniforms.h.value=((-sats[q.k].a/6.2832)%1+1)%1;});pg.forEach(q=>q.pt.rotation.y+=q.v);gim.forEach(q=>q.g.rotation.y+=q.sp*.01);{const sy=Math.sin(t*.45)*.92;scan.position.y=R*1.006*sy;scan.scale.setScalar(R*1.006*Math.sqrt(1-sy*sy));scan.material.opacity=.6*(1-Math.abs(sy)*.6);}mxs+=(tx-mxs)*.06;mys+=(ty-mys)*.06;stage.style.setProperty('--mx',mxs.toFixed(3));stage.style.setProperty('--my',mys.toFixed(3));
  rg.forEach(o=>{o.rotation.z=o.userData.z+.03*Math.sin(t*.2+o.userData.k);});
  UN.tm.value+=((tc?1:0)-UN.tm.value)*.1;if(tc)UN.tc.value.copy(tc);rim.material.uniforms.c.value.lerp(tc||baseC,.08);
- stars.rotation.y+=.0001;scene.rotation.y=tx*.08;scene.rotation.x=ty*.05;
+ 
  UN.ps.value=H()*DPR/(2*T20);
  renderer.render(scene,cam);})();
 })();
