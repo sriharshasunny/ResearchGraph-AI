@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  X, Key, Sliders, Check, User, Monitor, 
+  X, Key, Sliders, Check, User, 
   Keyboard, Shield, Database, Eye, EyeOff, 
   Download, Trash2
 } from 'lucide-react';
@@ -29,7 +29,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
 
   // Auto-save toast & Undo State
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
-  const [lastChangedSetting, setLastChangedSetting] = useState<string | null>(null);
+  const [lastChangedSetting] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;

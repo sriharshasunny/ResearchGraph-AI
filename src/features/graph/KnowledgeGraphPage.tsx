@@ -143,7 +143,7 @@ const edgeTypes = { relation: RelationEdge };
 
 // --- GRAPH COMPONENT ---
 const GraphCanvas = () => {
-  const { setActivePage, setSelectedPaperId, setSearchQuery, uiMode, theme } = useApp();
+  const { setActivePage, setSelectedPaperId, setSearchQuery, uiMode } = useApp();
   const { fitView } = useReactFlow();
   
   const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
@@ -329,11 +329,11 @@ const GraphCanvas = () => {
         maxZoom={3}
         proOptions={{ hideAttribution: true }}
       >
-        <Background color={theme === 'dark' ? '#1E293B' : '#E2E8F0'} gap={16} />
+        <Background color={'#E2E8F0'} gap={16} />
         <Controls className="bg-white dark:bg-[#111D35] dark:bg-[#09152E] border-gray-200 dark:border-white/[0.06] dark:border-gray-800 rounded-xl shadow-lg fill-gray-600 dark:fill-gray-400" />
         <MiniMap 
           nodeColor={(n: any) => nodeColorMap[n.data.type as keyof typeof nodeColorMap].bg}
-          maskColor={theme === 'dark' ? 'rgba(6, 17, 31, 0.7)' : 'rgba(249, 250, 251, 0.7)'}
+          maskColor={'rgba(249, 250, 251, 0.7)'}
           className="bg-white dark:bg-[#111D35] dark:bg-[#09152E] border-gray-200 dark:border-white/[0.06] dark:border-gray-800 rounded-xl shadow-lg"
         />
       </ReactFlow>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Search, Settings, LogOut, Menu, Network, ChevronDown, Sun, Moon } from 'lucide-react';
+import { Bell, Search, Settings, LogOut, Menu, Network, ChevronDown } from 'lucide-react';
 import { ProfileModal } from './ProfileModal';
 import { SettingsModal } from './SettingsModal';
 
