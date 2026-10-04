@@ -10,6 +10,17 @@ import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 export const Dashboard: React.FC = () => {
   const { setActivePage, setSearchQuery, savedPaperIds } = useApp();
   const [localSearch, setLocalSearch] = useState('');
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'globe_wheel' && scrollContainerRef.current) {
+        scrollContainerRef.current.scrollBy({ top: e.data.deltaY, behavior: 'auto' });
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +97,7 @@ export const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="flex-1 w-full overflow-y-auto bg-[#F7FAFC] p-4 sm:p-6 lg:p-8 scrollbar-thin pb-24">
+    <div ref={scrollContainerRef} className="flex-1 w-full overflow-y-auto bg-[#F7FAFC] p-4 sm:p-6 lg:p-8 scrollbar-thin pb-24">
       <div className="max-w-[1360px] mx-auto space-y-8">
         
         {/* ── HERO SECTION: 2-ZONE ENVIRONMENT ── */}
@@ -157,8 +168,13 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* RIGHT ZONE: RESEARCH KNOWLEDGE CORE (5 Cols) */}
-            <div className="lg:col-span-5 flex items-center justify-center">
-              <ResearchKnowledgeCore />
+            <div className="lg:col-span-5 flex items-center justify-center relative w-full h-[380px] lg:h-[460px] overflow-hidden rounded-2xl border border-white/5 bg-[#04061a] shadow-inner">
+              <iframe 
+                src="/home_globe.html"
+                className="absolute inset-0 w-full h-full border-none outline-none scale-[1.25]"
+                title="Dashboard Globe"
+                sandbox="allow-scripts allow-same-origin"
+              />
             </div>
 
           </div>
