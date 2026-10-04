@@ -7,14 +7,8 @@ import {
 import { useApp } from '../context/AppContext';
 
 export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  const { theme, setTheme, uiMode, setUIMode } = useApp();
+  const { theme, setTheme, uiMode } = useApp();
   const [activeTab, setActiveTab] = useState<'appearance' | 'preferences' | 'integrations' | 'account' | 'privacy' | 'shortcuts'>('appearance');
-  
-  // Appearance states
-  const [density, setDensity] = useState<'comfortable' | 'compact'>('comfortable');
-  const [textSize, setTextSize] = useState<'small' | 'medium' | 'large'>('medium');
-  const [reducedMotion, setReducedMotion] = useState(false);
-  const [graphLabelSize, setGraphLabelSize] = useState(12);
 
   // Preferences states
   const [exportFormat, setExportFormat] = useState('bibtex');
@@ -46,7 +40,7 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
       return () => clearTimeout(reset);
     }, 400);
     return () => clearTimeout(timer);
-  }, [theme, uiMode, density, textSize, reducedMotion, graphLabelSize, exportFormat, groundingStrictness, autoSyncLibrary, openAlexKey, semanticScholarKey, name, isOpen]);
+  }, [theme, uiMode, exportFormat, groundingStrictness, autoSyncLibrary, openAlexKey, semanticScholarKey, name, isOpen]);
 
   if (!isOpen) return null;
 
