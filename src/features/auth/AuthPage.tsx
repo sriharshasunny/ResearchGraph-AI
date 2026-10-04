@@ -53,6 +53,16 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const sourcesSectionRef = useRef<HTMLDivElement>(null);
   const pipelineSectionRef = useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'globe_wheel' && scrollContainerRef.current) {
+        scrollContainerRef.current.scrollBy({ top: e.data.deltaY, behavior: 'auto' });
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
