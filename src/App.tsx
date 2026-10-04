@@ -1,3 +1,4 @@
+import React from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useApp } from './context/AppContext';
@@ -56,6 +57,15 @@ const MainAppLayout = () => {
 export const App = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (location.pathname.startsWith('/app')) {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
+  }, [location.pathname]);
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>

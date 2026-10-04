@@ -71,10 +71,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     localStorage.setItem('rg_uiMode', mode);
   };
 
-  // Run initial setup to force light mode
-  React.useEffect(() => {
-    document.documentElement.classList.remove('dark');
-  }, []);
 
 
 
