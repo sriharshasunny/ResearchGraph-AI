@@ -1,74 +1,10 @@
-﻿<!doctype html>
-<html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ResearchGraph AI ÔÇô What are you researching today?</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-html,body{height:100%;margin:0;background:transparent !important;overflow:hidden;font-family:Inter,"Segoe UI",system-ui,sans-serif;color:#1e293b}
-#stage{user-select:none;-webkit-user-select:none;--u:1px;--s:1;position:relative;width:100%;height:100%;overflow:hidden;touch-action:pan-y;
- background:transparent !important;inset:0;pointer-events:none}
-#mt{position:absolute;left:0;bottom:4.5%;width:100%;height:26%;pointer-events:none}
-#hg{display:none;}
-#lake{display:none;}
-#tint{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,#f7f9fd 100%);pointer-events:none}
-.rip{position:absolute;border-radius:50%;border:1.5px solid var(--g);pointer-events:none;animation:rip 1.2s ease-out forwards}
-@keyframes rip{from{transform:translate(-50%,-50%) scale(.95);opacity:.8}to{transform:translate(-50%,-50%) scale(1.8);opacity:0}}
-#ui{position:absolute;inset:0;pointer-events:none}
-.a{position:absolute;transform:translate(-50%,-50%) scale(var(--s,1));opacity:0;transition:opacity .9s ease var(--d,0s)}.on .a{opacity:1}
-.f{animation:fl 7s ease-in-out infinite}@keyframes fl{50%{transform:translateY(-4px)}}
-.pill{pointer-events:auto;cursor:pointer;display:flex;align-items:center;gap:11px;height:40px;padding:0 20px 0 6px;border-radius:999px;font:600 14.5px Inter,system-ui,sans-serif;white-space:nowrap;border:1.5px solid transparent;background:linear-gradient(180deg,#151f58,#090e30) padding-box,linear-gradient(110deg,#4f8cff,#b36bff) border-box;box-shadow:0 8px 24px rgba(0,0,0,.5),0 0 20px rgba(110,100,255,.38);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
-.pill:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 34px color-mix(in srgb,var(--c) 65%,transparent)}
-.ic{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--g1),var(--g2));box-shadow:0 0 12px color-mix(in srgb,var(--g1) 60%,transparent);display:grid;place-items:center}
-.ic svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.dc{pointer-events:none;--s:1}.dc .f{width:100%;height:100%}
-.p1,.p2,.p3,.p4,.p5{border-radius:50%}
-.p1{background:radial-gradient(circle at 35% 30%,#dfe6ff,#7b88c4 38%,#2a3270 70%,#10153a);box-shadow:0 0 18px rgba(150,170,255,.5)}
-.p2{background:radial-gradient(circle at 35% 28%,#d6f3ff,#4aa0ff 35%,#1d3fa8 65%,#08133e);box-shadow:0 0 28px rgba(80,170,255,.7),inset -6px -8px 16px rgba(0,10,50,.6)}
-.p3{background:radial-gradient(circle at 38% 30%,#8ea6ff,#3a4fb0 40%,#141c5c 70%,#070a28);box-shadow:0 0 22px rgba(90,110,255,.45),inset -10px -12px 24px rgba(0,0,30,.7)}
-.p4{background:radial-gradient(circle at 35% 30%,#fff,#9fc2ff 40%,#5a6adf);box-shadow:0 0 10px rgba(150,170,255,.8)}
-.p5{background:radial-gradient(circle at 35% 30%,#ffe9c9,#c9926a 45%,#4a2f3f);box-shadow:0 0 10px rgba(255,190,140,.45)}
-.p5{position:relative}.p5:after{content:'';position:absolute;left:-60%;top:28%;width:220%;height:44%;border:2px solid rgba(255,205,165,.75);border-radius:50%;transform:rotate(-18deg);box-shadow:0 0 6px rgba(255,190,140,.5)}
-.cr{clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);background:linear-gradient(135deg,#a98bff,#4a2fb8);filter:drop-shadow(0 0 8px #8b6dff)}
-.gxy canvas{width:100%;height:100%;display:block;position:static}
-#core{position:absolute;left:calc(661*var(--u));top:calc(50% - 200*var(--u));width:calc(600*var(--u));display:flex;flex-direction:column;align-items:center;pointer-events:none;z-index:2}#core span{font-size:calc(180*var(--u));line-height:.85;font-weight:800;letter-spacing:-.04em;background:linear-gradient(180deg,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.01) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-#core span{display:block}
-/* ---- left hero ---- */
-#hero{position:absolute;left:calc(57*var(--u));top:calc(50% - 139*var(--u));width:calc(530*var(--u));display:flex;flex-direction:column;justify-content:flex-start;pointer-events:none;z-index:5;animation:hin 1s ease both}
-@keyframes hin{from{opacity:0;transform:translateY(14px)}}
-.chip0{align-self:flex-start;display:inline-flex;align-items:center;gap:calc(8*var(--u));height:calc(28*var(--u));padding:0 calc(14*var(--u)) 0 calc(10*var(--u));border-radius:99px;border:1px solid rgba(120,165,255,.5);background:rgba(18,28,84,.55);color:#86e3ff;font-size:calc(13*var(--u));font-weight:500;backdrop-filter:blur(6px)}
-.chip0 svg{width:calc(15*var(--u));height:calc(15*var(--u));fill:#7fe3ff}
-h1{margin:calc(11*var(--u)) 0 0;font-size:calc(53*var(--u));line-height:1.06;font-weight:800;letter-spacing:-.025em;color:#fff}
-h1 em{font-style:normal;white-space:nowrap;background:linear-gradient(90deg,#4de1ff 0%,#78a4ff 38%,#b57bff 72%,#ff7ad9 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{margin:calc(3*var(--u)) 0 0;font-size:calc(16.5*var(--u));font-weight:500;color:#e2eaff}
-.search{pointer-events:auto;margin-top:calc(17*var(--u));width:calc(516*var(--u));max-width:100%;height:calc(50*var(--u));box-sizing:border-box;display:flex;align-items:center;gap:calc(12*var(--u));padding:0 calc(5*var(--u)) 0 calc(18*var(--u));border-radius:calc(15*var(--u));border:1px solid rgba(120,155,255,.5);background:rgba(8,14,50,.72);backdrop-filter:blur(8px);box-shadow:0 0 24px rgba(80,110,255,.18)}
-.search svg.q{width:calc(20*var(--u));height:calc(20*var(--u));fill:none;stroke:#dbe6ff;stroke-width:2;stroke-linecap:round;flex:none}
-.search input{user-select:text;-webkit-user-select:text;flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:500 calc(16*var(--u)) Inter,system-ui,sans-serif}
-.search input::placeholder{color:#9db0dc}
-.search button{flex:none;width:calc(42*var(--u));height:calc(42*var(--u));border-radius:50%;border:0;cursor:pointer;display:grid;place-items:center;background:linear-gradient(135deg,#3b8bff,#2354ff);box-shadow:0 0 18px rgba(60,120,255,.7);transition:transform .2s}
-.search button:hover{transform:scale(1.08)}
-.search button svg{width:calc(20*var(--u));height:calc(20*var(--u));fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.chips{pointer-events:auto;margin-top:calc(17*var(--u));display:flex;flex-wrap:wrap;gap:calc(12*var(--u)) calc(8*var(--u));width:calc(540*var(--u));max-width:100%}
-.chips button{white-space:nowrap;height:calc(28*var(--u));padding:0 calc(12*var(--u));border-radius:calc(9*var(--u));border:1px solid rgba(150,170,255,.32);background:rgba(16,24,72,.55);color:#e8eeff;font:500 calc(11.6*var(--u)) Inter,system-ui,sans-serif;cursor:pointer;transition:border-color .2s,background .2s}
-.chips button:hover{border-color:rgba(120,230,255,.7);background:rgba(30,50,120,.65)}
-@media (max-width:900px){#hero{left:5vw;top:5vh;width:90vw}.search,.chips{width:100%}}
-@media (prefers-reduced-motion:reduce){.f,#hero{animation:none}}
-</style></head>
-<body>
-<div id="stage"><svg id="mt" viewBox="0 0 1000 100" preserveAspectRatio="none"></svg><div id="hg"></div><div id="lake"></div><div id="tint"></div><div id="ui"></div><div id="core"><span>RESEARCH</span><span>CORE</span></div>
-<section id="hero"><div class="chip0"><svg viewBox="0 0 24 24"><path d="M12 2l2.4 7.1L22 12l-7.6 2.9L12 22l-2.4-7.1L2 12l7.6-2.9z"/></svg>Next-Gen Academic Research OS</div>
-<h1>What are you<br><em>researching today?</em></h1><p class="sub">Explore research. Connect knowledge. Discover what's next.</p>
-<div class="search"><svg class="q" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" placeholder="Ask anything about academic research..." autocomplete="off"><button id="go" aria-label="Search"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
-<div class="chips"><button>Find papers about RAG</button><button>Compare DINOv2 and MAE</button><button>Research gaps in GNNs</button><button>Latest Vision Transformer research</button><button>Self-supervised learning in agriculture</button></div></section></div>
-<script src="/three.min.js"></script>
-<script>
+
 (function(){
-const stage=document.getElementById('stage'),ui=document.getElementById('ui'),tint=document.getElementById('tint'),core=document.getElementById('core'),mt=document.getElementById('mt');
+const stage=document.getElementById('stage'),ui=document.getElementById('ui'),tint=document.getElementById('tint'),core=document.getElementById('core'),mt=document.getElementById('mt') || {};
 const W=()=>stage.clientWidth,H=()=>stage.clientHeight,R=2.4,ADD=THREE.AdditiveBlending,DPR=Math.min(devicePixelRatio||1,2),T20=Math.tan(.34907),reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(DPR);stage.insertBefore(renderer.domElement,ui);
 const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(40,1,.1,300);
-const UN={time:{value:0},ps:{value:1},tm:{value:0},tc:{value:new THREE.Color(0x3b82f6)}};
+const UN={time:{value:0},ps:{value:1},tm:{value:0},tc:{value:new THREE.Color(0x22d3ee)}};
 const world=new THREE.Group(),globe=new THREE.Group();scene.add(world);world.add(globe);world.scale.setScalar(.88);
 const an=renderer.capabilities.getMaxAnisotropy(),ld=new THREE.TextureLoader(),TX=u=>{const t=ld.load(u);t.anisotropy=an;return t;};
 // ---- globe: the reference picture, unwrapped + sharpened, plus real city-lights for crisp detail
@@ -134,4 +70,3 @@ stage.addEventListener('pointermove',e=>{if(drag){const dx=e.clientX-lx,dy=e.cli
  
  renderer.render(scene,cam);})();
 })();
-</script></body></html>
