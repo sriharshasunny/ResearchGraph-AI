@@ -5,7 +5,6 @@ import {
   GitCompare, Network, Bookmark, Sparkles, Activity, Clock 
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
 export const Dashboard: React.FC = () => {
   const { setActivePage, setSearchQuery, savedPaperIds } = useApp();
