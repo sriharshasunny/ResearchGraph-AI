@@ -27,9 +27,9 @@ const MainAppLayout = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.02 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="flex h-screen w-full bg-[#F7FAFC] text-gray-900 overflow-hidden font-sans relative"
+      className="flex h-screen w-full bg-[#F7FAFC] dark:bg-[#0B1426] text-gray-900 dark:text-white overflow-hidden font-sans relative transition-colors duration-300"
     >
-      <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC]">
+      <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC] dark:bg-[#0B1426] transition-colors duration-300">
       </div>
       <div className="relative z-10 flex flex-col h-full w-full">
         <Navbar onLogout={handleLogout} />

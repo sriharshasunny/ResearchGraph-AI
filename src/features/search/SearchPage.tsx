@@ -90,39 +90,39 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC]">
+    <div className="relative w-full min-h-[calc(100vh-60px)] overflow-x-hidden p-4 sm:p-6 lg:p-8 pb-24 bg-[#F7FAFC] dark:bg-[#0B1426]">
       <div className="max-w-[1240px] mx-auto space-y-6">
 
         {/* ── HEADER ── */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm dark:shadow-none space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActivePage('dashboard')}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-xl text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:text-white hover:bg-gray-100 dark:bg-white/[0.06] transition-colors"
                 title="Return to Home"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-blue-600" />
                   Search Academic Research
                 </h1>
-                <p className="text-[13px] text-gray-500 mt-0.5">
+                <p className="text-[13px] text-gray-500 dark:text-gray-500 mt-0.5">
                   Find papers from global and private research libraries.
                 </p>
               </div>
             </div>
 
-            <div className="text-[12px] font-semibold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100">
+            <div className="text-[12px] font-semibold text-gray-500 dark:text-gray-500 bg-gray-50 dark:bg-white/[0.04] px-3 py-1.5 rounded-xl border border-gray-100 dark:border-white/[0.04]">
               {filteredPapers.length} Papers Available
             </div>
           </div>
 
           {/* Large Search Input */}
-          <div className="relative flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-            <Search className="w-4 h-4 text-gray-400 shrink-0 mr-3" />
+          <div className="relative flex items-center bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] rounded-xl px-4 py-2.5 focus-within:border-blue-500 focus-within:bg-white dark:bg-[#111D35] focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+            <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0 mr-3" />
             <input
               type="text"
               placeholder="Search papers, authors, datasets, concepts (e.g. DINOv2, self-attention, Vaswani)..."
@@ -131,12 +131,12 @@ export const SearchPage: React.FC = () => {
                 setLocalQuery(e.target.value);
                 setSearchQuery(e.target.value);
               }}
-              className="flex-1 bg-transparent text-[14px] text-gray-900 placeholder-gray-400 focus:outline-none"
+              className="flex-1 bg-transparent text-[14px] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none"
             />
             {localQuery && (
               <button 
                 onClick={() => { setLocalQuery(''); setSearchQuery(''); }}
-                className="text-gray-400 hover:text-gray-700 p-1"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:text-gray-200 p-1"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -144,7 +144,7 @@ export const SearchPage: React.FC = () => {
           </div>
 
           {/* ── FILTER PILLS ── */}
-          <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-gray-100 text-[12px]">
+          <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-gray-100 dark:border-white/[0.04] text-[12px]">
             {/* Year Filter */}
             <div className="relative">
               <button
@@ -152,20 +152,20 @@ export const SearchPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-all ${
                   selectedYear !== 'All' 
                     ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04]'
                 }`}
               >
                 <span>Year: {selectedYear}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               </button>
               {activeDropdown === 'year' && (
-                <div className="absolute left-0 mt-1 w-32 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1 max-h-48 overflow-y-auto">
+                <div className="absolute left-0 mt-1 w-32 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl shadow-lg z-30 py-1 max-h-48 overflow-y-auto">
                   {years.map(y => (
                     <button
                       key={y}
                       onClick={() => { setSelectedYear(y); setActiveDropdown(null); }}
-                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 flex items-center justify-between ${
-                        selectedYear === y ? 'font-bold text-blue-600' : 'text-gray-700'
+                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 dark:bg-white/[0.04] flex items-center justify-between ${
+                        selectedYear === y ? 'font-bold text-blue-600' : 'text-gray-700 dark:text-gray-200'
                       }`}
                     >
                       {y}
@@ -183,20 +183,20 @@ export const SearchPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-all ${
                   selectedField !== 'All' 
                     ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04]'
                 }`}
               >
                 <span>Research Area: {selectedField}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               </button>
               {activeDropdown === 'field' && (
-                <div className="absolute left-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1">
+                <div className="absolute left-0 mt-1 w-52 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl shadow-lg z-30 py-1">
                   {fields.map(f => (
                     <button
                       key={f}
                       onClick={() => { setSelectedField(f); setActiveDropdown(null); }}
-                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 flex items-center justify-between ${
-                        selectedField === f ? 'font-bold text-blue-600' : 'text-gray-700'
+                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 dark:bg-white/[0.04] flex items-center justify-between ${
+                        selectedField === f ? 'font-bold text-blue-600' : 'text-gray-700 dark:text-gray-200'
                       }`}
                     >
                       {f}
@@ -214,20 +214,20 @@ export const SearchPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-all ${
                   selectedMethod !== 'All' 
                     ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04]'
                 }`}
               >
                 <span>Method: {selectedMethod}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               </button>
               {activeDropdown === 'method' && (
-                <div className="absolute left-0 mt-1 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1">
+                <div className="absolute left-0 mt-1 w-56 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl shadow-lg z-30 py-1">
                   {methods.map(m => (
                     <button
                       key={m}
                       onClick={() => { setSelectedMethod(m); setActiveDropdown(null); }}
-                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 flex items-center justify-between ${
-                        selectedMethod === m ? 'font-bold text-blue-600' : 'text-gray-700'
+                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 dark:bg-white/[0.04] flex items-center justify-between ${
+                        selectedMethod === m ? 'font-bold text-blue-600' : 'text-gray-700 dark:text-gray-200'
                       }`}
                     >
                       {m}
@@ -245,20 +245,20 @@ export const SearchPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-all ${
                   selectedDataset !== 'All' 
                     ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04]'
                 }`}
               >
                 <span>Dataset: {selectedDataset}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               </button>
               {activeDropdown === 'dataset' && (
-                <div className="absolute left-0 mt-1 w-44 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1">
+                <div className="absolute left-0 mt-1 w-44 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl shadow-lg z-30 py-1">
                   {datasets.map(d => (
                     <button
                       key={d}
                       onClick={() => { setSelectedDataset(d); setActiveDropdown(null); }}
-                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 flex items-center justify-between ${
-                        selectedDataset === d ? 'font-bold text-blue-600' : 'text-gray-700'
+                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 dark:bg-white/[0.04] flex items-center justify-between ${
+                        selectedDataset === d ? 'font-bold text-blue-600' : 'text-gray-700 dark:text-gray-200'
                       }`}
                     >
                       {d}
@@ -276,20 +276,20 @@ export const SearchPage: React.FC = () => {
                 className={`px-3 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-all ${
                   selectedSource !== 'All' 
                     ? 'bg-blue-50 border-blue-300 text-blue-700' 
-                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04]'
                 }`}
               >
                 <span>Source: {selectedSource}</span>
-                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500" />
               </button>
               {activeDropdown === 'source' && (
-                <div className="absolute left-0 mt-1 w-36 bg-white border border-gray-200 rounded-xl shadow-lg z-30 py-1">
+                <div className="absolute left-0 mt-1 w-36 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl shadow-lg z-30 py-1">
                   {sources.map(s => (
                     <button
                       key={s}
                       onClick={() => { setSelectedSource(s); setActiveDropdown(null); }}
-                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 flex items-center justify-between ${
-                        selectedSource === s ? 'font-bold text-blue-600' : 'text-gray-700'
+                      className={`w-full text-left px-3 py-1.5 text-[12px] hover:bg-gray-50 dark:bg-white/[0.04] flex items-center justify-between ${
+                        selectedSource === s ? 'font-bold text-blue-600' : 'text-gray-700 dark:text-gray-200'
                       }`}
                     >
                       {s}
@@ -306,7 +306,7 @@ export const SearchPage: React.FC = () => {
               className={`px-3 py-1.5 rounded-lg border font-medium transition-all ${
                 openAccessOnly 
                   ? 'bg-emerald-50 border-emerald-300 text-emerald-700' 
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04]'
               }`}
             >
               Open Access
@@ -362,10 +362,10 @@ export const SearchPage: React.FC = () => {
         {/* ── PAPER RESULTS: CLEAN RESEARCH ROWS ── */}
         <div className="space-y-3">
           {filteredPapers.length === 0 ? (
-            <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center flex flex-col items-center">
+            <div className="bg-white dark:bg-[#111D35] rounded-2xl border border-gray-200 dark:border-white/[0.06] p-12 text-center flex flex-col items-center">
               <Search className="w-10 h-10 text-gray-300 mb-3" />
-              <h3 className="text-[16px] font-bold text-gray-900">No matching research papers</h3>
-              <p className="text-[13px] text-gray-500 mt-1 max-w-sm">
+              <h3 className="text-[16px] font-bold text-gray-900 dark:text-white">No matching research papers</h3>
+              <p className="text-[13px] text-gray-500 dark:text-gray-500 mt-1 max-w-sm">
                 Try searching for broader keywords like "Transformers", "Vision", or reset your filters.
               </p>
               <button
@@ -383,28 +383,28 @@ export const SearchPage: React.FC = () => {
               return (
                 <div
                   key={paper.id}
-                  className="bg-white rounded-2xl border border-gray-200 p-5 hover:border-blue-300 hover:shadow-sm transition-all"
+                  className="bg-white dark:bg-[#111D35] rounded-2xl border border-gray-200 dark:border-white/[0.06] p-5 hover:border-blue-300 hover:shadow-sm dark:shadow-none transition-all"
                 >
                   {/* Top Row: Title + Action Buttons */}
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <h3 
                         onClick={() => handleOpenPaper(paper.id)}
-                        className="text-[15px] sm:text-[16px] font-bold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer leading-snug"
+                        className="text-[15px] sm:text-[16px] font-bold text-gray-900 dark:text-white hover:text-blue-600 transition-colors cursor-pointer leading-snug"
                       >
                         {paper.title}
                       </h3>
 
-                      <div className="flex items-center gap-2 flex-wrap text-[12px] text-gray-500 mt-1.5">
-                        <span className="font-medium text-gray-700">{paper.authors.join(' · ')}</span>
+                      <div className="flex items-center gap-2 flex-wrap text-[12px] text-gray-500 dark:text-gray-500 mt-1.5">
+                        <span className="font-medium text-gray-700 dark:text-gray-200">{paper.authors.join(' · ')}</span>
                         <span>•</span>
-                        <span className="font-semibold text-gray-600">{paper.year}</span>
+                        <span className="font-semibold text-gray-600 dark:text-gray-300">{paper.year}</span>
                         <span>•</span>
-                        <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 text-[11px] font-mono font-medium">
+                        <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 text-[11px] font-mono font-medium">
                           {paper.venue || 'arXiv'}
                         </span>
                         <span>•</span>
-                        <span className="font-semibold text-gray-700">{paper.citations.toLocaleString()} citations</span>
+                        <span className="font-semibold text-gray-700 dark:text-gray-200">{paper.citations.toLocaleString()} citations</span>
                       </div>
                     </div>
 
@@ -412,7 +412,7 @@ export const SearchPage: React.FC = () => {
                     <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                       <button
                         onClick={() => handleOpenPaper(paper.id)}
-                        className="px-3 py-1.5 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-700 font-semibold text-[11px] border border-gray-200 transition-all"
+                        className="px-3 py-1.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 dark:bg-white/[0.06] text-gray-700 dark:text-gray-200 font-semibold text-[11px] border border-gray-200 dark:border-white/[0.06] transition-all"
                       >
                         Open
                       </button>
@@ -422,7 +422,7 @@ export const SearchPage: React.FC = () => {
                         className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-[11px] border transition-all ${
                           isSaved
                             ? 'bg-blue-50 border-blue-200 text-blue-600'
-                            : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                            : 'bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 dark:bg-white/[0.06] border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200'
                         }`}
                       >
                         <Bookmark className="w-3.5 h-3.5" fill={isSaved ? 'currentColor' : 'none'} />
@@ -434,7 +434,7 @@ export const SearchPage: React.FC = () => {
                         className={`flex items-center gap-1 px-3 py-1.5 rounded-xl font-semibold text-[11px] border transition-all ${
                           isCompared
                             ? 'bg-purple-50 border-purple-200 text-purple-700'
-                            : 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700'
+                            : 'bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 dark:bg-white/[0.06] border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200'
                         }`}
                       >
                         <GitCompare className="w-3.5 h-3.5" />
@@ -443,7 +443,7 @@ export const SearchPage: React.FC = () => {
 
                       <button
                         onClick={() => handleAskAI(paper.title)}
-                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] shadow-sm transition-all"
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-[11px] shadow-sm dark:shadow-none transition-all"
                       >
                         <MessageSquare className="w-3.5 h-3.5" />
                         <span>Ask AI</span>
@@ -452,7 +452,7 @@ export const SearchPage: React.FC = () => {
                   </div>
 
                   {/* Abstract preview */}
-                  <p className="text-[13px] text-gray-600 mt-3 line-clamp-2 leading-relaxed">
+                  <p className="text-[13px] text-gray-600 dark:text-gray-300 mt-3 line-clamp-2 leading-relaxed">
                     {paper.abstract}
                   </p>
 
@@ -464,7 +464,7 @@ export const SearchPage: React.FC = () => {
                       </span>
                     )}
                     {paper.tldr && (
-                      <span className="px-2.5 py-0.5 rounded-md bg-gray-100 text-gray-600 text-[11px] font-medium">
+                      <span className="px-2.5 py-0.5 rounded-md bg-gray-100 dark:bg-white/[0.06] text-gray-600 dark:text-gray-300 text-[11px] font-medium">
                         Key insight: {paper.tldr.slice(0, 70)}...
                       </span>
                     )}

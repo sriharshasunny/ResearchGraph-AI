@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { 
   Home, Search, MessageSquare, FileText, Bookmark, 
   GitCompare, Network, BookOpen, Activity, Clock, 
-  LayoutDashboard, Settings
+  Crown, ArrowRight, Sparkles
 } from 'lucide-react';
 import type { PageType } from '../types';
 
@@ -45,38 +45,48 @@ export const Sidebar: React.FC = () => {
 
   const handleNavClick = useCallback((id: string) => {
     setActivePage(id as PageType);
-    // Auto-close sidebar after navigation for clean UX
     if (isSidebarOpen) toggleSidebar();
   }, [setActivePage, isSidebarOpen, toggleSidebar]);
 
-  // Flatten items to compute stagger delay index
   let globalItemIndex = 0;
 
   return (
-    <div 
-      className="shrink-0 relative z-30 bg-white dark:bg-[#06111F] border-r border-gray-200 dark:border-[#0B1A38] h-full flex flex-col justify-between overflow-hidden"
-      style={{
-        width: isSidebarOpen ? 250 : 76,
-        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      }}
-    >
-      {/* ── NAVIGATION GROUPS ── */}
-      <div className="flex flex-col flex-1 min-h-0">
-        <nav className="flex-1 overflow-y-auto overflow-x-hidden py-5 px-3 scrollbar-thin">
-          <div className="flex flex-col gap-5">
+    <div className="w-[76px] shrink-0 relative z-30">
+      {/* Backdrop */}
+      <div 
+        onClick={toggleSidebar}
+        className={`fixed inset-0 bg-black/10 dark:bg-black/40 backdrop-blur-[1px] transition-opacity duration-300 ${
+          isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        style={{ zIndex: 20 }} // Below Sidebar (30) and Navbar (40)
+      />
+
+      {/* Sidebar Panel */}
+      <aside
+        style={{
+          width: isSidebarOpen ? 250 : 76,
+          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          zIndex: 30, // Above backdrop, below Navbar
+        }}
+        className="absolute inset-y-0 left-0 bg-white dark:bg-[#0B1426] flex flex-col justify-between border-r border-gray-200 dark:border-white/[0.06] select-none overflow-hidden shadow-xl dark:shadow-none"
+      >
+        <div className="flex flex-col flex-1 min-h-0">
+          {/* Navigation Groups - padding top adjusted since header was removed */}
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden pt-6 pb-5 scrollbar-thin">
+            <div className="flex flex-col gap-6">
               {navGroups.map((group, groupIdx) => {
                 return (
                   <div key={groupIdx} className="flex flex-col gap-0.5">
-                    {/* Group Title */}
+                    {/* Group Title — gray in light, colored in dark */}
                     <div 
-                      className="h-5 flex items-center px-2 mb-1 overflow-hidden transition-all duration-300"
+                      className="h-5 flex items-center px-6 mb-1 overflow-hidden"
                       style={{
                         maxHeight: isSidebarOpen ? 20 : 0,
                         opacity: isSidebarOpen ? 1 : 0,
-                        marginBottom: isSidebarOpen ? 4 : 0,
+                        transition: 'max-height 0.3s, opacity 0.3s',
                       }}
                     >
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
+                      <span className="text-[11px] font-bold text-gray-400 dark:text-blue-400/70 uppercase tracking-widest whitespace-nowrap">
                         {group.title}
                       </span>
                     </div>
@@ -93,26 +103,30 @@ export const Sidebar: React.FC = () => {
                             title={!isSidebarOpen ? item.label : undefined}
                             onClick={() => handleNavClick(item.id)}
                             className={`
-                              relative flex items-center rounded-xl transition-all duration-200 font-semibold text-[13px] group
-                              ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center py-2.5 mx-auto w-[50px]'}
+                              relative flex items-center rounded-xl font-medium text-[13px] group overflow-hidden mx-3
+                              ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center py-2.5 mx-auto w-[46px]'}
                               ${isActive
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
+                                ? 'bg-blue-50 text-blue-600 dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600 dark:text-white dark:shadow-lg dark:shadow-blue-600/20'
+                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-white'
                               }
                             `}
                           >
-                            <div className={`shrink-0 transition-all duration-200 ${isActive ? 'text-white scale-105' : 'group-hover:scale-110 group-hover:text-gray-900 dark:group-hover:text-white'}`}>
+                            {/* Left accent bar — light mode only */}
+                            {isActive && <div className="absolute inset-y-0 left-0 w-1 bg-blue-600 dark:bg-transparent rounded-r-md"></div>}
+                            <div className={`shrink-0 ${isActive ? 'text-blue-600 dark:text-white' : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-white'}`}>
                               {item.icon}
                             </div>
                             <span
-                              className="whitespace-nowrap text-left flex-1 overflow-hidden transition-all duration-300"
+                              className="whitespace-nowrap text-left flex-1 overflow-hidden flex items-center justify-between"
                               style={{
                                 maxWidth: isSidebarOpen ? 180 : 0,
                                 opacity: isSidebarOpen ? 1 : 0,
+                                transition: `max-width 0.3s, opacity 0.3s`,
                                 transitionDelay: isSidebarOpen ? `${itemDelay}s` : '0s',
                               }}
                             >
                               {item.label}
+                              {item.id === 'chat' && <Sparkles className="w-3.5 h-3.5 text-blue-500 dark:text-blue-300 shrink-0" />}
                             </span>
                           </button>
                         );
@@ -125,34 +139,30 @@ export const Sidebar: React.FC = () => {
           </nav>
         </div>
         
-        {/* ── BOTTOM FOOTER ── */}
-        <div className="p-3 border-t border-gray-200 dark:border-[#0B1A38] shrink-0">
-          {!isSidebarOpen ? (
-            <div className="flex flex-col items-center gap-3 text-gray-500">
-              <div className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-all duration-200 cursor-pointer" title="Dashboard">
-                <LayoutDashboard className="w-[18px] h-[18px]" />
+        {/* Bottom Footer — Upgrade to Pro */}
+        <div className="p-4 shrink-0 border-t border-gray-200 dark:border-white/[0.06]">
+          {isSidebarOpen ? (
+            <div className="bg-blue-50 dark:bg-gradient-to-r dark:from-[#111D35] dark:to-[#1A2A4A] rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-blue-100/60 dark:hover:from-[#152340] dark:hover:to-[#213460]">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-white dark:bg-blue-600/20 flex items-center justify-center shrink-0 shadow-sm dark:shadow-none text-blue-600 dark:text-blue-400">
+                  <Crown className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[12px] font-bold text-gray-900 dark:text-white">Upgrade to Pro</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400">Unlock advanced features</span>
+                </div>
               </div>
-              <div className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-all duration-200 cursor-pointer" title="Settings">
-                <Settings className="w-[18px] h-[18px]" />
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center shrink-0">
+                <ArrowRight className="w-3 h-3 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-between px-2">
-              <span
-                className="text-[10px] font-mono text-gray-500 dark:text-gray-600 uppercase tracking-widest whitespace-nowrap overflow-hidden transition-all duration-300"
-                style={{
-                  maxWidth: isSidebarOpen ? 150 : 0,
-                  opacity: isSidebarOpen ? 1 : 0,
-                }}
-              >
-                v1.0.2 / Enterprise
-              </span>
-              <div className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200 cursor-pointer" title="Settings">
-                <Settings className="w-4 h-4 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors" />
-              </div>
+            <div className="w-10 h-10 mx-auto rounded-full bg-blue-50 dark:bg-[#111D35] flex items-center justify-center cursor-pointer hover:bg-blue-100/60 dark:hover:bg-[#1A2A4A] shadow-sm dark:shadow-none">
+               <Crown className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
           )}
         </div>
+      </aside>
     </div>
   );
 };
