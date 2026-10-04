@@ -53,51 +53,17 @@ export const Sidebar: React.FC = () => {
   let globalItemIndex = 0;
 
   return (
-    <div className="w-[76px] shrink-0 relative z-[9999]">
-      {/* ── BACKDROP OVERLAY (visible when open) ── */}
-      <div 
-        onClick={toggleSidebar}
-        className={`fixed inset-0 bg-black/30 backdrop-blur-[2px] transition-opacity duration-300 ${
-          isSidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-        style={{ zIndex: 9998 }}
-      />
-
-      {/* ── SIDEBAR PANEL ── */}
-      <aside
-        style={{
-          width: isSidebarOpen ? 250 : 76,
-          transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          zIndex: 9999,
-        }}
-        className="absolute inset-y-0 left-0 bg-[#06111F] text-white flex flex-col justify-between border-r border-[#0B1A38] select-none overflow-hidden"
-      >
-        {/* ── TOP BRAND & TOGGLE ── */}
-        <div className="flex flex-col flex-1 min-h-0">
-          <div className="h-14 flex items-center px-4 border-b border-[#0B1A38] shrink-0">
-            <div 
-              onClick={toggleSidebar}
-              className="flex items-center gap-3 cursor-pointer group"
-              title={isSidebarOpen ? 'Collapse Sidebar' : 'Expand Sidebar'}
-            >
-              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 group-hover:bg-blue-500 group-hover:shadow-blue-500/40 transition-all duration-200 group-hover:scale-105">
-                <Network className="w-[18px] h-[18px] text-white" />
-              </div>
-              <span 
-                className="font-extrabold text-[14px] tracking-tight text-white whitespace-nowrap overflow-hidden transition-all duration-300"
-                style={{
-                  maxWidth: isSidebarOpen ? 160 : 0,
-                  opacity: isSidebarOpen ? 1 : 0,
-                }}
-              >
-                ResearchGraph
-              </span>
-            </div>
-          </div>
-
-          {/* ── NAVIGATION GROUPS ── */}
-          <nav className="flex-1 overflow-y-auto overflow-x-hidden py-5 px-3 scrollbar-thin">
-            <div className="flex flex-col gap-5">
+    <div 
+      className="shrink-0 relative z-30 bg-white dark:bg-[#06111F] border-r border-gray-200 dark:border-[#0B1A38] h-full flex flex-col justify-between overflow-hidden"
+      style={{
+        width: isSidebarOpen ? 250 : 76,
+        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      }}
+    >
+      {/* ── NAVIGATION GROUPS ── */}
+      <div className="flex flex-col flex-1 min-h-0">
+        <nav className="flex-1 overflow-y-auto overflow-x-hidden py-5 px-3 scrollbar-thin">
+          <div className="flex flex-col gap-5">
               {navGroups.map((group, groupIdx) => {
                 return (
                   <div key={groupIdx} className="flex flex-col gap-0.5">
@@ -131,11 +97,11 @@ export const Sidebar: React.FC = () => {
                               ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center py-2.5 mx-auto w-[50px]'}
                               ${isActive
                                 ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                : 'text-gray-400 hover:bg-white/[0.06] hover:text-white'
+                                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white'
                               }
                             `}
                           >
-                            <div className={`shrink-0 transition-all duration-200 ${isActive ? 'text-white scale-105' : 'group-hover:scale-110 group-hover:text-white'}`}>
+                            <div className={`shrink-0 transition-all duration-200 ${isActive ? 'text-white scale-105' : 'group-hover:scale-110 group-hover:text-gray-900 dark:group-hover:text-white'}`}>
                               {item.icon}
                             </div>
                             <span
@@ -160,20 +126,20 @@ export const Sidebar: React.FC = () => {
         </div>
         
         {/* ── BOTTOM FOOTER ── */}
-        <div className="p-3 border-t border-[#0B1A38] shrink-0">
+        <div className="p-3 border-t border-gray-200 dark:border-[#0B1A38] shrink-0">
           {!isSidebarOpen ? (
             <div className="flex flex-col items-center gap-3 text-gray-500">
-              <div className="p-2 rounded-lg hover:bg-white/[0.06] hover:text-white transition-all duration-200 cursor-pointer" title="Dashboard">
+              <div className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-all duration-200 cursor-pointer" title="Dashboard">
                 <LayoutDashboard className="w-[18px] h-[18px]" />
               </div>
-              <div className="p-2 rounded-lg hover:bg-white/[0.06] hover:text-white transition-all duration-200 cursor-pointer" title="Settings">
+              <div className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] hover:text-gray-900 dark:hover:text-white transition-all duration-200 cursor-pointer" title="Settings">
                 <Settings className="w-[18px] h-[18px]" />
               </div>
             </div>
           ) : (
             <div className="flex items-center justify-between px-2">
               <span
-                className="text-[10px] font-mono text-gray-600 uppercase tracking-widest whitespace-nowrap overflow-hidden transition-all duration-300"
+                className="text-[10px] font-mono text-gray-500 dark:text-gray-600 uppercase tracking-widest whitespace-nowrap overflow-hidden transition-all duration-300"
                 style={{
                   maxWidth: isSidebarOpen ? 150 : 0,
                   opacity: isSidebarOpen ? 1 : 0,
@@ -181,13 +147,12 @@ export const Sidebar: React.FC = () => {
               >
                 v1.0.2 / Enterprise
               </span>
-              <div className="p-1.5 rounded-lg hover:bg-white/[0.06] transition-all duration-200 cursor-pointer" title="Settings">
-                <Settings className="w-4 h-4 text-gray-500 hover:text-white transition-colors" />
+              <div className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/[0.06] transition-all duration-200 cursor-pointer" title="Settings">
+                <Settings className="w-4 h-4 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors" />
               </div>
             </div>
           )}
         </div>
-      </aside>
     </div>
   );
 };

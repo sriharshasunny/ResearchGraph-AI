@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Command, Search, Settings, LogOut, User, Moon, Sun, Laptop, HelpCircle } from 'lucide-react';
+import { Bell, Command, Search, Settings, LogOut, User, Moon, Sun, Laptop, HelpCircle, Menu, Network } from 'lucide-react';
 import { ProfileModal } from './ProfileModal';
 import { SettingsModal } from './SettingsModal';
 
 export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
-  const { activePage, setSearchQuery, setActivePage, theme, setTheme } = useApp();
+  const { setSearchQuery, setActivePage, theme, setTheme, isSidebarOpen, toggleSidebar } = useApp();
   
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const [isBellOpen, setIsBellOpen] = useState(false);
@@ -43,27 +43,31 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     }
   };
 
-  const getPageTitle = () => {
-    switch(activePage) {
-      case 'dashboard': return 'Home';
-      case 'chat': return 'AI Assistant';
-      case 'graph': return 'Knowledge Graph';
-      case 'search': return 'Search';
-      case 'details': return 'Papers';
-      case 'saved': return 'Saved Papers';
-      case 'compare': return 'Compare';
-      case 'literature': return 'Literature Review';
-      case 'gaps': return 'Research Gaps';
-      case 'history': return 'History';
-      default: return 'ResearchGraph AI';
-    }
-  };
+
 
   return (
     <>
-      <header className="h-14 shrink-0 bg-white/90 dark:bg-[#06111F]/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-4 sm:px-6 z-40 sticky top-0 relative transition-colors">
+      <header className="h-14 shrink-0 bg-white/90 dark:bg-[#06111F]/90 backdrop-blur-md border-b border-gray-200 dark:border-[#0B1A38] flex items-center justify-between px-3 sm:px-4 z-40 sticky top-0 relative transition-colors">
         <div className="flex items-center gap-3">
-          <h1 className="text-[15px] font-bold text-gray-900 dark:text-white tracking-tight">{getPageTitle()}</h1>
+          <button 
+            onClick={toggleSidebar} 
+            className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 dark:border-gray-800 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors bg-white dark:bg-[#06111F]"
+            title={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <div 
+            onClick={() => setActivePage('dashboard')}
+            className="flex items-center gap-3 cursor-pointer group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/30 group-hover:bg-blue-500 transition-all duration-200">
+              <Network className="w-[16px] h-[16px] text-white" />
+            </div>
+            <span className="font-extrabold text-[15px] tracking-tight text-gray-900 dark:text-white hidden sm:block">
+              ResearchGraph <span className="text-[#8B5CF6]">AI</span>
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-4 sm:gap-6">

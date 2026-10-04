@@ -31,10 +31,10 @@ const MainAppLayout = () => {
     >
       <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC]">
       </div>
-      <div className="relative z-10 flex h-full w-full">
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-          <Navbar onLogout={handleLogout} />
+      <div className="relative z-10 flex flex-col h-full w-full">
+        <Navbar onLogout={handleLogout} />
+        <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden relative">
+          <Sidebar />
           <main className="flex-1 overflow-x-hidden overflow-y-auto relative z-0">
             {activePage === 'dashboard'  && <Dashboard />}
             {activePage === 'chat'       && <ChatPage />}
