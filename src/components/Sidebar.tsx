@@ -68,7 +68,7 @@ export const Sidebar: React.FC = () => {
           transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           zIndex: 30, // Above backdrop, below Navbar
         }}
-        className="absolute inset-y-0 left-0 bg-white dark:bg-[#0B1426] flex flex-col justify-between border-r border-gray-200 dark:border-white/[0.06] select-none overflow-hidden shadow-xl dark:shadow-none"
+        className="absolute inset-y-0 left-0 bg-white dark:bg-[#111D35] dark:bg-[#0B1426] flex flex-col justify-between border-r border-gray-200 dark:border-white/[0.06] dark:border-white/[0.06] select-none overflow-hidden shadow-xl dark:shadow-none"
       >
         <div className="flex flex-col flex-1 min-h-0">
           {/* Navigation Groups - padding top adjusted since header was removed */}
@@ -107,13 +107,13 @@ export const Sidebar: React.FC = () => {
                               ${isSidebarOpen ? 'px-3 py-2.5 gap-3' : 'justify-center py-2.5 mx-auto w-[46px]'}
                               ${isActive
                                 ? 'bg-blue-50 text-blue-600 dark:bg-gradient-to-r dark:from-[#3B28CC] dark:to-[#6938F5] dark:text-white dark:shadow-[0_0_15px_rgba(105,56,245,0.4)] dark:border-t dark:border-white/20'
-                                : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/[0.04] dark:hover:text-white'
+                                : 'text-gray-600 dark:text-gray-300 dark:text-gray-300 hover:bg-gray-50 dark:bg-white/[0.04] dark:text-gray-400 dark:hover:bg-white dark:bg-[#111D35]/[0.04] dark:hover:text-white'
                               }
                             `}
                           >
                             {/* Left accent bar — light mode only */}
                             {isActive && <div className="absolute inset-y-0 left-0 w-1 bg-blue-600 dark:bg-transparent rounded-r-md"></div>}
-                            <div className={`shrink-0 ${isActive ? 'text-blue-600 dark:text-white' : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-white'}`}>
+                            <div className={`shrink-0 ${isActive ? 'text-blue-600 dark:text-white' : 'text-gray-400 dark:text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:text-gray-300 dark:group-hover:text-white'}`}>
                               {item.icon}
                             </div>
                             <span
@@ -140,19 +140,19 @@ export const Sidebar: React.FC = () => {
         </div>
         
         {/* Bottom Footer — Upgrade to Pro */}
-        <div className="p-4 shrink-0 border-t border-gray-200 dark:border-white/[0.06]">
+        <div className="p-4 shrink-0 border-t border-gray-200 dark:border-white/[0.06] dark:border-white/[0.06]">
           {isSidebarOpen ? (
             <div className="bg-blue-50 dark:bg-gradient-to-r dark:from-[#21115C] dark:to-[#3F1C99] dark:border-t dark:border-white/10 dark:shadow-[0_0_15px_rgba(105,56,245,0.2)] rounded-xl p-3 flex items-center justify-between cursor-pointer hover:bg-blue-100/60 dark:hover:from-[#2B1770] dark:hover:to-[#4D23B0] transition-colors">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white dark:bg-[#FBBC05]/20 flex items-center justify-center shrink-0 shadow-sm dark:shadow-none text-blue-600 dark:text-[#FBBC05]">
+                <div className="w-8 h-8 rounded-full bg-white dark:bg-[#111D35] dark:bg-[#FBBC05]/20 flex items-center justify-center shrink-0 shadow-sm dark:shadow-none text-blue-600 dark:text-[#FBBC05]">
                   <Crown className="w-4 h-4" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[12px] font-bold text-gray-900 dark:text-white">Upgrade to Pro</span>
-                  <span className="text-[10px] text-gray-500 dark:text-indigo-200">Unlock advanced features</span>
+                  <span className="text-[12px] font-bold text-gray-900 dark:text-white dark:text-white">Upgrade to Pro</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400 dark:text-indigo-200">Unlock advanced features</span>
                 </div>
               </div>
-              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-white/10 flex items-center justify-center shrink-0">
+              <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-white dark:bg-[#111D35]/10 flex items-center justify-center shrink-0">
                 <ArrowRight className="w-3 h-3 text-blue-600 dark:text-white" />
               </div>
             </div>

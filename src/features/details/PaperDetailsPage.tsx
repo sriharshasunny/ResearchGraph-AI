@@ -117,7 +117,7 @@ export const PaperDetailsPage: React.FC = () => {
 
         {/* ── BREADCRUMB HEADER ── */}
         <div className="flex flex-wrap items-center justify-between gap-3 pb-2">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-gray-500 font-medium">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[13px] text-gray-500 dark:text-gray-400 font-medium">
             <button 
               onClick={() => setActivePage('dashboard')}
               className="hover:text-blue-600 transition-colors"
@@ -132,7 +132,7 @@ export const PaperDetailsPage: React.FC = () => {
               Papers
             </button>
             <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
-            <span className="text-gray-900 font-semibold max-w-[280px] sm:max-w-[450px] truncate" title={paper.title}>
+            <span className="text-gray-900 dark:text-white font-semibold max-w-[280px] sm:max-w-[450px] truncate" title={paper.title}>
               {paper.title}
             </span>
           </nav>
@@ -143,7 +143,7 @@ export const PaperDetailsPage: React.FC = () => {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[12px] font-semibold border transition-all ${
                 readerMode 
                   ? 'bg-amber-50 border-amber-200 text-amber-800' 
-                  : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-600'
+                  : 'bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300'
               }`}
               title="Toggle distraction-free reader mode"
             >
@@ -153,7 +153,7 @@ export const PaperDetailsPage: React.FC = () => {
 
             <button
               onClick={() => setIsExportModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 text-[12px] font-semibold transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 text-[12px] font-semibold transition-all shadow-sm"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Cite / Export</span>
@@ -162,7 +162,7 @@ export const PaperDetailsPage: React.FC = () => {
         </div>
 
         {/* ── PAPER HERO / TITLE CONTAINER ── */}
-        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-5">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             
             {/* Field & Venue Badges */}
@@ -170,7 +170,7 @@ export const PaperDetailsPage: React.FC = () => {
               <span className="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 font-semibold text-[11px]">
                 {paper.field || 'Artificial Intelligence'}
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200 text-gray-700 font-mono text-[11px]">
+              <span className="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 font-mono text-[11px]">
                 {paper.venue || 'arXiv'} · {paper.year}
               </span>
               <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-semibold text-[11px]">
@@ -187,7 +187,7 @@ export const PaperDetailsPage: React.FC = () => {
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12px] font-semibold border transition-all ${
                     isSaved
                       ? 'bg-blue-50 border-blue-300 text-blue-700 shadow-sm'
-                      : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                      : 'bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   <Bookmark className="w-3.5 h-3.5" fill={isSaved ? 'currentColor' : 'none'} />
@@ -205,7 +205,7 @@ export const PaperDetailsPage: React.FC = () => {
 
                 {/* Collection selector menu */}
                 {isCollectionMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-gray-200 rounded-2xl shadow-xl p-2 z-30 space-y-1">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl shadow-xl p-2 z-30 space-y-1">
                     <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 px-3 py-1">
                       Assign Collection
                     </div>
@@ -217,7 +217,7 @@ export const PaperDetailsPage: React.FC = () => {
                           setIsCollectionMenuOpen(false);
                         }}
                         className={`w-full text-left px-3 py-1.5 rounded-xl text-[12px] flex items-center justify-between transition-colors ${
-                          selectedCollection === col ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 hover:bg-gray-50'
+                          selectedCollection === col ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:bg-white/[0.04]'
                         }`}
                       >
                         <span>{col}</span>
@@ -234,7 +234,7 @@ export const PaperDetailsPage: React.FC = () => {
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[12px] font-semibold border transition-all ${
                   isCompared
                     ? 'bg-purple-50 border-purple-300 text-purple-700 shadow-sm'
-                    : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                    : 'bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200'
                 }`}
               >
                 <GitCompare className="w-3.5 h-3.5" />
@@ -255,7 +255,7 @@ export const PaperDetailsPage: React.FC = () => {
                   href={paper.pdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-700 text-[12px] font-semibold border border-gray-200 transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 text-[12px] font-semibold border border-gray-200 dark:border-white/[0.06] transition-all"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>PDF</span>
@@ -265,13 +265,13 @@ export const PaperDetailsPage: React.FC = () => {
           </div>
 
           <div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 leading-snug tracking-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 dark:text-white leading-snug tracking-tight">
               {paper.title}
             </h1>
             
             {/* Clickable Authors */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 text-[13px] text-gray-600">
-              <span className="font-semibold text-gray-500">Authors:</span>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-3 text-[13px] text-gray-600 dark:text-gray-300">
+              <span className="font-semibold text-gray-500 dark:text-gray-400">Authors:</span>
               {paper.authors.map((author, index) => (
                 <span key={author} className="inline-flex items-center">
                   <button
@@ -296,7 +296,7 @@ export const PaperDetailsPage: React.FC = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex items-center gap-1 border-t border-gray-100 pt-3 overflow-x-auto scrollbar-none">
+          <div className="flex items-center gap-1 border-t border-gray-100 dark:border-white/[0.04] pt-3 overflow-x-auto scrollbar-none">
             {tabs.map(tab => (
               <button
                 key={tab.id}
@@ -304,7 +304,7 @@ export const PaperDetailsPage: React.FC = () => {
                 className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-blue-50 text-blue-700 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-50 dark:bg-white/[0.04]'
                 }`}
               >
                 {tab.label}
@@ -326,19 +326,19 @@ export const PaperDetailsPage: React.FC = () => {
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-blue-600" />
-                      <h2 className="text-[14px] font-bold text-gray-900">
+                      <h2 className="text-[14px] font-bold text-gray-900 dark:text-white">
                         Executive Summary &amp; TL;DR
                       </h2>
                     </div>
 
                     {/* Mode Segmented Control */}
-                    <div className="flex items-center p-0.5 bg-white border border-gray-200 rounded-xl shadow-xs">
+                    <div className="flex items-center p-0.5 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl shadow-xs">
                       <button
                         onClick={() => setTldrMode('simple')}
                         className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all ${
                           tldrMode === 'simple'
                             ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-gray-600 hover:text-gray-900'
+                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                         }`}
                       >
                         Simple (Intuition)
@@ -348,7 +348,7 @@ export const PaperDetailsPage: React.FC = () => {
                         className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition-all ${
                           tldrMode === 'expert'
                             ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-gray-600 hover:text-gray-900'
+                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                         }`}
                       >
                         Expert (Rigorous)
@@ -362,23 +362,23 @@ export const PaperDetailsPage: React.FC = () => {
                 </div>
 
                 {/* Abstract Card */}
-                <div className={`bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3 ${
+                <div className={`bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3 ${
                   readerMode ? 'font-serif text-[15px] leading-loose max-w-[68ch] mx-auto bg-[#FCFBF8]' : ''
                 }`}>
-                  <h2 className="text-[15px] font-bold text-gray-900">
+                  <h2 className="text-[15px] font-bold text-gray-900 dark:text-white">
                     Abstract
                   </h2>
-                  <p className="text-[14px] text-gray-700 leading-relaxed max-w-[72ch]">
+                  <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed max-w-[72ch]">
                     {paper.abstract}
                   </p>
                 </div>
 
                 {/* Key Contributions & Findings */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3">
-                  <h2 className="text-[15px] font-bold text-gray-900">
+                <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3">
+                  <h2 className="text-[15px] font-bold text-gray-900 dark:text-white">
                     Key contributions &amp; findings
                   </h2>
-                  <ul className="space-y-2 text-[14px] text-gray-700 leading-relaxed">
+                  <ul className="space-y-2 text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
                     {paper.keyFindings && paper.keyFindings.length > 0 ? (
                       paper.keyFindings.map((finding, idx) => (
                         <li key={idx} className="flex items-start gap-2.5">
@@ -402,21 +402,21 @@ export const PaperDetailsPage: React.FC = () => {
                 </div>
 
                 {/* Methodology & Benchmark Architecture */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3">
-                  <h2 className="text-[15px] font-bold text-gray-900">
+                <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3">
+                  <h2 className="text-[15px] font-bold text-gray-900 dark:text-white">
                     Methodology &amp; benchmark architecture
                   </h2>
-                  <p className="text-[14px] text-gray-700 leading-relaxed">
+                  <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
                     The framework builds on scalable representations with end-to-end differentiable loss functions. Optimization incorporates cosine decay scheduling with AdamW optimizer, demonstrating robust downstream transferability across both in-distribution and out-of-distribution evaluation suites.
                   </p>
                 </div>
 
                 {/* Limitations & Future Directions */}
-                <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3">
-                  <h2 className="text-[15px] font-bold text-gray-900">
+                <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3">
+                  <h2 className="text-[15px] font-bold text-gray-900 dark:text-white">
                     Limitations &amp; future directions
                   </h2>
-                  <p className="text-[14px] text-gray-700 leading-relaxed">
+                  <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
                     While the model exhibits superior zero-shot performance, compute requirements during pre-training scale non-linearly with context length. Future extensions explore parameter-efficient adaptation, sparse attention patterns, and edge deployment constraints.
                   </p>
                 </div>
@@ -424,31 +424,31 @@ export const PaperDetailsPage: React.FC = () => {
             )}
 
             {activeTab === 'methodology' && (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
-                <h2 className="text-[16px] font-bold text-gray-900">Mathematical formulation &amp; training pipeline</h2>
-                <div className="bg-gray-50 p-4 rounded-xl font-mono text-[13px] text-gray-800 border border-gray-200">
+              <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
+                <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">Mathematical formulation &amp; training pipeline</h2>
+                <div className="bg-gray-50 dark:bg-white/[0.04] p-4 rounded-xl font-mono text-[13px] text-gray-800 border border-gray-200 dark:border-white/[0.06]">
                   Attention(Q, K, V) = softmax( (Q · K^T) / √d_k ) · V
                 </div>
-                <p className="text-[14px] text-gray-700 leading-relaxed">
+                <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
                   Scaled Dot-Product Attention allows high degree of parallelization during backward passes. The multi-head projection projects queries, keys, and values h times with learned linear projections.
                 </p>
               </div>
             )}
 
             {activeTab === 'results' && (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
-                <h2 className="text-[16px] font-bold text-gray-900">Benchmark metrics &amp; ablation studies</h2>
+              <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
+                <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">Benchmark metrics &amp; ablation studies</h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-[13px] border-collapse">
                     <thead>
-                      <tr className="border-b border-gray-200 text-gray-500 font-semibold">
+                      <tr className="border-b border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-gray-400 font-semibold">
                         <th className="py-2.5">Evaluation benchmark</th>
                         <th className="py-2.5">Baseline SOTA</th>
                         <th className="py-2.5">This paper</th>
                         <th className="py-2.5">Relative gain</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 text-gray-700">
+                    <tbody className="divide-y divide-gray-100 text-gray-700 dark:text-gray-200">
                       <tr>
                         <td className="py-2.5 font-medium">Standard Primary Metric</td>
                         <td className="py-2.5">26.3</td>
@@ -468,12 +468,12 @@ export const PaperDetailsPage: React.FC = () => {
             )}
 
             {activeTab === 'citations' && (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+              <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-[16px] font-bold text-gray-900">BibTeX Citation</h2>
+                  <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">BibTeX Citation</h2>
                   <button
                     onClick={handleCopyCitation}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-[12px] font-medium transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-[12px] font-medium transition-colors"
                   >
                     {copiedCitation ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedCitation ? 'Copied Citation!' : 'Copy BibTeX'}</span>
@@ -486,19 +486,19 @@ export const PaperDetailsPage: React.FC = () => {
             )}
 
             {activeTab === 'related' && (
-              <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3">
-                <h2 className="text-[16px] font-bold text-gray-900">Directly related research</h2>
+              <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3">
+                <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">Directly related research</h2>
                 <div className="divide-y divide-gray-100">
                   {relatedPapers.map(rel => (
                     <div key={rel.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
                         <h4 
                           onClick={() => setSelectedPaperId(rel.id)}
-                          className="text-[14px] font-bold text-gray-900 hover:text-blue-600 cursor-pointer"
+                          className="text-[14px] font-bold text-gray-900 dark:text-white hover:text-blue-600 cursor-pointer"
                         >
                           {rel.title}
                         </h4>
-                        <p className="text-[12px] text-gray-500 mt-0.5">
+                        <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
                           {rel.authors[0]} et al. · {rel.year} · {rel.citations.toLocaleString()} citations
                         </p>
                       </div>
@@ -508,14 +508,14 @@ export const PaperDetailsPage: React.FC = () => {
                           className={`px-3 py-1.5 text-[11px] font-semibold rounded-lg border transition-colors ${
                             comparisonPaperIds.includes(rel.id)
                               ? 'bg-purple-50 border-purple-200 text-purple-700'
-                              : 'bg-white hover:bg-gray-50 border-gray-200 text-gray-700'
+                              : 'bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200'
                           }`}
                         >
                           {comparisonPaperIds.includes(rel.id) ? 'In Compare' : '+ Compare'}
                         </button>
                         <button
                           onClick={() => setSelectedPaperId(rel.id)}
-                          className="px-3 py-1.5 bg-gray-50 hover:bg-gray-100 text-gray-700 text-[11px] font-semibold rounded-lg border border-gray-200 transition-colors"
+                          className="px-3 py-1.5 bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 text-[11px] font-semibold rounded-lg border border-gray-200 dark:border-white/[0.06] transition-colors"
                         >
                           Inspect
                         </button>
@@ -555,30 +555,30 @@ export const PaperDetailsPage: React.FC = () => {
           <div className="lg:col-span-4 space-y-6">
             
             {/* Paper Information Card */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm space-y-4">
-              <h3 className="text-[14px] font-bold text-gray-900 pb-2 border-b border-gray-100">
+            <div className="bg-white dark:bg-[#111D35] rounded-2xl p-5 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
+              <h3 className="text-[14px] font-bold text-gray-900 dark:text-white pb-2 border-b border-gray-100 dark:border-white/[0.04]">
                 Paper information
               </h3>
 
               <div className="space-y-3 text-[13px]">
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Citations</span>
-                  <span className="font-bold text-gray-900">{paper.citations.toLocaleString()}</span>
+                  <span className="text-gray-500 dark:text-gray-400">Citations</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{paper.citations.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Publication year</span>
-                  <span className="font-semibold text-gray-900">{paper.year}</span>
+                  <span className="text-gray-500 dark:text-gray-400">Publication year</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{paper.year}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Venue / Archive</span>
-                  <span className="font-semibold text-gray-900">{paper.venue || 'arXiv'}</span>
+                  <span className="text-gray-500 dark:text-gray-400">Venue / Archive</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{paper.venue || 'arXiv'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Research field</span>
+                  <span className="text-gray-500 dark:text-gray-400">Research field</span>
                   <span className="font-semibold text-blue-600">{paper.field || 'Artificial Intelligence'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-500">Open access</span>
+                  <span className="text-gray-500 dark:text-gray-400">Open access</span>
                   <span className="font-bold text-emerald-600">Verified Open Access</span>
                 </div>
               </div>
@@ -586,7 +586,7 @@ export const PaperDetailsPage: React.FC = () => {
               <div className="pt-2">
                 <button
                   onClick={() => setIsExportModalOpen(true)}
-                  className="w-full py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 text-[12px] font-semibold rounded-xl border border-gray-200 flex items-center justify-center gap-1.5 transition-colors"
+                  className="w-full py-2 bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 text-[12px] font-semibold rounded-xl border border-gray-200 dark:border-white/[0.06] flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <Copy className="w-3.5 h-3.5" />
                   <span>Export Citation</span>
@@ -595,30 +595,30 @@ export const PaperDetailsPage: React.FC = () => {
             </div>
 
             {/* Mini Knowledge Graph Connections Card */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm space-y-3">
+            <div className="bg-white dark:bg-[#111D35] rounded-2xl p-5 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-[14px] font-bold text-gray-900 flex items-center gap-1.5">
+                <h3 className="text-[14px] font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
                   <Share2 className="w-4 h-4 text-blue-600" />
                   Knowledge connections
                 </h3>
               </div>
 
-              <p className="text-[12px] text-gray-500">
+              <p className="text-[12px] text-gray-500 dark:text-gray-400">
                 Core semantic relationships extracted from academic index:
               </p>
 
               <div className="space-y-2 pt-1">
-                <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between text-[12px]">
-                  <span className="text-gray-600 font-medium">USES</span>
-                  <span className="font-bold text-gray-900">Self-Attention Mechanism</span>
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-between text-[12px]">
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">USES</span>
+                  <span className="font-bold text-gray-900 dark:text-white">Self-Attention Mechanism</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between text-[12px]">
-                  <span className="text-gray-600 font-medium">EVALUATED_ON</span>
-                  <span className="font-bold text-gray-900">WMT 2014 &amp; ImageNet</span>
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-between text-[12px]">
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">EVALUATED_ON</span>
+                  <span className="font-bold text-gray-900 dark:text-white">WMT 2014 &amp; ImageNet</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-between text-[12px]">
-                  <span className="text-gray-600 font-medium">IMPROVES</span>
-                  <span className="font-bold text-gray-900">Recurrent Encoders</span>
+                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-between text-[12px]">
+                  <span className="text-gray-600 dark:text-gray-300 font-medium">IMPROVES</span>
+                  <span className="font-bold text-gray-900 dark:text-white">Recurrent Encoders</span>
                 </div>
               </div>
 
@@ -640,15 +640,15 @@ export const PaperDetailsPage: React.FC = () => {
       {/* ── CITATION EXPORT MODAL ── */}
       {isExportModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full border border-gray-200 shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-              <h3 className="text-[16px] font-bold text-gray-900 flex items-center gap-2">
+          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-lg w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+              <h3 className="text-[16px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Download className="w-4 h-4 text-blue-600" />
                 Export Citation
               </h3>
               <button
                 onClick={() => setIsExportModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 dark:text-gray-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -661,7 +661,7 @@ export const PaperDetailsPage: React.FC = () => {
                   key={fmt}
                   onClick={() => setExportFormat(fmt)}
                   className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold uppercase transition-all whitespace-nowrap ${
-                    exportFormat === fmt ? 'bg-white text-blue-700 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+                    exportFormat === fmt ? 'bg-white dark:bg-[#111D35] text-blue-700 shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                   }`}
                 >
                   {fmt}
@@ -680,7 +680,7 @@ export const PaperDetailsPage: React.FC = () => {
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={handleDownloadCitation}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-[12px] font-semibold transition-colors"
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-[12px] font-semibold transition-colors"
               >
                 Download File
               </button>

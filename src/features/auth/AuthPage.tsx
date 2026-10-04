@@ -219,10 +219,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
                 
                 {/* Center Navigation Links */}
-                <div className="hidden lg:flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-xl">
+                <div className="hidden lg:flex items-center gap-1.5 bg-white dark:bg-[#111D35]/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-xl">
                   <button 
                     onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white dark:bg-[#111D35]/10 transition-all"
                   >
                     Cockpit View
                   </button>
@@ -265,7 +265,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 <div className="flex items-center gap-2.5 sm:gap-3">
                   <button 
                     onClick={() => triggerTraversal('AUTH', 'LOGIN')} 
-                    className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all px-3.5 sm:px-4 py-2 rounded-xl hover:bg-white/10 border border-transparent hover:border-white/10"
+                    className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all px-3.5 sm:px-4 py-2 rounded-xl hover:bg-white dark:bg-[#111D35]/10 border border-transparent hover:border-white/10"
                   >
                     Log In
                   </button>
@@ -280,7 +280,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   {/* Mobile Menu Trigger */}
                   <button 
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="lg:hidden p-2 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:text-white"
+                    className="lg:hidden p-2 rounded-lg bg-white dark:bg-[#111D35]/5 border border-white/10 text-gray-300 hover:text-white"
                   >
                     <Layers className="w-4 h-4" />
                   </button>
@@ -298,7 +298,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   >
                     <button 
                       onClick={() => { scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-gray-300 hover:bg-white/5 rounded-lg"
+                      className="text-left py-2 px-3 text-sm font-medium text-gray-300 hover:bg-white dark:bg-[#111D35]/5 rounded-lg"
                     >
                       Cockpit View
                     </button>
@@ -413,7 +413,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                       <button 
                         onClick={() => setActiveModal('DEMO')}
-                        className="px-4 py-2.5 rounded-xl bg-[#060c20]/90 border border-white/20 hover:border-cyan-400/50 text-gray-200 hover:text-white font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xl hover:bg-white/10 shadow-lg"
+                        className="px-4 py-2.5 rounded-xl bg-[#060c20]/90 border border-white/20 hover:border-cyan-400/50 text-gray-200 hover:text-white font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xl hover:bg-white dark:bg-[#111D35]/10 shadow-lg"
                       >
                         <Play className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
                         Watch Demo
@@ -662,7 +662,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
                             isActive 
                               ? `${tab.color} shadow-lg shadow-cyan-950/50` 
-                              : 'border-white/10 text-gray-400 hover:text-white hover:bg-white/5'
+                              : 'border-white/10 text-gray-400 hover:text-white hover:bg-white dark:bg-[#111D35]/5'
                           }`}
                         >
                           <Icon className="w-3.5 h-3.5" />
@@ -738,11 +738,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       { name: 'bioRxiv / medRxiv', papers: '5.2M Preprints', domain: 'Life Sciences & Therapeutics', tag: 'Preprints', status: 'Hourly Poll', color: 'border-teal-500/40 text-teal-400' },
                       { name: 'Nature Portfolio', papers: '18.6M Articles', domain: 'High-Impact Multi-Disciplinary', tag: 'Springer Nature', status: 'Cataloged', color: 'border-indigo-500/40 text-indigo-400' },
                     ].map((source, idx) => (
-                      <div key={idx} className="p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-cyan-500/40 transition-all flex flex-col justify-between group">
+                      <div key={idx} className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 hover:border-cyan-500/40 transition-all flex flex-col justify-between group">
                         <div>
                           <div className="flex items-center justify-between mb-2">
                             <span className="font-extrabold text-white text-base">{source.name}</span>
-                            <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white/5 font-mono ${source.color}`}>
+                            <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white dark:bg-[#111D35]/5 font-mono ${source.color}`}>
                               {source.tag}
                             </span>
                           </div>
@@ -838,12 +838,12 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30 text-emerald-400"
                       },
                     ].map((stage, idx) => (
-                      <div key={idx} className="p-6 rounded-3xl bg-white/5 border border-white/10 hover:border-white/20 flex flex-col justify-between relative group">
+                      <div key={idx} className="p-6 rounded-3xl bg-white dark:bg-[#111D35]/5 border border-white/10 hover:border-white/20 flex flex-col justify-between relative group">
                         <div className="flex items-center justify-between mb-4">
                           <span className={`text-2xl font-black bg-gradient-to-r ${stage.color} bg-clip-text text-transparent`}>
                             {stage.step}
                           </span>
-                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-mono text-gray-300">
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white dark:bg-[#111D35]/5 border border-white/10 font-mono text-gray-300">
                             {stage.tag}
                           </span>
                         </div>
@@ -852,7 +852,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           <span className="text-xs font-semibold text-cyan-400 block mb-3">{stage.subtitle}</span>
                           <p className="text-xs text-gray-300 leading-relaxed mb-4">{stage.desc}</p>
                         </div>
-                        <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
+                        <div className="w-full h-1 bg-white dark:bg-[#111D35]/5 rounded-full overflow-hidden">
                           <div className={`h-full bg-gradient-to-r ${stage.color}`} style={{ width: `${(idx + 1) * 25}%` }}></div>
                         </div>
                       </div>
@@ -893,7 +893,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         className={`p-4 rounded-2xl text-left transition-all border flex items-center justify-between gap-3 ${
                           activeDemoQuery === idx
                             ? 'bg-[#09132e] border-cyan-400 shadow-lg shadow-cyan-950/40 text-white'
-                            : 'bg-white/5 border-white/10 text-gray-300 hover:text-white hover:bg-white/10'
+                            : 'bg-white dark:bg-[#111D35]/5 border-white/10 text-gray-300 hover:text-white hover:bg-white dark:bg-[#111D35]/10'
                         }`}
                       >
                         <div>
@@ -902,7 +902,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </span>
                           <span className="text-xs sm:text-sm font-semibold">{item.query}</span>
                         </div>
-                        <ArrowRight className={`w-4 h-4 flex-shrink-0 transition-transform ${activeDemoQuery === idx ? 'text-cyan-400 translate-x-1' : 'text-gray-500'}`} />
+                        <ArrowRight className={`w-4 h-4 flex-shrink-0 transition-transform ${activeDemoQuery === idx ? 'text-cyan-400 translate-x-1' : 'text-gray-500 dark:text-gray-400'}`} />
                       </button>
                     ))}
                   </div>
@@ -945,7 +945,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       </span>
                       <div className="space-y-2">
                         {demoQueries[activeDemoQuery].papers.map((p, pIdx) => (
-                          <div key={pIdx} className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div key={pIdx} className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
                               <span className="text-xs font-bold text-white block">{p.title}</span>
                               <span className="text-[11px] text-gray-400">{p.authors} • {p.journal} • {p.citations} citations</span>
@@ -965,7 +965,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {demoQueries[activeDemoQuery].connections.map((conn, cIdx) => (
-                          <span key={cIdx} className="px-3 py-1 rounded-full bg-white/5 border border-white/15 text-xs text-gray-300 font-semibold flex items-center gap-1.5">
+                          <span key={cIdx} className="px-3 py-1 rounded-full bg-white dark:bg-[#111D35]/5 border border-white/15 text-xs text-gray-300 font-semibold flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
                             {conn}
                           </span>
@@ -1019,7 +1019,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     <button 
                       onClick={() => triggerTraversal('AUTH', 'LOGIN')}
-                      className="px-8 py-3.5 rounded-xl bg-white/5 border border-white/20 hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm sm:text-base transition-all backdrop-blur-md hover:bg-white/10"
+                      className="px-8 py-3.5 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/20 hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm sm:text-base transition-all backdrop-blur-md hover:bg-white dark:bg-[#111D35]/10"
                     >
                       Sign In to Account
                     </button>
@@ -1080,7 +1080,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       {/* Close button */}
                       <button 
                         onClick={() => setActiveModal(null)}
-                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white dark:bg-[#111D35]/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white dark:bg-[#111D35]/10 transition-all"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -1097,7 +1097,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </p>
 
                           <div className="space-y-4 mb-8">
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4 items-start">
+                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex gap-4 items-start">
                               <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400 font-bold">1</div>
                               <div>
                                 <h3 className="font-bold text-base text-white mb-1">Continuous Multi-Source Ingestion</h3>
@@ -1107,7 +1107,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </div>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4 items-start">
+                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex gap-4 items-start">
                               <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 text-cyan-400 font-bold">2</div>
                               <div>
                                 <h3 className="font-bold text-base text-white mb-1">Graph Neural Embedding & 3D Topology</h3>
@@ -1117,7 +1117,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </div>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4 items-start">
+                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex gap-4 items-start">
                               <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0 text-purple-400 font-bold">3</div>
                               <div>
                                 <h3 className="font-bold text-base text-white mb-1">Multi-LLM Synthesis & Hypothesis Generation</h3>
@@ -1160,10 +1160,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               { name: 'CrossRef', count: '140M DOIs', desc: 'Universal scientific citation networks, publisher metadata, and DOIs', tag: 'Citations', color: 'border-green-500/30 text-green-400' },
                               { name: 'OpenAlex', count: '250M Entities', desc: 'Global scholarly ontology mapping authors, institutions, and concepts', tag: 'Ontology', color: 'border-purple-500/30 text-purple-400' },
                             ].map((source, idx) => (
-                              <div key={idx} className="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all">
+                              <div key={idx} className="p-3.5 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 hover:border-white/20 transition-all">
                                 <div className="flex items-center justify-between mb-1.5">
                                   <span className="font-bold text-white text-sm">{source.name}</span>
-                                  <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white/5 font-mono ${source.color}`}>{source.tag}</span>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white dark:bg-[#111D35]/5 font-mono ${source.color}`}>{source.tag}</span>
                                 </div>
                                 <span className="text-cyan-400 font-extrabold text-xs block mb-1">{source.count}</span>
                                 <p className="text-[11px] text-gray-400 leading-tight">{source.desc}</p>
@@ -1195,7 +1195,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </p>
 
                           <div className="space-y-3.5 mb-8">
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10">
                               <h3 className="font-bold text-sm text-cyan-300 mb-1 flex items-center gap-2">
                                 <Compass className="w-4 h-4 text-cyan-400" />
                                 Breaking Academic Silos
@@ -1205,7 +1205,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </p>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10">
                               <h3 className="font-bold text-sm text-purple-300 mb-1 flex items-center gap-2">
                                 <Award className="w-4 h-4 text-purple-400" />
                                 Built for Academics, Labs & Innovators
@@ -1215,7 +1215,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </p>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10">
                               <h3 className="font-bold text-sm text-emerald-300 mb-1 flex items-center gap-2">
                                 <Sparkles className="w-4 h-4 text-emerald-400" />
                                 Verifiable Citations, Zero Hallucinations
@@ -1256,15 +1256,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                             </div>
 
                             <div className="space-y-3 text-xs">
-                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                              <div className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10">
                                 <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 1 • Parallel Query Dispatch</span>
                                 <span className="text-white font-semibold">Broadcasting to arXiv, PubMed, IEEE, CrossRef (1,420 matched candidates)</span>
                               </div>
-                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                              <div className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10">
                                 <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 2 • 3D Topology Clustering</span>
                                 <span className="text-cyan-300 font-semibold">Extracting ADMET prediction cluster & E(3)-equivariant graph neural networks</span>
                               </div>
-                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+                              <div className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10">
                                 <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 3 • Multi-LLM Consensus Synthesis</span>
                                 <span className="text-emerald-300 font-semibold">Ensemble generated 4 key hypotheses with 100% verified citation anchors</span>
                               </div>
@@ -1306,7 +1306,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* BACK TO BASE BUTTON */}
               <button 
                 onClick={() => triggerTraversal('LANDING')} 
-                className="absolute top-6 left-6 z-[110] px-4 py-2 rounded-full bg-[#0a0f1c]/90 border border-white/15 flex items-center gap-2 hover:bg-white/10 hover:border-cyan-500/40 transition-all backdrop-blur-md shadow-xl"
+                className="absolute top-6 left-6 z-[110] px-4 py-2 rounded-full bg-[#0a0f1c]/90 border border-white/15 flex items-center gap-2 hover:bg-white dark:bg-[#111D35]/10 hover:border-cyan-500/40 transition-all backdrop-blur-md shadow-xl"
               >
                 <ArrowLeft className="w-4 h-4 text-cyan-400" />
                 <span className="font-semibold text-xs sm:text-sm text-gray-200">Return to Base</span>
@@ -1340,7 +1340,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <span className={`w-1.5 h-1.5 rounded-full animate-ping ${authMode === 'LOGIN' ? 'bg-cyan-400' : 'bg-purple-400'}`}></span>
                         <span>3D NEURAL UPLINK ACTIVE</span>
                       </div>
-                      <span className="text-[10px] text-gray-300 font-mono bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
+                      <span className="text-[10px] text-gray-300 font-mono bg-white dark:bg-[#111D35]/10 px-2.5 py-1 rounded-full border border-white/15">
                         ✦ DRAG TO ROTATE
                       </span>
                     </div>
@@ -1353,13 +1353,13 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         : 'Generate your cryptographic researcher identity to contribute hypotheses and synthesize discoveries.'}
                     </p>
                     <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-gray-400 border-t border-white/10 pt-3">
-                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
+                      <div className="bg-white dark:bg-[#111D35]/5 rounded-lg py-1.5 px-2 border border-white/5">
                         <span className="text-cyan-400 font-bold block">204.8M</span> Papers
                       </div>
-                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
+                      <div className="bg-white dark:bg-[#111D35]/5 rounded-lg py-1.5 px-2 border border-white/5">
                         <span className="text-purple-400 font-bold block">14ms</span> Latency
                       </div>
-                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
+                      <div className="bg-white dark:bg-[#111D35]/5 rounded-lg py-1.5 px-2 border border-white/5">
                         <span className="text-emerald-400 font-bold block">TLS 1.3</span> Encrypted
                       </div>
                     </div>

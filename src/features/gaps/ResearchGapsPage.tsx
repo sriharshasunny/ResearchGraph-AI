@@ -199,22 +199,22 @@ export const ResearchGapsPage: React.FC = () => {
       <div className="max-w-[1140px] mx-auto space-y-6">
 
         {/* ── HEADER ── */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActivePage('dashboard')}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 transition-colors"
                 title="Return to Home"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
                   <Activity className="w-5 h-5 text-rose-600" />
                   Discover Potential Research Gaps
                 </h1>
-                <p className="text-[13px] text-gray-500 mt-0.5">
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">
                   Analyze academic literature to identify unexplored frontiers, benchmark deficits, and methodology voids.
                 </p>
               </div>
@@ -240,7 +240,7 @@ export const ResearchGapsPage: React.FC = () => {
                 value={topicInput}
                 onChange={(e) => setTopicInput(e.target.value)}
                 placeholder="Enter a research topic (e.g. Graph Neural Networks in Drug Discovery)..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-[14px] text-gray-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 focus:bg-white dark:bg-[#111D35] transition-colors"
               />
             </div>
             <button
@@ -254,7 +254,7 @@ export const ResearchGapsPage: React.FC = () => {
           </form>
 
           {/* Quick Suggestions */}
-          <div className="flex items-center gap-2 flex-wrap text-[11px] pt-1 border-t border-gray-100">
+          <div className="flex items-center gap-2 flex-wrap text-[11px] pt-1 border-t border-gray-100 dark:border-white/[0.04]">
             <span className="text-gray-400 font-bold uppercase">Popular Topics:</span>
             {[
               'Vision Transformers in Plant Pathology',
@@ -265,7 +265,7 @@ export const ResearchGapsPage: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => setTopicInput(t)}
-                className="px-2.5 py-1 rounded-lg bg-gray-50 hover:bg-blue-50 text-gray-600 hover:text-blue-700 transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-white/[0.04] hover:bg-blue-50 text-gray-600 dark:text-gray-300 hover:text-blue-700 transition-colors"
               >
                 {t}
               </button>
@@ -310,9 +310,9 @@ export const ResearchGapsPage: React.FC = () => {
         )}
 
         {/* ── FILTERS & SORT CONTROLS ── */}
-        <div className="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm flex flex-wrap items-center justify-between gap-3 text-[12px]">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-4 border border-gray-200 dark:border-white/[0.06] shadow-sm flex flex-wrap items-center justify-between gap-3 text-[12px]">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-gray-500 uppercase tracking-wider text-[11px]">Filter by:</span>
+            <span className="font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[11px]">Filter by:</span>
             
             {/* Confidence filter */}
             <div className="flex items-center p-0.5 bg-gray-100 rounded-xl">
@@ -321,7 +321,7 @@ export const ResearchGapsPage: React.FC = () => {
                   key={conf}
                   onClick={() => setFilterConfidence(conf)}
                   className={`px-3 py-1 rounded-lg font-semibold transition-all ${
-                    filterConfidence === conf ? 'bg-white text-blue-700 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+                    filterConfidence === conf ? 'bg-white dark:bg-[#111D35] text-blue-700 shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                   }`}
                 >
                   {conf === 'All' ? 'All Confidence' : `${conf} Conf`}
@@ -336,7 +336,7 @@ export const ResearchGapsPage: React.FC = () => {
                   key={imp}
                   onClick={() => setFilterImpact(imp)}
                   className={`px-3 py-1 rounded-lg font-semibold transition-all ${
-                    filterImpact === imp ? 'bg-white text-blue-700 shadow-xs' : 'text-gray-600 hover:text-gray-900'
+                    filterImpact === imp ? 'bg-white dark:bg-[#111D35] text-blue-700 shadow-xs' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white'
                   }`}
                 >
                   {imp}
@@ -347,11 +347,11 @@ export const ResearchGapsPage: React.FC = () => {
 
           {/* Sort */}
           <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-500 uppercase tracking-wider text-[11px]">Sort:</span>
+            <span className="font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[11px]">Sort:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3 py-1.5 rounded-xl border border-gray-200 bg-white font-semibold text-gray-700 focus:outline-none focus:border-blue-500"
+              className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-[#111D35] font-semibold text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500"
             >
               <option value="confidence">Highest Confidence</option>
               <option value="impact">Highest Impact</option>
@@ -377,7 +377,7 @@ export const ResearchGapsPage: React.FC = () => {
             return (
               <div
                 key={gap.id}
-                className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:border-blue-300 transition-all space-y-4"
+                className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm hover:border-blue-300 transition-all space-y-4"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="space-y-1.5">
@@ -393,13 +393,13 @@ export const ResearchGapsPage: React.FC = () => {
                           ? 'bg-purple-50 text-purple-700 border border-purple-200'
                           : gap.impactLevel === 'High Impact'
                           ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-gray-100 text-gray-700'
+                          : 'bg-gray-100 text-gray-700 dark:text-gray-200'
                       }`}>
                         {gap.impactLevel}
                       </span>
                     </div>
 
-                    <h3 className="text-[16px] font-bold text-gray-900 leading-snug">
+                    <h3 className="text-[16px] font-bold text-gray-900 dark:text-white leading-snug">
                       {gap.title}
                     </h3>
                   </div>
@@ -409,7 +409,7 @@ export const ResearchGapsPage: React.FC = () => {
                     <button
                       onClick={() => toggleSaveGap(gap.id)}
                       className={`px-3 py-1.5 rounded-xl border text-[11px] font-semibold flex items-center gap-1.5 transition-colors ${
-                        isSaved ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                        isSaved ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-white/[0.06]'
                       }`}
                       title={isSaved ? 'Remove from saved' : 'Save gap'}
                     >
@@ -420,7 +420,7 @@ export const ResearchGapsPage: React.FC = () => {
                     <button
                       onClick={() => toggleAddToProposal(gap.id)}
                       className={`px-3 py-1.5 rounded-xl border text-[11px] font-semibold flex items-center gap-1.5 transition-colors ${
-                        isInProposal ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                        isInProposal ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-white/[0.06]'
                       }`}
                     >
                       {isInProposal ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Plus className="w-3.5 h-3.5" />}
@@ -437,14 +437,14 @@ export const ResearchGapsPage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-[13px] text-gray-600 leading-relaxed font-sans">
+                <p className="text-[13px] text-gray-600 dark:text-gray-300 leading-relaxed font-sans">
                   {gap.desc}
                 </p>
 
                 {/* ── CONFIDENCE METER WITH EXPLANATION ── */}
-                <div className="p-3.5 rounded-xl bg-gray-50 border border-gray-200 space-y-2">
+                <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] space-y-2">
                   <div className="flex items-center justify-between text-[12px]">
-                    <span className="font-bold text-gray-700">Synthesized Confidence Rating:</span>
+                    <span className="font-bold text-gray-700 dark:text-gray-200">Synthesized Confidence Rating:</span>
                     <span className="font-mono font-extrabold text-blue-600">{gap.confidenceScore}% ({gap.confidenceLabel})</span>
                   </div>
 
@@ -458,14 +458,14 @@ export const ResearchGapsPage: React.FC = () => {
                     />
                   </div>
 
-                  <p className="text-[11px] text-gray-500 italic">
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 italic">
                     {gap.confidenceReason}
                   </p>
                 </div>
 
                 {/* ── SUPPORTING ACADEMIC EVIDENCE (CLICKABLE LINKS) ── */}
                 <div className="p-3.5 rounded-xl bg-blue-50/40 border border-blue-100 text-[12px] space-y-2">
-                  <span className="font-bold text-gray-700 block uppercase text-[10px] tracking-wider">
+                  <span className="font-bold text-gray-700 dark:text-gray-200 block uppercase text-[10px] tracking-wider">
                     Supporting Academic Evidence &amp; Literature Sources:
                   </span>
                   <div className="space-y-1.5">
@@ -503,20 +503,20 @@ export const ResearchGapsPage: React.FC = () => {
       {/* ── PROPOSAL OUTLINE EDITOR MODAL ── */}
       {isProposalModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-2xl w-full border border-gray-200 shadow-2xl p-6 sm:p-8 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-2xl w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 sm:p-8 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-white/[0.04]">
               <div>
-                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
                   <FileText className="w-5 h-5 text-blue-600" />
                   Grant Proposal Outline Editor
                 </h3>
-                <p className="text-[12px] text-gray-500 mt-0.5">
+                <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-0.5">
                   Structured draft synthesizing {selectedProposalGaps.length} selected research gaps.
                 </p>
               </div>
               <button
                 onClick={() => setIsProposalModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700"
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 dark:text-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -528,14 +528,14 @@ export const ResearchGapsPage: React.FC = () => {
               </pre>
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+            <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-white/[0.04]">
               <span className="text-[11px] text-gray-400">
                 Ready for import into LaTeX / Word grant templates
               </span>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleDownloadProposal}
-                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-[12px] font-semibold transition-colors flex items-center gap-1.5"
+                  className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-[12px] font-semibold transition-colors flex items-center gap-1.5"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Download .md</span>

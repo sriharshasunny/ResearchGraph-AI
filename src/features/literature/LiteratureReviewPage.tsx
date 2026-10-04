@@ -194,22 +194,22 @@ export const LiteratureReviewPage: React.FC = () => {
       <div className="max-w-[1140px] mx-auto space-y-6">
 
         {/* ── TOP HEADER ── */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActivePage('dashboard')}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 transition-colors"
                 title="Return to Home"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-blue-600" />
                   Literature Review Generator
                 </h1>
-                <p className="text-[13px] text-gray-500 mt-0.5">
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">
                   Synthesize comparative literature reviews across indexed academic publications.
                 </p>
               </div>
@@ -219,14 +219,14 @@ export const LiteratureReviewPage: React.FC = () => {
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => setIsEditingOutline(!isEditingOutline)}
-                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   <Edit3 className="w-3.5 h-3.5 text-blue-600" />
                   <span>{isEditingOutline ? 'View Rendered' : 'Edit Sections'}</span>
                 </button>
                 <button
                   onClick={handleCopyReview}
-                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-700 dark:text-gray-200 bg-white dark:bg-[#111D35] hover:bg-gray-50 dark:bg-white/[0.04] font-semibold text-[12px] flex items-center gap-1.5 transition-all shadow-xs"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -240,14 +240,14 @@ export const LiteratureReviewPage: React.FC = () => {
                 </button>
                 <button
                   onClick={handleDownloadBibTeX}
-                  className="px-3.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-[12px] flex items-center gap-1.5 transition-all"
+                  className="px-3.5 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 font-semibold text-[12px] flex items-center gap-1.5 transition-all"
                   title="Export BibTeX for all cited papers"
                 >
                   <span>BibTeX</span>
                 </button>
                 <button
                   onClick={() => window.print()}
-                  className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+                  className="p-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 transition-colors"
                   title="Print / Save PDF"
                 >
                   <Printer className="w-4 h-4" />
@@ -257,7 +257,7 @@ export const LiteratureReviewPage: React.FC = () => {
           </div>
 
           {/* ── 3-STEP PROGRESS INDICATOR (CLICKABLE) ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-gray-100 dark:border-white/[0.04]">
             {[
               { num: 1, title: '1. Select Literature', desc: `${selectedPaperIds.length} publications selected` },
               { num: 2, title: '2. Scope & Structure', desc: `${structure} structure · ${citationStyle.toUpperCase()}` },
@@ -269,7 +269,7 @@ export const LiteratureReviewPage: React.FC = () => {
                 className={`text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
                   step === s.num
                     ? 'bg-blue-50/80 border-blue-300 text-blue-900 shadow-xs ring-1 ring-blue-300/50'
-                    : 'bg-gray-50/50 border-gray-200 text-gray-600 hover:bg-gray-100/70 hover:border-gray-300'
+                    : 'bg-gray-50 dark:bg-white/[0.04]/50 border-gray-200 dark:border-white/[0.06] text-gray-600 dark:text-gray-300 hover:bg-gray-100/70 hover:border-gray-300'
                 }`}
               >
                 <div className="text-[13px] font-bold flex items-center justify-between">
@@ -278,7 +278,7 @@ export const LiteratureReviewPage: React.FC = () => {
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                   )}
                 </div>
-                <div className="text-[11px] text-gray-500 mt-0.5">{s.desc}</div>
+                <div className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">{s.desc}</div>
               </button>
             ))}
           </div>
@@ -289,7 +289,7 @@ export const LiteratureReviewPage: React.FC = () => {
           <div className="space-y-6">
             
             {/* Search, Filter, Sort Controls */}
-            <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-[#111D35] rounded-2xl p-5 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -298,7 +298,7 @@ export const LiteratureReviewPage: React.FC = () => {
                     placeholder="Search by title, author, or keyword..."
                     value={searchFilter}
                     onChange={(e) => setSearchFilter(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white text-[13px] text-gray-900 focus:outline-none focus:border-blue-500 transition-colors"
+                    className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] focus:bg-white dark:bg-[#111D35] text-[13px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                   />
                 </div>
 
@@ -307,7 +307,7 @@ export const LiteratureReviewPage: React.FC = () => {
                   <select
                     value={venueFilter}
                     onChange={(e) => setVenueFilter(e.target.value as any)}
-                    className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-[12px] font-semibold text-gray-700 focus:outline-none focus:border-blue-500"
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-[#111D35] text-[12px] font-semibold text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500"
                   >
                     <option value="all">All Venues</option>
                     <option value="saved">Saved Papers Only</option>
@@ -320,7 +320,7 @@ export const LiteratureReviewPage: React.FC = () => {
                   <select
                     value={sortCriteria}
                     onChange={(e) => setSortCriteria(e.target.value as any)}
-                    className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-[12px] font-semibold text-gray-700 focus:outline-none focus:border-blue-500"
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-white dark:bg-[#111D35] text-[12px] font-semibold text-gray-700 dark:text-gray-200 focus:outline-none focus:border-blue-500"
                   >
                     <option value="citations">Most Citations</option>
                     <option value="year">Newest Year</option>
@@ -330,13 +330,13 @@ export const LiteratureReviewPage: React.FC = () => {
                   {/* Select All / None */}
                   <button
                     onClick={handleSelectAll}
-                    className="px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-[11px] font-bold text-gray-700 transition-colors"
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-[11px] font-bold text-gray-700 dark:text-gray-200 transition-colors"
                   >
                     Select All
                   </button>
                   <button
                     onClick={handleSelectNone}
-                    className="px-3 py-2 rounded-xl border border-gray-200 bg-gray-50 hover:bg-gray-100 text-[11px] font-bold text-gray-700 transition-colors"
+                    className="px-3 py-2 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-[11px] font-bold text-gray-700 dark:text-gray-200 transition-colors"
                   >
                     Select None
                   </button>
@@ -348,12 +348,12 @@ export const LiteratureReviewPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
               
               {/* Paper Selection (8 Cols) */}
-              <div className="lg:col-span-8 bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                  <h3 className="text-[14px] font-bold text-gray-900">
+              <div className="lg:col-span-8 bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+                  <h3 className="text-[14px] font-bold text-gray-900 dark:text-white">
                     Academic Publications ({filteredPapers.length})
                   </h3>
-                  <span className="text-[12px] text-gray-500">
+                  <span className="text-[12px] text-gray-500 dark:text-gray-400">
                     {selectedPaperIds.length} papers selected
                   </span>
                 </div>
@@ -366,18 +366,18 @@ export const LiteratureReviewPage: React.FC = () => {
                         key={paper.id}
                         onClick={() => togglePaper(paper.id)}
                         className={`py-3.5 px-3 rounded-xl transition-all cursor-pointer flex items-start gap-3.5 ${
-                          isSelected ? 'bg-blue-50/50 hover:bg-blue-50' : 'hover:bg-gray-50'
+                          isSelected ? 'bg-blue-50/50 hover:bg-blue-50' : 'hover:bg-gray-50 dark:bg-white/[0.04]'
                         }`}
                       >
                         <div className={`w-5 h-5 rounded-lg border mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
-                          isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 bg-white'
+                          isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 bg-white dark:bg-[#111D35]'
                         }`}>
                           {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-[14px] font-bold text-gray-900 leading-snug">{paper.title}</h4>
-                          <p className="text-[12px] text-gray-500 mt-1">
-                            {paper.authors.join(', ')} · <span className="font-semibold text-gray-700">{paper.year}</span> · {paper.venue || 'arXiv'} · <span className="text-blue-600 font-semibold">{paper.citations.toLocaleString()} citations</span>
+                          <h4 className="text-[14px] font-bold text-gray-900 dark:text-white leading-snug">{paper.title}</h4>
+                          <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-1">
+                            {paper.authors.join(', ')} · <span className="font-semibold text-gray-700 dark:text-gray-200">{paper.year}</span> · {paper.venue || 'arXiv'} · <span className="text-blue-600 font-semibold">{paper.citations.toLocaleString()} citations</span>
                           </p>
                         </div>
                       </div>
@@ -387,9 +387,9 @@ export const LiteratureReviewPage: React.FC = () => {
               </div>
 
               {/* Selected Papers Tray (4 Cols) */}
-              <div className="lg:col-span-4 bg-white rounded-2xl p-5 border border-gray-200 shadow-sm space-y-4">
-                <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-                  <h3 className="text-[14px] font-bold text-gray-900 flex items-center gap-1.5">
+              <div className="lg:col-span-4 bg-white dark:bg-[#111D35] rounded-2xl p-5 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+                  <h3 className="text-[14px] font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
                     <FileText className="w-4 h-4 text-blue-600" />
                     Synthesis Tray ({selectedPapers.length})
                   </h3>
@@ -413,18 +413,18 @@ export const LiteratureReviewPage: React.FC = () => {
                   {selectedPapers.map((paper, index) => (
                     <div
                       key={paper.id}
-                      className="p-3 rounded-xl bg-gray-50 border border-gray-200 text-[12px] flex items-center justify-between gap-2"
+                      className="p-3 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] text-[12px] flex items-center justify-between gap-2"
                     >
                       <div className="min-w-0">
-                        <h5 className="font-bold text-gray-900 truncate">{paper.title}</h5>
-                        <p className="text-[11px] text-gray-500 truncate">{paper.authors[0]} et al. ({paper.year})</p>
+                        <h5 className="font-bold text-gray-900 dark:text-white truncate">{paper.title}</h5>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{paper.authors[0]} et al. ({paper.year})</p>
                       </div>
 
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => movePaper(index, 'up')}
                           disabled={index === 0}
-                          className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30"
+                          className="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200 disabled:opacity-30"
                           title="Move up"
                         >
                           <ArrowUp className="w-3.5 h-3.5" />
@@ -432,7 +432,7 @@ export const LiteratureReviewPage: React.FC = () => {
                         <button
                           onClick={() => movePaper(index, 'down')}
                           disabled={index === selectedPapers.length - 1}
-                          className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30"
+                          className="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200 disabled:opacity-30"
                           title="Move down"
                         >
                           <ArrowDown className="w-3.5 h-3.5" />
@@ -457,20 +457,20 @@ export const LiteratureReviewPage: React.FC = () => {
 
         {/* ── STEP 2: SCOPE & STRUCTURE ── */}
         {step === 2 && (
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-gray-900">Define Synthesis Scope &amp; Taxonomic Structure</h3>
-              <p className="text-[13px] text-gray-500 mt-0.5">Configure how the literature will be organized, compared, and cited.</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Define Synthesis Scope &amp; Taxonomic Structure</h3>
+              <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">Configure how the literature will be organized, compared, and cited.</p>
             </div>
 
             {/* Topic Input & Suggested Themes */}
             <div className="space-y-3">
-              <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600">Review Topic Title</label>
+              <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">Review Topic Title</label>
               <input
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white text-[14px] text-gray-900 focus:outline-none focus:border-blue-500 font-semibold"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04] focus:bg-white dark:bg-[#111D35] text-[14px] text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 font-semibold"
               />
 
               <div className="space-y-1.5 pt-1">
@@ -488,7 +488,7 @@ export const LiteratureReviewPage: React.FC = () => {
                       className={`px-3 py-1.5 rounded-xl text-[12px] font-medium border transition-colors ${
                         topic === t
                           ? 'bg-blue-50 text-blue-700 border-blue-300 font-bold'
-                          : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                          : 'bg-gray-50 dark:bg-white/[0.04] hover:bg-gray-100 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-white/[0.06]'
                       }`}
                     >
                       {t}
@@ -502,7 +502,7 @@ export const LiteratureReviewPage: React.FC = () => {
               
               {/* Scope Selector */}
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600">Synthesis Scope</label>
+                <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">Synthesis Scope</label>
                 <div className="space-y-2">
                   {[
                     { id: 'comparative', label: 'Comparative Benchmark', desc: 'Focus on empirical trade-offs & SOTA gains' },
@@ -513,11 +513,11 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setScope(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        scope === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 hover:bg-gray-50'
+                        scope === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">{item.desc}</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -525,7 +525,7 @@ export const LiteratureReviewPage: React.FC = () => {
 
               {/* Structure Selector */}
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600">Review Structure</label>
+                <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">Review Structure</label>
                 <div className="space-y-2">
                   {[
                     { id: 'thematic', label: 'Thematic Clusters', desc: 'Grouped by problem formulation and design patterns' },
@@ -536,11 +536,11 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setStructure(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        structure === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 hover:bg-gray-50'
+                        structure === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">{item.desc}</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -548,7 +548,7 @@ export const LiteratureReviewPage: React.FC = () => {
 
               {/* Citation Style Selector */}
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600">Citation Style</label>
+                <label className="text-[12px] font-bold uppercase tracking-wider text-gray-600 dark:text-gray-300">Citation Style</label>
                 <div className="space-y-2">
                   {[
                     { id: 'apa', label: 'APA 7th Edition', desc: '(Author, Year) format with full bibliography' },
@@ -560,11 +560,11 @@ export const LiteratureReviewPage: React.FC = () => {
                       key={item.id}
                       onClick={() => setCitationStyle(item.id as any)}
                       className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                        citationStyle === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 hover:bg-gray-50'
+                        citationStyle === item.id ? 'bg-blue-50 border-blue-300 text-blue-900 shadow-xs' : 'border-gray-200 dark:border-white/[0.06] hover:bg-gray-50 dark:bg-white/[0.04]'
                       }`}
                     >
                       <div className="font-bold text-[12px]">{item.label}</div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">{item.desc}</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">{item.desc}</div>
                     </div>
                   ))}
                 </div>
@@ -573,10 +573,10 @@ export const LiteratureReviewPage: React.FC = () => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+            <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-white/[0.04]">
               <button
                 onClick={() => setStep(1)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-900 text-[12px] font-semibold"
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white text-[12px] font-semibold"
               >
                 ← Back to Literature Selection
               </button>
@@ -593,12 +593,12 @@ export const LiteratureReviewPage: React.FC = () => {
 
         {/* ── STEP 3: GENERATED REVIEW & EDITABLE OUTLINE ── */}
         {step === 3 && (
-          <div className="bg-white rounded-2xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-6">
+          <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-6">
             {isGenerating ? (
               <div className="py-20 text-center flex flex-col items-center justify-center space-y-4">
                 <RefreshCw className="w-8 h-8 text-blue-600 animate-spin" />
-                <h3 className="text-lg font-bold text-gray-900">{generationStage}</h3>
-                <p className="text-[13px] text-gray-500 max-w-md">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">{generationStage}</h3>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 max-w-md">
                   Synthesizing empirical findings, architectural trade-offs, and taxonomy across {selectedPapers.length} selected publications.
                 </p>
               </div>
@@ -630,8 +630,8 @@ export const LiteratureReviewPage: React.FC = () => {
                 {/* EDITABLE SECTIONS VIEW */}
                 {isEditingOutline ? (
                   <div className="space-y-6">
-                    <div className="flex items-center justify-between pb-2 border-b border-gray-200">
-                      <h3 className="text-[15px] font-bold text-gray-900">Editable Section Outlines</h3>
+                    <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-white/[0.06]">
+                      <h3 className="text-[15px] font-bold text-gray-900 dark:text-white">Editable Section Outlines</h3>
                       <button
                         onClick={() => setIsEditingOutline(false)}
                         className="px-3 py-1.5 bg-blue-600 text-white rounded-xl text-[12px] font-semibold"
@@ -641,7 +641,7 @@ export const LiteratureReviewPage: React.FC = () => {
                     </div>
 
                     {reviewSections.map((sec, idx) => (
-                      <div key={idx} className="p-4 rounded-2xl border border-gray-200 bg-gray-50/50 space-y-3">
+                      <div key={idx} className="p-4 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]/50 space-y-3">
                         <input
                           type="text"
                           value={sec.title}
@@ -653,7 +653,7 @@ export const LiteratureReviewPage: React.FC = () => {
                               return arr;
                             });
                           }}
-                          className="w-full font-bold text-[15px] bg-white border border-gray-200 rounded-xl px-3 py-1.5 text-gray-900"
+                          className="w-full font-bold text-[15px] bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl px-3 py-1.5 text-gray-900 dark:text-white"
                         />
                         <textarea
                           rows={4}
@@ -666,7 +666,7 @@ export const LiteratureReviewPage: React.FC = () => {
                               return arr;
                             });
                           }}
-                          className="w-full text-[13px] bg-white border border-gray-200 rounded-xl p-3 text-gray-800 leading-relaxed font-sans"
+                          className="w-full text-[13px] bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl p-3 text-gray-800 leading-relaxed font-sans"
                         />
                         <div className="flex justify-end">
                           <button
@@ -683,11 +683,11 @@ export const LiteratureReviewPage: React.FC = () => {
                 ) : (
                   /* RENDERED REVIEW VIEW */
                   <div className="space-y-8 text-gray-800">
-                    <div className="border-b border-gray-200 pb-4">
-                      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 leading-tight">
+                    <div className="border-b border-gray-200 dark:border-white/[0.06] pb-4">
+                      <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white leading-tight">
                         {topic}
                       </h1>
-                      <p className="text-[12px] text-gray-500 mt-2 font-medium">
+                      <p className="text-[12px] text-gray-500 dark:text-gray-400 mt-2 font-medium">
                         Structured Academic Review · {structure.toUpperCase()} STRUCTURE · {citationStyle.toUpperCase()} CITATIONS
                       </p>
                     </div>
@@ -695,7 +695,7 @@ export const LiteratureReviewPage: React.FC = () => {
                     {reviewSections.map((sec, idx) => (
                       <div key={idx} className="space-y-3 group">
                         <div className="flex items-center justify-between">
-                          <h2 className="text-lg font-bold text-gray-900">
+                          <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                             {sec.title}
                           </h2>
                           <button
@@ -708,7 +708,7 @@ export const LiteratureReviewPage: React.FC = () => {
                           </button>
                         </div>
 
-                        <div className="text-[14px] text-gray-700 leading-relaxed whitespace-pre-wrap font-sans">
+                        <div className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap font-sans">
                           {sec.content.split(/(\[\d+\])/g).map((chunk, j) => {
                             const match = chunk.match(/\[(\d+)\]/);
                             if (match) {
@@ -737,11 +737,11 @@ export const LiteratureReviewPage: React.FC = () => {
                     ))}
 
                     {/* Grounded Bibliography */}
-                    <div className="pt-6 border-t border-gray-200 space-y-3">
-                      <h3 className="text-base font-bold text-gray-900">
+                    <div className="pt-6 border-t border-gray-200 dark:border-white/[0.06] space-y-3">
+                      <h3 className="text-base font-bold text-gray-900 dark:text-white">
                         Primary Cited References
                       </h3>
-                      <ol className="list-decimal list-inside space-y-2 text-[13px] text-gray-600">
+                      <ol className="list-decimal list-inside space-y-2 text-[13px] text-gray-600 dark:text-gray-300">
                         {selectedPapers.map((paper) => (
                           <li key={paper.id} className="leading-relaxed">
                             <span 

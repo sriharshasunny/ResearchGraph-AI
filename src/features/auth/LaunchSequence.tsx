@@ -125,7 +125,7 @@ export const LaunchSequence: React.FC<{ onComplete: () => void }> = ({ onComplet
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 transition-all duration-500 relative ${
                     isActive ? 'border-2 border-cyan-400 bg-[#0c233f] shadow-[0_0_25px_rgba(34,211,238,0.5)] text-cyan-400 scale-110' 
                     : isCompleted ? 'border-2 border-cyan-500/50 bg-[#07172c] text-cyan-500' 
-                    : 'border-2 border-gray-700 bg-[#030712] text-gray-600'
+                    : 'border-2 border-gray-700 bg-[#030712] text-gray-600 dark:text-gray-300'
                   }`}>
                     <Icon className="w-5 h-5" />
                     {/* Small checkmark badge for completed steps */}
@@ -135,10 +135,10 @@ export const LaunchSequence: React.FC<{ onComplete: () => void }> = ({ onComplet
                       </div>
                     )}
                   </div>
-                  <span className={`text-[13px] font-bold tracking-wide transition-colors ${isActive || isCompleted ? 'text-white drop-shadow-md' : 'text-gray-500'}`}>
+                  <span className={`text-[13px] font-bold tracking-wide transition-colors ${isActive || isCompleted ? 'text-white drop-shadow-md' : 'text-gray-500 dark:text-gray-400'}`}>
                     {step.title}
                   </span>
-                  <span className={`text-[11px] mt-0.5 transition-colors ${isActive || isCompleted ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <span className={`text-[11px] mt-0.5 transition-colors ${isActive || isCompleted ? 'text-gray-400' : 'text-gray-600 dark:text-gray-300'}`}>
                     {step.subtitle}
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export const LaunchSequence: React.FC<{ onComplete: () => void }> = ({ onComplet
              />
            ))}
         </div>
-        <div className="text-[8px] text-gray-500 font-mono mt-1">SECURE CONNECTION ESTABLISHED</div>
+        <div className="text-[8px] text-gray-500 dark:text-gray-400 font-mono mt-1">SECURE CONNECTION ESTABLISHED</div>
       </div>
 
       {/* Bottom Right: Skip Button */}

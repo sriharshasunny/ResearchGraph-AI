@@ -157,7 +157,7 @@ export const ComparePage: React.FC = () => {
             <div className="pt-3 border-t border-[var(--border,#f3f4f6)] flex flex-col gap-3">
               <div className="relative w-full max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type="text" placeholder="Search the index to add papers..." className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                <input type="text" placeholder="Search the index to add papers..." className="w-full pl-9 pr-3 py-2 text-sm bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
               </div>
               <div className="flex flex-wrap gap-2 items-center">
                 <span className="text-[11px] font-bold text-[var(--text-muted,#9ca3af)] uppercase tracking-wider">Suggested:</span>
@@ -181,7 +181,7 @@ export const ComparePage: React.FC = () => {
         {selectedPapers.length >= 2 && (
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100 shadow-sm shrink-0">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-[14px] font-bold text-gray-900 flex items-center gap-2">
+              <h2 className="text-[14px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-blue-600" />
                 AI Summary: Which should I use?
               </h2>
@@ -193,19 +193,19 @@ export const ComparePage: React.FC = () => {
                 <span>Ask AI About Comparison</span>
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[13px] text-gray-700">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[13px] text-gray-700 dark:text-gray-200">
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                  <p><strong>For robust feature extraction:</strong> <span className="font-medium text-gray-900">{selectedPapers[0]?.title}</span> provides the best out-of-the-box frozen representations without requiring extensive fine-tuning.</p>
+                  <p><strong>For robust feature extraction:</strong> <span className="font-medium text-gray-900 dark:text-white">{selectedPapers[0]?.title}</span> provides the best out-of-the-box frozen representations without requiring extensive fine-tuning.</p>
                 </div>
                 <div className="flex items-start gap-2">
                   <LayoutPanelLeft className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                  <p><strong>For high-throughput pre-training:</strong> <span className="font-medium text-gray-900">{selectedPapers[1]?.title || 'MAE'}</span> scales better visually with high masking ratios (75%) but requires fine-tuning.</p>
+                  <p><strong>For high-throughput pre-training:</strong> <span className="font-medium text-gray-900 dark:text-white">{selectedPapers[1]?.title || 'MAE'}</span> scales better visually with high masking ratios (75%) but requires fine-tuning.</p>
                 </div>
               </div>
-              <div className="bg-white/60 p-3 rounded-xl border border-white">
-                <p className="font-medium text-gray-900 mb-1 flex items-center gap-1.5">
+              <div className="bg-white dark:bg-[#111D35]/60 p-3 rounded-xl border border-white">
+                <p className="font-medium text-gray-900 dark:text-white mb-1 flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                   <span>Key Conflict:</span>
                 </p>
@@ -250,7 +250,7 @@ export const ComparePage: React.FC = () => {
                         </div>
                         <button 
                           onClick={() => setBaselineId(baselineId === paper.id ? null : paper.id)}
-                          className={`self-start text-[11px] font-medium px-2 py-1 rounded border transition-colors ${baselineId === paper.id ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-transparent border-gray-200 text-gray-500 hover:bg-gray-50'}`}
+                          className={`self-start text-[11px] font-medium px-2 py-1 rounded border transition-colors ${baselineId === paper.id ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-transparent border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:bg-white/[0.04]'}`}
                         >
                           {baselineId === paper.id ? '★ Baseline' : 'Set as baseline'}
                         </button>

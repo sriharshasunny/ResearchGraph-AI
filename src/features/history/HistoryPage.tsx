@@ -128,7 +128,7 @@ export const HistoryPage: React.FC = () => {
       case 'Chats': return <MessageSquare className="w-4 h-4 text-emerald-600" />;
       case 'Searches': return <Search className="w-4 h-4 text-cyan-600" />;
       case 'Reviews': return <BookOpen className="w-4 h-4 text-amber-600" />;
-      default: return <Activity className="w-4 h-4 text-gray-600" />;
+      default: return <Activity className="w-4 h-4 text-gray-600 dark:text-gray-300" />;
     }
   };
 
@@ -198,22 +198,22 @@ export const HistoryPage: React.FC = () => {
       <div className="max-w-[1040px] mx-auto space-y-6">
 
         {/* ── HEADER ── */}
-        <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setActivePage('dashboard')}
-                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-xl text-gray-400 hover:text-gray-900 dark:text-white hover:bg-gray-100 transition-colors"
                 title="Return to Home"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-2">
                   <Clock className="w-5 h-5 text-blue-600" />
                   Research Activity History
                 </h1>
-                <p className="text-[13px] text-gray-500 mt-0.5">
+                <p className="text-[13px] text-gray-500 dark:text-gray-400 mt-0.5">
                   Daily timeline of your academic queries, opened papers, comparisons, and synthesized reviews.
                 </p>
               </div>
@@ -222,7 +222,7 @@ export const HistoryPage: React.FC = () => {
             {historyItems.length > 0 && (
               <button
                 onClick={() => setIsClearModalOpen(true)}
-                className="text-gray-500 hover:text-red-600 px-3 py-1.5 rounded-xl hover:bg-red-50 text-[12px] font-semibold flex items-center gap-1.5 transition-colors border border-gray-200 hover:border-red-200"
+                className="text-gray-500 dark:text-gray-400 hover:text-red-600 px-3 py-1.5 rounded-xl hover:bg-red-50 text-[12px] font-semibold flex items-center gap-1.5 transition-colors border border-gray-200 dark:border-white/[0.06] hover:border-red-200"
                 title="Clear all activity history"
               >
                 <Trash2 className="w-4 h-4" />
@@ -232,7 +232,7 @@ export const HistoryPage: React.FC = () => {
           </div>
 
           {/* Search & Categories Filter */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-gray-100">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-white/[0.04]">
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -240,7 +240,7 @@ export const HistoryPage: React.FC = () => {
                 placeholder="Search history by keyword or topic..."
                 value={searchQueryLocal}
                 onChange={(e) => setSearchQueryLocal(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 text-[13px] bg-gray-50 focus:bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
+                className="w-full pl-9 pr-3 py-1.5 text-[13px] bg-gray-50 dark:bg-white/[0.04] focus:bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-xl focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
@@ -252,7 +252,7 @@ export const HistoryPage: React.FC = () => {
                   className={`px-3 py-1 rounded-xl font-semibold transition-all ${
                     filterCategory === cat
                       ? 'bg-blue-50 text-blue-700 shadow-xs'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-white hover:bg-gray-100'
                   }`}
                 >
                   {cat}
@@ -264,10 +264,10 @@ export const HistoryPage: React.FC = () => {
 
         {/* ── DAILY GROUPED TIMELINE ── */}
         {groups.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 border border-gray-200 text-center space-y-3">
+          <div className="bg-white dark:bg-[#111D35] rounded-2xl p-12 border border-gray-200 dark:border-white/[0.06] text-center space-y-3">
             <Clock className="w-8 h-8 text-gray-400 mx-auto" />
             <h3 className="text-base font-bold text-gray-800">No activity history found</h3>
-            <p className="text-[13px] text-gray-500">
+            <p className="text-[13px] text-gray-500 dark:text-gray-400">
               {searchQueryLocal ? 'No results matched your search term.' : 'Your research interactions will appear here.'}
             </p>
           </div>
@@ -276,7 +276,7 @@ export const HistoryPage: React.FC = () => {
             {groups.map((group) => (
               <div key={group.key} className="space-y-2">
                 <div className="flex items-center gap-2 px-1">
-                  <span className="text-[12px] font-bold uppercase tracking-wider text-gray-500 font-mono">
+                  <span className="text-[12px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 font-mono">
                     {group.label}
                   </span>
                   <div className="flex-1 h-px bg-gray-200" />
@@ -285,15 +285,15 @@ export const HistoryPage: React.FC = () => {
                   </span>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden">
+                <div className="bg-white dark:bg-[#111D35] rounded-2xl border border-gray-200 dark:border-white/[0.06] shadow-sm divide-y divide-gray-100 overflow-hidden">
                   {group.items.map((item) => (
                     <div
                       key={item.id}
                       onClick={(e) => handleResume(item, e)}
-                      className="p-4 sm:p-5 hover:bg-gray-50/80 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+                      className="p-4 sm:p-5 hover:bg-gray-50 dark:bg-white/[0.04]/80 transition-colors cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
                     >
                       <div className="flex items-start gap-3.5 min-w-0">
-                        <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-center shrink-0 mt-0.5">
                           {getCategoryIcon(item.category)}
                         </div>
 
@@ -307,11 +307,11 @@ export const HistoryPage: React.FC = () => {
                             </span>
                           </div>
 
-                          <h3 className="text-[14px] sm:text-[15px] font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+                          <h3 className="text-[14px] sm:text-[15px] font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors leading-snug">
                             {item.title}
                           </h3>
 
-                          <p className="text-[12px] sm:text-[13px] text-gray-500 leading-relaxed max-w-2xl">
+                          <p className="text-[12px] sm:text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed max-w-2xl">
                             {item.desc}
                           </p>
                         </div>
@@ -362,15 +362,15 @@ export const HistoryPage: React.FC = () => {
       {/* ── CLEAR ALL CONFIRMATION MODAL ── */}
       {isClearModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full border border-gray-200 shadow-2xl p-6 space-y-4">
-            <h3 className="text-[16px] font-bold text-gray-900">Clear entire research timeline?</h3>
-            <p className="text-[13px] text-gray-500">
+          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-sm w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 space-y-4">
+            <h3 className="text-[16px] font-bold text-gray-900 dark:text-white">Clear entire research timeline?</h3>
+            <p className="text-[13px] text-gray-500 dark:text-gray-400">
               All history logs, search traces, comparison sessions, and review records will be permanently removed.
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setIsClearModalOpen(false)}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-[12px] font-semibold transition-colors"
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-[12px] font-semibold transition-colors"
               >
                 Cancel
               </button>

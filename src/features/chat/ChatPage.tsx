@@ -306,10 +306,10 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
     <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden bg-[#F7FAFC]">
       
       {/* ── LEFT PANEL: RESEARCH SESSIONS (260px) ── */}
-      <aside className="w-64 shrink-0 bg-white border-r border-gray-200 flex flex-col justify-between hidden md:flex">
+      <aside className="w-64 shrink-0 bg-white dark:bg-[#111D35] border-r border-gray-200 dark:border-white/[0.06] flex flex-col justify-between hidden md:flex">
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[13px] font-bold text-gray-900">
+            <h2 className="text-[13px] font-bold text-gray-900 dark:text-white">
               Research Sessions
             </h2>
             <button
@@ -347,7 +347,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                 className={`group relative w-full text-left p-3 rounded-xl transition-all cursor-pointer ${
                   activeSessionId === s.id
                     ? 'bg-blue-50/80 border border-blue-200 text-blue-900 shadow-sm'
-                    : 'hover:bg-gray-50 text-gray-700 border border-transparent'
+                    : 'hover:bg-gray-50 dark:bg-white/[0.04] text-gray-700 dark:text-gray-200 border border-transparent'
                 }`}
               >
                 {editingSessionId === s.id ? (
@@ -361,7 +361,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                         if (e.key === 'Escape') setEditingSessionId(null);
                       }}
                       autoFocus
-                      className="flex-1 px-1.5 py-0.5 text-[12px] bg-white border border-blue-400 rounded focus:outline-none"
+                      className="flex-1 px-1.5 py-0.5 text-[12px] bg-white dark:bg-[#111D35] border border-blue-400 rounded focus:outline-none"
                     />
                     <button
                       onClick={() => handleSaveRename(s.id)}
@@ -394,7 +394,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                         <button
                           onClick={(e) => handleStartRename(s, e)}
                           title="Rename session"
-                          className="p-1 text-gray-400 hover:text-gray-700 transition-colors"
+                          className="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200 transition-colors"
                         >
                           <Edit2 className="w-3 h-3" />
                         </button>
@@ -419,10 +419,10 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
         </div>
 
         {/* Bottom Actions */}
-        <div className="p-3 border-t border-gray-100 flex items-center gap-1.5 bg-gray-50/50">
+        <div className="p-3 border-t border-gray-100 dark:border-white/[0.04] flex items-center gap-1.5 bg-gray-50 dark:bg-white/[0.04]/50">
           <button
             onClick={handleExportChat}
-            className="flex-1 py-1.5 px-2 rounded-lg hover:bg-gray-200/60 text-gray-600 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            className="flex-1 py-1.5 px-2 rounded-lg hover:bg-gray-200/60 text-gray-600 dark:text-gray-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
             title="Export as Markdown (.md)"
           >
             <Download className="w-3.5 h-3.5" />
@@ -430,7 +430,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
           </button>
           <button
             onClick={handlePrintChat}
-            className="py-1.5 px-2 rounded-lg hover:bg-gray-200/60 text-gray-600 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
+            className="py-1.5 px-2 rounded-lg hover:bg-gray-200/60 text-gray-600 dark:text-gray-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
             title="Print or Save as PDF"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -449,13 +449,13 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-[#F7FAFC] relative">
         
         {/* Chat Header */}
-        <div className="px-6 py-3.5 bg-white border-b border-gray-200 flex items-center justify-between shrink-0">
+        <div className="px-6 py-3.5 bg-white dark:bg-[#111D35] border-b border-gray-200 dark:border-white/[0.06] flex items-center justify-between shrink-0">
           <div>
-            <h1 className="text-[16px] font-bold text-gray-900 flex items-center gap-2">
+            <h1 className="text-[16px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-blue-600" />
               AI Research Assistant
             </h1>
-            <p className="text-[12px] text-gray-500">
+            <p className="text-[12px] text-gray-500 dark:text-gray-400">
               Ask questions, compare studies, explore empirical findings.
             </p>
           </div>
@@ -463,7 +463,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowMobileSources(!showMobileSources)}
-              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 text-[11px] font-semibold"
+              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 dark:text-gray-200 text-[11px] font-semibold"
             >
               <BookOpen className="w-3.5 h-3.5 text-blue-600" />
               <span>Sources ({Object.keys(sources).length})</span>
@@ -485,8 +485,8 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">How can I assist your research today?</h3>
-                <p className="text-sm text-gray-500 mt-1">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">How can I assist your research today?</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                   Synthesize literature, extract methodology trade-offs, and map citations.
                 </p>
               </div>
@@ -496,17 +496,17 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                   <div
                     key={idx}
                     onClick={() => handleSendMessage(item.title)}
-                    className="p-3.5 rounded-2xl bg-white border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                    className="p-3.5 rounded-2xl bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="p-1 rounded-lg bg-gray-50 group-hover:bg-blue-50 transition-colors">
+                      <div className="p-1 rounded-lg bg-gray-50 dark:bg-white/[0.04] group-hover:bg-blue-50 transition-colors">
                         {item.icon}
                       </div>
-                      <h4 className="text-[13px] font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <h4 className="text-[13px] font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
                         {item.title}
                       </h4>
                     </div>
-                    <p className="text-[11px] text-gray-500 pl-7 leading-relaxed">
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 pl-7 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -524,12 +524,12 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                 className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-4 sm:p-5 text-[13px] sm:text-[14px] leading-relaxed ${
                   msg.sender === 'user'
                     ? 'bg-blue-600 text-white font-medium rounded-br-none shadow-sm'
-                    : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm font-sans'
+                    : 'bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] text-gray-800 rounded-bl-none shadow-sm font-sans'
                 }`}
               >
                 {/* Assistant Label Header */}
                 {msg.sender === 'assistant' && (
-                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100">
+                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-white/[0.04]">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold text-blue-600 tracking-wider">
                         ResearchGraph Intelligence
@@ -541,7 +541,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCopyMessage(msg.id, msg.content)}
-                        className="p-1 text-gray-400 hover:text-gray-700 rounded transition-colors"
+                        className="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200 rounded transition-colors"
                         title="Copy message"
                       >
                         {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
@@ -563,7 +563,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                     if (block.startsWith('|')) {
                       return (
                         <div key={i} className="my-3 overflow-x-auto">
-                          <pre className="font-mono text-[12px] bg-gray-50 p-3 rounded-xl border border-gray-200 text-gray-800">
+                          <pre className="font-mono text-[12px] bg-gray-50 dark:bg-white/[0.04] p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-800">
                             {block}
                           </pre>
                         </div>
@@ -609,9 +609,9 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
 
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-none p-4 shadow-sm flex items-center gap-3">
+              <div className="bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl rounded-bl-none p-4 shadow-sm flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
-                <span className="text-[12px] text-gray-500 font-medium animate-pulse">
+                <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium animate-pulse">
                   Retrieving papers, cross-referencing citations &amp; generating synthesis...
                 </span>
               </div>
@@ -623,11 +623,11 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
 
         {/* ── EDITABLE RESEARCH CONTEXT BAR ── */}
         <div className="px-4 sm:px-6 pt-2 shrink-0">
-          <div className="bg-white border border-gray-200 rounded-2xl p-2.5 shadow-sm">
+          <div className="bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl p-2.5 shadow-sm">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setShowContextDetails(!showContextDetails)}
-                className="flex items-center gap-2 text-[12px] font-semibold text-gray-700 hover:text-blue-600 transition-colors"
+                className="flex items-center gap-2 text-[12px] font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-600 transition-colors"
               >
                 <Layers className="w-3.5 h-3.5 text-blue-600" />
                 <span>Research Context: {contextPaperIds.length} papers active</span>
@@ -649,7 +649,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="pt-2.5 mt-2 border-t border-gray-100 space-y-2"
+                  className="pt-2.5 mt-2 border-t border-gray-100 dark:border-white/[0.04] space-y-2"
                 >
                   <div className="flex flex-wrap items-center gap-1.5">
                     {contextPaperIds.map(pId => {
@@ -657,7 +657,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                       return (
                         <span
                           key={pId}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-50 border border-gray-200 text-[11px] text-gray-700"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] text-[11px] text-gray-700 dark:text-gray-200"
                         >
                           <BookOpen className="w-3 h-3 text-blue-600 shrink-0" />
                           <span className="max-w-[180px] truncate font-medium">{paperObj?.title || pId}</span>
@@ -673,7 +673,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                     })}
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-gray-500 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-gray-500 dark:text-gray-400 pt-1">
                     <div className="flex items-center gap-1.5">
                       <Database className="w-3 h-3 text-blue-600" />
                       <span>Vector Retrieval: Top-k dense embeddings enabled</span>
@@ -696,7 +696,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
               e.preventDefault();
               handleSendMessage();
             }}
-            className="relative flex items-center bg-white border border-gray-200 rounded-2xl p-2 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all"
+            className="relative flex items-center bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl p-2 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all"
           >
             <textarea
               rows={1}
@@ -709,7 +709,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                   handleSendMessage();
                 }
               }}
-              className="flex-1 px-3 py-2 text-[14px] text-gray-900 placeholder-gray-400 bg-transparent resize-none focus:outline-none max-h-32"
+              className="flex-1 px-3 py-2 text-[14px] text-gray-900 dark:text-white placeholder-gray-400 bg-transparent resize-none focus:outline-none max-h-32"
             />
 
             {isStreaming ? (
@@ -745,12 +745,12 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
       </main>
 
       {/* ── RIGHT PANEL: GROUNDED SOURCES (300px) ── */}
-      <aside className={`w-72 shrink-0 bg-white border-l border-gray-200 p-5 flex flex-col justify-between overflow-y-auto scrollbar-thin ${
+      <aside className={`w-72 shrink-0 bg-white dark:bg-[#111D35] border-l border-gray-200 dark:border-white/[0.06] p-5 flex flex-col justify-between overflow-y-auto scrollbar-thin ${
         showMobileSources ? 'fixed inset-y-0 right-0 z-40 shadow-2xl block' : 'hidden lg:flex'
       }`}>
         <div className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-            <h2 className="text-[13px] font-bold text-gray-900">
+          <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+            <h2 className="text-[13px] font-bold text-gray-900 dark:text-white">
               Sources &amp; Grounding
             </h2>
             <div className="flex items-center gap-2">
@@ -760,7 +760,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
               {showMobileSources && (
                 <button
                   onClick={() => setShowMobileSources(false)}
-                  className="lg:hidden p-1 text-gray-400 hover:text-gray-700"
+                  className="lg:hidden p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -768,7 +768,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
             </div>
           </div>
 
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">
             Every statement generated by the assistant is grounded in indexed academic papers:
           </p>
 
@@ -776,20 +776,20 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
             {Object.entries(sources).map(([citeKey, src]) => (
               <div
                 key={citeKey}
-                className="p-3.5 rounded-2xl border border-gray-200 bg-gray-50/70 hover:bg-white hover:border-blue-300 hover:shadow-sm transition-all space-y-2"
+                className="p-3.5 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]/70 hover:bg-white dark:bg-[#111D35] hover:border-blue-300 hover:shadow-sm transition-all space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono font-extrabold text-blue-600 bg-white px-2 py-0.5 rounded-md border border-gray-200">
+                  <span className="text-[11px] font-mono font-extrabold text-blue-600 bg-white dark:bg-[#111D35] px-2 py-0.5 rounded-md border border-gray-200 dark:border-white/[0.06]">
                     {citeKey} {src.match} MATCH
                   </span>
                   <span className="text-[10px] font-medium text-gray-400">{src.year}</span>
                 </div>
 
-                <h4 className="text-[13px] font-bold text-gray-900 leading-snug line-clamp-2">
+                <h4 className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug line-clamp-2">
                   {src.title}
                 </h4>
 
-                <p className="text-[11px] text-gray-500">{src.authors}</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">{src.authors}</p>
 
                 <div className="flex items-center justify-between pt-1">
                   <span className="text-[10px] font-medium text-gray-400">{src.type}</span>
@@ -814,7 +814,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-100">
+        <div className="pt-4 border-t border-gray-100 dark:border-white/[0.04]">
           <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-blue-900 leading-relaxed">
             <span className="font-bold block mb-0.5">Academic Verification</span>
             Answers are grounded in peer-reviewed literature. Verify critical findings before publication.
@@ -825,15 +825,15 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
       {/* ── MODAL: DELETE SESSION CONFIRMATION ── */}
       {sessionToDelete && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-sm w-full border border-gray-200 shadow-2xl p-6 space-y-4">
-            <h3 className="text-[16px] font-bold text-gray-900">Delete research session?</h3>
-            <p className="text-[13px] text-gray-500">
+          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-sm w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 space-y-4">
+            <h3 className="text-[16px] font-bold text-gray-900 dark:text-white">Delete research session?</h3>
+            <p className="text-[13px] text-gray-500 dark:text-gray-400">
               This will remove the conversation history for this inquest. This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setSessionToDelete(null)}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 text-[12px] font-semibold transition-colors"
+                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-[12px] font-semibold transition-colors"
               >
                 Cancel
               </button>
@@ -851,15 +851,15 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
       {/* ── MODAL: ADD PAPER TO CONTEXT ── */}
       {isAddContextModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-md w-full border border-gray-200 shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-100">
-              <h3 className="text-[16px] font-bold text-gray-900 flex items-center gap-2">
+          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-md w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+              <h3 className="text-[16px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
                 <BookOpen className="w-4 h-4 text-blue-600" />
                 Add Paper to Research Context
               </h3>
               <button
                 onClick={() => setIsAddContextModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 transition-colors"
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 dark:text-gray-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -874,13 +874,13 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                     onClick={() => !isAlreadyIn && handleAddContextPaper(p)}
                     className={`p-3 rounded-2xl border transition-all flex items-center justify-between ${
                       isAlreadyIn
-                        ? 'bg-gray-50 border-gray-200 opacity-60 cursor-default'
-                        : 'bg-white border-gray-200 hover:border-blue-300 hover:bg-blue-50/40 cursor-pointer'
+                        ? 'bg-gray-50 dark:bg-white/[0.04] border-gray-200 dark:border-white/[0.06] opacity-60 cursor-default'
+                        : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] hover:border-blue-300 hover:bg-blue-50/40 cursor-pointer'
                     }`}
                   >
                     <div>
-                      <h4 className="text-[13px] font-bold text-gray-900 line-clamp-1">{p.title}</h4>
-                      <p className="text-[11px] text-gray-500">{p.authors[0]} et al. · {p.year}</p>
+                      <h4 className="text-[13px] font-bold text-gray-900 dark:text-white line-clamp-1">{p.title}</h4>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400">{p.authors[0]} et al. · {p.year}</p>
                     </div>
                     {isAlreadyIn ? (
                       <span className="text-[11px] text-gray-400 font-semibold">Active</span>
@@ -900,7 +900,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
       {/* ── CITATION POPOVER ON HOVER ── */}
       {activeCitationPopover && sources[activeCitationPopover.id] && (
         <div
-          className="fixed z-50 bg-white border border-gray-200 rounded-2xl shadow-xl p-4 max-w-sm pointer-events-none transition-all"
+          className="fixed z-50 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl shadow-xl p-4 max-w-sm pointer-events-none transition-all"
           style={{
             left: `${Math.min(activeCitationPopover.x, window.innerWidth - 320)}px`,
             top: `${Math.max(activeCitationPopover.y - 120, 20)}px`
@@ -909,13 +909,13 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
           <div className="text-[10px] font-mono font-bold text-blue-600 uppercase mb-1">
             {sources[activeCitationPopover.id].match} Match · {sources[activeCitationPopover.id].year}
           </div>
-          <h4 className="text-[13px] font-bold text-gray-900 leading-snug">
+          <h4 className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
             {sources[activeCitationPopover.id].title}
           </h4>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
             {sources[activeCitationPopover.id].authors}
           </p>
-          <p className="text-[11px] text-gray-700 italic bg-gray-50 p-2 rounded-lg mt-2 border border-gray-100">
+          <p className="text-[11px] text-gray-700 dark:text-gray-200 italic bg-gray-50 dark:bg-white/[0.04] p-2 rounded-lg mt-2 border border-gray-100 dark:border-white/[0.04]">
             "{sources[activeCitationPopover.id].quote}"
           </p>
         </div>
