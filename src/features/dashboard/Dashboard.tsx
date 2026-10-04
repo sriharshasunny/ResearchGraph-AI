@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Search, ArrowRight, BookOpen, MessageSquare, 
@@ -8,7 +8,6 @@ import { motion } from 'framer-motion';
 
 export const Dashboard: React.FC = () => {
   const { setActivePage, setSearchQuery, savedPaperIds } = useApp();
-  const [localSearch, setLocalSearch] = useState('');
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -25,25 +24,7 @@ export const Dashboard: React.FC = () => {
     return () => window.removeEventListener('message', handleMessage);
   }, [setSearchQuery, setActivePage]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!localSearch.trim()) return;
-    setSearchQuery(localSearch);
-    setActivePage('search');
-  };
 
-  const handleQuickTopic = (topic: string) => {
-    setSearchQuery(topic);
-    setActivePage('search');
-  };
-
-  const suggestions = [
-    "Find papers about RAG",
-    "Compare DINOv2 and MAE",
-    "Research gaps in GNNs",
-    "Latest Vision Transformer research",
-    "Self-supervised learning in agriculture"
-  ];
 
   const quickActions = [
     { 
