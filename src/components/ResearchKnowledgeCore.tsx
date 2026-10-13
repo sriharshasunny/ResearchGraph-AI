@@ -11,14 +11,13 @@ import {
   Sparkles,
   Users,
 } from 'lucide-react';
-import { useApp } from '../context/AppContext';
 import { originalHubPoints, originalOrbitSprites } from './researchCoreModelData';
 
 const MODEL_ORIGIN = { x: 1210, y: 444 };
 const MODEL_BOUNDS = { width: 800, height: 540 };
 const MODEL_RADIUS = 141;
 const SPHERE_RADIUS = 2.4;
-const MODEL_ZOOM = 1.38;
+const MODEL_ZOOM = 1.0;
 
 const labelData = [
   { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#6d4dff', tone: 'from-violet-500 to-indigo-500' },
@@ -35,8 +34,9 @@ const labelData = [
 type ModelLabel = (typeof labelData)[number];
 
 export const ResearchKnowledgeCore: React.FC = () => {
-  const { setActivePage, setSearchQuery } = useApp();
   const hostRef = useRef<HTMLDivElement>(null);
+  const globeRef = useRef<THREE.Group | null>(null);
+  const rotationTargetRef = useRef<number | null>(null);
   const hoveredTintRef = useRef<THREE.Color | null>(null);
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
   const [modelScale, setModelScale] = useState(0.5);
@@ -55,6 +55,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 300);
     const globe = new THREE.Group();
+    globeRef.current = globe;
     scene.add(globe);
     const uniforms = {
       time: { value: 0 },
@@ -275,8 +276,19 @@ export const ResearchKnowledgeCore: React.FC = () => {
       if (!reduceMotion.matches) elapsed += 0.016;
       uniforms.time.value = elapsed;
       if (!dragState) {
-        globe.rotation.y += yawVelocity;
-        yawVelocity += ((reduceMotion.matches ? 0 : 0.0016) - yawVelocity) * 0.03;
+        if (rotationTargetRef.current !== null && !reduceMotion.matches) {
+          const remaining = rotationTargetRef.current - globe.rotation.y;
+          const step = Math.sign(remaining) * Math.min(0.045, Math.max(0.002, Math.abs(remaining) * 0.06));
+          globe.rotation.y += step;
+          if (Math.abs(remaining) <= 0.006) {
+            globe.rotation.y = rotationTargetRef.current;
+            rotationTargetRef.current = null;
+          }
+        } else {
+          rotationTargetRef.current = null;
+          globe.rotation.y += yawVelocity;
+          yawVelocity += ((reduceMotion.matches ? 0 : 0.0016) - yawVelocity) * 0.03;
+        }
         globe.rotation.x += (0 - globe.rotation.x) * 0.01;
       }
       arcs.forEach(arc => {
@@ -330,17 +342,19 @@ export const ResearchKnowledgeCore: React.FC = () => {
       glowTexture.dispose();
       renderer.dispose();
       renderer.domElement.remove();
+      globeRef.current = null;
     };
   }, []);
 
-  const handleLabelClick = (label: ModelLabel) => {
-    if (label.id === 'papers') setActivePage('search');
-    else if (label.id === 'graph') setActivePage('graph');
-    else if (label.id === 'gaps') setActivePage('gaps');
-    else if (label.id === 'chat') setActivePage('chat');
-    else if ('query' in label && label.query) {
-      setSearchQuery(label.query);
-      setActivePage('search');
+  const handleLabelClick = () => {
+    const globe = globeRef.current;
+    if (!globe) return;
+    const target = globe.rotation.y + Math.PI * 1.5;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      globe.rotation.y = target;
+      rotationTargetRef.current = null;
+    } else {
+      rotationTargetRef.current = target;
     }
   };
 
@@ -389,22 +403,22 @@ export const ResearchKnowledgeCore: React.FC = () => {
           onMouseLeave={() => updateHoveredLabel(null)}
           onFocus={() => updateHoveredLabel(labelData.find(item => item.id === id) ?? null)}
           onBlur={() => updateHoveredLabel(null)}
-          onClick={() => handleLabelClick(labelData.find(item => item.id === id)!)}
-          aria-label={`Explore ${label}`}
+          onClick={handleLabelClick}
+          aria-label={`Rotate the research core from ${label}`}
           className={`research-core-label absolute z-10 inline-flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full border font-semibold leading-none text-white shadow-[0_4px_14px_rgba(0,0,0,.22)] transition duration-300 hover:scale-105 hover:shadow-[0_0_15px_var(--label-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${hoveredLabel === id ? 'bg-[#102a50]' : 'bg-[#071a3c]/95'}`}
           style={{
             left: offset(x, 'x'),
             top: offset(y, 'y'),
-            gap: 6 * labelScale,
-            padding: `${4 * labelScale}px ${8 * labelScale}px`,
-            fontSize: `${Math.max(10, 11.5 * labelScale)}px`,
+            gap: 7 * labelScale,
+            padding: `${4.5 * labelScale}px ${9 * labelScale}px`,
+            fontSize: `${Math.max(11, 12.9 * labelScale)}px`,
             borderColor: `${color}bf`,
             boxShadow: `0 5px 18px ${color}36`,
             ['--label-glow' as string]: `${color}8c`,
           }}
         >
-          <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white ${tone}`} style={{ width: Math.max(18, 24 * labelScale), height: Math.max(18, 24 * labelScale) }}>
-            <Icon style={{ width: Math.max(11, 14 * labelScale), height: Math.max(11, 14 * labelScale) }} />
+          <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white ${tone}`} style={{ width: Math.max(19, 26.5 * labelScale), height: Math.max(19, 26.5 * labelScale) }}>
+            <Icon style={{ width: Math.max(12, 15.5 * labelScale), height: Math.max(12, 15.5 * labelScale) }} />
           </span>
           <span className="whitespace-nowrap">{label}</span>
         </button>
