@@ -1,7 +1,6 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ChatMessage, PageType, Paper } from '../types';
-import { mockPapers } from '../data/mockData';
 
 export type ReadingStatus = 'to_read' | 'reading' | 'completed';
 
@@ -52,17 +51,19 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activePage, setActivePage] = useState<PageType>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
-  const [allPapers, setAllPapers] = useState<Paper[]>(mockPapers);
+  const [allPapers, setAllPapers] = useState<Paper[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{
     id: 'welcome',
     sender: 'assistant',
     content: 'Welcome to your ResearchGraph AI Copilot. I can synthesize literature across foundational papers, construct comparative benchmarks, extract methodology trade-offs, and map citations. Ground me in your saved library or query indexed papers directly.',
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }]);
-  const [savedPaperIds, setSavedPaperIds] = useState<string[]>(['p1', 'p2', 'p5', 'p8']);
+  const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
   const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
-  const [recentlyViewed, setRecentlyViewed] = useState<string[]>(['p1', 'p2', 'p3', 'p5', 'p6']);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
+  );
 
   // UI Mode
   const [uiMode, setUIModeState] = useState<UIMode>(() => (localStorage.getItem('rg_uiMode') as UIMode) || 'simple');
@@ -76,12 +77,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
 
   // Reading status
-  const [paperReadingStatus, setPaperReadingStatusState] = useState<Record<string, ReadingStatus>>({
-    p1: 'completed',
-    p2: 'reading',
-    p5: 'reading',
-    p8: 'to_read'
-  });
+  const [paperReadingStatus, setPaperReadingStatusState] = useState<Record<string, ReadingStatus>>({});
 
   // Paper personal notes
   const [paperNotes, setPaperNotes] = useState<Record<string, string>>({
@@ -91,10 +87,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   });
 
   // Comparison list
-  const [comparisonPaperIds, setComparisonPaperIds] = useState<string[]>(['p2', 'p3']);
+  const [comparisonPaperIds, setComparisonPaperIds] = useState<string[]>([]);
 
   // Active research project
-  const [activeProject, setActiveProject] = useState('Vision-Language Scaling & Reasoning');
+  const [activeProject, setActiveProject] = useState('Research workspace');
 
   // Scratchpad
   const [scratchpad, setScratchpadState] = useState(() => {

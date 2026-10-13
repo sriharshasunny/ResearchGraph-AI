@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { useApp } from '../../context/AppContext';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
   Bookmark,
-  Clock3,
   FileSearch,
+  FileText,
   GitCompare,
   Layers3,
   MessageSquareText,
@@ -14,8 +14,26 @@ import {
   Search,
   Sparkles,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
+import { useApp } from '../../context/AppContext';
+import type { PageType } from '../../types';
+import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
+
+const shortcuts: Array<{ title: string; description: string; icon: typeof Search; page: PageType; tone: string }> = [
+  { title: 'Search Papers', description: 'Discover relevant research', icon: FileSearch, page: 'search', tone: 'bg-blue-50 text-blue-700' },
+  { title: 'AI Research Assistant', description: 'Ask questions across papers', icon: MessageSquareText, page: 'chat', tone: 'bg-violet-50 text-violet-700' },
+  { title: 'Knowledge Graph', description: 'Explore connected ideas', icon: Network, page: 'graph', tone: 'bg-cyan-50 text-cyan-700' },
+  { title: 'Compare Papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare', tone: 'bg-emerald-50 text-emerald-700' },
+  { title: 'Literature Review', description: 'Build a focused literature review', icon: BookOpen, page: 'literature', tone: 'bg-amber-50 text-amber-700' },
+  { title: 'Research Gaps', description: 'Find open questions and directions', icon: Sparkles, page: 'gaps', tone: 'bg-rose-50 text-rose-700' },
+];
+
+const suggestedQueries = [
+  'Vision Transformer',
+  'Graph Neural Networks',
+  'Self-supervised Learning',
+  'Research gaps in medical imaging',
+  'Compare DINOv2 and MAE',
+];
 
 export const Dashboard: React.FC = () => {
   const {
@@ -28,6 +46,8 @@ export const Dashboard: React.FC = () => {
     paperReadingStatus,
     activeProject,
     comparisonPaperIds,
+    toggleSavedPaper,
+    toggleComparisonPaper,
   } = useApp();
   const [query, setQuery] = useState('');
 
@@ -41,7 +61,9 @@ export const Dashboard: React.FC = () => {
   const readingNowCount = allPapers.filter(paper => paperReadingStatus[paper.id] === 'reading').length;
 
   const openSearch = (searchTerm = query) => {
-    setSearchQuery(searchTerm.trim());
+    const trimmed = searchTerm.trim();
+    if (!trimmed) return;
+    setSearchQuery(trimmed);
     setActivePage('search');
   };
 
@@ -50,53 +72,36 @@ export const Dashboard: React.FC = () => {
     setActivePage('details');
   };
 
-  const stats = [
-    { label: 'Saved papers', value: savedPaperIds.length, icon: Bookmark, color: 'text-emerald-700 bg-emerald-50' },
-    { label: 'Papers in workspace', value: allPapers.length, icon: Layers3, color: 'text-blue-700 bg-blue-50' },
-    { label: 'Reading now', value: readingNowCount, icon: BookOpen, color: 'text-violet-700 bg-violet-50' },
-    { label: 'Comparisons', value: comparisonPaperIds.length, icon: GitCompare, color: 'text-amber-700 bg-amber-50' },
-  ];
-
-  const shortcuts = [
-    { title: 'Search papers', description: 'Discover relevant literature', icon: FileSearch, page: 'search' as const, tone: 'text-blue-700 bg-blue-50' },
-    { title: 'Ask AI', description: 'Explore a research question', icon: MessageSquareText, page: 'chat' as const, tone: 'text-violet-700 bg-violet-50' },
-    { title: 'Compare papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare' as const, tone: 'text-emerald-700 bg-emerald-50' },
-    { title: 'Explore graph', description: 'Follow connected ideas', icon: Network, page: 'graph' as const, tone: 'text-cyan-700 bg-cyan-50' },
-  ];
-
-  const suggestedQueries = [
-    'Find papers about RAG',
-    'Compare DINOv2 and MAE',
-    'Research gaps in GNNs',
-    'Latest Vision Transformer research',
-    'Self-supervised learning in agriculture',
+  const stats: Array<{ label: string; value: number; icon: typeof Search; tone: string; page: PageType }> = [
+    { label: 'Saved papers', value: savedPaperIds.length, icon: Bookmark, tone: 'bg-emerald-50 text-emerald-700', page: 'saved' },
+    { label: 'Papers in workspace', value: allPapers.length, icon: Layers3, tone: 'bg-blue-50 text-blue-700', page: 'papers' },
+    { label: 'Reading now', value: readingNowCount, icon: BookOpen, tone: 'bg-violet-50 text-violet-700', page: 'papers' },
+    { label: 'Comparisons', value: comparisonPaperIds.length, icon: GitCompare, tone: 'bg-orange-50 text-orange-700', page: 'compare' },
   ];
 
   return (
-    <div className="min-h-full bg-[#F5F7FB] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-      <div className="mx-auto max-w-[1320px] space-y-7">
+    <div className="min-h-full bg-[#F5F7FB] px-4 py-5 sm:px-6 lg:px-7 lg:py-6">
+      <div className="mx-auto max-w-[1440px] space-y-5">
         <motion.section
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.04 }}
+          transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 54%, #164e63 100%)' }}
-          className="relative isolate overflow-hidden rounded-[26px] bg-slate-950 px-6 py-7 text-white shadow-[0_20px_55px_-30px_rgba(15,45,75,0.75)] sm:px-9 sm:py-9 lg:px-11 lg:py-10"
+          className="relative isolate overflow-hidden rounded-[22px] bg-[#07152D] px-5 py-6 text-white shadow-[0_18px_45px_-28px_rgba(15,35,65,0.72)] sm:px-7 lg:px-9 lg:py-7"
         >
-          <div aria-hidden="true" className="absolute -right-20 -top-32 -z-10 h-80 w-80 rounded-full border border-white/10" />
-          <div aria-hidden="true" className="absolute -right-6 -top-16 -z-10 h-56 w-56 rounded-full border border-white/[0.08]" />
-          <div aria-hidden="true" className="absolute bottom-[-120px] right-[16%] -z-10 h-64 w-64 rounded-full bg-cyan-300/10 blur-3xl" />
-          <div className="grid items-center gap-7 lg:grid-cols-[minmax(0,1fr)_300px]">
-            <div className="max-w-[700px]">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-cyan-100">
-                <Sparkles className="h-3.5 w-3.5" />
+          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_78%_48%,rgba(14,116,220,0.28),transparent_42%),radial-gradient(ellipse_at_10%_100%,rgba(16,67,136,0.18),transparent_45%)]" />
+          <div aria-hidden="true" className="absolute -right-24 -top-36 -z-10 h-[420px] w-[420px] rounded-full border border-blue-100/[0.07]" />
+          <div className="grid items-center gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.82fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(400px,0.92fr)]">
+            <div className="relative z-10 max-w-[690px] py-1 lg:py-3">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-blue-100">
+                <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
                 YOUR RESEARCH WORKSPACE
               </div>
-              <h2 id="dashboard-search-title" className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-                What are you researching today?
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-blue-100/80 sm:text-[15px]">
-                Explore research. Connect knowledge. Discover what&apos;s next.
+              <h1 id="dashboard-search-title" className="max-w-[610px] text-[30px] font-semibold leading-[1.12] tracking-tight sm:text-[36px] lg:text-[40px]">
+                Discover. Connect. Advance <span className="text-blue-400">Research</span> with AI.
+              </h1>
+              <p className="mt-3 max-w-[510px] text-[14px] leading-6 text-slate-300 sm:text-[15px]">
+                Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
               <form
@@ -105,28 +110,29 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-6 flex max-w-[650px] items-center gap-2 rounded-2xl border border-white/70 bg-white p-1.5 pl-4 shadow-xl shadow-slate-950/10 focus-within:ring-4 focus-within:ring-cyan-300/20"
+                className="mt-5 flex max-w-[650px] items-center gap-2 rounded-xl border border-white/70 bg-white p-1.5 pl-3.5 shadow-lg shadow-slate-950/15 focus-within:ring-4 focus-within:ring-blue-300/20"
               >
-                <Search className="h-4 w-4 shrink-0 text-slate-400" />
+                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
-                  aria-label="Search academic research"
+                  aria-label="Search academic papers, authors, and topics"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
-                  placeholder="Ask anything about academic research..."
-                  className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                  placeholder="Search papers, authors, datasets, methods, concepts..."
+                  className="min-w-0 flex-1 bg-transparent py-2.5 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 sm:text-sm"
                 />
-                <button type="submit" style={{ backgroundColor: '#1d4ed8', color: '#ffffff' }} className="inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+                <button type="submit" className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
                   Search <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-blue-100/70">
-                <span className="mr-1">Try</span>
+              <div className="mt-3 flex max-w-[680px] flex-wrap items-center gap-2 text-[10px] text-blue-100/75 sm:text-[11px]">
+                <span className="mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
                     key={term}
+                    type="button"
                     onClick={() => openSearch(term)}
-                    className="rounded-full border border-white/15 bg-white/[0.06] px-3 py-1.5 text-blue-50 transition hover:border-cyan-200/50 hover:bg-white/[0.12]"
+                    className="rounded-full border border-white/15 bg-white/[0.05] px-2.5 py-1.5 text-slate-100 transition hover:border-blue-300/50 hover:bg-blue-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                   >
                     {term}
                   </button>
@@ -134,141 +140,139 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative mx-auto hidden h-[270px] w-full max-w-[300px] items-center justify-center lg:flex" role="img" aria-label="Animated research knowledge model">
-              <div aria-hidden="true" className="absolute inset-7 rounded-full bg-cyan-300/15 blur-3xl" />
-              <div aria-hidden="true" className="absolute h-[220px] w-[220px] rounded-full border border-cyan-100/[0.08]" />
-              <div aria-hidden="true" className="absolute h-[178px] w-[178px] rounded-full border border-blue-100/[0.08]" />
-              <div className="relative z-10 h-[250px] w-[250px]">
-                <ThreeNeuralCore className="h-full w-full" interactive={false} theme="cyan" />
-              </div>
-              <div className="absolute left-2 top-9 rounded-full border border-white/15 bg-slate-950/35 px-2.5 py-1 text-[10px] font-medium text-cyan-100 backdrop-blur-sm">Papers</div>
-              <div className="absolute right-0 top-14 rounded-full border border-white/15 bg-slate-950/35 px-2.5 py-1 text-[10px] font-medium text-blue-100 backdrop-blur-sm">Methods</div>
-              <div className="absolute bottom-8 right-2 rounded-full border border-white/15 bg-slate-950/35 px-2.5 py-1 text-[10px] font-medium text-violet-100 backdrop-blur-sm">Knowledge graph</div>
+            <div className="relative mx-auto flex h-[320px] w-full max-w-[520px] items-center justify-center overflow-visible sm:h-[350px]" aria-label="Interactive research knowledge core">
+              <ResearchKnowledgeCore />
             </div>
           </div>
         </motion.section>
 
-        <section aria-label="Workspace overview">
-          <div className="mb-3 flex items-end justify-between gap-3">
-            <div>
-              <h2 className="text-base font-bold tracking-tight text-slate-900">Your research overview</h2>
-              <p className="mt-1 text-xs text-slate-500">A clear view of your work in progress.</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {stats.map(({ label, value, icon: Icon, color }, index) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.06 + index * 0.04 }}
-              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)] transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5"
-            >
-              <span className={`mb-4 flex h-9 w-9 items-center justify-center rounded-xl ${color}`}><Icon className="h-4 w-4" /></span>
-              <div className="text-2xl font-bold tracking-tight text-slate-900">{value}</div>
-              <div className="mt-1 text-xs font-medium text-slate-500 sm:text-[13px]">{label}</div>
-            </motion.div>
-          ))}
+        <section aria-label="Research overview">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {stats.map(({ label, value, icon: Icon, tone, page }, index) => (
+              <motion.button
+                key={label}
+                type="button"
+                onClick={() => setActivePage(page)}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: index * 0.04 }}
+                className="group flex min-h-[78px] items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3.5 py-3 text-left shadow-[0_3px_14px_-12px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:px-4"
+              >
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
+                <span className="min-w-0">
+                  <span className="block text-[22px] font-bold leading-none tracking-tight text-slate-900">{value}</span>
+                  <span className="mt-1.5 block truncate text-[11px] font-medium text-slate-500 sm:text-xs">{label}</span>
+                </span>
+              </motion.button>
+            ))}
           </div>
         </section>
 
-        <section className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.8fr)]">
-          <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)]">
-            <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
+        <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(330px,1fr)]">
+          <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)]">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3.5 sm:px-5">
               <div>
                 <h2 className="text-sm font-bold text-slate-900">Continue your research</h2>
                 <p className="mt-0.5 text-xs text-slate-500">Pick up where you left off.</p>
               </div>
-              <button onClick={() => setActivePage('history')} className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900">
+              <button type="button" onClick={() => setActivePage('history')} className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900">
                 View history <ArrowUpRight className="h-3.5 w-3.5" />
               </button>
             </div>
             {recentPapers.length > 0 ? (
               <div className="divide-y divide-slate-100">
-                {recentPapers.map(paper => (
-                  <button
-                    key={paper.id}
-                    onClick={() => openPaper(paper.id)}
-                    className="group flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-slate-50 sm:px-6"
-                  >
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><BookOpen className="h-4 w-4" /></span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[13px] font-semibold text-slate-800 transition group-hover:text-blue-700 sm:text-sm">{paper.title}</span>
-                      <span className="mt-1 block truncate text-[11px] text-slate-500">{paper.authors.slice(0, 3).join(', ')}{paper.authors.length > 3 ? ' et al.' : ''} · {paper.year}</span>
-                    </span>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600" />
-                  </button>
-                ))}
+                {recentPapers.map(paper => {
+                  const isSaved = savedPaperIds.includes(paper.id);
+                  const isComparing = comparisonPaperIds.includes(paper.id);
+                  const readingStatus = paperReadingStatus[paper.id];
+                  return (
+                    <article key={paper.id} className="group flex items-center gap-3 px-4 py-3 transition hover:bg-slate-50/80 sm:px-5">
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 text-slate-500"><FileText className="h-4 w-4" /></span>
+                      <button type="button" onClick={() => openPaper(paper.id)} className="min-w-0 flex-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+                        <span className="block truncate text-[12px] font-semibold text-slate-800 group-hover:text-blue-700 sm:text-[13px]">{paper.title}</span>
+                        <span className="mt-1 block truncate text-[10px] text-slate-500 sm:text-[11px]">
+                          {paper.authors.slice(0, 2).join(', ')}{paper.authors.length > 2 ? ' et al.' : ''} · {paper.year || 'Year unavailable'}{paper.venue ? ` · ${paper.venue}` : ''}
+                        </span>
+                        <span className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                          {paper.field && <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-medium text-blue-800">{paper.field}</span>}
+                          {readingStatus && <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-medium capitalize text-slate-600">{readingStatus.replace('_', ' ')}</span>}
+                        </span>
+                      </button>
+                      <div className="flex shrink-0 items-center gap-1">
+                        <button type="button" onClick={() => openPaper(paper.id)} className="hidden rounded-lg bg-blue-50 px-3 py-1.5 text-[11px] font-semibold text-blue-700 hover:bg-blue-100 sm:inline-flex">Open</button>
+                        <button type="button" aria-label={isSaved ? 'Remove saved paper' : 'Save paper'} title={isSaved ? 'Remove saved paper' : 'Save paper'} onClick={() => toggleSavedPaper(paper.id)} className={`rounded-lg p-2 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSaved ? 'text-blue-700' : 'text-slate-400'}`}>
+                          <Bookmark className="h-4 w-4" fill={isSaved ? 'currentColor' : 'none'} />
+                        </button>
+                        <button type="button" aria-label={isComparing ? 'Remove from comparison' : 'Add to comparison'} title={isComparing ? 'Remove from comparison' : 'Add to comparison'} onClick={() => toggleComparisonPaper(paper.id)} className={`rounded-lg p-2 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isComparing ? 'text-blue-700' : 'text-slate-400'}`}>
+                          <GitCompare className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             ) : (
-              <div className="px-6 py-10 text-center">
-                <p className="text-sm font-semibold text-slate-700">Your reading history will appear here.</p>
-                <button onClick={() => openSearch('')} className="mt-3 text-xs font-semibold text-blue-700 hover:text-blue-900">Find your first paper</button>
+              <div className="px-5 py-9 text-center">
+                <p className="text-sm font-semibold text-slate-800">Your research journey starts here.</p>
+                <p className="mt-1 text-xs text-slate-500">Explore academic papers and save the ones you want to revisit.</p>
+                <button type="button" onClick={() => setActivePage('search')} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-700">Search papers <ArrowRight className="h-3.5 w-3.5" /></button>
               </div>
             )}
           </div>
 
-          <div className="space-y-5">
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)] sm:p-6">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-blue-700">Current project</p>
-                  <h2 className="mt-2 text-base font-bold leading-snug text-slate-900">{activeProject}</h2>
-                  <p className="mt-1.5 text-xs leading-5 text-slate-500">Keep your papers and ideas moving forward.</p>
-                </div>
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-700"><Layers3 className="h-4 w-4" /></span>
+          <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)]">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5 sm:px-5">
+              <div>
+                <h2 className="text-sm font-bold text-slate-900">Current project</h2>
+                <p className="mt-0.5 text-xs text-slate-500">Your active research workspace.</p>
               </div>
-              <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 text-xs">
-                <span className="text-slate-500">{readingQueue.length} papers in your reading queue</span>
-                <button onClick={() => setActivePage('saved')} className="font-semibold text-blue-700 hover:text-blue-900">Open library</button>
-              </div>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Layers3 className="h-4 w-4" /></span>
             </div>
-
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)] sm:p-6">
-              <div className="mb-3 flex items-center justify-between">
-                <div>
-                  <h2 className="text-sm font-bold text-slate-900">Reading queue</h2>
-                  <p className="mt-0.5 text-xs text-slate-500">{readingNowCount} currently in progress</p>
-                </div>
-                <Clock3 className="h-4 w-4 text-slate-400" />
+            <div className="p-4 sm:p-5">
+              <h3 className="text-[13px] font-semibold leading-5 text-slate-900">{activeProject || 'Research workspace'}</h3>
+              <p className="mt-1 text-[11px] leading-5 text-slate-500">Organize papers and ideas around your current research focus.</p>
+              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]">
+                <span className="text-slate-500">{readingQueue.length} papers in your reading queue</span>
+                <button type="button" onClick={() => setActivePage('saved')} className="font-semibold text-blue-700 hover:text-blue-900">Open library</button>
               </div>
-              {readingQueue.length > 0 ? (
-                <div className="space-y-1">
-                  {readingQueue.slice(0, 3).map(paper => (
-                    <button key={paper.id} onClick={() => openPaper(paper.id)} className="group flex w-full items-center gap-2 rounded-xl px-2 py-2 text-left hover:bg-slate-50">
-                      <span className={`h-2 w-2 shrink-0 rounded-full ${paperReadingStatus[paper.id] === 'reading' ? 'bg-emerald-500' : 'bg-slate-300'}`} />
-                      <span className="min-w-0 flex-1 truncate text-xs font-medium text-slate-700 group-hover:text-blue-700">{paper.title}</span>
-                      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-slate-300 group-hover:text-blue-600" />
-                    </button>
-                  ))}
+
+              <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/70 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-[11px] font-semibold text-slate-800">Related research network</h4>
+                    <p className="mt-0.5 text-[10px] text-slate-500">No linked entities yet. Open the graph to explore.</p>
+                  </div>
+                  <Network className="h-4 w-4 shrink-0 text-blue-600" />
                 </div>
-              ) : (
-                <div className="rounded-xl bg-slate-50 px-3 py-3 text-xs text-slate-500">Save a paper to build your reading queue.</div>
-              )}
+                <button type="button" onClick={() => setActivePage('graph')} className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-[10px] font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-700">
+                  Explore knowledge graph <ArrowRight className="h-3 w-3" />
+                </button>
+              </div>
             </div>
           </div>
         </section>
 
-        <section>
+        <section aria-labelledby="explore-tools-title">
           <div className="mb-3 flex items-end justify-between gap-3">
             <div>
-              <h2 className="text-sm font-bold text-slate-900">Explore your workspace</h2>
-              <p className="mt-0.5 text-xs text-slate-500">Jump into the tools you use most.</p>
+              <h2 id="explore-tools-title" className="text-sm font-bold text-slate-900">Explore research tools</h2>
+              <p className="mt-0.5 text-xs text-slate-500">Tools to accelerate your research workflow.</p>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6">
             {shortcuts.map(({ title, description, icon: Icon, page, tone }) => (
               <button
                 key={title}
+                type="button"
                 onClick={() => setActivePage(page)}
-                className="group flex items-center gap-3 rounded-2xl border border-slate-200/80 bg-white p-4 text-left shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                className="group flex min-h-[74px] items-center gap-3 rounded-xl border border-slate-200/80 bg-white p-3 text-left shadow-[0_4px_15px_-13px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"
               >
-                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}><Icon className="h-4 w-4" /></span>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${tone}`}><Icon className="h-4 w-4" /></span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[13px] font-semibold text-slate-800 group-hover:text-blue-700">{title}</span>
-                  <span className="mt-0.5 block text-[11px] text-slate-500">{description}</span>
+                  <span className="block truncate text-[11px] font-semibold text-slate-800 group-hover:text-blue-700">{title}</span>
+                  <span className="mt-1 block line-clamp-2 text-[10px] leading-4 text-slate-500">{description}</span>
                 </span>
-                <ArrowRight className="h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600" />
+                <ArrowRight className="h-3.5 w-3.5 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600" />
               </button>
             ))}
           </div>

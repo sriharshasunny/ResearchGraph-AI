@@ -48,9 +48,9 @@ export const ResearchKnowledgeCore: React.FC = () => {
   ];
 
   return (
-    <div className="relative w-full h-[420px] lg:h-[460px] flex items-center justify-center select-none">
+    <div className="relative flex h-[320px] w-full select-none items-center justify-center sm:h-[350px]">
       
-      <div className="absolute transform scale-90 sm:scale-95 md:scale-100 lg:scale-100 flex items-center justify-center pointer-events-none">
+      <div className="pointer-events-none absolute flex items-center justify-center scale-[0.7] sm:scale-[0.78] xl:scale-[0.84]">
         
         {/* Ambient Celestial Glow Behind Core */}
         <div className="absolute w-[340px] h-[340px] rounded-full bg-blue-600/15 blur-[90px] pointer-events-none" />
@@ -100,7 +100,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
             {/* Center Brand Identity */}
             <div className="relative z-10 flex flex-col items-center justify-center text-center p-3">
               <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center mb-1 shadow-inner">
-                <Network className="w-3.5 h-3.5 text-cyan-300 animate-pulse" />
+                <Network className={`w-3.5 h-3.5 text-cyan-300 ${shouldReduceMotion ? '' : 'animate-pulse'}`} />
               </div>
               <span className="text-[11px] font-extrabold tracking-wider text-white uppercase drop-shadow">
                 Research
@@ -139,13 +139,15 @@ export const ResearchKnowledgeCore: React.FC = () => {
                   transform: 'translate(-50%, -50%)',
                 }}
               >
-                <motion.div
+                <motion.button
+                  type="button"
                   animate={{ rotate: shouldReduceMotion ? 0 : -360 }}
                   transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
                   onMouseEnter={() => setHoveredLabel(item.id)}
                   onMouseLeave={() => setHoveredLabel(null)}
                   onClick={() => handleLabelClick(item.id, item.query)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full cursor-pointer backdrop-blur-md transition-all duration-300 ${
+                  aria-label={`Explore ${item.label}`}
+                  className={`pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 backdrop-blur-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
                     hoveredLabel === item.id
                       ? 'bg-cyan-500/30 border border-cyan-300 text-white scale-110 shadow-[0_0_12px_rgba(56,189,248,0.5)]'
                       : 'bg-[#0B1730]/85 border border-white/15 text-gray-200 hover:border-cyan-400/50 hover:bg-[#0B1730]'
@@ -153,7 +155,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
                 >
                   <span className="shrink-0">{item.icon}</span>
                   <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">{item.label}</span>
-                </motion.div>
+                </motion.button>
               </div>
             );
           })}
@@ -181,13 +183,15 @@ export const ResearchKnowledgeCore: React.FC = () => {
                   transform: 'translate(-50%, -50%)',
                 }}
               >
-                <motion.div
+                <motion.button
+                  type="button"
                   animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
                   transition={{ duration: 65, repeat: Infinity, ease: 'linear' }}
                   onMouseEnter={() => setHoveredLabel(item.id)}
                   onMouseLeave={() => setHoveredLabel(null)}
                   onClick={() => handleLabelClick(item.id, item.query)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full cursor-pointer backdrop-blur-md transition-all duration-300 ${
+                  aria-label={`Explore ${item.label}`}
+                  className={`pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 backdrop-blur-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 ${
                     hoveredLabel === item.id
                       ? 'bg-blue-500/30 border border-blue-300 text-white scale-110 shadow-[0_0_12px_rgba(96,165,250,0.5)]'
                       : 'bg-[#0B1730]/85 border border-white/15 text-gray-200 hover:border-blue-400/50 hover:bg-[#0B1730]'
@@ -195,7 +199,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
                 >
                   <span className="shrink-0">{item.icon}</span>
                   <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">{item.label}</span>
-                </motion.div>
+                </motion.button>
               </div>
             );
           })}
@@ -223,13 +227,15 @@ export const ResearchKnowledgeCore: React.FC = () => {
                   transform: 'translate(-50%, -50%)',
                 }}
               >
-                <motion.div
+                <motion.button
+                  type="button"
                   animate={{ rotate: shouldReduceMotion ? 0 : -360 }}
                   transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
                   onMouseEnter={() => setHoveredLabel(item.id)}
                   onMouseLeave={() => setHoveredLabel(null)}
                   onClick={() => handleLabelClick(item.id, item.query)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full cursor-pointer backdrop-blur-md transition-all duration-300 ${
+                  aria-label={`Explore ${item.label}`}
+                  className={`pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 backdrop-blur-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 ${
                     hoveredLabel === item.id
                       ? 'bg-indigo-500/30 border border-indigo-300 text-white scale-110 shadow-[0_0_12px_rgba(129,140,248,0.5)]'
                       : 'bg-[#0B1730]/85 border border-white/15 text-gray-200 hover:border-indigo-400/50 hover:bg-[#0B1730]'
@@ -237,7 +243,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
                 >
                   <span className="shrink-0">{item.icon}</span>
                   <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">{item.label}</span>
-                </motion.div>
+                </motion.button>
               </div>
             );
           })}
@@ -247,3 +253,4 @@ export const ResearchKnowledgeCore: React.FC = () => {
     </div>
   );
 };
+

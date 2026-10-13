@@ -1,122 +1,99 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Search, Settings, LogOut, Menu, Network, ChevronDown } from 'lucide-react';
+import { Bell, Search, Settings, LogOut, Menu, Network, ChevronDown, UserRound } from 'lucide-react';
 import { ProfileModal } from './ProfileModal';
 import { SettingsModal } from './SettingsModal';
 
 export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
-  const { setSearchQuery, setActivePage, toggleSidebar } = useApp();
-  
+  const { setSearchQuery, setActivePage, toggleSidebar, isSidebarOpen } = useApp();
   const [isAvatarOpen, setIsAvatarOpen] = useState(false);
   const [isBellOpen, setIsBellOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  
-  const [cmdKey, setCmdKey] = useState('⌘');
+  const [query, setQuery] = useState('');
+  const [shortcut, setShortcut] = useState('Ctrl K');
+  const inputRef = useRef<HTMLInputElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
   const bellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
-      setCmdKey('⌘');
-    } else {
-      setCmdKey('Ctrl');
-    }
+    const isMac = navigator.platform.toUpperCase().includes('MAC');
+    setShortcut(isMac ? '⌘ K' : 'Ctrl K');
 
-    const handleClickOutside = (e: MouseEvent) => {
-      if (avatarRef.current && !avatarRef.current.contains(e.target as Node)) {
-        setIsAvatarOpen(false);
-      }
-      if (bellRef.current && !bellRef.current.contains(e.target as Node)) {
-        setIsBellOpen(false);
-      }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
+      event.preventDefault();
+      inputRef.current?.focus();
+      inputRef.current?.select();
     };
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (avatarRef.current && !avatarRef.current.contains(target)) setIsAvatarOpen(false);
+      if (bellRef.current && !bellRef.current.contains(target)) setIsBellOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
-  const handleGlobalSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-      setSearchQuery(e.currentTarget.value);
-      setActivePage('search');
-    }
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    setSearchQuery(trimmed);
+    setActivePage('search');
   };
 
   return (
     <>
-      <header className="h-[64px] shrink-0 bg-white dark:bg-[#111D35] dark:bg-[#0B1426] border-b border-gray-200 dark:border-white/[0.06] dark:border-white/[0.06] flex items-center justify-between px-4 sm:px-6 z-40 sticky top-0 relative">
-        <div className="flex items-center gap-4">
-          {/* Hamburger Sidebar Toggle */}
-          <button
-            onClick={toggleSidebar}
-            className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 dark:border-white/[0.06] dark:border-white/[0.06] text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:text-gray-400 dark:hover:text-white hover:bg-gray-50 dark:bg-white/[0.04] dark:hover:bg-white dark:bg-[#111D35]/[0.04]"
-          >
-            <Menu className="w-5 h-5" />
+      <header className="sticky top-0 z-40 flex h-[58px] shrink-0 items-center gap-3 border-b border-slate-200/90 bg-white/95 px-3 backdrop-blur sm:px-5">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <button type="button" onClick={toggleSidebar} aria-label="Toggle navigation" aria-expanded={isSidebarOpen} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+            <Menu className="h-5 w-5" />
           </button>
-
-          {/* Brand */}
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActivePage('dashboard')}>
-            <Network className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            <span className="font-semibold text-[16px] tracking-tight text-gray-900 dark:text-white dark:text-white">
-              ResearchGraph <span className="font-bold text-blue-600 dark:text-blue-400">AI</span>
-            </span>
+          <div className="flex shrink-0 items-center gap-1.5 md:hidden">
+            <Network className="h-5 w-5 text-blue-600" />
+            <span className="text-xs font-semibold text-slate-900">ResearchGraph <span className="text-blue-600">AI</span></span>
           </div>
+          <form role="search" onSubmit={submitSearch} className="relative ml-auto flex w-full max-w-[540px] items-center">
+            <Search aria-hidden="true" className="absolute left-3.5 h-4 w-4 text-slate-400" />
+            <input
+              ref={inputRef}
+              type="search"
+              value={query}
+              onChange={event => setQuery(event.target.value)}
+              aria-label="Search papers, authors, and topics"
+              placeholder="Search papers, authors, topics..."
+              className="h-9 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-[76px] text-[12px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-2 focus:ring-blue-100"
+            />
+            <button type="submit" aria-label="Submit search" className="absolute right-2 rounded-md px-1.5 py-1 text-slate-400 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"><kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-medium">{shortcut}</kbd></button>
+          </form>
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-5">
-          {/* Search Bar */}
-          <div className="hidden md:flex items-center relative ml-8">
-            <div className="absolute left-3.5 w-5 h-5 flex items-center justify-center z-10">
-              <Search className="w-4 h-4 text-gray-400 dark:text-gray-500 dark:text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search papers, authors, topics..."
-              onKeyDown={handleGlobalSearch}
-              className="w-[280px] lg:w-[480px] h-10 pl-11 pr-14 rounded-full bg-gray-100 dark:bg-[#111D35] border border-transparent dark:border-white/[0.06] text-[13px] text-gray-900 dark:text-white dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-500/30"
-            />
-            <div className="absolute right-2.5 flex items-center gap-1">
-              <kbd className="px-2 py-1 text-[11px] font-medium bg-gray-200 dark:bg-white dark:bg-[#111D35]/[0.08] rounded text-gray-500 dark:text-gray-400 dark:text-gray-400 flex items-center gap-0.5">{cmdKey === '⌘' ? '⌘' : 'Ctrl'} K</kbd>
-            </div>
-          </div>
-
-          {/* Action Icons */}
-          <div className="flex items-center gap-1 sm:gap-1.5">
-
-
-            {/* Bell */}
-            <div className="relative" ref={bellRef}>
-              <button
-                onClick={() => setIsBellOpen(!isBellOpen)}
-                className="relative p-2 rounded-full text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white dark:bg-[#111D35]/[0.06]"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#0B1426]"></span>
-              </button>
-            </div>
-
-            {/* Settings */}
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="p-2 text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white dark:bg-[#111D35]/[0.06] rounded-full hidden sm:flex"
-            >
-              <Settings className="w-5 h-5" />
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="relative" ref={bellRef}>
+            <button type="button" onClick={() => setIsBellOpen(value => !value)} aria-label="Notifications" aria-expanded={isBellOpen} className="relative flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+              <Bell className="h-[18px] w-[18px]" />
             </button>
-
-            {/* Avatar */}
-            <div className="relative ml-1.5 flex items-center gap-1 cursor-pointer hover:opacity-80" onClick={() => setIsAvatarOpen(!isAvatarOpen)} ref={avatarRef}>
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-[11px] font-bold ring-2 ring-white/20 dark:ring-white/10">
-                JD
+            {isBellOpen && <div role="status" className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-xl"><p className="text-xs font-semibold text-slate-800">Notifications</p><p className="mt-2 text-xs text-slate-500">You&apos;re all caught up.</p></div>}
+          </div>
+          <button type="button" onClick={() => setIsSettingsOpen(true)} aria-label="Open settings" className="hidden h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 sm:flex">
+            <Settings className="h-[18px] w-[18px]" />
+          </button>
+          <div className="relative" ref={avatarRef}>
+            <button type="button" onClick={() => setIsAvatarOpen(value => !value)} aria-label="Open user menu" aria-haspopup="menu" aria-expanded={isAvatarOpen} className="flex items-center gap-1 rounded-full p-0.5 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">JD</span>
+              <ChevronDown className="hidden h-3.5 w-3.5 text-slate-500 sm:block" />
+            </button>
+            {isAvatarOpen && (
+              <div role="menu" className="absolute right-0 top-11 z-50 w-48 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl">
+                <button type="button" role="menuitem" onClick={() => { setIsAvatarOpen(false); setIsProfileOpen(true); }} className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs text-slate-700 hover:bg-slate-50"><UserRound className="h-4 w-4" />Profile</button>
+                <button type="button" role="menuitem" onClick={() => { setIsAvatarOpen(false); onLogout?.(); }} className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs text-rose-600 hover:bg-rose-50"><LogOut className="h-4 w-4" />Log out</button>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 dark:text-gray-400" />
-              {isAvatarOpen && (
-                <div className="absolute right-0 top-12 w-48 bg-white dark:bg-[#111D35] dark:bg-[#111D35] rounded-xl shadow-xl shadow-sm dark:shadow-none border border-gray-200 dark:border-white/[0.06] dark:border-white/[0.06] overflow-hidden py-1 flex flex-col z-50">
-                  <button onClick={onLogout} className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 dark:bg-white/[0.04] dark:hover:bg-white dark:bg-[#111D35]/[0.04] text-red-600 dark:text-red-400 flex items-center gap-2">
-                    <LogOut className="w-4 h-4" /> Log out
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </header>
@@ -126,3 +103,4 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     </>
   );
 };
+

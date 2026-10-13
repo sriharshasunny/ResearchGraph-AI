@@ -28,14 +28,14 @@ const MainAppLayout = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 1.02 }}
       transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="flex h-screen w-full bg-[#F7FAFC] dark:bg-[#0B1426] text-gray-900 dark:text-white overflow-hidden font-sans relative transition-colors duration-300"
+      className="flex h-screen w-full overflow-hidden bg-[#F7FAFC] font-sans text-gray-900 transition-colors duration-300"
     >
       <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC] dark:bg-[#0B1426] transition-colors duration-300">
       </div>
-      <div className="relative z-10 flex flex-col h-full w-full">
-        <Navbar onLogout={handleLogout} />
-        <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden relative">
-          <Sidebar />
+      <div className="relative z-10 flex h-full w-full min-w-0">
+        <Sidebar />
+        <div className="flex h-full min-w-0 flex-1 flex-col">
+          <Navbar onLogout={handleLogout} />
           <main
             className="relative z-0 flex-1 overflow-x-hidden overflow-y-auto"
             style={{ background: 'radial-gradient(ellipse at 92% 0%, rgba(219,234,254,0.38), transparent 36%), #F7FAFC' }}
