@@ -10,11 +10,11 @@ import {
   GitCompare,
   Layers3,
   MessageSquareText,
-  Network,
   Search,
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
 export const Dashboard: React.FC = () => {
   const {
@@ -147,21 +147,9 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="hidden lg:block" aria-hidden="true">
-              <div className="relative mx-auto flex h-[210px] w-[250px] items-center justify-center">
-                <div className="absolute h-[180px] w-[180px] rounded-full border border-cyan-100/15" />
-                <div className="absolute h-[132px] w-[132px] rounded-full border border-cyan-100/20" />
-                <div className="absolute h-[84px] w-[84px] rounded-full bg-gradient-to-br from-cyan-300/30 to-blue-300/10 shadow-[0_0_55px_rgba(103,232,249,0.2)]" />
-                <div className="relative flex h-[58px] w-[58px] items-center justify-center rounded-2xl border border-white/20 bg-white/10 shadow-lg backdrop-blur">
-                  <Network className="h-7 w-7 text-cyan-100" />
-                </div>
-                <span className="absolute left-4 top-10 h-3 w-3 rounded-full bg-cyan-200 shadow-[0_0_18px_rgba(165,243,252,0.9)]" />
-                <span className="absolute right-3 top-14 h-2.5 w-2.5 rounded-full bg-blue-200 shadow-[0_0_16px_rgba(191,219,254,0.8)]" />
-                <span className="absolute bottom-7 left-10 h-2 w-2 rounded-full bg-emerald-200 shadow-[0_0_15px_rgba(167,243,208,0.8)]" />
-                <span className="absolute bottom-10 right-8 h-3.5 w-3.5 rounded-full bg-cyan-100 shadow-[0_0_18px_rgba(207,250,254,0.8)]" />
-                <span className="absolute bottom-0 rounded-full border border-white/10 bg-white/[0.08] px-3 py-1.5 text-[10px] font-medium tracking-wide text-cyan-50/90">
-                  CONNECTED KNOWLEDGE
-                </span>
+            <div className="hidden h-[230px] w-[250px] items-center justify-center overflow-hidden lg:flex">
+              <div className="h-[420px] w-[420px] shrink-0 origin-center scale-[0.54]">
+                <ResearchKnowledgeCore />
               </div>
             </div>
           </div>
