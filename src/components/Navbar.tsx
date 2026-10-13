@@ -49,16 +49,16 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-[58px] shrink-0 items-center gap-3 border-b border-slate-200/90 bg-white/95 px-3 backdrop-blur sm:px-5">
+      <header className="sticky top-0 z-50 flex h-[58px] shrink-0 items-center gap-2 border-b border-slate-200/90 bg-white/95 px-2.5 backdrop-blur sm:gap-3 sm:px-5">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <button type="button" onClick={toggleSidebar} aria-label="Toggle navigation" aria-expanded={isSidebarOpen} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
             <Menu className="h-5 w-5" />
           </button>
-          <div className="flex shrink-0 items-center gap-1.5 md:hidden">
-            <Network className="h-5 w-5 text-blue-600" />
-            <span className="text-xs font-semibold text-slate-900">ResearchGraph <span className="text-blue-600">AI</span></span>
-          </div>
-          <form role="search" onSubmit={submitSearch} className="relative ml-auto flex w-full max-w-[540px] items-center">
+          <button type="button" onClick={() => setActivePage('dashboard')} aria-label="ResearchGraph AI home" className="flex min-w-0 shrink-0 items-center gap-1.5 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+            <Network className="h-5 w-5 shrink-0 text-blue-600" />
+            <span className="max-w-[122px] truncate text-[11px] font-semibold text-slate-900 sm:max-w-none sm:text-xs">ResearchGraph <span className="text-blue-600">AI</span></span>
+          </button>
+          <form role="search" onSubmit={submitSearch} className="relative ml-auto flex min-w-0 w-full max-w-[540px] items-center">
             <Search aria-hidden="true" className="absolute left-3.5 h-4 w-4 text-slate-400" />
             <input
               ref={inputRef}

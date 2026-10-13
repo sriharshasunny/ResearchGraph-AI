@@ -61,9 +61,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
   const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
-  );
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // UI Mode
   const [uiMode, setUIModeState] = useState<UIMode>(() => (localStorage.getItem('rg_uiMode') as UIMode) || 'simple');

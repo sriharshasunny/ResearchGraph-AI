@@ -48,16 +48,16 @@ export const ResearchKnowledgeCore: React.FC = () => {
   ];
 
   return (
-    <div className="relative flex h-[320px] w-full select-none items-center justify-center sm:h-[350px]">
+    <div className="relative flex h-[390px] w-full select-none items-center justify-center sm:h-[420px] lg:h-[390px]">
       
-      <div className="pointer-events-none absolute flex items-center justify-center scale-[0.7] sm:scale-[0.78] xl:scale-[0.84]">
+      <div className="pointer-events-none absolute flex items-center justify-center scale-[0.78] sm:scale-[0.86] lg:scale-[0.72] xl:scale-[0.96]">
         
         {/* Ambient Celestial Glow Behind Core */}
         <div className="absolute w-[340px] h-[340px] rounded-full bg-blue-600/15 blur-[90px] pointer-events-none" />
         <div className="absolute w-[200px] h-[200px] rounded-full bg-cyan-400/10 blur-[60px] pointer-events-none" />
 
         {/* ── CENTRAL RESEARCH KNOWLEDGE CORE ── */}
-        <div className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full flex items-center justify-center">
+        <div className="relative z-10 h-[208px] w-[208px] sm:h-[224px] sm:w-[224px] rounded-full flex items-center justify-center">
           {/* Core Outer Atmosphere Ring */}
           <div className={`absolute inset-0 rounded-full border border-cyan-400/30 transition-all duration-700 ${
             hoveredLabel ? 'scale-105 border-cyan-400/60 shadow-[0_0_30px_rgba(56,189,248,0.35)]' : 'shadow-[0_0_20px_rgba(37,99,235,0.25)]'
@@ -67,7 +67,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
           <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-tr from-[#050B18] via-[#0B1A38] to-[#122A5C] border border-blue-400/20 shadow-2xl flex items-center justify-center">
             
             {/* Internal Grid & Knowledge Topological Lines */}
-            <svg className="absolute inset-0 w-full h-full opacity-40 mix-blend-screen pointer-events-none" viewBox="0 0 200 200">
+            <svg className="absolute inset-0 w-full h-full opacity-50 mix-blend-screen pointer-events-none" viewBox="0 0 200 200" aria-hidden="true">
               {/* Latitude Curves */}
               <ellipse cx="100" cy="100" rx="90" ry="32" fill="none" stroke="#38BDF8" strokeWidth="0.75" strokeDasharray="3 3" opacity="0.6" />
               <ellipse cx="100" cy="100" rx="90" ry="60" fill="none" stroke="#60A5FA" strokeWidth="0.75" opacity="0.4" />
@@ -78,19 +78,43 @@ export const ResearchKnowledgeCore: React.FC = () => {
               <ellipse cx="100" cy="100" rx="65" ry="90" fill="none" stroke="#60A5FA" strokeWidth="0.75" opacity="0.35" />
 
               {/* Neural Topology Network Points */}
-              <circle cx="70" cy="80" r="3" fill="#38BDF8" className={hoveredLabel === 'papers' || hoveredLabel === 'datasets' ? 'animate-ping' : ''} />
+              <motion.g
+                animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
+                transition={{ duration: 110, repeat: Infinity, ease: 'linear' }}
+                style={{ transformOrigin: '100px 100px' }}
+              >
+                <line x1="42" y1="94" x2="70" y2="80" stroke="#38BDF8" strokeWidth="0.8" opacity="0.55" />
+                <line x1="70" y1="80" x2="94" y2="42" stroke="#38BDF8" strokeWidth="0.8" opacity="0.6" />
+                <line x1="94" y1="42" x2="115" y2="65" stroke="#818CF8" strokeWidth="0.8" opacity="0.62" />
+                <line x1="115" y1="65" x2="158" y2="82" stroke="#818CF8" strokeWidth="0.8" opacity="0.52" />
+                <line x1="158" y1="82" x2="140" y2="110" stroke="#38BDF8" strokeWidth="0.8" opacity="0.6" />
+                <line x1="140" y1="110" x2="154" y2="145" stroke="#34D399" strokeWidth="0.8" opacity="0.5" />
+                <line x1="154" y1="145" x2="110" y2="162" stroke="#818CF8" strokeWidth="0.8" opacity="0.55" />
+                <line x1="110" y1="162" x2="90" y2="135" stroke="#F472B6" strokeWidth="0.8" opacity="0.62" />
+                <line x1="90" y1="135" x2="60" y2="120" stroke="#F472B6" strokeWidth="0.8" opacity="0.5" />
+                <line x1="60" y1="120" x2="42" y2="94" stroke="#FBBF24" strokeWidth="0.8" opacity="0.55" />
+                <line x1="70" y1="80" x2="90" y2="135" stroke="#38BDF8" strokeWidth="0.65" opacity="0.4" />
+                <line x1="115" y1="65" x2="60" y2="120" stroke="#818CF8" strokeWidth="0.65" opacity="0.36" />
+                <line x1="140" y1="110" x2="90" y2="135" stroke="#34D399" strokeWidth="0.65" opacity="0.42" />
+                <circle cx="42" cy="94" r="2.2" fill="#38BDF8" />
+                <circle cx="94" cy="42" r="2.5" fill="#60A5FA" />
+                <circle cx="158" cy="82" r="2.4" fill="#818CF8" />
+                <circle cx="154" cy="145" r="2.5" fill="#38BDF8" />
+                <circle cx="110" cy="162" r="2" fill="#F472B6" />
+              </motion.g>
+              <circle cx="70" cy="80" r="3" fill="#38BDF8" className={!shouldReduceMotion && (hoveredLabel === 'papers' || hoveredLabel === 'datasets') ? 'animate-ping' : ''} />
               <line x1="70" y1="80" x2="115" y2="65" stroke="#38BDF8" strokeWidth="1" opacity="0.7" />
               
               <circle cx="115" cy="65" r="2.5" fill="#818CF8" />
               <line x1="115" y1="65" x2="140" y2="110" stroke="#818CF8" strokeWidth="0.75" opacity="0.6" />
               
-              <circle cx="140" cy="110" r="3.5" fill="#34D399" className={hoveredLabel === 'datasets' || hoveredLabel === 'methods' ? 'animate-pulse' : ''} />
+              <circle cx="140" cy="110" r="3.5" fill="#34D399" className={!shouldReduceMotion && (hoveredLabel === 'datasets' || hoveredLabel === 'methods') ? 'animate-pulse' : ''} />
               <line x1="140" y1="110" x2="90" y2="135" stroke="#34D399" strokeWidth="0.75" opacity="0.5" />
 
               <circle cx="90" cy="135" r="2.5" fill="#F472B6" />
               <line x1="90" y1="135" x2="60" y2="120" stroke="#F472B6" strokeWidth="0.75" opacity="0.5" />
 
-              <circle cx="60" cy="120" r="3" fill="#FBBF24" className={hoveredLabel === 'authors' ? 'animate-ping' : ''} />
+              <circle cx="60" cy="120" r="3" fill="#FBBF24" className={!shouldReduceMotion && hoveredLabel === 'authors' ? 'animate-ping' : ''} />
               <line x1="60" y1="120" x2="70" y2="80" stroke="#FBBF24" strokeWidth="0.75" opacity="0.6" />
             </svg>
 
@@ -121,11 +145,11 @@ export const ResearchKnowledgeCore: React.FC = () => {
         <motion.div
           animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
           transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[240px] h-[240px] rounded-full border border-cyan-400/10 pointer-events-none"
+          className="absolute w-[250px] h-[250px] rounded-full border border-cyan-400/10 pointer-events-none"
         >
           {orbit1Items.map((item) => {
             const rad = (item.angle * Math.PI) / 180;
-            const radius = 120;
+            const radius = 125;
             const x = Math.cos(rad) * radius;
             const y = Math.sin(rad) * radius;
 
@@ -165,11 +189,11 @@ export const ResearchKnowledgeCore: React.FC = () => {
         <motion.div
           animate={{ rotate: shouldReduceMotion ? 0 : -360 }}
           transition={{ duration: 65, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[310px] h-[310px] rounded-full border border-blue-400/10 pointer-events-none"
+          className="absolute w-[330px] h-[330px] rounded-full border border-blue-400/10 pointer-events-none"
         >
           {orbit2Items.map((item) => {
             const rad = (item.angle * Math.PI) / 180;
-            const radius = 155;
+            const radius = 165;
             const x = Math.cos(rad) * radius;
             const y = Math.sin(rad) * radius;
 
@@ -209,11 +233,11 @@ export const ResearchKnowledgeCore: React.FC = () => {
         <motion.div
           animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
           transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[380px] h-[380px] rounded-full border border-indigo-400/10 pointer-events-none"
+          className="absolute w-[420px] h-[420px] rounded-full border border-indigo-400/10 pointer-events-none"
         >
           {orbit3Items.map((item) => {
             const rad = (item.angle * Math.PI) / 180;
-            const radius = 190;
+            const radius = 210;
             const x = Math.cos(rad) * radius;
             const y = Math.sin(rad) * radius;
 
