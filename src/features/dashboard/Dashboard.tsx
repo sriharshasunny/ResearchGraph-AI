@@ -99,7 +99,7 @@ export const Dashboard: React.FC = () => {
           <div aria-hidden="true" className="absolute -right-20 -top-32 -z-10 h-80 w-80 rounded-full border border-white/10" />
           <div aria-hidden="true" className="absolute -right-6 -top-16 -z-10 h-56 w-56 rounded-full border border-white/[0.08]" />
           <div aria-hidden="true" className="absolute bottom-[-120px] right-[16%] -z-10 h-64 w-64 rounded-full bg-cyan-300/10 blur-3xl" />
-          <div className="grid items-center gap-9 lg:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="grid items-center gap-9 lg:grid-cols-[minmax(0,1fr)_310px]">
             <div className="max-w-[700px]">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-cyan-100">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -147,13 +147,18 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative hidden h-[230px] w-[280px] overflow-hidden lg:block" aria-hidden="true">
+            <div className="relative hidden h-[230px] w-[310px] overflow-hidden lg:block" aria-hidden="true">
               <iframe
                 src="/dashboard_model.html"
                 title="Rotating research knowledge model"
                 sandbox="allow-scripts allow-same-origin"
                 tabIndex={-1}
-                className="pointer-events-none absolute left-[-210px] top-[-17px] h-[850px] w-[1530px] origin-top-left scale-[0.32] border-0"
+                style={{
+                  mixBlendMode: 'screen',
+                  maskImage: 'radial-gradient(ellipse 46% 57% at 71.5% 48.6%, #000 66%, transparent 100%)',
+                  WebkitMaskImage: 'radial-gradient(ellipse 46% 57% at 71.5% 48.6%, #000 66%, transparent 100%)',
+                }}
+                className="pointer-events-none absolute left-[-180px] top-[-17px] h-[850px] w-[1530px] origin-top-left scale-[0.32] border-0"
               />
             </div>
           </div>
@@ -166,7 +171,7 @@ export const Dashboard: React.FC = () => {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.06 + index * 0.04 }}
-              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)] sm:p-5"
+              className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)] transition duration-200 hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md sm:p-5"
             >
               <span className={`mb-4 flex h-9 w-9 items-center justify-center rounded-xl ${color}`}><Icon className="h-4 w-4" /></span>
               <div className="text-2xl font-bold tracking-tight text-slate-900">{value}</div>
