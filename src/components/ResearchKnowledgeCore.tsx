@@ -1,279 +1,329 @@
-import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { 
-  FileText, Users, Database, Cpu, Lightbulb, 
-  Share2, Network, Sparkles, Activity 
+import React, { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import {
+  Activity,
+  Database,
+  FileText,
+  Lightbulb,
+  Network,
+  Quote,
+  Settings2,
+  Sparkles,
+  Users,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { originalHubPoints, originalOrbitSprites } from './researchCoreModelData';
+
+const MODEL_ORIGIN = { x: 1210, y: 444 };
+const MODEL_BOUNDS = { width: 800, height: 540 };
+const MODEL_RADIUS = 141;
+const SPHERE_RADIUS = 2.4;
+
+const labelData = [
+  { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#6d4dff', tone: 'from-violet-500 to-indigo-500' },
+  { id: 'papers', label: 'Papers', Icon: FileText, x: 1034, y: 258, color: '#3b82f6', tone: 'from-blue-500 to-sky-400', query: 'Transformers' },
+  { id: 'authors', label: 'Authors', Icon: Users, x: 1437, y: 296, color: '#ff8a1f', tone: 'from-orange-400 to-amber-400', query: 'Ashish Vaswani' },
+  { id: 'methods', label: 'Methods', Icon: Settings2, x: 962, y: 349, color: '#3b82f6', tone: 'from-blue-500 to-sky-400', query: 'Self-Supervised' },
+  { id: 'datasets', label: 'Datasets', Icon: Database, x: 1516, y: 388, color: '#3b82f6', tone: 'from-blue-500 to-sky-400', query: 'ImageNet' },
+  { id: 'citations', label: 'Citations', Icon: Quote, x: 960, y: 453, color: '#22b8ff', tone: 'from-cyan-400 to-sky-400', query: 'Attention Is All You Need' },
+  { id: 'concepts', label: 'Concepts', Icon: Lightbulb, x: 1498, y: 493, color: '#ff4fc3', tone: 'from-pink-500 to-fuchsia-400', query: 'Multi-Head Attention' },
+  { id: 'chat', label: 'AI Insights', Icon: Sparkles, x: 990, y: 566, color: '#8b3df0', tone: 'from-violet-500 to-purple-400' },
+  { id: 'gaps', label: 'Research Gaps', Icon: Activity, x: 1244, y: 659, color: '#ff3fc0', tone: 'from-pink-500 to-rose-400' },
+] as const;
+
+type ModelLabel = (typeof labelData)[number];
 
 export const ResearchKnowledgeCore: React.FC = () => {
   const { setActivePage, setSearchQuery } = useApp();
+  const hostRef = useRef<HTMLDivElement>(null);
+  const hoveredTintRef = useRef<THREE.Color | null>(null);
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
-  const shouldReduceMotion = useReducedMotion();
+  const [modelScale, setModelScale] = useState(0.5);
 
-  const handleLabelClick = (id: string, query?: string) => {
-    if (id === 'papers') {
-      setActivePage('search');
-    } else if (id === 'graph') {
-      setActivePage('graph');
-    } else if (id === 'gaps') {
-      setActivePage('gaps');
-    } else if (id === 'chat') {
-      setActivePage('chat');
-    } else if (query) {
-      setSearchQuery(query);
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+    } catch {
+      return;
+    }
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 300);
+    const globe = new THREE.Group();
+    scene.add(globe);
+    const uniforms = {
+      time: { value: 0 },
+      pointScale: { value: 1 },
+      tintMix: { value: 0 },
+      tint: { value: new THREE.Color(0x2563eb) },
+    };
+    const textureLoader = new THREE.TextureLoader();
+    const anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const coreTexture = textureLoader.load('/research-core/core-texture.webp');
+    coreTexture.anisotropy = anisotropy;
+    coreTexture.colorSpace = THREE.SRGBColorSpace;
+    const core = new THREE.Mesh(
+      new THREE.SphereGeometry(SPHERE_RADIUS, 160, 160),
+      new THREE.MeshBasicMaterial({ map: coreTexture }),
+    );
+    globe.add(core);
+
+    const baseRimColor = new THREE.Color(0xe9f2ff);
+    const rim = new THREE.Mesh(
+      new THREE.SphereGeometry(SPHERE_RADIUS * 1.003, 96, 96),
+      new THREE.ShaderMaterial({
+        uniforms: { color: { value: baseRimColor.clone() } },
+        transparent: true,
+        depthWrite: false,
+        vertexShader: 'varying vec3 normalView;void main(){normalView=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+        fragmentShader: 'varying vec3 normalView;uniform vec3 color;void main(){float rim=pow(1.0-abs(dot(normalView,vec3(0.0,0.0,1.0))),3.2)*0.85;gl_FragColor=vec4(color,rim);}',
+      }),
+    );
+    rim.renderOrder = 6;
+    scene.add(rim);
+
+    // These 48 positions and their pulse sizes come from the supplied model's original shader geometry.
+    const positions: number[] = [];
+    const colors: number[] = [];
+    const phases: number[] = [];
+    const sizes: number[] = [];
+    originalHubPoints.forEach(([x, y, z, color, size], index) => {
+      positions.push(x * SPHERE_RADIUS * 1.004, y * SPHERE_RADIUS * 1.004, z * SPHERE_RADIUS * 1.004);
+      const nodeColor = new THREE.Color(color);
+      colors.push(nodeColor.r, nodeColor.g, nodeColor.b);
+      phases.push(index * 1.7);
+      sizes.push(size);
+    });
+    const hubsGeometry = new THREE.BufferGeometry();
+    hubsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    hubsGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    hubsGeometry.setAttribute('phase', new THREE.Float32BufferAttribute(phases, 1));
+    hubsGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
+    const hubs = new THREE.Points(hubsGeometry, new THREE.ShaderMaterial({
+      uniforms: { ...uniforms },
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexShader: `attribute vec3 color;attribute float phase,size;uniform float pointScale,time;varying vec3 nodeColor;varying float visibility;void main(){vec3 n=normalize(normalMatrix*normalize(position));visibility=mix(0.16,1.0,smoothstep(-0.2,0.35,n.z));nodeColor=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(1.0+0.12*sin(time*1.6+phase))*pointScale/-mv.z;gl_Position=projectionMatrix*mv;}`,
+      fragmentShader: 'varying vec3 nodeColor;varying float visibility;uniform float tintMix;uniform vec3 tint;void main(){float d=length(gl_PointCoord-0.5)*2.0;if(d>1.0)discard;float core=1.0-smoothstep(0.05,0.2,d),ring=(1.0-smoothstep(0.0,0.07,abs(d-0.5)))*0.85,halo=pow(1.0-d,3.0)*0.5;float alpha=(core+ring+halo)*visibility;vec3 color=mix(mix(nodeColor,tint,tintMix),vec3(1.0),core);gl_FragColor=vec4(color,min(alpha,1.0));}',
+    }));
+    hubs.renderOrder = 4;
+    globe.add(hubs);
+
+    const glowCanvas = document.createElement('canvas');
+    glowCanvas.width = glowCanvas.height = 64;
+    const glowContext = glowCanvas.getContext('2d');
+    if (glowContext) {
+      const gradient = glowContext.createRadialGradient(32, 32, 0, 32, 32, 32);
+      gradient.addColorStop(0, 'rgba(255,255,255,1)');
+      gradient.addColorStop(0.3, 'rgba(255,255,255,.6)');
+      gradient.addColorStop(1, 'rgba(255,255,255,0)');
+      glowContext.fillStyle = gradient;
+      glowContext.fillRect(0, 0, 64, 64);
+    }
+    const glowTexture = new THREE.CanvasTexture(glowCanvas);
+    const randomDirection = () => new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
+    const arcs = Array.from({ length: 12 }, (_, arcIndex) => {
+      const particles = Array.from({ length: 7 }, () => {
+        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: glowTexture,
+          color: arcIndex % 2 ? 0x9fd0ff : 0xffb8f0,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+        }));
+        sprite.visible = false;
+        globe.add(sprite);
+        return sprite;
+      });
+      return { particles, from: randomDirection(), to: randomDirection(), progress: -Math.random() * 1.2, speed: 0.22 + Math.random() * 0.3 };
+    });
+
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.className = 'absolute inset-0 h-full w-full';
+    renderer.domElement.setAttribute('aria-hidden', 'true');
+    host.prepend(renderer.domElement);
+
+    let frame = 0;
+    let elapsed = 0;
+    let yawVelocity = 0.0016;
+    let dragState: { x: number; y: number } | null = null;
+    let pointerX = 0;
+    let pointerY = 0;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mousePosition = (event: PointerEvent) => {
+      const bounds = host.getBoundingClientRect();
+      pointerX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
+      pointerY = ((event.clientY - bounds.top) / bounds.height) * 2 - 1;
+    };
+    const onPointerDown = (event: PointerEvent) => {
+      if ((event.target as HTMLElement).closest('button')) return;
+      dragState = { x: event.clientX, y: event.clientY };
+      host.setPointerCapture?.(event.pointerId);
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      mousePosition(event);
+      if (!dragState) return;
+      const dx = event.clientX - dragState.x;
+      const dy = event.clientY - dragState.y;
+      globe.rotation.y += dx * 0.006;
+      globe.rotation.x = THREE.MathUtils.clamp(globe.rotation.x + dy * 0.006, -0.9, 0.9);
+      yawVelocity = dx * 0.0045;
+      dragState = { x: event.clientX, y: event.clientY };
+    };
+    const onPointerUp = () => { dragState = null; };
+    const resize = () => {
+      const width = host.clientWidth;
+      const height = host.clientHeight;
+      if (!width || !height) return;
+      const scale = Math.min(width / MODEL_BOUNDS.width, height / MODEL_BOUNDS.height);
+      setModelScale(scale);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.position.set(0, 0, SPHERE_RADIUS * (height / 2) / (MODEL_RADIUS * scale * Math.tan(Math.PI / 9)));
+      camera.updateProjectionMatrix();
+      uniforms.pointScale.value = renderer.getPixelRatio() * height / (2 * Math.tan(Math.PI / 9));
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(host);
+    resize();
+    host.addEventListener('pointerdown', onPointerDown);
+    host.addEventListener('pointermove', onPointerMove);
+    host.addEventListener('pointerup', onPointerUp);
+    host.addEventListener('pointercancel', onPointerUp);
+
+    const animate = () => {
+      frame = window.requestAnimationFrame(animate);
+      if (!reduceMotion.matches) elapsed += 0.016;
+      uniforms.time.value = elapsed;
+      if (!dragState) {
+        globe.rotation.y += yawVelocity;
+        yawVelocity += ((reduceMotion.matches ? 0 : 0.0016) - yawVelocity) * 0.03;
+        globe.rotation.x += (0 - globe.rotation.x) * 0.01;
+      }
+      arcs.forEach(arc => {
+        arc.progress += reduceMotion.matches ? 0 : 0.016 * arc.speed;
+        if (arc.progress > 1.3) {
+          arc.from = randomDirection();
+          arc.to = arc.from.clone().add(randomDirection().multiplyScalar(0.8)).normalize();
+          arc.progress = -Math.random() * 1.2;
+          arc.speed = 0.22 + Math.random() * 0.3;
+        }
+        arc.particles.forEach((particle, index) => {
+          const progress = arc.progress - index * 0.025;
+          if (progress < 0 || progress > 1) {
+            particle.visible = false;
+            return;
+          }
+          particle.visible = true;
+          particle.position.lerpVectors(arc.from, arc.to, progress).normalize().multiplyScalar(SPHERE_RADIUS * (1.01 + 0.12 * Math.sin(Math.PI * progress)));
+          particle.scale.setScalar(index ? 0.14 * (1 - index / 8) : 0.24);
+          (particle.material as THREE.SpriteMaterial).opacity = (1 - index / 7) * 0.9;
+        });
+      });
+      const tintUniform = hubs.material as THREE.ShaderMaterial;
+      tintUniform.uniforms.tintMix.value += ((hoveredTintRef.current ? 1 : 0) - tintUniform.uniforms.tintMix.value) * 0.1;
+      if (hoveredTintRef.current) tintUniform.uniforms.tint.value.copy(hoveredTintRef.current);
+      rim.material.uniforms.color.value.lerp(hoveredTintRef.current ?? baseRimColor, 0.08);
+      scene.rotation.y = pointerX * 0.05;
+      scene.rotation.x = pointerY * 0.03;
+      renderer.render(scene, camera);
+    };
+    animate();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      host.removeEventListener('pointerdown', onPointerDown);
+      host.removeEventListener('pointermove', onPointerMove);
+      host.removeEventListener('pointerup', onPointerUp);
+      host.removeEventListener('pointercancel', onPointerUp);
+      scene.traverse(object => {
+        if (object instanceof THREE.Mesh || object instanceof THREE.Points || object instanceof THREE.Line) {
+          object.geometry.dispose();
+          const materials = Array.isArray(object.material) ? object.material : [object.material];
+          materials.forEach(material => material.dispose());
+        } else if (object instanceof THREE.Sprite) {
+          object.material.dispose();
+        }
+      });
+      coreTexture.dispose();
+      glowTexture.dispose();
+      renderer.dispose();
+      renderer.domElement.remove();
+    };
+  }, []);
+
+  const handleLabelClick = (label: ModelLabel) => {
+    if (label.id === 'papers') setActivePage('search');
+    else if (label.id === 'graph') setActivePage('graph');
+    else if (label.id === 'gaps') setActivePage('gaps');
+    else if (label.id === 'chat') setActivePage('chat');
+    else if ('query' in label && label.query) {
+      setSearchQuery(label.query);
       setActivePage('search');
     }
   };
 
-  // Orbit 1: Inner Orbit
-  const orbit1Items = [
-    { id: 'papers', label: 'Papers', icon: <FileText className="w-3.5 h-3.5 text-cyan-400" />, angle: 45, query: 'Transformers' },
-    { id: 'authors', label: 'Authors', icon: <Users className="w-3.5 h-3.5 text-amber-400" />, angle: 225, query: 'Ashish Vaswani' },
-  ];
+  const updateHoveredLabel = (label: ModelLabel | null) => {
+    setHoveredLabel(label?.id ?? null);
+    hoveredTintRef.current = label ? new THREE.Color(label.color) : null;
+  };
 
-  // Orbit 2: Middle Orbit
-  const orbit2Items = [
-    { id: 'datasets', label: 'Datasets', icon: <Database className="w-3.5 h-3.5 text-emerald-400" />, angle: 0, query: 'ImageNet' },
-    { id: 'methods', label: 'Methods', icon: <Cpu className="w-3.5 h-3.5 text-blue-400" />, angle: 120, query: 'Self-Supervised' },
-    { id: 'concepts', label: 'Concepts', icon: <Lightbulb className="w-3.5 h-3.5 text-purple-400" />, angle: 240, query: 'Multi-Head Attention' },
-  ];
-
-  // Orbit 3: Outer Orbit
-  const orbit3Items = [
-    { id: 'citations', label: 'Citations', icon: <Share2 className="w-3.5 h-3.5 text-teal-400" />, angle: 90, query: 'Attention Is All You Need' },
-    { id: 'graph', label: 'Knowledge Graph', icon: <Network className="w-3.5 h-3.5 text-indigo-400" />, angle: 180 },
-    { id: 'chat', label: 'AI Insights', icon: <Sparkles className="w-3.5 h-3.5 text-pink-400" />, angle: 270 },
-    { id: 'gaps', label: 'Research Gaps', icon: <Activity className="w-3.5 h-3.5 text-rose-400" />, angle: 360 },
-  ];
+  const offset = (coordinate: number, axis: 'x' | 'y') =>
+    `calc(50% + ${(coordinate - MODEL_ORIGIN[axis]) * modelScale}px)`;
 
   return (
-    <div className="relative flex h-[390px] w-full select-none items-center justify-center sm:h-[420px] lg:h-[390px]">
-      
-      <div className="pointer-events-none absolute flex items-center justify-center scale-[0.78] sm:scale-[0.86] lg:scale-[0.72] xl:scale-[0.96]">
-        
-        {/* Ambient Celestial Glow Behind Core */}
-        <div className="absolute w-[340px] h-[340px] rounded-full bg-blue-600/15 blur-[90px] pointer-events-none" />
-        <div className="absolute w-[200px] h-[200px] rounded-full bg-cyan-400/10 blur-[60px] pointer-events-none" />
-
-        {/* ── CENTRAL RESEARCH KNOWLEDGE CORE ── */}
-        <div className="relative z-10 h-[208px] w-[208px] sm:h-[224px] sm:w-[224px] rounded-full flex items-center justify-center">
-          {/* Core Outer Atmosphere Ring */}
-          <div className={`absolute inset-0 rounded-full border border-cyan-400/30 transition-all duration-700 ${
-            hoveredLabel ? 'scale-105 border-cyan-400/60 shadow-[0_0_30px_rgba(56,189,248,0.35)]' : 'shadow-[0_0_20px_rgba(37,99,235,0.25)]'
-          }`} />
-
-          {/* Sphere Base & Texture Simulation */}
-          <div className="relative w-full h-full rounded-full overflow-hidden bg-gradient-to-tr from-[#050B18] via-[#0B1A38] to-[#122A5C] border border-blue-400/20 shadow-2xl flex items-center justify-center">
-            
-            {/* Internal Grid & Knowledge Topological Lines */}
-            <svg className="absolute inset-0 w-full h-full opacity-50 mix-blend-screen pointer-events-none" viewBox="0 0 200 200" aria-hidden="true">
-              {/* Latitude Curves */}
-              <ellipse cx="100" cy="100" rx="90" ry="32" fill="none" stroke="#38BDF8" strokeWidth="0.75" strokeDasharray="3 3" opacity="0.6" />
-              <ellipse cx="100" cy="100" rx="90" ry="60" fill="none" stroke="#60A5FA" strokeWidth="0.75" opacity="0.4" />
-              <ellipse cx="100" cy="100" rx="90" ry="85" fill="none" stroke="#818CF8" strokeWidth="0.75" strokeDasharray="2 4" opacity="0.3" />
-              
-              {/* Longitudinal Curvature */}
-              <ellipse cx="100" cy="100" rx="35" ry="90" fill="none" stroke="#38BDF8" strokeWidth="0.75" strokeDasharray="4 2" opacity="0.5" />
-              <ellipse cx="100" cy="100" rx="65" ry="90" fill="none" stroke="#60A5FA" strokeWidth="0.75" opacity="0.35" />
-
-              {/* Neural Topology Network Points */}
-              <motion.g
-                animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
-                transition={{ duration: 110, repeat: Infinity, ease: 'linear' }}
-                style={{ transformOrigin: '100px 100px' }}
-              >
-                <line x1="42" y1="94" x2="70" y2="80" stroke="#38BDF8" strokeWidth="0.8" opacity="0.55" />
-                <line x1="70" y1="80" x2="94" y2="42" stroke="#38BDF8" strokeWidth="0.8" opacity="0.6" />
-                <line x1="94" y1="42" x2="115" y2="65" stroke="#818CF8" strokeWidth="0.8" opacity="0.62" />
-                <line x1="115" y1="65" x2="158" y2="82" stroke="#818CF8" strokeWidth="0.8" opacity="0.52" />
-                <line x1="158" y1="82" x2="140" y2="110" stroke="#38BDF8" strokeWidth="0.8" opacity="0.6" />
-                <line x1="140" y1="110" x2="154" y2="145" stroke="#34D399" strokeWidth="0.8" opacity="0.5" />
-                <line x1="154" y1="145" x2="110" y2="162" stroke="#818CF8" strokeWidth="0.8" opacity="0.55" />
-                <line x1="110" y1="162" x2="90" y2="135" stroke="#F472B6" strokeWidth="0.8" opacity="0.62" />
-                <line x1="90" y1="135" x2="60" y2="120" stroke="#F472B6" strokeWidth="0.8" opacity="0.5" />
-                <line x1="60" y1="120" x2="42" y2="94" stroke="#FBBF24" strokeWidth="0.8" opacity="0.55" />
-                <line x1="70" y1="80" x2="90" y2="135" stroke="#38BDF8" strokeWidth="0.65" opacity="0.4" />
-                <line x1="115" y1="65" x2="60" y2="120" stroke="#818CF8" strokeWidth="0.65" opacity="0.36" />
-                <line x1="140" y1="110" x2="90" y2="135" stroke="#34D399" strokeWidth="0.65" opacity="0.42" />
-                <circle cx="42" cy="94" r="2.2" fill="#38BDF8" />
-                <circle cx="94" cy="42" r="2.5" fill="#60A5FA" />
-                <circle cx="158" cy="82" r="2.4" fill="#818CF8" />
-                <circle cx="154" cy="145" r="2.5" fill="#38BDF8" />
-                <circle cx="110" cy="162" r="2" fill="#F472B6" />
-              </motion.g>
-              <circle cx="70" cy="80" r="3" fill="#38BDF8" className={!shouldReduceMotion && (hoveredLabel === 'papers' || hoveredLabel === 'datasets') ? 'animate-ping' : ''} />
-              <line x1="70" y1="80" x2="115" y2="65" stroke="#38BDF8" strokeWidth="1" opacity="0.7" />
-              
-              <circle cx="115" cy="65" r="2.5" fill="#818CF8" />
-              <line x1="115" y1="65" x2="140" y2="110" stroke="#818CF8" strokeWidth="0.75" opacity="0.6" />
-              
-              <circle cx="140" cy="110" r="3.5" fill="#34D399" className={!shouldReduceMotion && (hoveredLabel === 'datasets' || hoveredLabel === 'methods') ? 'animate-pulse' : ''} />
-              <line x1="140" y1="110" x2="90" y2="135" stroke="#34D399" strokeWidth="0.75" opacity="0.5" />
-
-              <circle cx="90" cy="135" r="2.5" fill="#F472B6" />
-              <line x1="90" y1="135" x2="60" y2="120" stroke="#F472B6" strokeWidth="0.75" opacity="0.5" />
-
-              <circle cx="60" cy="120" r="3" fill="#FBBF24" className={!shouldReduceMotion && hoveredLabel === 'authors' ? 'animate-ping' : ''} />
-              <line x1="60" y1="120" x2="70" y2="80" stroke="#FBBF24" strokeWidth="0.75" opacity="0.6" />
-            </svg>
-
-            {/* Sphere Center Shimmer */}
-            <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_35%,rgba(56,189,248,0.35),transparent_65%)] pointer-events-none" />
-
-            {/* Center Brand Identity */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center p-3">
-              <div className="w-7 h-7 rounded-full bg-blue-500/20 border border-blue-400/40 flex items-center justify-center mb-1 shadow-inner">
-                <Network className={`w-3.5 h-3.5 text-cyan-300 ${shouldReduceMotion ? '' : 'animate-pulse'}`} />
-              </div>
-              <span className="text-[11px] font-extrabold tracking-wider text-white uppercase drop-shadow">
-                Research
-              </span>
-              <span className="text-[9px] font-semibold tracking-widest text-cyan-300 uppercase">
-                Core
-              </span>
-              {hoveredLabel && (
-                <span className="mt-0.5 px-1.5 py-0.2 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-[8px] font-mono text-cyan-200">
-                  {hoveredLabel.toUpperCase()}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* ── ORBIT LAYER 1 (Inner Orbit) ── */}
-        <motion.div
-          animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
-          transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[250px] h-[250px] rounded-full border border-cyan-400/10 pointer-events-none"
-        >
-          {orbit1Items.map((item) => {
-            const rad = (item.angle * Math.PI) / 180;
-            const radius = 125;
-            const x = Math.cos(rad) * radius;
-            const y = Math.sin(rad) * radius;
-
-            return (
-              <div
-                key={item.id}
-                className="absolute pointer-events-auto"
-                style={{
-                  left: `calc(50% + ${x}px)`,
-                  top: `calc(50% + ${y}px)`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-              >
-                <motion.button
-                  type="button"
-                  animate={{ rotate: shouldReduceMotion ? 0 : -360 }}
-                  transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-                  onMouseEnter={() => setHoveredLabel(item.id)}
-                  onMouseLeave={() => setHoveredLabel(null)}
-                  onClick={() => handleLabelClick(item.id, item.query)}
-                  aria-label={`Explore ${item.label}`}
-                  className={`pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 backdrop-blur-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${
-                    hoveredLabel === item.id
-                      ? 'bg-cyan-500/30 border border-cyan-300 text-white scale-110 shadow-[0_0_12px_rgba(56,189,248,0.5)]'
-                      : 'bg-[#0B1730]/85 border border-white/15 text-gray-200 hover:border-cyan-400/50 hover:bg-[#0B1730]'
-                  }`}
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">{item.label}</span>
-                </motion.button>
-              </div>
-            );
-          })}
-        </motion.div>
-
-        {/* ── ORBIT LAYER 2 (Middle Orbit) ── */}
-        <motion.div
-          animate={{ rotate: shouldReduceMotion ? 0 : -360 }}
-          transition={{ duration: 65, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[330px] h-[330px] rounded-full border border-blue-400/10 pointer-events-none"
-        >
-          {orbit2Items.map((item) => {
-            const rad = (item.angle * Math.PI) / 180;
-            const radius = 165;
-            const x = Math.cos(rad) * radius;
-            const y = Math.sin(rad) * radius;
-
-            return (
-              <div
-                key={item.id}
-                className="absolute pointer-events-auto"
-                style={{
-                  left: `calc(50% + ${x}px)`,
-                  top: `calc(50% + ${y}px)`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-              >
-                <motion.button
-                  type="button"
-                  animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
-                  transition={{ duration: 65, repeat: Infinity, ease: 'linear' }}
-                  onMouseEnter={() => setHoveredLabel(item.id)}
-                  onMouseLeave={() => setHoveredLabel(null)}
-                  onClick={() => handleLabelClick(item.id, item.query)}
-                  aria-label={`Explore ${item.label}`}
-                  className={`pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 backdrop-blur-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 ${
-                    hoveredLabel === item.id
-                      ? 'bg-blue-500/30 border border-blue-300 text-white scale-110 shadow-[0_0_12px_rgba(96,165,250,0.5)]'
-                      : 'bg-[#0B1730]/85 border border-white/15 text-gray-200 hover:border-blue-400/50 hover:bg-[#0B1730]'
-                  }`}
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">{item.label}</span>
-                </motion.button>
-              </div>
-            );
-          })}
-        </motion.div>
-
-        {/* ── ORBIT LAYER 3 (Outer Orbit) ── */}
-        <motion.div
-          animate={{ rotate: shouldReduceMotion ? 0 : 360 }}
-          transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-          className="absolute w-[420px] h-[420px] rounded-full border border-indigo-400/10 pointer-events-none"
-        >
-          {orbit3Items.map((item) => {
-            const rad = (item.angle * Math.PI) / 180;
-            const radius = 210;
-            const x = Math.cos(rad) * radius;
-            const y = Math.sin(rad) * radius;
-
-            return (
-              <div
-                key={item.id}
-                className="absolute pointer-events-auto"
-                style={{
-                  left: `calc(50% + ${x}px)`,
-                  top: `calc(50% + ${y}px)`,
-                  transform: 'translate(-50%, -50%)',
-                }}
-              >
-                <motion.button
-                  type="button"
-                  animate={{ rotate: shouldReduceMotion ? 0 : -360 }}
-                  transition={{ duration: 90, repeat: Infinity, ease: 'linear' }}
-                  onMouseEnter={() => setHoveredLabel(item.id)}
-                  onMouseLeave={() => setHoveredLabel(null)}
-                  onClick={() => handleLabelClick(item.id, item.query)}
-                  aria-label={`Explore ${item.label}`}
-                  className={`pointer-events-auto flex items-center gap-1.5 rounded-full px-2.5 py-1 backdrop-blur-md transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 ${
-                    hoveredLabel === item.id
-                      ? 'bg-indigo-500/30 border border-indigo-300 text-white scale-110 shadow-[0_0_12px_rgba(129,140,248,0.5)]'
-                      : 'bg-[#0B1730]/85 border border-white/15 text-gray-200 hover:border-indigo-400/50 hover:bg-[#0B1730]'
-                  }`}
-                >
-                  <span className="shrink-0">{item.icon}</span>
-                  <span className="text-[11px] font-medium tracking-tight whitespace-nowrap">{item.label}</span>
-                </motion.button>
-              </div>
-            );
-          })}
-        </motion.div>
-        
+    <div ref={hostRef} className="relative h-[300px] w-full max-w-[500px] touch-pan-y select-none sm:h-[330px]" aria-label="Interactive research knowledge core">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        {originalOrbitSprites.map(sprite => (
+          <img
+            key={sprite.n}
+            src={`/research-core/${sprite.n}.webp`}
+            alt=""
+            draggable={false}
+            className="research-core-orbit-sprite absolute object-contain"
+            style={{
+              left: offset(sprite.cx, 'x'),
+              top: offset(sprite.cy, 'y'),
+              width: sprite.w * modelScale,
+              height: sprite.h * modelScale,
+              animationDuration: `${sprite.dur}s`,
+              animationDelay: `${-sprite.dl}s`,
+            }}
+          />
+        ))}
       </div>
+
+      <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center drop-shadow-[0_1px_5px_rgba(3,10,30,0.95)]" aria-hidden="true">
+        <span className="text-[9px] font-extrabold tracking-[0.12em] text-white sm:text-[10px]">RESEARCH</span>
+        <span className="text-[8px] font-bold tracking-[0.2em] text-cyan-200 sm:text-[9px]">CORE</span>
+      </div>
+
+      {labelData.map(({ id, label, Icon, x, y, color, tone }) => (
+        <button
+          key={id}
+          type="button"
+          onMouseEnter={() => updateHoveredLabel(labelData.find(item => item.id === id) ?? null)}
+          onMouseLeave={() => updateHoveredLabel(null)}
+          onFocus={() => updateHoveredLabel(labelData.find(item => item.id === id) ?? null)}
+          onBlur={() => updateHoveredLabel(null)}
+          onClick={() => handleLabelClick(labelData.find(item => item.id === id)!)}
+          aria-label={`Explore ${label}`}
+          className={`research-core-label absolute z-10 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border px-1.5 py-1 text-[8px] font-semibold leading-none text-slate-900 shadow-[0_4px_14px_rgba(0,0,0,.22)] transition duration-300 hover:scale-105 hover:shadow-[0_0_15px_var(--label-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 sm:gap-1.5 sm:px-2 sm:text-[9px] ${hoveredLabel === id ? 'border-white/90 bg-white' : 'border-white/65 bg-white/90'}`}
+          style={{ left: offset(x, 'x'), top: offset(y, 'y'), ['--label-glow' as string]: `${color}8c` }}
+        >
+          <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white sm:h-[18px] sm:w-[18px] ${tone}`}>
+            <Icon className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+          </span>
+          <span className="whitespace-nowrap">{label}</span>
+        </button>
+      ))}
     </div>
   );
 };

@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes research-core-float {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -5px, 0) rotate(2deg); }
+}
+
+.research-core-orbit-sprite {
+  animation-name: research-core-float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-core-orbit-sprite { animation: none; }
+}
+
 @layer base {
   body {
     @apply bg-brand-bg text-brand-text font-sans antialiased selection:bg-brand-accent selection:text-white;
@@ -53,3 +68,4 @@
     background-position: 100% 50%;
   }
 }
+
