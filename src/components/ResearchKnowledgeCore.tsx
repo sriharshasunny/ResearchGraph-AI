@@ -18,6 +18,7 @@ const MODEL_ORIGIN = { x: 1210, y: 444 };
 const MODEL_BOUNDS = { width: 800, height: 540 };
 const MODEL_RADIUS = 141;
 const SPHERE_RADIUS = 2.4;
+const MODEL_ZOOM = 1.38;
 
 const labelData = [
   { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#6d4dff', tone: 'from-violet-500 to-indigo-500' },
@@ -72,6 +73,76 @@ export const ResearchKnowledgeCore: React.FC = () => {
     );
     globe.add(core);
 
+    // Connect each source hub to its two nearest neighbors along the sphere surface.
+    // Sampling great-circle arcs keeps the mesh on the globe instead of drawing
+    // straight chords through its center.
+    const hubDirections = originalHubPoints.map(([x, y, z]) => new THREE.Vector3(x, y, z).normalize());
+    const edgePositions: number[] = [];
+    const edgeColors: number[] = [];
+    const edgePalette = [new THREE.Color('#43d9ff'), new THREE.Color('#468dff'), new THREE.Color('#9b78ff')];
+    const edgePairs = new Set<string>();
+    hubDirections.forEach((direction, nodeIndex) => {
+      hubDirections
+        .map((candidate, candidateIndex) => ({ candidate, candidateIndex, distance: direction.distanceToSquared(candidate) }))
+        .filter(({ candidateIndex }) => candidateIndex !== nodeIndex)
+        .sort((a, b) => a.distance - b.distance)
+        .slice(0, 2)
+        .forEach(({ candidate, candidateIndex }) => {
+          const key = [nodeIndex, candidateIndex].sort((a, b) => a - b).join(':');
+          if (edgePairs.has(key)) return;
+          edgePairs.add(key);
+          const start = direction.clone();
+          const end = candidate.clone();
+          const angle = start.angleTo(end);
+          const divisions = 12;
+          const color = edgePalette[(nodeIndex + candidateIndex) % edgePalette.length];
+          let previous = start.clone().multiplyScalar(SPHERE_RADIUS * 1.012);
+          for (let step = 1; step <= divisions; step += 1) {
+            const progress = step / divisions;
+            const next = start.clone().multiplyScalar(Math.sin((1 - progress) * angle))
+              .add(end.clone().multiplyScalar(Math.sin(progress * angle)))
+              .divideScalar(Math.sin(angle))
+              .multiplyScalar(SPHERE_RADIUS * 1.012);
+            edgePositions.push(previous.x, previous.y, previous.z, next.x, next.y, next.z);
+            const intensity = 0.5 + 0.18 * (1 - Math.abs(progress - 0.5) * 2);
+            edgeColors.push(color.r * intensity, color.g * intensity, color.b * intensity, color.r * intensity, color.g * intensity, color.b * intensity);
+            previous = next;
+          }
+        });
+    });
+    const networkGeometry = new THREE.BufferGeometry();
+    networkGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
+    networkGeometry.setAttribute('color', new THREE.Float32BufferAttribute(edgeColors, 3));
+    const network = new THREE.LineSegments(networkGeometry, new THREE.LineBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.9,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }));
+    network.renderOrder = 3;
+    globe.add(network);
+
+    // Tilted orbital tracks add depth without competing with the category labels.
+    const orbitMaterials = [0x42cfff, 0x6a8dff, 0xa276ff].map(color => new THREE.MeshBasicMaterial({
+      color,
+      transparent: true,
+      opacity: 0.28,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }));
+    const orbitTracks = [
+      { radius: 3.05, tube: 0.012, rotation: [0.16, 0.18, -0.22] },
+      { radius: 3.2, tube: 0.009, rotation: [1.03, 0.38, 0.1] },
+      { radius: 3.35, tube: 0.008, rotation: [0.66, -0.72, 0.24] },
+    ] as const;
+    orbitTracks.forEach((track, index) => {
+      const orbit = new THREE.Mesh(new THREE.TorusGeometry(track.radius, track.tube, 5, 180), orbitMaterials[index]);
+      orbit.rotation.set(track.rotation[0], track.rotation[1], track.rotation[2]);
+      orbit.renderOrder = 1;
+      scene.add(orbit);
+    });
+
     const baseRimColor = new THREE.Color(0xe9f2ff);
     const rim = new THREE.Mesh(
       new THREE.SphereGeometry(SPHERE_RADIUS * 1.003, 96, 96),
@@ -96,7 +167,9 @@ export const ResearchKnowledgeCore: React.FC = () => {
       const nodeColor = new THREE.Color(color);
       colors.push(nodeColor.r, nodeColor.g, nodeColor.b);
       phases.push(index * 1.7);
-      sizes.push(size);
+      // Source values were authored for a much smaller overlay. At the new display
+      // size, scale them back so each hub reads as a node instead of a white ring.
+      sizes.push(size * 0.18);
     });
     const hubsGeometry = new THREE.BufferGeometry();
     hubsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -185,7 +258,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
-      camera.position.set(0, 0, SPHERE_RADIUS * (height / 2) / (MODEL_RADIUS * scale * 1.2 * Math.tan(Math.PI / 9)));
+      camera.position.set(0, 0, SPHERE_RADIUS * (height / 2) / (MODEL_RADIUS * scale * MODEL_ZOOM * Math.tan(Math.PI / 9)));
       camera.updateProjectionMatrix();
       uniforms.pointScale.value = renderer.getPixelRatio() * height / (2 * Math.tan(Math.PI / 9));
     };
@@ -252,6 +325,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
           object.material.dispose();
         }
       });
+      orbitMaterials.forEach(material => material.dispose());
       coreTexture.dispose();
       glowTexture.dispose();
       renderer.dispose();
@@ -280,7 +354,8 @@ export const ResearchKnowledgeCore: React.FC = () => {
   const labelScale = Math.max(0.72, Math.min(modelScale, 1));
 
   return (
-    <div ref={hostRef} className="relative h-[300px] w-full max-w-[500px] touch-pan-y select-none sm:h-[330px]" aria-label="Interactive research knowledge core">
+    <div ref={hostRef} className="relative h-[300px] w-full touch-pan-y select-none sm:h-[360px] lg:h-[430px] xl:h-[440px]" aria-label="Interactive research knowledge core">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[68%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.24)_0%,rgba(34,211,238,0.12)_48%,transparent_72%)] blur-2xl" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         {originalOrbitSprites.map(sprite => (
           <img
@@ -322,7 +397,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
             top: offset(y, 'y'),
             gap: 6 * labelScale,
             padding: `${4 * labelScale}px ${8 * labelScale}px`,
-            fontSize: `${Math.max(9, 11 * labelScale)}px`,
+            fontSize: `${Math.max(10, 11.5 * labelScale)}px`,
             borderColor: `${color}bf`,
             boxShadow: `0 5px 18px ${color}36`,
             ['--label-glow' as string]: `${color}8c`,
