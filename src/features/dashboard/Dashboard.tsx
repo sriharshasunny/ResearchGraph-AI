@@ -15,7 +15,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
 export const Dashboard: React.FC = () => {
   const {
@@ -148,10 +147,14 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="hidden h-[230px] w-[250px] items-center justify-center overflow-hidden lg:flex">
-              <div className="h-[420px] w-[420px] shrink-0 origin-center scale-[0.54]">
-                <ResearchKnowledgeCore />
-              </div>
+            <div className="relative hidden h-[230px] w-[280px] overflow-hidden lg:block" aria-hidden="true">
+              <iframe
+                src="/dashboard_model.html"
+                title="Rotating research knowledge model"
+                sandbox="allow-scripts allow-same-origin"
+                tabIndex={-1}
+                className="pointer-events-none absolute left-[-210px] top-[-17px] h-[850px] w-[1530px] origin-top-left scale-[0.32] border-0"
+              />
             </div>
           </div>
         </motion.section>
