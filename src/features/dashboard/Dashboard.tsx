@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 
 export const Dashboard: React.FC = () => {
   const {
@@ -85,7 +86,7 @@ export const Dashboard: React.FC = () => {
           <div aria-hidden="true" className="absolute -right-20 -top-32 -z-10 h-80 w-80 rounded-full border border-white/10" />
           <div aria-hidden="true" className="absolute -right-6 -top-16 -z-10 h-56 w-56 rounded-full border border-white/[0.08]" />
           <div aria-hidden="true" className="absolute bottom-[-120px] right-[16%] -z-10 h-64 w-64 rounded-full bg-cyan-300/10 blur-3xl" />
-          <div className="grid items-center gap-9 lg:grid-cols-[minmax(0,1fr)_310px]">
+          <div className="grid items-center gap-7 lg:grid-cols-[minmax(0,1fr)_300px]">
             <div className="max-w-[700px]">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-cyan-100">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -133,19 +134,16 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative hidden h-[230px] w-[310px] overflow-hidden lg:block" aria-hidden="true">
-              <iframe
-                src="/dashboard_model.html"
-                title="Rotating research knowledge model"
-                sandbox="allow-scripts allow-same-origin"
-                tabIndex={-1}
-                style={{
-                  mixBlendMode: 'screen',
-                  maskImage: 'radial-gradient(ellipse 46% 57% at 71.5% 48.6%, #000 66%, transparent 100%)',
-                  WebkitMaskImage: 'radial-gradient(ellipse 46% 57% at 71.5% 48.6%, #000 66%, transparent 100%)',
-                }}
-                className="pointer-events-none absolute left-[-180px] top-[-17px] h-[850px] w-[1530px] origin-top-left scale-[0.32] border-0"
-              />
+            <div className="relative mx-auto hidden h-[270px] w-full max-w-[300px] items-center justify-center lg:flex" role="img" aria-label="Animated research knowledge model">
+              <div aria-hidden="true" className="absolute inset-7 rounded-full bg-cyan-300/15 blur-3xl" />
+              <div aria-hidden="true" className="absolute h-[220px] w-[220px] rounded-full border border-cyan-100/[0.08]" />
+              <div aria-hidden="true" className="absolute h-[178px] w-[178px] rounded-full border border-blue-100/[0.08]" />
+              <div className="relative z-10 h-[250px] w-[250px]">
+                <ThreeNeuralCore className="h-full w-full" interactive={false} theme="cyan" />
+              </div>
+              <div className="absolute left-2 top-9 rounded-full border border-white/15 bg-slate-950/35 px-2.5 py-1 text-[10px] font-medium text-cyan-100 backdrop-blur-sm">Papers</div>
+              <div className="absolute right-0 top-14 rounded-full border border-white/15 bg-slate-950/35 px-2.5 py-1 text-[10px] font-medium text-blue-100 backdrop-blur-sm">Methods</div>
+              <div className="absolute bottom-8 right-2 rounded-full border border-white/15 bg-slate-950/35 px-2.5 py-1 text-[10px] font-medium text-violet-100 backdrop-blur-sm">Knowledge graph</div>
             </div>
           </div>
         </motion.section>
