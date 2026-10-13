@@ -36,7 +36,10 @@ const MainAppLayout = () => {
         <Navbar onLogout={handleLogout} />
         <div className="flex-1 flex min-w-0 min-h-0 overflow-hidden relative">
           <Sidebar />
-          <main className="flex-1 overflow-x-hidden overflow-y-auto relative z-0">
+          <main
+            className="relative z-0 flex-1 overflow-x-hidden overflow-y-auto"
+            style={{ background: 'radial-gradient(ellipse at 92% 0%, rgba(219,234,254,0.38), transparent 36%), #F7FAFC' }}
+          >
             {activePage === 'dashboard'  && <Dashboard />}
             {activePage === 'chat'       && <ChatPage />}
             {activePage === 'graph'      && <KnowledgeGraphPage />}
@@ -91,3 +94,4 @@ export const App = () => {
     </AnimatePresence>
   );
 };
+

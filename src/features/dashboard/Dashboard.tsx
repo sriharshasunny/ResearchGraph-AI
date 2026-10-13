@@ -57,37 +57,23 @@ export const Dashboard: React.FC = () => {
   ];
 
   const shortcuts = [
-    { title: 'Search literature', description: 'Find papers across OpenAlex', icon: FileSearch, page: 'search' as const, tone: 'text-blue-700 bg-blue-50' },
-    { title: 'Ask the copilot', description: 'Explore a research question', icon: MessageSquareText, page: 'chat' as const, tone: 'text-violet-700 bg-violet-50' },
+    { title: 'Search papers', description: 'Discover relevant literature', icon: FileSearch, page: 'search' as const, tone: 'text-blue-700 bg-blue-50' },
+    { title: 'Ask AI', description: 'Explore a research question', icon: MessageSquareText, page: 'chat' as const, tone: 'text-violet-700 bg-violet-50' },
     { title: 'Compare papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare' as const, tone: 'text-emerald-700 bg-emerald-50' },
-    { title: 'Explore the graph', description: 'Follow connections and ideas', icon: Network, page: 'graph' as const, tone: 'text-cyan-700 bg-cyan-50' },
+    { title: 'Explore graph', description: 'Follow connected ideas', icon: Network, page: 'graph' as const, tone: 'text-cyan-700 bg-cyan-50' },
   ];
 
-  const suggestedQueries = ['Graph neural networks', 'Retrieval-augmented generation', 'Multimodal learning'];
+  const suggestedQueries = [
+    'Find papers about RAG',
+    'Compare DINOv2 and MAE',
+    'Research gaps in GNNs',
+    'Latest Vision Transformer research',
+    'Self-supervised learning in agriculture',
+  ];
 
   return (
     <div className="min-h-full bg-[#F5F7FB] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
       <div className="mx-auto max-w-[1320px] space-y-7">
-        <motion.header
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="flex flex-wrap items-end justify-between gap-4"
-        >
-          <div>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-blue-700">ResearchGraph AI</p>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Your research, at a glance</h1>
-            <p className="mt-1.5 max-w-2xl text-sm text-slate-500">Pick up where you left off or start exploring a new idea.</p>
-          </div>
-          <button
-            onClick={() => openSearch('')}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
-          >
-            <Search className="h-4 w-4" />
-            New search
-          </button>
-        </motion.header>
-
         <motion.section
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -106,10 +92,10 @@ export const Dashboard: React.FC = () => {
                 YOUR RESEARCH WORKSPACE
               </div>
               <h2 id="dashboard-search-title" className="text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-                Start with a question.
+                What are you researching today?
               </h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-blue-100/80 sm:text-[15px]">
-                Search scholarly literature, save useful papers, and connect ideas as your project grows.
+                Explore research. Connect knowledge. Discover what&apos;s next.
               </p>
 
               <form
@@ -125,7 +111,7 @@ export const Dashboard: React.FC = () => {
                   aria-label="Search academic research"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
-                  placeholder="Search a topic, method, author, or paper title"
+                  placeholder="Ask anything about academic research..."
                   className="min-w-0 flex-1 bg-transparent py-2.5 text-sm text-slate-900 outline-none placeholder:text-slate-400"
                 />
                 <button type="submit" style={{ backgroundColor: '#1d4ed8', color: '#ffffff' }} className="inline-flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
@@ -164,7 +150,14 @@ export const Dashboard: React.FC = () => {
           </div>
         </motion.section>
 
-        <section aria-label="Workspace overview" className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <section aria-label="Workspace overview">
+          <div className="mb-3 flex items-end justify-between gap-3">
+            <div>
+              <h2 className="text-base font-bold tracking-tight text-slate-900">Your research overview</h2>
+              <p className="mt-1 text-xs text-slate-500">A clear view of your work in progress.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           {stats.map(({ label, value, icon: Icon, color }, index) => (
             <motion.div
               key={label}
@@ -178,14 +171,15 @@ export const Dashboard: React.FC = () => {
               <div className="mt-1 text-xs font-medium text-slate-500 sm:text-[13px]">{label}</div>
             </motion.div>
           ))}
+          </div>
         </section>
 
         <section className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(300px,0.8fr)]">
           <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)]">
             <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-5 py-4 sm:px-6">
               <div>
-                <h2 className="text-sm font-bold text-slate-900">Recently viewed</h2>
-                <p className="mt-0.5 text-xs text-slate-500">Return to papers you opened recently.</p>
+                <h2 className="text-sm font-bold text-slate-900">Continue your research</h2>
+                <p className="mt-0.5 text-xs text-slate-500">Pick up where you left off.</p>
               </div>
               <button onClick={() => setActivePage('history')} className="inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900">
                 View history <ArrowUpRight className="h-3.5 w-3.5" />
