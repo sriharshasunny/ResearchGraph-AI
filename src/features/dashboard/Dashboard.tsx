@@ -10,6 +10,7 @@ import {
   GitCompare,
   Layers3,
   MessageSquareText,
+  Network,
   Search,
   Sparkles,
 } from 'lucide-react';
