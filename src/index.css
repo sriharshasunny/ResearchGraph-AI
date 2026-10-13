@@ -13,8 +13,26 @@
   animation-iteration-count: infinite;
 }
 
+.research-core-wave-ring {
+  border-width: 1.5px;
+  animation: research-core-water-wave 1.15s cubic-bezier(0.16, 0.72, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes research-core-water-wave {
+  0% { opacity: 0; transform: scale(0.92); }
+  14% { opacity: 0.82; }
+  100% { opacity: 0; transform: scale(1.55); }
+}
+
+@keyframes research-core-water-wave-reduced {
+  0% { opacity: 0.55; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.04); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .research-core-orbit-sprite { animation: none; }
+  .research-core-wave-ring { animation-name: research-core-water-wave-reduced; animation-duration: 0.3s; }
 }
 
 @layer base {

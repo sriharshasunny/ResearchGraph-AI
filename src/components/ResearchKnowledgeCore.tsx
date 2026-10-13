@@ -17,7 +17,7 @@ const MODEL_ORIGIN = { x: 1210, y: 444 };
 const MODEL_BOUNDS = { width: 800, height: 540 };
 const MODEL_RADIUS = 141;
 const SPHERE_RADIUS = 2.4;
-const MODEL_ZOOM = 1.0;
+const MODEL_ZOOM = 0.9;
 
 const labelData = [
   { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#6d4dff', tone: 'from-violet-500 to-indigo-500' },
@@ -37,8 +37,10 @@ export const ResearchKnowledgeCore: React.FC = () => {
   const hostRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<THREE.Group | null>(null);
   const rotationTargetRef = useRef<number | null>(null);
+  const rippleSequenceRef = useRef(0);
   const hoveredTintRef = useRef<THREE.Color | null>(null);
   const [hoveredLabel, setHoveredLabel] = useState<string | null>(null);
+  const [rippleEffect, setRippleEffect] = useState<{ color: string; id: number } | null>(null);
   const [modelScale, setModelScale] = useState(0.5);
 
   useEffect(() => {
@@ -224,6 +226,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
 
     let frame = 0;
     let elapsed = 0;
+    let lastFrameTime = 0;
     let yawVelocity = 0.0016;
     let dragState: { x: number; y: number } | null = null;
     let pointerX = 0;
@@ -271,14 +274,16 @@ export const ResearchKnowledgeCore: React.FC = () => {
     host.addEventListener('pointerup', onPointerUp);
     host.addEventListener('pointercancel', onPointerUp);
 
-    const animate = () => {
+    const animate = (time = performance.now()) => {
       frame = window.requestAnimationFrame(animate);
-      if (!reduceMotion.matches) elapsed += 0.016;
+      const delta = lastFrameTime ? Math.min((time - lastFrameTime) / 16.667, 2) : 1;
+      lastFrameTime = time;
+      if (!reduceMotion.matches) elapsed += 0.016 * delta;
       uniforms.time.value = elapsed;
       if (!dragState) {
         if (rotationTargetRef.current !== null && !reduceMotion.matches) {
           const remaining = rotationTargetRef.current - globe.rotation.y;
-          const step = Math.sign(remaining) * Math.min(0.045, Math.max(0.002, Math.abs(remaining) * 0.06));
+          const step = Math.sign(remaining) * Math.min(0.045, Math.max(0.002, Math.abs(remaining) * 0.06)) * delta;
           globe.rotation.y += step;
           if (Math.abs(remaining) <= 0.006) {
             globe.rotation.y = rotationTargetRef.current;
@@ -286,13 +291,13 @@ export const ResearchKnowledgeCore: React.FC = () => {
           }
         } else {
           rotationTargetRef.current = null;
-          globe.rotation.y += yawVelocity;
-          yawVelocity += ((reduceMotion.matches ? 0 : 0.0016) - yawVelocity) * 0.03;
+          globe.rotation.y += yawVelocity * delta;
+          yawVelocity += ((reduceMotion.matches ? 0 : 0.0016) - yawVelocity) * (1 - Math.pow(0.97, delta));
         }
-        globe.rotation.x += (0 - globe.rotation.x) * 0.01;
+        globe.rotation.x += (0 - globe.rotation.x) * (1 - Math.pow(0.99, delta));
       }
       arcs.forEach(arc => {
-        arc.progress += reduceMotion.matches ? 0 : 0.016 * arc.speed;
+        arc.progress += reduceMotion.matches ? 0 : 0.016 * delta * arc.speed;
         if (arc.progress > 1.3) {
           arc.from = randomDirection();
           arc.to = arc.from.clone().add(randomDirection().multiplyScalar(0.8)).normalize();
@@ -312,9 +317,9 @@ export const ResearchKnowledgeCore: React.FC = () => {
         });
       });
       const tintUniform = hubs.material as THREE.ShaderMaterial;
-      tintUniform.uniforms.tintMix.value += ((hoveredTintRef.current ? 1 : 0) - tintUniform.uniforms.tintMix.value) * 0.1;
+      tintUniform.uniforms.tintMix.value += ((hoveredTintRef.current ? 1 : 0) - tintUniform.uniforms.tintMix.value) * (1 - Math.pow(0.9, delta));
       if (hoveredTintRef.current) tintUniform.uniforms.tint.value.copy(hoveredTintRef.current);
-      rim.material.uniforms.color.value.lerp(hoveredTintRef.current ?? baseRimColor, 0.08);
+      rim.material.uniforms.color.value.lerp(hoveredTintRef.current ?? baseRimColor, 1 - Math.pow(0.92, delta));
       scene.rotation.y = pointerX * 0.05;
       scene.rotation.x = pointerY * 0.03;
       renderer.render(scene, camera);
@@ -346,9 +351,12 @@ export const ResearchKnowledgeCore: React.FC = () => {
     };
   }, []);
 
-  const handleLabelClick = () => {
+  const handleLabelClick = (label: ModelLabel) => {
     const globe = globeRef.current;
     if (!globe) return;
+    const rippleId = rippleSequenceRef.current + 1;
+    rippleSequenceRef.current = rippleId;
+    setRippleEffect({ color: label.color, id: rippleId });
     const target = globe.rotation.y + Math.PI * 1.5;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       globe.rotation.y = target;
@@ -390,6 +398,28 @@ export const ResearchKnowledgeCore: React.FC = () => {
         ))}
       </div>
 
+      {rippleEffect && (
+        <div
+          key={rippleEffect.id}
+          className="pointer-events-none absolute left-1/2 top-1/2 z-[1] aspect-square -translate-x-1/2 -translate-y-1/2"
+          style={{ width: `${MODEL_RADIUS * 2 * modelScale * MODEL_ZOOM}px`, height: `${MODEL_RADIUS * 2 * modelScale * MODEL_ZOOM}px` }}
+          aria-hidden="true"
+        >
+          {[0, 1, 2].map(index => (
+            <span
+              key={index}
+              className="research-core-wave-ring absolute inset-0 rounded-full border"
+              style={{
+                borderColor: rippleEffect.color,
+                boxShadow: `0 0 14px ${rippleEffect.color}b0, inset 0 0 9px ${rippleEffect.color}70`,
+                animationDelay: `${index * 170}ms`,
+              }}
+              onAnimationEnd={index === 2 ? () => setRippleEffect(current => current?.id === rippleEffect.id ? null : current) : undefined}
+            />
+          ))}
+        </div>
+      )}
+
       <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center drop-shadow-[0_1px_5px_rgba(3,10,30,0.95)]" aria-hidden="true">
         <span className="text-[12px] font-extrabold tracking-[0.12em] text-white sm:text-[14px]">RESEARCH</span>
         <span className="text-[11px] font-bold tracking-[0.2em] text-cyan-200 sm:text-[12px]">CORE</span>
@@ -403,7 +433,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
           onMouseLeave={() => updateHoveredLabel(null)}
           onFocus={() => updateHoveredLabel(labelData.find(item => item.id === id) ?? null)}
           onBlur={() => updateHoveredLabel(null)}
-          onClick={handleLabelClick}
+          onClick={() => handleLabelClick(labelData.find(item => item.id === id)!)}
           aria-label={`Rotate the research core from ${label}`}
           className={`research-core-label absolute z-10 inline-flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full border font-semibold leading-none text-white shadow-[0_4px_14px_rgba(0,0,0,.22)] transition duration-300 hover:scale-105 hover:shadow-[0_0_15px_var(--label-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${hoveredLabel === id ? 'bg-[#102a50]' : 'bg-[#071a3c]/95'}`}
           style={{
