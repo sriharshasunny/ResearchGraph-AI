@@ -5,8 +5,11 @@ import {
   ArrowUpRight,
   BookOpen,
   Bookmark,
+  ChevronRight,
+  Clock3,
   FileSearch,
   FileText,
+  FolderOpen,
   GitCompare,
   Layers3,
   MessageSquareText,
@@ -80,27 +83,31 @@ export const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-full bg-[#F5F7FB] px-4 py-5 sm:px-6 lg:px-7 lg:py-6">
-      <div className="mx-auto max-w-[1440px] space-y-5">
+    <div className="min-h-full bg-[#F5F7FB] px-4 py-4 sm:px-6 lg:px-7 lg:py-5">
+      <div className="mx-auto max-w-[1520px] space-y-4">
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate overflow-hidden rounded-[22px] bg-[#07152D] px-5 py-6 text-white shadow-[0_18px_45px_-28px_rgba(15,35,65,0.72)] sm:px-7 lg:px-9 lg:py-7"
+          className="relative isolate overflow-hidden rounded-[22px] bg-[#07152D] px-5 py-6 text-white shadow-[0_18px_45px_-28px_rgba(15,35,65,0.72)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
         >
-          <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_78%_48%,rgba(14,116,220,0.28),transparent_42%),radial-gradient(ellipse_at_10%_100%,rgba(16,67,136,0.18),transparent_45%)]" />
-          <div aria-hidden="true" className="absolute -right-24 -top-36 -z-10 h-[420px] w-[420px] rounded-full border border-blue-100/[0.07]" />
-          <div className="grid items-center gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(360px,0.82fr)] xl:grid-cols-[minmax(0,1.08fr)_minmax(400px,0.92fr)]">
-            <div className="relative z-10 max-w-[690px] py-1 lg:py-3">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.07] px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-blue-100">
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10"
+            style={{ backgroundImage: 'radial-gradient(ellipse at 76% 50%, rgba(14,116,220,0.24), transparent 37%), radial-gradient(ellipse at 94% 28%, rgba(6,182,212,0.12), transparent 32%), radial-gradient(1px 1px at 64% 18%, rgba(191,219,254,.72) 50%, transparent 100%), radial-gradient(1px 1px at 83% 14%, rgba(147,197,253,.65) 50%, transparent 100%), radial-gradient(1.5px 1.5px at 94% 63%, rgba(125,211,252,.65) 50%, transparent 100%), radial-gradient(1px 1px at 71% 78%, rgba(191,219,254,.55) 50%, transparent 100%), linear-gradient(110deg, #07152D, #06162F 70%, #0A2040)' }}
+          />
+          <div aria-hidden="true" className="absolute -right-20 -top-40 -z-10 h-[500px] w-[500px] rounded-full border border-cyan-100/[0.08]" />
+          <div className="grid items-center gap-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:gap-5">
+            <div className="relative z-10 max-w-[700px] py-1 lg:py-3">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200/15 bg-blue-400/[0.09] px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-blue-100">
                 <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
                 YOUR RESEARCH WORKSPACE
               </div>
-              <h1 id="dashboard-search-title" className="max-w-[610px] text-[30px] font-semibold leading-[1.12] tracking-tight sm:text-[36px] lg:text-[40px]">
-                Discover. Connect. Advance <span className="text-blue-400">Research</span> with AI.
+              <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.035em] sm:text-[38px] lg:text-[46px]">
+                Discover. Connect. Advance<br className="hidden sm:block" /> <span className="bg-gradient-to-r from-sky-400 to-blue-400 bg-clip-text text-transparent">Research</span> with AI.
               </h1>
-              <p className="mt-3 max-w-[510px] text-[14px] leading-6 text-slate-300 sm:text-[15px]">
+              <p className="mt-3 max-w-[540px] text-[14px] leading-6 text-slate-300 sm:text-[16px] sm:leading-7">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -110,29 +117,29 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-5 flex max-w-[650px] items-center gap-2 rounded-xl border border-white/70 bg-white p-1.5 pl-3.5 shadow-lg shadow-slate-950/15 focus-within:ring-4 focus-within:ring-blue-300/20"
+                className="mt-5 flex h-[54px] max-w-[680px] items-center gap-2 rounded-xl border border-white/70 bg-white p-1.5 pl-4 shadow-lg shadow-slate-950/15 focus-within:ring-4 focus-within:ring-blue-300/20 sm:h-[60px]"
               >
-                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
+                <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-slate-400" />
                 <input
                   aria-label="Search academic papers, authors, and topics"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
-                  placeholder="Search papers, authors, datasets, methods, concepts..."
-                  className="min-w-0 flex-1 bg-transparent py-2.5 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 sm:text-sm"
+                  placeholder="Ask anything about academic research..."
+                  className="min-w-0 flex-1 bg-transparent py-2.5 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 sm:text-[15px]"
                 />
-                <button type="submit" className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+                <button type="submit" className="inline-flex h-full shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:px-5">
                   Search <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
 
-              <div className="mt-3 flex max-w-[680px] flex-wrap items-center gap-2 text-[10px] text-blue-100/75 sm:text-[11px]">
+              <div className="mt-4 flex max-w-[700px] flex-wrap items-center gap-2 text-[11px] text-blue-100/75 sm:mt-4 sm:text-xs">
                 <span className="mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
                     key={term}
                     type="button"
                     onClick={() => openSearch(term)}
-                    className="rounded-full border border-white/15 bg-white/[0.05] px-2.5 py-1.5 text-slate-100 transition hover:border-blue-300/50 hover:bg-blue-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                    className="rounded-full border border-white/15 bg-white/[0.055] px-3 py-2 text-slate-100 transition hover:border-blue-300/50 hover:bg-blue-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                   >
                     {term}
                   </button>
@@ -140,14 +147,14 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative mx-auto flex h-[320px] w-full max-w-[520px] items-center justify-center overflow-visible sm:h-[350px]" aria-label="Interactive research knowledge core">
+            <div className="relative mx-auto flex h-[310px] w-full items-center justify-center overflow-visible sm:h-[370px] lg:h-[430px] xl:h-[440px]" aria-label="Interactive research knowledge core">
               <ResearchKnowledgeCore />
             </div>
           </div>
         </motion.section>
 
         <section aria-label="Research overview">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
             {stats.map(({ label, value, icon: Icon, tone, page }, index) => (
               <motion.button
                 key={label}
@@ -156,24 +163,28 @@ export const Dashboard: React.FC = () => {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: index * 0.04 }}
-                className="group flex min-h-[78px] items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3.5 py-3 text-left shadow-[0_3px_14px_-12px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:px-4"
+                className="group flex min-h-[88px] items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3.5 py-3.5 text-left shadow-[0_3px_14px_-12px_rgba(15,23,42,0.25)] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 sm:min-h-[98px] sm:px-4"
               >
                 <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${tone}`}><Icon className="h-5 w-5" /></span>
                 <span className="min-w-0">
-                  <span className="block text-[22px] font-bold leading-none tracking-tight text-slate-900">{value}</span>
+                  <span className="block text-[25px] font-bold leading-none tracking-tight text-slate-900">{value}</span>
                   <span className="mt-1.5 block truncate text-[11px] font-medium text-slate-500 sm:text-xs">{label}</span>
                 </span>
+                <ChevronRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600" />
               </motion.button>
             ))}
           </div>
         </section>
 
-        <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(330px,1fr)]">
+        <section className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.58fr)_minmax(360px,1fr)]">
           <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)]">
             <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3.5 sm:px-5">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Continue your research</h2>
+              <div className="flex items-start gap-2.5">
+                <Clock3 aria-hidden="true" className="mt-0.5 h-[18px] w-[18px] shrink-0 text-slate-700" />
+                <div>
+                  <h2 className="text-[15px] font-bold text-slate-900">Continue your research</h2>
                 <p className="mt-0.5 text-xs text-slate-500">Pick up where you left off.</p>
+                </div>
               </div>
               <button type="button" onClick={() => setActivePage('history')} className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900">
                 View history <ArrowUpRight className="h-3.5 w-3.5" />
@@ -212,29 +223,44 @@ export const Dashboard: React.FC = () => {
                 })}
               </div>
             ) : (
-              <div className="px-5 py-9 text-center">
+              <div className="flex min-h-[224px] flex-col items-center justify-center px-5 py-7 text-center">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><FileSearch className="h-6 w-6" /></span>
                 <p className="text-sm font-semibold text-slate-800">Your research journey starts here.</p>
-                <p className="mt-1 text-xs text-slate-500">Explore academic papers and save the ones you want to revisit.</p>
-                <button type="button" onClick={() => setActivePage('search')} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white hover:bg-blue-700">Search papers <ArrowRight className="h-3.5 w-3.5" /></button>
+                <p className="mt-1 max-w-[360px] text-xs text-slate-500">Explore academic papers and save the ones you want to revisit.</p>
+                <button type="button" onClick={() => setActivePage('search')} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700">Search Papers <ArrowRight className="h-3.5 w-3.5" /></button>
               </div>
             )}
           </div>
 
           <div className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-[0_4px_18px_-14px_rgba(15,23,42,0.25)]">
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3.5 sm:px-5">
-              <div>
-                <h2 className="text-sm font-bold text-slate-900">Current project</h2>
-                <p className="mt-0.5 text-xs text-slate-500">Your active research workspace.</p>
+              <div className="flex items-start gap-2.5">
+                <Layers3 aria-hidden="true" className="mt-0.5 h-[18px] w-[18px] shrink-0 text-blue-600" />
+                <div>
+                  <h2 className="text-[15px] font-bold text-slate-900">Current project</h2>
+                  <p className="mt-0.5 text-xs text-slate-500">Your active research workspace.</p>
+                </div>
               </div>
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-700"><Layers3 className="h-4 w-4" /></span>
+              <button type="button" onClick={() => setActivePage('papers')} className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900">View all <ArrowUpRight className="h-3.5 w-3.5" /></button>
             </div>
             <div className="p-4 sm:p-5">
-              <h3 className="text-[13px] font-semibold leading-5 text-slate-900">{activeProject || 'Research workspace'}</h3>
-              <p className="mt-1 text-[11px] leading-5 text-slate-500">Organize papers and ideas around your current research focus.</p>
-              <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]">
-                <span className="text-slate-500">{readingQueue.length} papers in your reading queue</span>
-                <button type="button" onClick={() => setActivePage('saved')} className="font-semibold text-blue-700 hover:text-blue-900">Open library</button>
+              <div className="rounded-xl border border-slate-100 bg-[linear-gradient(135deg,#f8fbff,#f1f6ff)] p-4">
+                <div className="flex items-start gap-3">
+                  <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-white bg-white text-blue-700 shadow-sm"><FolderOpen className="h-7 w-7" /></span>
+                  <div className="min-w-0 pt-0.5">
+                    <h3 className="truncate text-[14px] font-bold leading-5 text-slate-900">{activeProject || 'Research workspace'}</h3>
+                    <p className="mt-1 text-[11px] leading-4 text-slate-500">Organize papers and ideas around your current research focus.</p>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-slate-500">
+                  <span className="inline-flex items-center gap-1.5"><FileText className="h-3.5 w-3.5 text-blue-600" />{allPapers.length} papers</span>
+                  <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5 text-blue-600" />{readingQueue.length} in reading queue</span>
+                </div>
               </div>
+
+              <button type="button" onClick={() => setActivePage('papers')} className="mt-3 flex w-full items-center gap-2 rounded-lg border border-blue-100 bg-blue-50/80 px-3.5 py-2.5 text-xs font-semibold text-blue-700 transition hover:border-blue-200 hover:bg-blue-100/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40">
+                <FolderOpen className="h-4 w-4" /> Open workspace <ArrowRight className="ml-auto h-3.5 w-3.5" />
+              </button>
 
               <div className="mt-4 rounded-lg border border-slate-100 bg-slate-50/70 p-3">
                 <div className="flex items-center justify-between gap-2">

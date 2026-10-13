@@ -185,7 +185,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
-      camera.position.set(0, 0, SPHERE_RADIUS * (height / 2) / (MODEL_RADIUS * scale * Math.tan(Math.PI / 9)));
+      camera.position.set(0, 0, SPHERE_RADIUS * (height / 2) / (MODEL_RADIUS * scale * 1.2 * Math.tan(Math.PI / 9)));
       camera.updateProjectionMatrix();
       uniforms.pointScale.value = renderer.getPixelRatio() * height / (2 * Math.tan(Math.PI / 9));
     };
@@ -277,6 +277,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
 
   const offset = (coordinate: number, axis: 'x' | 'y') =>
     `calc(50% + ${(coordinate - MODEL_ORIGIN[axis]) * modelScale}px)`;
+  const labelScale = Math.max(0.72, Math.min(modelScale, 1));
 
   return (
     <div ref={hostRef} className="relative h-[300px] w-full max-w-[500px] touch-pan-y select-none sm:h-[330px]" aria-label="Interactive research knowledge core">
@@ -301,8 +302,8 @@ export const ResearchKnowledgeCore: React.FC = () => {
       </div>
 
       <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center drop-shadow-[0_1px_5px_rgba(3,10,30,0.95)]" aria-hidden="true">
-        <span className="text-[9px] font-extrabold tracking-[0.12em] text-white sm:text-[10px]">RESEARCH</span>
-        <span className="text-[8px] font-bold tracking-[0.2em] text-cyan-200 sm:text-[9px]">CORE</span>
+        <span className="text-[12px] font-extrabold tracking-[0.12em] text-white sm:text-[14px]">RESEARCH</span>
+        <span className="text-[11px] font-bold tracking-[0.2em] text-cyan-200 sm:text-[12px]">CORE</span>
       </div>
 
       {labelData.map(({ id, label, Icon, x, y, color, tone }) => (
@@ -315,11 +316,20 @@ export const ResearchKnowledgeCore: React.FC = () => {
           onBlur={() => updateHoveredLabel(null)}
           onClick={() => handleLabelClick(labelData.find(item => item.id === id)!)}
           aria-label={`Explore ${label}`}
-          className={`research-core-label absolute z-10 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-1 rounded-full border px-1.5 py-1 text-[8px] font-semibold leading-none text-slate-900 shadow-[0_4px_14px_rgba(0,0,0,.22)] transition duration-300 hover:scale-105 hover:shadow-[0_0_15px_var(--label-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 sm:gap-1.5 sm:px-2 sm:text-[9px] ${hoveredLabel === id ? 'border-white/90 bg-white' : 'border-white/65 bg-white/90'}`}
-          style={{ left: offset(x, 'x'), top: offset(y, 'y'), ['--label-glow' as string]: `${color}8c` }}
+          className={`research-core-label absolute z-10 inline-flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full border font-semibold leading-none text-white shadow-[0_4px_14px_rgba(0,0,0,.22)] transition duration-300 hover:scale-105 hover:shadow-[0_0_15px_var(--label-glow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${hoveredLabel === id ? 'bg-[#102a50]' : 'bg-[#071a3c]/95'}`}
+          style={{
+            left: offset(x, 'x'),
+            top: offset(y, 'y'),
+            gap: 6 * labelScale,
+            padding: `${4 * labelScale}px ${8 * labelScale}px`,
+            fontSize: `${Math.max(9, 11 * labelScale)}px`,
+            borderColor: `${color}bf`,
+            boxShadow: `0 5px 18px ${color}36`,
+            ['--label-glow' as string]: `${color}8c`,
+          }}
         >
-          <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white sm:h-[18px] sm:w-[18px] ${tone}`}>
-            <Icon className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+          <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white ${tone}`} style={{ width: Math.max(18, 24 * labelScale), height: Math.max(18, 24 * labelScale) }}>
+            <Icon style={{ width: Math.max(11, 14 * labelScale), height: Math.max(11, 14 * labelScale) }} />
           </span>
           <span className="whitespace-nowrap">{label}</span>
         </button>

@@ -49,16 +49,16 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex h-[58px] shrink-0 items-center gap-2 border-b border-slate-200/90 bg-white/95 px-2.5 backdrop-blur sm:gap-3 sm:px-5">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <button type="button" onClick={toggleSidebar} aria-label="Toggle navigation" aria-expanded={isSidebarOpen} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
-            <Menu className="h-5 w-5" />
+      <header className="sticky top-0 z-50 flex h-[68px] shrink-0 items-center gap-2 border-b border-slate-200/90 bg-white/95 px-3 backdrop-blur sm:gap-4 sm:px-6">
+        <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-5">
+          <button type="button" onClick={toggleSidebar} aria-label="Toggle navigation" aria-expanded={isSidebarOpen} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+            <Menu className="h-[21px] w-[21px]" />
           </button>
-          <button type="button" onClick={() => setActivePage('dashboard')} aria-label="ResearchGraph AI home" className="flex min-w-0 shrink-0 items-center gap-1.5 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
-            <Network className="h-5 w-5 shrink-0 text-blue-600" />
-            <span className="max-w-[122px] truncate text-[11px] font-semibold text-slate-900 sm:max-w-none sm:text-xs">ResearchGraph <span className="text-blue-600">AI</span></span>
+          <button type="button" onClick={() => setActivePage('dashboard')} aria-label="ResearchGraph AI home" className="flex min-w-0 shrink-0 items-center gap-2 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+            <Network className="h-7 w-7 shrink-0 text-blue-600" />
+            <span className="max-w-[122px] truncate text-[12px] font-bold tracking-tight text-slate-900 sm:max-w-none sm:text-[17px]">ResearchGraph <span className="text-blue-600">AI</span></span>
           </button>
-          <form role="search" onSubmit={submitSearch} className="relative ml-auto flex min-w-0 w-full max-w-[540px] items-center">
+          <form role="search" onSubmit={submitSearch} className="relative ml-auto flex min-w-0 w-full max-w-[730px] items-center">
             <Search aria-hidden="true" className="absolute left-3.5 h-4 w-4 text-slate-400" />
             <input
               ref={inputRef}
@@ -67,7 +67,7 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
               onChange={event => setQuery(event.target.value)}
               aria-label="Search papers, authors, and topics"
               placeholder="Search papers, authors, topics..."
-              className="h-9 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-[76px] text-[12px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-2 focus:ring-blue-100"
+              className="h-10 w-full rounded-full border border-slate-200 bg-slate-50 pl-10 pr-[76px] text-[13px] text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-2 focus:ring-blue-100 sm:h-11"
             />
             <button type="submit" aria-label="Submit search" className="absolute right-2 rounded-md px-1.5 py-1 text-slate-400 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40"><kbd className="rounded border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-medium">{shortcut}</kbd></button>
           </form>
@@ -75,17 +75,17 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
 
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <div className="relative" ref={bellRef}>
-            <button type="button" onClick={() => setIsBellOpen(value => !value)} aria-label="Notifications" aria-expanded={isBellOpen} className="relative flex h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
-              <Bell className="h-[18px] w-[18px]" />
+            <button type="button" onClick={() => setIsBellOpen(value => !value)} aria-label="Notifications" aria-expanded={isBellOpen} className="relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
+              <Bell className="h-5 w-5" />
             </button>
             {isBellOpen && <div role="status" className="absolute right-0 top-11 z-50 w-64 rounded-xl border border-slate-200 bg-white p-4 shadow-xl"><p className="text-xs font-semibold text-slate-800">Notifications</p><p className="mt-2 text-xs text-slate-500">You&apos;re all caught up.</p></div>}
           </div>
-          <button type="button" onClick={() => setIsSettingsOpen(true)} aria-label="Open settings" className="hidden h-9 w-9 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 sm:flex">
-            <Settings className="h-[18px] w-[18px]" />
+          <button type="button" onClick={() => setIsSettingsOpen(true)} aria-label="Open settings" className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 sm:flex">
+            <Settings className="h-5 w-5" />
           </button>
           <div className="relative" ref={avatarRef}>
             <button type="button" onClick={() => setIsAvatarOpen(value => !value)} aria-label="Open user menu" aria-haspopup="menu" aria-expanded={isAvatarOpen} className="flex items-center gap-1 rounded-full p-0.5 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">JD</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-[11px] font-bold text-white sm:h-10 sm:w-10">JD</span>
               <ChevronDown className="hidden h-3.5 w-3.5 text-slate-500 sm:block" />
             </button>
             {isAvatarOpen && (
