@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ChatMessage, PageType, Paper } from '../types';
 import { mockPapers } from '../data/mockData';
@@ -44,6 +44,7 @@ interface AppContextType {
   setChatScope: (scope: string) => void;
   allPapers: Paper[];
   addCustomPaper: (paper: Paper) => void;
+  addSearchResults: (papers: Paper[]) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -167,6 +168,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSavedPaperIds(prev => [paper.id, ...prev]);
   };
 
+  const addSearchResults = useCallback((papers: Paper[]) => {
+    setAllPapers(prev => {
+      const papersById = new Map(prev.map(paper => [paper.id, paper]));
+      for (const paper of papers) papersById.set(paper.id, paper);
+      return [...papersById.values()];
+    });
+  }, []);
+
   return (
     <AppContext.Provider
       value={{
@@ -201,7 +210,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         chatScope,
         setChatScope,
         allPapers,
-        addCustomPaper
+        addCustomPaper,
+        addSearchResults
       }}
     >
       {children}
@@ -216,3 +226,4 @@ export const useApp = () => {
   }
   return context;
 };
+

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { searchPapers } from '../../services/api';
+import type { Paper } from '../../types';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, Bookmark, MessageSquare, 
@@ -18,7 +20,8 @@ export const SearchPage: React.FC = () => {
     allPapers,
     comparisonPaperIds,
     toggleComparisonPaper,
-    clearComparison
+    clearComparison,
+    addSearchResults
   } = useApp();
 
   const [localQuery, setLocalQuery] = useState(searchQuery || '');
@@ -28,6 +31,9 @@ export const SearchPage: React.FC = () => {
   const [selectedDataset, setSelectedDataset] = useState('All');
   const [selectedSource, setSelectedSource] = useState('All');
   const [openAccessOnly, setOpenAccessOnly] = useState(false);
+  const [remotePapers, setRemotePapers] = useState<Paper[] | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   // Active Dropdown menu for pills
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -36,7 +42,41 @@ export const SearchPage: React.FC = () => {
     if (searchQuery !== undefined && searchQuery !== localQuery) {
       setLocalQuery(searchQuery);
     }
-  }, [searchQuery]);
+  }, [searchQuery, localQuery]);
+
+  useEffect(() => {
+    const query = localQuery.trim();
+    if (!query) {
+      setRemotePapers(null);
+      setIsSearching(false);
+      setSearchError(null);
+      return;
+    }
+
+    const controller = new AbortController();
+    setIsSearching(true);
+    setSearchError(null);
+    const timer = window.setTimeout(() => {
+      searchPapers(query, controller.signal)
+        .then(papers => {
+          setRemotePapers(papers);
+          addSearchResults(papers);
+        })
+        .catch(error => {
+          if (controller.signal.aborted) return;
+          setRemotePapers([]);
+          setSearchError(error instanceof Error ? error.message : 'Paper search failed. Please try again.');
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setIsSearching(false);
+        });
+    }, 350);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [localQuery, addSearchResults]);
 
   const years = ['All', '2025', '2024', '2023', '2022', '2021', '2020', '2017'];
   const fields = ['All', 'Architecture & NLP', 'Computer Vision', 'Multimodal', 'Reasoning & LLMs', 'Efficient ML', 'Graph AI & RAG'];
@@ -45,8 +85,9 @@ export const SearchPage: React.FC = () => {
   const sources = ['All', 'arXiv', 'NeurIPS', 'ICLR', 'ICML'];
 
   // Filtering
-  const filteredPapers = allPapers.filter(paper => {
-    if (localQuery.trim()) {
+  const sourcePapers = localQuery.trim() ? (remotePapers || []) : allPapers;
+  const filteredPapers = sourcePapers.filter(paper => {
+    if (localQuery.trim() && remotePapers === null) {
       const q = localQuery.toLowerCase();
       const matchTitle = paper.title.toLowerCase().includes(q);
       const matchAbstract = paper.abstract.toLowerCase().includes(q);
@@ -361,7 +402,15 @@ export const SearchPage: React.FC = () => {
 
         {/* ── PAPER RESULTS: CLEAN RESEARCH ROWS ── */}
         <div className="space-y-3">
-          {filteredPapers.length === 0 ? (
+          {searchError ? (
+            <div role="alert" className="bg-red-50 dark:bg-red-950/20 rounded-2xl border border-red-200 dark:border-red-900/50 p-6 text-center text-sm text-red-700 dark:text-red-300">
+              {searchError}
+            </div>
+          ) : isSearching ? (
+            <div role="status" className="bg-white dark:bg-[#111D35] rounded-2xl border border-gray-200 dark:border-white/[0.06] p-8 text-center text-sm text-gray-500 dark:text-gray-300">
+              Searching OpenAlex for research papers…
+            </div>
+          ) : filteredPapers.length === 0 ? (
             <div className="bg-white dark:bg-[#111D35] dark:bg-[#111D35] rounded-2xl border border-gray-200 dark:border-white/[0.06] dark:border-white/[0.06] p-12 text-center flex flex-col items-center">
               <Search className="w-10 h-10 text-gray-300 mb-3" />
               <h3 className="text-[16px] font-bold text-gray-900 dark:text-white dark:text-white">No matching research papers</h3>
@@ -479,3 +528,4 @@ export const SearchPage: React.FC = () => {
     </div>
   );
 };
+
