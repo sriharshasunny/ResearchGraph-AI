@@ -1,194 +1,196 @@
-from fastapi import FastAPI, HTTPException, Query
+from __future__ import annotations
+
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-import requests
-from typing import List, Optional
+from pydantic import BaseModel, Field
 
-app = FastAPI(title="ResearchGraph AI Backend")
+try:
+    from .pipeline import (
+        PaperNotFound,
+        PipelineError,
+        get_graph_for_paper,
+        get_graph,
+        get_graph_search,
+        get_ingestion_status,
+        get_paper_chunks,
+        get_paper_metadata,
+        health_status,
+        ingest_paper,
+        query_research,
+        search_openalex,
+        start_ingestion,
+    )
+except ImportError:  # Supports Render's backend-root command: uvicorn main:app
+    from pipeline import (
+        PaperNotFound,
+        PipelineError,
+        get_graph_for_paper,
+        get_graph,
+        get_graph_search,
+        get_ingestion_status,
+        get_paper_chunks,
+        get_paper_metadata,
+        health_status,
+        ingest_paper,
+        query_research,
+        search_openalex,
+        start_ingestion,
+    )
 
-# Allow CORS for local frontend development
+app = FastAPI(title="ResearchGraph AI Backend", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins
-    allow_credentials=True,
-    allow_methods=["*"],  # Allows all methods
-    allow_headers=["*"],  # Allows all headers
+    allow_origins=[origin.strip() for origin in __import__("os").getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if origin.strip()],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
-OPENALEX_API_URL = "https://api.openalex.org/works"
-SEMANTIC_SCHOLAR_API_URL = "https://api.semanticscholar.org/graph/v1/paper/search"
+
+class IngestRequest(BaseModel):
+    paper_id: str = Field(min_length=1, max_length=500)
+
+
+class RagRequest(BaseModel):
+    question: str = Field(min_length=3, max_length=4000)
+    paper_ids: list[str] = Field(default_factory=list, max_length=50)
+
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to ResearchGraph AI Backend"}
+def root():
+    return {"message": "ResearchGraph AI API", "health": "/api/health"}
+
+
+@app.get("/api/health")
+def health():
+    return health_status()
+
+
+@app.get("/api/paper")
+def paper_details_by_id(id: str = Query(..., min_length=1, max_length=500)):
+    try:
+        return get_paper_metadata(id)
+    except PaperNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except PipelineError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.get("/api/paper-status")
+def paper_status_by_id(paper_id: str = Query(..., min_length=1, max_length=500)):
+    record = get_ingestion_status(paper_id)
+    if not record:
+        return {"paper_id": paper_id, "status": "discovered", "message": "This paper has not been added to the research index."}
+    return record
+
 
 @app.get("/api/search")
-def search_papers(q: str = Query(..., description="Search query"), limit: int = 10):
-    """
-    Searches for papers using the OpenAlex API.
-    """
+def search_papers(q: str = Query(..., min_length=1), limit: int = Query(10, ge=1, le=50)):
     try:
-        response = requests.get(
-            OPENALEX_API_URL,
-            params={
-                "search": q,
-                "per-page": limit,
-                "sort": "cited_by_count:desc"
-            }
-        )
-        response.raise_for_status()
-        data = response.json()
-        
-        results = []
-        for work in data.get("results", []):
-            # Extract Authors
-            authors = [
-                author.get("author", {}).get("display_name")
-                for author in work.get("authorships", [])
-                if author.get("author", {}).get("display_name")
-            ]
-            
-            # Extract Abstract (OpenAlex uses an inverted index which needs to be reconstructed, 
-            # but sometimes it's empty. We'll simplify or use semantic scholar later)
-            abstract_inverted = work.get("abstract_inverted_index")
-            abstract = "Abstract not available."
-            if abstract_inverted:
-                # Reconstruct abstract from inverted index
-                words = max([max(positions) for positions in abstract_inverted.values()]) + 1
-                abstract_arr = [""] * words
-                for word, positions in abstract_inverted.items():
-                    for pos in positions:
-                        abstract_arr[pos] = word
-                abstract = " ".join(abstract_arr)
-            
-            # Check Open Access
-            open_access = work.get("open_access", {}).get("is_oa", False)
-            pdf_url = work.get("open_access", {}).get("oa_url")
-            
-            # Concepts/Topics
-            concepts = [
-                concept.get("display_name") 
-                for concept in work.get("concepts", [])[:5]
-            ]
-            
-            results.append({
-                "id": work.get("id"),
-                "title": work.get("title", "Untitled"),
-                "authors": authors,
-                "abstract": abstract,
-                "publication_year": work.get("publication_year"),
-                "doi": work.get("doi"),
-                "source": "OpenAlex",
-                "open_access": open_access,
-                "pdf_url": pdf_url,
-                "landing_page": work.get("id"),
-                "cited_by_count": work.get("cited_by_count", 0),
-                "topics": concepts
-            })
-            
-        return {"papers": results}
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"papers": search_openalex(q, limit)}
+    except PipelineError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
+
+@app.post("/api/papers/ingest", status_code=202)
+def ingest(request: IngestRequest, background_tasks: BackgroundTasks):
+    try:
+        record = start_ingestion(request.paper_id)
+        if record.get("stage") == "queued":
+            background_tasks.add_task(ingest_paper, request.paper_id)
+        return record
+    except PaperNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/papers/{paper_id:path}/status")
+def paper_status(paper_id: str):
+    record = get_ingestion_status(paper_id)
+    if not record:
+        return {"paper_id": paper_id, "status": "discovered", "message": "This paper has not been added to the research index."}
+    return record
+
+
+@app.get("/api/papers/{paper_id:path}/chunks")
+def paper_chunks(paper_id: str, limit: int = Query(100, ge=1, le=500)):
+    try:
+        return {"paper_id": paper_id, "chunks": get_paper_chunks(paper_id, limit)}
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/graph/paper/{paper_id:path}")
+def graph_for_paper(paper_id: str):
+    try:
+        return get_graph_for_paper(paper_id)
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/graph/search")
+def graph_search(q: str = Query(..., min_length=1, max_length=200), limit: int = Query(20, ge=1, le=100)):
+    try:
+        return {"results": get_graph_search(q, limit)}
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/graph")
+def graph_all(limit: int = Query(500, ge=1, le=2000)):
+    try:
+        return get_graph(limit)
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.get("/api/graph/paper")
+def graph_for_paper_by_id(paper_id: str = Query(..., min_length=1, max_length=500)):
+    try:
+        return get_graph_for_paper(paper_id)
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.post("/api/rag/query")
+def rag(request: RagRequest):
+    try:
+        return query_research(request.question, request.paper_ids)
+    except PaperNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+# Keep the established paper-detail route compatible with existing clients.
 @app.get("/api/papers/{paper_id:path}")
-def get_paper_details(paper_id: str):
-    """
-    Gets details for a specific paper from OpenAlex using its full ID.
-    Example paper_id: https://openalex.org/W2103268463
-    """
+def paper_details(paper_id: str):
     try:
-        # If the paper_id is already a URL, use it directly. Otherwise construct it.
-        url = paper_id if paper_id.startswith("https://") else f"{OPENALEX_API_URL}/{paper_id}"
-        response = requests.get(url)
-        response.raise_for_status()
-        work = response.json()
-        
-        authors = [
-            author.get("author", {}).get("display_name")
-            for author in work.get("authorships", [])
-            if author.get("author", {}).get("display_name")
-        ]
-        
-        abstract_inverted = work.get("abstract_inverted_index")
-        abstract = "Abstract not available."
-        if abstract_inverted:
-            words = max([max(positions) for positions in abstract_inverted.values()]) + 1
-            abstract_arr = [""] * words
-            for word, positions in abstract_inverted.items():
-                for pos in positions:
-                    abstract_arr[pos] = word
-            abstract = " ".join(abstract_arr)
-        
-        open_access = work.get("open_access", {}).get("is_oa", False)
-        pdf_url = work.get("open_access", {}).get("oa_url")
-        
-        concepts = [
-            concept.get("display_name") 
-            for concept in work.get("concepts", [])[:5]
-        ]
-        
-        paper_data = {
-            "id": work.get("id"),
-            "title": work.get("title", "Untitled"),
-            "authors": authors,
-            "abstract": abstract,
-            "publication_year": work.get("publication_year"),
-            "doi": work.get("doi"),
-            "source": "OpenAlex",
-            "open_access": open_access,
-            "pdf_url": pdf_url,
-            "landing_page": work.get("id"),
-            "cited_by_count": work.get("cited_by_count", 0),
-            "topics": concepts
-        }
-        
-        return paper_data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return get_paper_metadata(paper_id)
+    except PaperNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except PipelineError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
+
+# Legacy chat endpoint now delegates to genuine retrieval and never returns a canned answer.
 @app.post("/api/chat")
-def chat_with_papers(query: str, paper_ids: List[str] = []):
-    """
-    Mock implementation of LLM RAG chat.
-    In a real implementation, this would query ChromaDB/Neo4j and an LLM.
-    """
-    return {
-        "answer": f"This is a simulated AI response based on real retrieved papers. Real implementation requires LLM configuration. Query was: '{query}'",
-        "citations": [
-            {"id": pid, "title": "Retrieving context for citation..."} for pid in paper_ids
-        ]
-    }
+def legacy_chat(query: str = Query(..., min_length=3), paper_ids: list[str] = Query(default=[])):
+    try:
+        return query_research(query, paper_ids)
+    except PaperNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
 
 @app.post("/api/literature-review")
-def generate_literature_review(paper_ids: List[str]):
-    """
-    Generates a mock literature review based on given paper IDs.
-    """
-    return {
-        "review": {
-            "topic": "Generated Review from Selected Papers",
-            "research_area": "Computer Science / AI",
-            "major_approaches": ["Approach A", "Approach B"],
-            "datasets": ["Dataset 1"],
-            "methods": ["Method X"],
-            "key_findings": ["Finding 1", "Finding 2"],
-            "limitations": ["Limitation 1"],
-            "research_trends": ["Trend 1"],
-            "potential_gaps": ["Potential Gap 1: More evaluation needed on Dataset 2"]
-        },
-        "papers": paper_ids
-    }
+def literature_review():
+    raise HTTPException(status_code=501, detail="Literature review generation is not yet connected to indexed evidence.")
+
 
 @app.post("/api/compare")
-def compare_papers(paper_ids: List[str]):
-    """
-    Generates a comparison matrix for the given papers.
-    """
-    return {
-        "comparison": {
-            "problem": "Simulated Research Problem",
-            "methodology": "Simulated Methodology",
-            "results": "Simulated Results",
-            "limitations": "Simulated Limitations"
-        }
-    }
+def compare_papers():
+    raise HTTPException(status_code=501, detail="Paper comparison generation is not yet connected to indexed evidence.")
+
