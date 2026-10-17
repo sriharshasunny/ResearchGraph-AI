@@ -877,3 +877,46 @@
   .landing-final-cta { margin-right: 16px; margin-left: 16px; }
 }
 
+/* Keep the public hero confident and readable without letting its scale take over. */
+@media (min-width: 881px) {
+  .landing-nav { gap: clamp(10px, 1.15vw, 18px); }
+  .landing-nav .landing-brand { flex: 0 0 auto; gap: 11px; font-size: 19px; }
+  .landing-nav-links { flex: 1 1 auto; justify-content: center; gap: clamp(3px, .45vw, 8px); min-width: 0; }
+  .landing-nav-links button {
+    flex: 0 0 auto;
+    padding-right: clamp(7px, .85vw, 14px);
+    padding-left: clamp(7px, .85vw, 14px);
+    font-size: 13px;
+    white-space: nowrap;
+  }
+  .landing-nav-actions { flex: 0 0 auto; gap: 8px; }
+  .landing-nav-search { width: 40px; margin-right: 4px; }
+  .landing-nav-actions .landing-login,
+  .landing-signup { min-height: 48px; padding-right: 15px; padding-left: 15px; font-size: 13px; }
+  .landing-nav-actions .landing-login { min-width: 92px; }
+  .landing-signup { min-width: 156px; }
+
+  .landing-hero h1 {
+    margin: 16px 0 18px;
+    font-size: clamp(60px, 4.3vw, 78px);
+    line-height: .97;
+  }
+  .landing-hero .landing-eyebrow { font-size: 11px; letter-spacing: .17em; }
+  .landing-hero-description { max-width: 560px; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.62; }
+  .landing-hero-visual,
+  .landing-visual-frame { min-height: 580px; }
+  .landing-visual-frame { max-width: 840px; }
+  .landing-visual-frame iframe { top: -17.5%; left: -17.5%; width: 135%; height: 135%; }
+}
+
+@media (min-width: 881px) and (max-width: 1000px) {
+  .landing-hero h1 { font-size: clamp(52px, 6.1vw, 62px); }
+  .landing-hero-visual,
+  .landing-visual-frame { min-height: 470px; }
+  .landing-visual-frame iframe { top: -15%; left: -15%; width: 130%; height: 130%; }
+}
+
+@media (max-width: 700px) {
+  .landing-hero h1 { font-size: clamp(44px, 9.5vw, 60px); }
+}
+
