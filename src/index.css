@@ -638,3 +638,41 @@
   .landing-final-cta { margin-right: 16px; margin-left: 16px; }
 }
 
+@media (min-width: 701px) and (max-width: 880px) {
+  .landing-nav { gap: 10px; }
+  .landing-nav-links,
+  .landing-nav-actions { display: none; }
+  .landing-menu-toggle {
+    display: inline-flex;
+    width: 40px;
+    min-height: 40px;
+    padding: 0;
+  }
+  .landing-mobile-menu {
+    display: grid;
+    gap: 3px;
+    max-width: 1320px;
+    margin: 6px auto 0;
+    border: 1px solid rgba(174, 199, 236, .24);
+    border-radius: 15px;
+    padding: 8px;
+    background: rgba(7, 17, 37, .94);
+    box-shadow: 0 14px 36px -18px rgba(0, 0, 0, .72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  .landing-mobile-menu > button,
+  .landing-mobile-menu > div > button:first-child {
+    min-height: 42px;
+    border: 0;
+    border-radius: 10px;
+    padding: 0 11px;
+    background: transparent;
+    color: #D5E2F6;
+    text-align: left;
+  }
+  .landing-mobile-menu > button:hover { background: rgba(142, 176, 231, .12); }
+  .landing-mobile-menu > div { display: flex; gap: 8px; align-items: center; padding-top: 5px; }
+  .landing-mobile-menu > div > button { flex: 1; }
+}
+
