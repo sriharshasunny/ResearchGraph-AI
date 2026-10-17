@@ -103,4 +103,3 @@ export const Navbar: React.FC<{ onLogout?: () => void }> = ({ onLogout }) => {
     </>
   );
 };
-

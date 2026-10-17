@@ -1,10 +1,20 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ChatMessage, PageType, Paper } from '../types';
 
 export type ReadingStatus = 'to_read' | 'reading' | 'completed';
 
 export type UIMode = 'simple' | 'expert';
+
+const readSavedPapers = (): Paper[] => {
+  try {
+    const value = localStorage.getItem('researchgraph_saved_papers');
+    const parsed: unknown = value ? JSON.parse(value) : [];
+    return Array.isArray(parsed) ? parsed as Paper[] : [];
+  } catch {
+    return [];
+  }
+};
 
 interface AppContextType {
   activePage: PageType;
@@ -51,14 +61,14 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activePage, setActivePage] = useState<PageType>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
-  const [allPapers, setAllPapers] = useState<Paper[]>([]);
+  const [allPapers, setAllPapers] = useState<Paper[]>(readSavedPapers);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{
     id: 'welcome',
     sender: 'assistant',
-    content: 'Welcome to your ResearchGraph AI Copilot. I can synthesize literature across foundational papers, construct comparative benchmarks, extract methodology trade-offs, and map citations. Ground me in your saved library or query indexed papers directly.',
+    content: 'Ask a question about papers you have added to the research index. Answers use retrieved passages and show the source paper and page when available.',
     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }]);
-  const [savedPaperIds, setSavedPaperIds] = useState<string[]>([]);
+  const [savedPaperIds, setSavedPaperIds] = useState<string[]>(() => readSavedPapers().map(paper => paper.id));
   const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -119,7 +129,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setChatMessages([{
       id: 'welcome',
       sender: 'assistant',
-      content: 'Workspace chat cleared. How would you like to direct the research copilot next?',
+      content: 'Chat cleared. Add open-access papers from Research Search to the index, then ask a question grounded in their passages.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }]);
   };
@@ -169,6 +179,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return [...papersById.values()];
     });
   }, []);
+
+  useEffect(() => {
+    const savedPapers = allPapers.filter(paper => savedPaperIds.includes(paper.id));
+    try {
+      localStorage.setItem('researchgraph_saved_papers', JSON.stringify(savedPapers));
+    } catch {
+      // The in-memory saved-paper state remains available if browser storage is unavailable.
+    }
+  }, [allPapers, savedPaperIds]);
 
   return (
     <AppContext.Provider
@@ -220,4 +239,3 @@ export const useApp = () => {
   }
   return context;
 };
-

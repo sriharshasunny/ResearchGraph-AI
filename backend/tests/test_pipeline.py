@@ -179,4 +179,3 @@ def test_graph_failure_keeps_vector_stage_as_a_reported_partial_result(monkeypat
     assert status["stage"] == "knowledge_graph"
     assert status["vector_ready"] is True
     assert status["graph_ready"] is False
-

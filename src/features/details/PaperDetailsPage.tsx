@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { 
   Bookmark, MessageSquare, ExternalLink, 
   GitCompare, Network, Copy, Check, FileText, Share2,
   Sparkles, Tag, BookOpen, Download, ChevronRight, X
 } from 'lucide-react';
+import { getPaperDetails, getPaperGraph } from '../../services/api';
+import type { ResearchGraph } from '../../services/api';
+import type { Paper } from '../../types';
 
 export const PaperDetailsPage: React.FC = () => {
   const {
@@ -27,14 +30,39 @@ export const PaperDetailsPage: React.FC = () => {
   const [copiedCitation, setCopiedCitation] = useState(false);
   const [selectedCollection, setSelectedCollection] = useState<string>('Foundational Reading');
   const [isCollectionMenuOpen, setIsCollectionMenuOpen] = useState(false);
+  const [remotePaper, setRemotePaper] = useState<Paper | null>(null);
+  const [paperLoadError, setPaperLoadError] = useState<string | null>(null);
+  const [paperGraph, setPaperGraph] = useState<ResearchGraph | null>(null);
+  const [graphLoadError, setGraphLoadError] = useState<string | null>(null);
 
-  const paper = allPapers.find(p => p.id === selectedPaperId) || allPapers[0];
+  const localPaper = allPapers.find(p => p.id === selectedPaperId);
+  const paper = localPaper || (remotePaper?.id === selectedPaperId ? remotePaper : null);
+
+  useEffect(() => {
+    if (!selectedPaperId || localPaper) return;
+    let cancelled = false;
+    setPaperLoadError(null);
+    getPaperDetails(selectedPaperId).then(result => { if (!cancelled) setRemotePaper(result); })
+      .catch(error => { if (!cancelled) setPaperLoadError(error instanceof Error ? error.message : 'Paper metadata could not be loaded.'); });
+    return () => { cancelled = true; };
+  }, [selectedPaperId, localPaper]);
+
+  useEffect(() => {
+    if (!selectedPaperId) return;
+    let cancelled = false;
+    setPaperGraph(null);
+    setGraphLoadError(null);
+    getPaperGraph(selectedPaperId).then(result => { if (!cancelled) setPaperGraph(result); })
+      .catch(error => { if (!cancelled) setGraphLoadError(error instanceof Error ? error.message : 'Knowledge graph data is unavailable.'); });
+    return () => { cancelled = true; };
+  }, [selectedPaperId]);
 
   if (!paper) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-transparent">
         <FileText className="w-12 h-12 text-gray-400 mb-3" />
-        <h2 className="text-lg font-bold text-gray-800">No paper selected</h2>
+        <h2 className="text-lg font-bold text-gray-800">{selectedPaperId && !paperLoadError ? 'Loading paper details…' : selectedPaperId ? 'Paper details unavailable' : 'No paper selected'}</h2>
+        {paperLoadError && <p className="mt-2 max-w-md text-sm text-gray-600">{paperLoadError}</p>}
         <button
           onClick={() => setActivePage('search')}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-500 transition-colors"
@@ -48,6 +76,8 @@ export const PaperDetailsPage: React.FC = () => {
   const isSaved = savedPaperIds.includes(paper.id);
   const isCompared = comparisonPaperIds.includes(paper.id);
   const relatedPapers = allPapers.filter(p => p.id !== paper.id).slice(0, 4);
+  const graphLabelById = new Map((paperGraph?.nodes || []).map(node => [node.id, node.label]));
+  const paperGraphEdges = paperGraph?.edges || [];
 
   const collections = [
     'Foundational Reading',
@@ -59,11 +89,12 @@ export const PaperDetailsPage: React.FC = () => {
 
   // Formatted citations
   const year = paper.year;
-  const venue = paper.venue || 'arXiv';
+  const venue = paper.venue || paper.source || 'Publication venue unavailable';
+  const bibtexKey = paper.id.replace(/[^a-z0-9]/gi, '').slice(-24) || 'paper';
 
   const citationsRecord: Record<string, string> = {
-    bibtex: paper.bibtex || `@article{${paper.id},\n  title={${paper.title}},\n  author={${paper.authors.join(' and ')}},\n  journal={${venue}},\n  year={${year}}\n}`,
-    apa: `${paper.authors.join(', ')} (${year}). ${paper.title}. ${venue}. https://doi.org/${paper.doi || '10.48550/arXiv.' + paper.id}`,
+    bibtex: paper.bibtex || `@article{${bibtexKey},\n  title={${paper.title}},\n  author={${paper.authors.join(' and ')}},\n  journal={${venue}},\n  year={${year}}${paper.doi ? `,\n  doi={${paper.doi}}` : ''}\n}`,
+    apa: `${paper.authors.join(', ')} (${year || 'n.d.'}). ${paper.title}. ${venue}.${paper.doi ? ` https://doi.org/${paper.doi}` : paper.url ? ` ${paper.url}` : ''}`,
     mla: `${paper.authors.join(', ')}. "${paper.title}." ${venue}, ${year}.`,
     chicago: `${paper.authors.join(', ')}. "${paper.title}." ${venue} (${year}).`,
     ris: `TY  - JOUR\nTI  - ${paper.title}\nAU  - ${paper.authors.join('\nAU  - ')}\nPY  - ${year}\nJO  - ${venue}\nER  -`
@@ -99,8 +130,8 @@ export const PaperDetailsPage: React.FC = () => {
   };
 
   // TL;DR content by mode
-  const tldrSimple = paper.tldr || `This paper introduces a revolutionary architecture that processes entire input sequences in parallel, removing slow step-by-step recurrent bottlenecks and enabling computers to comprehend vast contextual relationships with unprecedented speed.`;
-  const tldrExpert = `Formalizes multi-head scaled dot-product attention mapping queries and key-value pairs of dimension d_k to an output vector with O(N² · d) sequence complexity. Eliminates sequential recurrence while preserving permutation sensitivity via sinusoidal positional encodings, optimized via AdamW with cosine decay and label smoothing (ε=0.1).`;
+  const tldrSimple = paper.tldr || 'No verified summary is available yet. Add this paper to the research index to ask questions grounded in its accessible text.';
+  const tldrExpert = paper.tldr || 'A verified technical summary is not available for this paper.';
 
   const tabs = [
     { id: 'overview', label: 'Overview' },
@@ -387,16 +418,7 @@ export const PaperDetailsPage: React.FC = () => {
                         </li>
                       ))
                     ) : (
-                      <>
-                        <li className="flex items-start gap-2.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0" />
-                          <span>Presents rigorous empirical evaluation validating scaling laws across multimodal tasks.</span>
-                        </li>
-                        <li className="flex items-start gap-2.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-blue-600 mt-2 shrink-0" />
-                          <span>Eliminates architectural bottlenecks, achieving significant training speedups.</span>
-                        </li>
-                      </>
+                      <li className="text-gray-500">No verified key findings are available from the indexed paper content yet.</li>
                     )}
                   </ul>
                 </div>
@@ -407,7 +429,7 @@ export const PaperDetailsPage: React.FC = () => {
                     Methodology &amp; benchmark architecture
                   </h2>
                   <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
-                    The framework builds on scalable representations with end-to-end differentiable loss functions. Optimization incorporates cosine decay scheduling with AdamW optimizer, demonstrating robust downstream transferability across both in-distribution and out-of-distribution evaluation suites.
+                    Methodology details have not been extracted from this paper. Add an accessible full text to the research index to retrieve evidence-backed methods.
                   </p>
                 </div>
 
@@ -417,7 +439,7 @@ export const PaperDetailsPage: React.FC = () => {
                     Limitations &amp; future directions
                   </h2>
                   <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
-                    While the model exhibits superior zero-shot performance, compute requirements during pre-training scale non-linearly with context length. Future extensions explore parameter-efficient adaptation, sparse attention patterns, and edge deployment constraints.
+                    Limitations and future directions are not available from the metadata record. They will appear here only when supported by indexed paper passages.
                   </p>
                 </div>
               </>
@@ -426,11 +448,8 @@ export const PaperDetailsPage: React.FC = () => {
             {activeTab === 'methodology' && (
               <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
                 <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">Mathematical formulation &amp; training pipeline</h2>
-                <div className="bg-gray-50 dark:bg-white/[0.04] p-4 rounded-xl font-mono text-[13px] text-gray-800 border border-gray-200 dark:border-white/[0.06]">
-                  Attention(Q, K, V) = softmax( (Q · K^T) / √d_k ) · V
-                </div>
                 <p className="text-[14px] text-gray-700 dark:text-gray-200 leading-relaxed">
-                  Scaled Dot-Product Attention allows high degree of parallelization during backward passes. The multi-head projection projects queries, keys, and values h times with learned linear projections.
+                  No verified methodology passages are indexed for this paper. Add the paper to the research index to enable passage-based analysis.
                 </p>
               </div>
             )}
@@ -438,32 +457,7 @@ export const PaperDetailsPage: React.FC = () => {
             {activeTab === 'results' && (
               <div className="bg-white dark:bg-[#111D35] rounded-2xl p-6 border border-gray-200 dark:border-white/[0.06] shadow-sm space-y-4">
                 <h2 className="text-[16px] font-bold text-gray-900 dark:text-white">Benchmark metrics &amp; ablation studies</h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-[13px] border-collapse">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-white/[0.06] text-gray-500 dark:text-gray-400 font-semibold">
-                        <th className="py-2.5">Evaluation benchmark</th>
-                        <th className="py-2.5">Baseline SOTA</th>
-                        <th className="py-2.5">This paper</th>
-                        <th className="py-2.5">Relative gain</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 text-gray-700 dark:text-gray-200">
-                      <tr>
-                        <td className="py-2.5 font-medium">Standard Primary Metric</td>
-                        <td className="py-2.5">26.3</td>
-                        <td className="py-2.5 font-bold text-blue-600">28.4</td>
-                        <td className="py-2.5 text-emerald-600 font-semibold">+8.0%</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2.5 font-medium">Training Wall-Clock Time</td>
-                        <td className="py-2.5">8.4 days</td>
-                        <td className="py-2.5 font-bold text-blue-600">3.5 days</td>
-                        <td className="py-2.5 text-emerald-600 font-semibold">2.4x Speedup</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
+                <p className="text-sm text-gray-600">No benchmark metrics have been extracted from indexed evidence for this paper.</p>
               </div>
             )}
 
@@ -540,11 +534,17 @@ export const PaperDetailsPage: React.FC = () => {
                     Open Full Graph Explorer →
                   </button>
                 </div>
-                <div className="h-64 rounded-xl bg-[#09152E] border border-white/10 flex items-center justify-center p-4">
-                  <div className="text-center space-y-2">
-                    <Network className="w-10 h-10 text-cyan-400 mx-auto animate-pulse" />
-                    <p className="text-[13px] text-gray-300 font-medium">Node linked to 14 foundational methodologies and 32 downstream variants.</p>
-                  </div>
+                <div className="min-h-56 rounded-xl bg-[#09152E] border border-white/10 p-4">
+                  {paperGraphEdges.length ? <div className="space-y-3">
+                    {paperGraphEdges.map(edge => <article key={edge.id} className="rounded-lg border border-white/10 bg-white/[0.04] p-3">
+                      <div className="flex flex-wrap items-center gap-2 text-sm"><span className="font-semibold text-cyan-200">{paper.title}</span><span className="rounded-full bg-blue-500/20 px-2 py-0.5 text-[10px] font-bold text-blue-200">{edge.relation}</span><span className="font-semibold text-violet-200">{graphLabelById.get(edge.source === paper.id ? edge.target : edge.source) || graphLabelById.get(edge.target) || 'Research entity'}</span></div>
+                      {edge.evidence && <p className="mt-2 text-xs leading-relaxed text-gray-300">Evidence: {edge.evidence}{edge.page ? ` · page ${edge.page}` : ''}</p>}
+                    </article>)}
+                  </div> : <div className="flex min-h-48 flex-col items-center justify-center text-center">
+                    <Network className="h-9 w-9 text-cyan-400" />
+                    <p className="mt-3 text-sm text-gray-300">{graphLoadError || 'No graph entities have been indexed for this paper yet.'}</p>
+                    <button type="button" onClick={() => setActivePage('search')} className="mt-3 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-500">Find paper in Search</button>
+                  </div>}
                 </div>
               </div>
             )}
@@ -563,23 +563,23 @@ export const PaperDetailsPage: React.FC = () => {
               <div className="space-y-3 text-[13px]">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Citations</span>
-                  <span className="font-bold text-gray-900 dark:text-white">{paper.citations.toLocaleString()}</span>
+                  <span className="font-bold text-gray-900 dark:text-white">{paper.citationCountAvailable === false ? 'Not provided' : paper.citations.toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Publication year</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{paper.year}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{paper.year || 'Not provided'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Venue / Archive</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">{paper.venue || 'arXiv'}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{paper.venue || paper.source || 'Not provided'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Research field</span>
-                  <span className="font-semibold text-blue-600">{paper.field || 'Artificial Intelligence'}</span>
+                  <span className="font-semibold text-blue-600">{paper.field || 'Not provided by source'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-500 dark:text-gray-400">Open access</span>
-                  <span className="font-bold text-emerald-600">Verified Open Access</span>
+                    <span className={`font-bold ${paper.openAccess ? 'text-emerald-600' : 'text-gray-500'}`}>{paper.openAccess ? 'Listed open access' : 'Not listed as open access'}</span>
                 </div>
               </div>
 
@@ -603,23 +603,12 @@ export const PaperDetailsPage: React.FC = () => {
                 </h3>
               </div>
 
-              <p className="text-[12px] text-gray-500 dark:text-gray-400">
-                Core semantic relationships extracted from academic index:
-              </p>
-
               <div className="space-y-2 pt-1">
-                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-between text-[12px]">
-                  <span className="text-gray-600 dark:text-gray-300 font-medium">USES</span>
-                  <span className="font-bold text-gray-900 dark:text-white">Self-Attention Mechanism</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-between text-[12px]">
-                  <span className="text-gray-600 dark:text-gray-300 font-medium">EVALUATED_ON</span>
-                  <span className="font-bold text-gray-900 dark:text-white">WMT 2014 &amp; ImageNet</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-100 dark:border-white/[0.04] flex items-center justify-between text-[12px]">
-                  <span className="text-gray-600 dark:text-gray-300 font-medium">IMPROVES</span>
-                  <span className="font-bold text-gray-900 dark:text-white">Recurrent Encoders</span>
-                </div>
+                {paperGraphEdges.slice(0, 4).map(edge => <div key={edge.id} className="rounded-xl border border-gray-100 bg-gray-50 p-2.5 text-[12px]">
+                  <div className="flex items-center justify-between gap-2"><span className="font-medium text-gray-500">{edge.relation.replaceAll('_', ' ')}</span><span className="text-right font-bold text-gray-900">{graphLabelById.get(edge.source === paper.id ? edge.target : edge.source) || graphLabelById.get(edge.target) || 'Research entity'}</span></div>
+                  {edge.evidence && <p className="mt-1 line-clamp-2 text-[11px] text-gray-500">{edge.evidence}{edge.page ? ` · page ${edge.page}` : ''}</p>}
+                </div>)}
+                {!paperGraphEdges.length && <p className="rounded-xl bg-gray-50 p-3 text-[12px] text-gray-500">{graphLoadError || 'No indexed graph relationships are available for this paper yet.'}</p>}
               </div>
 
               <button

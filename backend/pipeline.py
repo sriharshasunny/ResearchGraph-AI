@@ -688,4 +688,3 @@ def health_status() -> dict[str, Any]:
         },
         "private_uploads": False,
     }
-

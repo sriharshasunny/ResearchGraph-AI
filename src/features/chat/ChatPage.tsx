@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useApp } from '../../context/AppContext';
 import type { ChatMessage, Paper } from '../../types';
 import {
@@ -8,6 +8,7 @@ import {
   Pin, Edit2, RotateCcw, X, GitCompare, Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { askResearchQuestion } from '../../services/api';
 
 interface SessionItem {
   id: string;
@@ -26,6 +27,7 @@ export const ChatPage: React.FC = () => {
     searchQuery,
     setSearchQuery,
     allPapers,
+    selectedPaperId,
     comparisonPaperIds,
     toggleComparisonPaper
   } = useApp();
@@ -37,10 +39,9 @@ export const ChatPage: React.FC = () => {
   const [showMobileSources, setShowMobileSources] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState('s1');
   const [copiedMsgId, setCopiedMsgId] = useState<string | null>(null);
-  const [activeCitationPopover, setActiveCitationPopover] = useState<{ id: string; x: number; y: number } | null>(null);
   
   // Research Context Papers
-  const [contextPaperIds, setContextPaperIds] = useState<string[]>(['p3', 'p4', 'p2']);
+  const [contextPaperIds, setContextPaperIds] = useState<string[]>(() => selectedPaperId ? [selectedPaperId] : []);
   const [isAddContextModalOpen, setIsAddContextModalOpen] = useState(false);
 
   // Sessions state with Pin, Rename, Delete
@@ -53,9 +54,10 @@ export const ChatPage: React.FC = () => {
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
+  const latestCitations = [...chatMessages].reverse().find(message => message.sender === 'assistant' && message.citations?.length)?.citations || [];
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const streamTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const requestControllerRef = useRef<AbortController | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,52 +67,14 @@ export const ChatPage: React.FC = () => {
     scrollToBottom();
   }, [chatMessages, isTyping, isStreaming]);
 
-  // Clean up streaming on unmount
+  // Cancel an in-flight request when leaving the chat.
   useEffect(() => {
     return () => {
-      if (streamTimerRef.current) clearInterval(streamTimerRef.current);
+      requestControllerRef.current?.abort();
     };
   }, []);
 
-  // Handle incoming query from other pages
-  useEffect(() => {
-    if (searchQuery && searchQuery.trim().length > 0) {
-      handleSendMessage(searchQuery);
-      setSearchQuery('');
-    }
-  }, [searchQuery]);
-
-  const sources: Record<string, { title: string; authors: string; year: number; match: string; type: string; quote: string; paperId: string }> = {
-    '[1]': {
-      title: 'DINOv2: Learning Robust Visual Features without Supervision',
-      authors: 'M. Oquab et al.',
-      year: 2023,
-      match: '95%',
-      type: 'Model & Architecture',
-      quote: 'Self-distillation directly produces task-agnostic dense representations superior to supervised baselines on linear probing without fine-tuning.',
-      paperId: 'p3'
-    },
-    '[2]': {
-      title: 'Masked Autoencoders Are Scalable Vision Learners (MAE)',
-      authors: 'K. He et al.',
-      year: 2022,
-      match: '92%',
-      type: 'Pre-training Strategy',
-      quote: 'Masking a high ratio (75%) of random visual patches enables accelerated, scalable pre-training that transfers with fine-tuning to SOTA accuracy.',
-      paperId: 'p4'
-    },
-    '[3]': {
-      title: 'An Image is Worth 16x16 Words: Transformers for Image Recognition',
-      authors: 'A. Dosovitskiy et al.',
-      year: 2020,
-      match: '88%',
-      type: 'Foundational Baseline',
-      quote: 'When pre-trained on large amounts of data and transferred to mid-size or small image recognition benchmarks, ViT achieves excellent results.',
-      paperId: 'p2'
-    }
-  };
-
-  const handleSendMessage = (textToSend?: string) => {
+  const handleSendMessage = useCallback(async (textToSend?: string) => {
     const content = textToSend || prompt;
     if (!content.trim() || isStreaming) return;
 
@@ -124,85 +88,55 @@ export const ChatPage: React.FC = () => {
     addChatMessage(userMsg);
     setPrompt('');
     setIsTyping(true);
-
-    let targetAiContent = `Based on literature indexing across the research corpus, **DINOv2** and **MAE** represent distinct self-supervised paradigms for Vision Transformers:
-
-### 1. Training Objectives & Supervision
-- **DINOv2** [1] utilizes discriminative student-teacher distillation with a combination of image-level and patch-level contrastive losses.
-- **Masked Autoencoders (MAE)** [2] use generative masked autoencoding with asymmetric encoder-decoder architectures, reconstructing 75% masked pixels.
-
-### 2. Empirical Benchmark Comparison
-| Metric / Characteristic | DINOv2 (Oquab et al., 2023) | MAE (He et al., 2022) |
-| :--- | :--- | :--- |
-| **Primary Objective** | Self-distillation + DINO/iBOT | Masked Pixel Reconstruction |
-| **Downstream Transfer** | Out-of-the-box linear probing SOTA | Requires fine-tuning for SOTA |
-| **Dataset Requirement** | LVD-142M curated data | Standard ImageNet-1K / ImageNet-22K |
-| **Feature Properties** | Dense semantic representations | Reconstructive low-level features |
-
-### 3. Key Takeaway
-If you require frozen visual embeddings without fine-tuning, **DINOv2** is superior. For downstream fine-tuning with limited labeled data, **MAE** offers simpler compute scaling [3].`;
-
-    if (content.toLowerCase().includes('rag')) {
-      targetAiContent = `Retrieval-Augmented Generation (RAG) integrates non-parametric vector retrieval with parametric autoregressive generators:
-
-### 1. Architectural Foundations
-- **Dense Vector Retrieval:** Queries are mapped to dense embeddings using encoders fine-tuned on contrastive semantic relevance [1].
-- **GraphRAG Subgraph Traversal:** Injects topological relationships and community clusters to resolve synthesis queries that naive semantic search misses [2].
-
-### 2. Empirical Reliability
-Grounded RAG pipelines reduce hallucinations by enforcing explicit attribution constraints, ensuring every synthesized claim cites a verifiable peer-reviewed DOI.`;
-    } else if (content.toLowerCase().includes('attention') || content.toLowerCase().includes('transformer')) {
-      targetAiContent = `The Multi-Head Attention mechanism formalizes sequence mapping as:
-
-$$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V$$
-
-- **Computational Scaling:** Evaluates all pairwise token dependencies in parallel ($O(N^2)$ memory and compute) [3].
-- **Multi-Head Projections:** Computes $h$ independent subspaces, allowing the model to jointly attend to information from different representation subspaces at different positions.`;
-    }
-
-    // Prepare assistant message and stream
-    setTimeout(() => {
-      setIsTyping(false);
-      setIsStreaming(true);
-
-      const assistantMsgId = `ai-${Date.now()}`;
-      const words = targetAiContent.split(' ');
-      let currentWordIndex = 0;
-      let streamedText = '';
-
-      const initialAssistantMsg: ChatMessage = {
-        id: assistantMsgId,
+    setIsStreaming(true);
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
+    try {
+      const response = await askResearchQuestion(content.trim(), contextPaperIds, controller.signal);
+      addChatMessage({
+        id: `ai-${Date.now()}`,
         sender: 'assistant',
-        content: '',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      };
-      addChatMessage(initialAssistantMsg);
+        content: response.answer,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        answerType: response.answer_type,
+        citations: response.citations.map(citation => ({
+          id: citation.paper_id,
+          index: citation.index,
+          title: citation.title,
+          url: citation.url || undefined,
+          doi: citation.doi || undefined,
+          page: citation.page,
+          section: citation.section,
+          supportingPassage: citation.supporting_passage,
+        })),
+      });
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      addChatMessage({
+        id: `ai-${Date.now()}`,
+        sender: 'assistant',
+        content: error instanceof Error ? error.message : 'The research backend could not answer this question.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        answerType: 'error',
+      });
+    } finally {
+      if (requestControllerRef.current === controller) requestControllerRef.current = null;
+      setIsTyping(false);
+      setIsStreaming(false);
+    }
+  }, [addChatMessage, contextPaperIds, isStreaming, prompt]);
 
-      streamTimerRef.current = setInterval(() => {
-        if (currentWordIndex < words.length) {
-          streamedText += (currentWordIndex === 0 ? '' : ' ') + words[currentWordIndex];
-          currentWordIndex++;
-          
-          // Update in-place
-          addChatMessage({
-            id: assistantMsgId,
-            sender: 'assistant',
-            content: streamedText,
-            timestamp: initialAssistantMsg.timestamp
-          });
-        } else {
-          if (streamTimerRef.current) clearInterval(streamTimerRef.current);
-          setIsStreaming(false);
-        }
-      }, 35);
-    }, 600);
-  };
+  // Handle incoming query from other pages.
+  useEffect(() => {
+    if (searchQuery && searchQuery.trim().length > 0) {
+      void handleSendMessage(searchQuery);
+      setSearchQuery('');
+    }
+  }, [searchQuery, setSearchQuery, handleSendMessage]);
 
   const handleStopStreaming = () => {
-    if (streamTimerRef.current) {
-      clearInterval(streamTimerRef.current);
-      streamTimerRef.current = null;
-    }
+    requestControllerRef.current?.abort();
+    requestControllerRef.current = null;
     setIsStreaming(false);
     setIsTyping(false);
   };
@@ -466,11 +400,11 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
               className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 dark:text-gray-200 text-[11px] font-semibold"
             >
               <BookOpen className="w-3.5 h-3.5 text-blue-600" />
-              <span>Sources ({Object.keys(sources).length})</span>
+              <span>Sources ({latestCitations.length})</span>
             </button>
             <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Grounded in Peer-Reviewed Index
+              Citations appear when indexed evidence is available
             </span>
           </div>
         </div>
@@ -532,7 +466,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                   <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-white/[0.04]">
                     <div className="flex items-center gap-2">
                       <span className="text-[11px] font-bold text-blue-600 tracking-wider">
-                        ResearchGraph Intelligence
+                        {msg.answerType === 'retrieval_only' ? 'Retrieved research evidence' : msg.answerType === 'insufficient_context' ? 'Evidence check' : msg.answerType === 'error' ? 'Research service' : 'ResearchGraph grounded answer'}
                       </span>
                       <span className="text-[11px] text-gray-400">· {msg.timestamp}</span>
                     </div>
@@ -569,34 +503,23 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
                         </div>
                       );
                     }
-                    return (
-                      <p key={i}>
-                        {block.split(/(\[\d+\])/g).map((chunk, j) => {
-                          if (chunk === '[1]' || chunk === '[2]' || chunk === '[3]') {
-                            const src = sources[chunk];
-                            return (
-                              <span key={j} className="relative inline-block mx-0.5">
-                                <button
-                                  onClick={() => handleOpenSource(src?.paperId || 'p1')}
-                                  onMouseEnter={(e) => {
-                                    const rect = e.currentTarget.getBoundingClientRect();
-                                    setActiveCitationPopover({ id: chunk, x: rect.left, y: rect.top });
-                                  }}
-                                  onMouseLeave={() => setActiveCitationPopover(null)}
-                                  className="inline-flex items-center px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-bold font-mono text-[11px] hover:bg-blue-200 cursor-pointer transition-colors"
-                                  title={src?.title}
-                                >
-                                  {chunk} {src?.authors || 'Citation'}
-                                </button>
-                              </span>
-                            );
-                          }
-                          return chunk;
-                        })}
-                      </p>
-                    );
+                    return <p key={i}>{block}</p>;
                   })}
                 </div>
+
+                {msg.citations && msg.citations.length > 0 && <div className="mt-4 border-t border-gray-100 pt-3">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">Retrieved sources</p>
+                  <div className="flex flex-col gap-2">
+                    {msg.citations.map(citation => <div key={`${msg.id}-${citation.index}`} className="rounded-lg border border-blue-100 bg-blue-50/60 p-2.5 text-[11px]">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <button type="button" onClick={() => handleOpenSource(citation.id)} className="text-left font-semibold text-blue-800 hover:underline">[{citation.index}] {citation.title}</button>
+                        <span className="text-gray-500">{citation.page ? `Page ${citation.page}` : citation.section || 'Paper passage'}</span>
+                      </div>
+                      {citation.supportingPassage && <p className="mt-1 line-clamp-3 text-gray-600">{citation.supportingPassage}</p>}
+                      {citation.url && <a href={citation.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-blue-700 hover:underline"><ExternalLink className="h-3 w-3" /> Original source</a>}
+                    </div>)}
+                  </div>
+                </div>}
 
                 {msg.sender === 'user' && (
                   <div className="text-right text-[10px] text-blue-200 mt-1">
@@ -755,7 +678,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
             </h2>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
-                {Object.keys(sources).length} VERIFIED
+                {latestCitations.length} SOURCES
               </span>
               {showMobileSources && (
                 <button
@@ -769,39 +692,39 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
           </div>
 
           <p className="text-[11px] text-gray-500 dark:text-gray-400">
-            Every statement generated by the assistant is grounded in indexed academic papers:
+            Sources from the latest answer are shown here with retrieved passages:
           </p>
 
           <div className="space-y-3">
-            {Object.entries(sources).map(([citeKey, src]) => (
+            {latestCitations.map(src => (
               <div
-                key={citeKey}
+                key={`${src.index}-${src.id}`}
                 className="p-3.5 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]/70 hover:bg-white dark:bg-[#111D35] hover:border-blue-300 hover:shadow-sm transition-all space-y-2"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-mono font-extrabold text-blue-600 bg-white dark:bg-[#111D35] px-2 py-0.5 rounded-md border border-gray-200 dark:border-white/[0.06]">
-                    {citeKey} {src.match} MATCH
+                    [{src.index}]
                   </span>
-                  <span className="text-[10px] font-medium text-gray-400">{src.year}</span>
+                  <span className="text-[10px] font-medium text-gray-400">{src.page ? `Page ${src.page}` : src.section || 'Passage'}</span>
                 </div>
 
                 <h4 className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug line-clamp-2">
                   {src.title}
                 </h4>
 
-                <p className="text-[11px] text-gray-500 dark:text-gray-400">{src.authors}</p>
+                {src.supportingPassage && <p className="line-clamp-4 text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">{src.supportingPassage}</p>}
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] font-medium text-gray-400">{src.type}</span>
+                  <span className="text-[10px] font-medium text-gray-400">Indexed evidence passage</span>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => toggleComparisonPaper(src.paperId)}
+                      onClick={() => toggleComparisonPaper(src.id)}
                       className="text-[11px] font-semibold text-purple-600 hover:text-purple-700 transition-colors"
                     >
-                      {comparisonPaperIds.includes(src.paperId) ? 'In Compare' : '+ Compare'}
+                      {comparisonPaperIds.includes(src.id) ? 'In Compare' : '+ Compare'}
                     </button>
                     <button
-                      onClick={() => handleOpenSource(src.paperId)}
+                      onClick={() => handleOpenSource(src.id)}
                       className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700"
                     >
                       <span>Open</span>
@@ -817,7 +740,7 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
         <div className="pt-4 border-t border-gray-100 dark:border-white/[0.04]">
           <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-blue-900 leading-relaxed">
             <span className="font-bold block mb-0.5">Academic Verification</span>
-            Answers are grounded in peer-reviewed literature. Verify critical findings before publication.
+            Answers are generated only when matching indexed passages are available. Check each source passage before relying on a claim.
           </div>
         </div>
       </aside>
@@ -894,30 +817,6 @@ $$\\text{Attention}(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\
               })}
             </div>
           </div>
-        </div>
-      )}
-
-      {/* ── CITATION POPOVER ON HOVER ── */}
-      {activeCitationPopover && sources[activeCitationPopover.id] && (
-        <div
-          className="fixed z-50 bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl shadow-xl p-4 max-w-sm pointer-events-none transition-all"
-          style={{
-            left: `${Math.min(activeCitationPopover.x, window.innerWidth - 320)}px`,
-            top: `${Math.max(activeCitationPopover.y - 120, 20)}px`
-          }}
-        >
-          <div className="text-[10px] font-mono font-bold text-blue-600 uppercase mb-1">
-            {sources[activeCitationPopover.id].match} Match · {sources[activeCitationPopover.id].year}
-          </div>
-          <h4 className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug">
-            {sources[activeCitationPopover.id].title}
-          </h4>
-          <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-            {sources[activeCitationPopover.id].authors}
-          </p>
-          <p className="text-[11px] text-gray-700 dark:text-gray-200 italic bg-gray-50 dark:bg-white/[0.04] p-2 rounded-lg mt-2 border border-gray-100 dark:border-white/[0.04]">
-            "{sources[activeCitationPopover.id].quote}"
-          </p>
         </div>
       )}
 

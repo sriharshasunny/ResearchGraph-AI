@@ -24,42 +24,19 @@ import {
 import type { EdgeProps } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { forceSimulation, forceManyBody, forceLink, forceCenter, forceCollide } from 'd3-force';
+import { getResearchGraph } from '../../services/api';
 
 // --- DATA TYPES ---
 interface EntityData {
   id: string;
   label: string;
-  type: 'Paper' | 'Author' | 'Dataset' | 'Method' | 'Model' | 'Concept';
+  type: string;
   usedBy?: string;
   related?: string[];
   datasets?: string[];
   paperId?: string;
+  sourceUrl?: string;
 }
-
-const rawNodes: EntityData[] = [
-  { id: 'dinov2', label: 'DINOv2', type: 'Model', usedBy: '24 papers', related: ['Vision Transformer', 'Self-Supervised Learning', 'MAE'], datasets: ['ImageNet-1K', 'LVD-142M'], paperId: 'p3' },
-  { id: 'mae', label: 'MAE (Masked Autoencoders)', type: 'Model', usedBy: '38 papers', related: ['Vision Transformer', 'Pixel Reconstruction'], datasets: ['ImageNet-1K'], paperId: 'p4' },
-  { id: 'attention', label: 'Attention Is All You Need', type: 'Paper', usedBy: '114,850 citations', related: ['Multi-Head Attention', 'Transformer Encoder'], datasets: ['WMT 2014 En-De'], paperId: 'p1' },
-  { id: 'vit', label: 'Vision Transformer (ViT)', type: 'Concept', usedBy: '32,410 citations', related: ['Patch Projection', 'Attention Is All You Need'], datasets: ['ImageNet-1K', 'JFT-300M'], paperId: 'p2' },
-  { id: 'deepseek_r1', label: 'DeepSeek-R1', type: 'Model', usedBy: '12 papers', related: ['GRPO Algorithm', 'Test-Time Compute', 'Multi-Head Attention'], datasets: ['MATH-500', 'AIME 2024'], paperId: 'p5' },
-  { id: 'vaswani', label: 'Ashish Vaswani', type: 'Author', usedBy: 'Transformer Architectures', related: ['Attention Is All You Need'] },
-  { id: 'oquab', label: 'Maxime Oquab', type: 'Author', usedBy: 'DINOv2, Self-Supervised Learning', related: ['DINOv2'] },
-  { id: 'imagenet', label: 'ImageNet-1K', type: 'Dataset', usedBy: '1,200+ publications', related: ['ViT', 'MAE', 'DINOv2'] },
-  { id: 'grpo', label: 'GRPO Optimization', type: 'Method', usedBy: 'DeepSeek-R1', related: ['Reinforcement Learning', 'DeepSeek-R1'] },
-];
-
-const rawEdges = [
-  { source: 'dinov2', target: 'vit', relation: 'USES', verb: 'uses' },
-  { source: 'mae', target: 'vit', relation: 'USES', verb: 'uses' },
-  { source: 'vit', target: 'attention', relation: 'BUILDS_ON', verb: 'builds upon' },
-  { source: 'deepseek_r1', target: 'attention', relation: 'BUILDS_ON', verb: 'builds upon' },
-  { source: 'deepseek_r1', target: 'grpo', relation: 'USES', verb: 'uses' },
-  { source: 'attention', target: 'vaswani', relation: 'AUTHORED_BY', verb: 'authored by' },
-  { source: 'dinov2', target: 'oquab', relation: 'AUTHORED_BY', verb: 'authored by' },
-  { source: 'dinov2', target: 'imagenet', relation: 'EVALUATED_ON', verb: 'evaluated on' },
-  { source: 'mae', target: 'imagenet', relation: 'EVALUATED_ON', verb: 'evaluated on' },
-  { source: 'dinov2', target: 'mae', relation: 'RELATED_TO', verb: 'related to' },
-];
 
 const nodeColorMap = {
   Model: { bg: '#2563EB', text: '#BFDBFE', border: '#60A5FA', glow: 'rgba(37,99,235,0.4)' },
@@ -68,11 +45,13 @@ const nodeColorMap = {
   Author: { bg: '#D97706', text: '#FDE68A', border: '#FBBF24', glow: 'rgba(217,119,6,0.4)' },
   Paper: { bg: '#0891B2', text: '#CFFAFE', border: '#22D3EE', glow: 'rgba(8,145,178,0.4)' },
   Method: { bg: '#4F46E5', text: '#C7D2FE', border: '#818CF8', glow: 'rgba(79,70,229,0.4)' },
+  Algorithm: { bg: '#4F46E5', text: '#C7D2FE', border: '#818CF8', glow: 'rgba(79,70,229,0.4)' },
+  ResearchTask: { bg: '#DB2777', text: '#FBCFE8', border: '#F472B6', glow: 'rgba(219,39,119,0.4)' },
 };
 
 // --- CUSTOM NODE ---
 const EntityNode = ({ data, selected }: any) => {
-  const colors = nodeColorMap[data.type as keyof typeof nodeColorMap];
+  const colors = nodeColorMap[data.type as keyof typeof nodeColorMap] || nodeColorMap.Concept;
   const { uiMode } = useApp();
   const isExpert = uiMode === 'expert';
 
@@ -153,12 +132,32 @@ const GraphCanvas = () => {
   const [filterType, setFilterType] = useState<string>('All');
   const [searchQueryLocal, setSearchQueryLocal] = useState('');
   const [isLegendOpen, setIsLegendOpen] = useState(true);
+  const [graphItems, setGraphItems] = useState<EntityData[]>([]);
+  const [graphEdges, setGraphEdges] = useState<Array<{ source: string; target: string; relation: string; evidence?: string; page?: number }>>([]);
+  const [graphLoading, setGraphLoading] = useState(true);
+  const [graphError, setGraphError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getResearchGraph().then(data => {
+      if (cancelled) return;
+      setGraphItems(data.nodes.map(node => ({ id: node.id, label: node.label, type: node.type, paperId: node.paperId, sourceUrl: node.sourceUrl })));
+      setGraphEdges(data.edges);
+    }).catch(error => {
+      if (!cancelled) setGraphError(error instanceof Error ? error.message : 'Knowledge graph service is unavailable.');
+    }).finally(() => { if (!cancelled) setGraphLoading(false); });
+    return () => { cancelled = true; };
+  }, []);
 
   // Initialize nodes and edges with d3-force
   useEffect(() => {
     // Setup D3 Force Simulation
-    const simulationNodes = rawNodes.map(n => ({ ...n, x: Math.random() * 500, y: Math.random() * 500 }));
-    const simulationLinks = rawEdges.map(e => ({ source: e.source, target: e.target, relation: e.relation, verb: e.verb }));
+    if (!graphItems.length) { setNodes([]); setEdges([]); return; }
+    const simulationNodes = graphItems.map((node, index) => {
+      const angle = (index / graphItems.length) * Math.PI * 2;
+      return { ...node, x: 420 + Math.cos(angle) * 220, y: 300 + Math.sin(angle) * 180 };
+    });
+    const simulationLinks = graphEdges.map(edge => ({ source: edge.source, target: edge.target, relation: edge.relation, evidence: edge.evidence, page: edge.page }));
 
     const simulation = forceSimulation(simulationNodes as any)
       .force('link', forceLink(simulationLinks).id((d: any) => d.id).distance(150))
@@ -182,8 +181,8 @@ const GraphCanvas = () => {
       source: e.source.id || e.source,
       target: e.target.id || e.target,
       type: 'relation',
-      data: { relation: e.relation, verb: e.verb, isSelected: false },
-      animated: e.relation === 'USES' || e.relation === 'BUILDS_ON',
+      data: { relation: e.relation, evidence: e.evidence, page: e.page, isSelected: false },
+      animated: false,
       style: { stroke: '#334155', strokeWidth: 1.5, opacity: 0.6 },
     }));
 
@@ -193,13 +192,13 @@ const GraphCanvas = () => {
     setTimeout(() => {
       fitView({ padding: 0.2, duration: 800 });
     }, 50);
-  }, []);
+  }, [graphItems, graphEdges, setNodes, setEdges, fitView]);
 
   // Handle Selection & Hover styles
   useEffect(() => {
     setNodes(nds => nds.map(n => {
       const isSelected = n.id === selectedNodeId;
-      const isDimmed = (filterType !== 'All' && n.data.type !== filterType) || (selectedNodeId && n.id !== selectedNodeId && !rawEdges.some(e => (e.source === selectedNodeId && e.target === n.id) || (e.target === selectedNodeId && e.source === n.id)));
+      const isDimmed = (filterType !== 'All' && n.data.type !== filterType) || (selectedNodeId && n.id !== selectedNodeId && !graphEdges.some(e => (e.source === selectedNodeId && e.target === n.id) || (e.target === selectedNodeId && e.source === n.id)));
       
       return {
         ...n,
@@ -222,7 +221,7 @@ const GraphCanvas = () => {
         }
       };
     }));
-  }, [selectedNodeId, filterType]);
+  }, [selectedNodeId, filterType, graphEdges, setNodes, setEdges]);
 
   const onNodeClick = (_e: React.MouseEvent, node: any) => {
     setSelectedNodeId(node.id === selectedNodeId ? null : node.id);
@@ -234,7 +233,7 @@ const GraphCanvas = () => {
 
   const handleExport = () => {
     // Mock export
-    const data = JSON.stringify({ nodes: rawNodes, edges: rawEdges }, null, 2);
+    const data = JSON.stringify({ nodes: graphItems, edges: graphEdges }, null, 2);
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -243,7 +242,7 @@ const GraphCanvas = () => {
     a.click();
   };
 
-  const selectedNodeData = rawNodes.find(n => n.id === selectedNodeId);
+  const selectedNodeData = graphItems.find(n => n.id === selectedNodeId);
 
   return (
     <div className="w-full h-full relative flex">
@@ -274,7 +273,7 @@ const GraphCanvas = () => {
               value={searchQueryLocal}
               onChange={(e) => {
                 setSearchQueryLocal(e.target.value);
-                const match = rawNodes.find(n => n.label.toLowerCase().includes(e.target.value.toLowerCase()));
+                const match = graphItems.find(n => n.label.toLowerCase().includes(e.target.value.toLowerCase()));
                 if (match && e.target.value.length > 2) setSelectedNodeId(match.id);
               }}
               className="pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#111D35]/90 dark:bg-[#09152E]/90 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 text-[12px] text-gray-900 dark:text-white dark:text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 backdrop-blur-md w-48 sm:w-60 shadow-lg"
@@ -332,11 +331,20 @@ const GraphCanvas = () => {
         <Background color={'#E2E8F0'} gap={16} />
         <Controls className="bg-white dark:bg-[#111D35] dark:bg-[#09152E] border-gray-200 dark:border-white/[0.06] dark:border-gray-800 rounded-xl shadow-lg fill-gray-600 dark:fill-gray-400" />
         <MiniMap 
-          nodeColor={(n: any) => nodeColorMap[n.data.type as keyof typeof nodeColorMap].bg}
+          nodeColor={(n: any) => (nodeColorMap[n.data.type as keyof typeof nodeColorMap] || nodeColorMap.Concept).bg}
           maskColor={'rgba(249, 250, 251, 0.7)'}
           className="bg-white dark:bg-[#111D35] dark:bg-[#09152E] border-gray-200 dark:border-white/[0.06] dark:border-gray-800 rounded-xl shadow-lg"
         />
       </ReactFlow>
+
+      {(graphLoading || graphError || graphItems.length === 0) && <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/80 p-6 backdrop-blur-[2px] dark:bg-[#06111F]/80">
+        <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-lg dark:border-white/10 dark:bg-[#111D35]">
+          <Network className="mx-auto h-8 w-8 text-blue-600" />
+          <h2 className="mt-3 text-base font-bold text-slate-900 dark:text-white">{graphLoading ? 'Loading indexed research graph…' : graphError ? 'Knowledge graph is unavailable' : 'Your graph is ready to grow'}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{graphLoading ? 'Loading real entities and relationships from the research database.' : graphError || 'No indexed paper relationships are available yet. Add an open-access paper from Research Search to build a graph with evidence.'}</p>
+          {!graphLoading && <button type="button" onClick={() => setActivePage('search')} className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Search papers</button>}
+        </div>
+      </div>}
 
       {/* ── GRAPH SIDE PANEL ── */}
       <AnimatePresence>

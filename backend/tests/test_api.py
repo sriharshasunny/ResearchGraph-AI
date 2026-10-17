@@ -52,4 +52,3 @@ def test_knowledge_graph_api_returns_only_service_graph_records(monkeypatch):
     response = client.get("/api/graph")
     assert response.status_code == 200
     assert response.json() == graph
-

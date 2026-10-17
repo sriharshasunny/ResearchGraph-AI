@@ -456,4 +456,3 @@ export const ResearchKnowledgeCore: React.FC = () => {
     </div>
   );
 };
-

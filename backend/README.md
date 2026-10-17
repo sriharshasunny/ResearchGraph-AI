@@ -23,4 +23,3 @@ uvicorn main:app --reload --port 8000
 ```
 
 Alternatively, from the repository root, run `uvicorn backend.main:app --reload --port 8000`.
-

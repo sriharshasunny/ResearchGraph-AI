@@ -40,4 +40,3 @@ services:
         value: neo4j
       - key: RESEARCHGRAPH_DATA_DIR
         value: /tmp/researchgraph-data
-

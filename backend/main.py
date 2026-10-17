@@ -193,4 +193,3 @@ def literature_review():
 @app.post("/api/compare")
 def compare_papers():
     raise HTTPException(status_code=501, detail="Paper comparison generation is not yet connected to indexed evidence.")
-
