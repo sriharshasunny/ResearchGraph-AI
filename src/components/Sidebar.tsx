@@ -18,15 +18,15 @@ import { ProfileModal } from './ProfileModal';
 import { SettingsModal } from './SettingsModal';
 
 const navItems = [
-  { id: 'dashboard', label: 'Home', rail: 'Home', icon: Home },
-  { id: 'search', label: 'Search Papers', rail: 'Search', icon: Search },
-  { id: 'chat', label: 'AI Research Assistant', rail: 'Chat', icon: MessageSquare },
-  { id: 'graph', label: 'Knowledge Graph', rail: 'Graph', icon: Network },
-  { id: 'compare', label: 'Compare Papers', rail: 'Compare', icon: GitCompare },
-  { id: 'literature', label: 'Literature Review', rail: 'Review', icon: BookOpen },
-  { id: 'gaps', label: 'Research Gaps', rail: 'Gaps', icon: Activity },
-  { id: 'saved', label: 'Saved Papers', rail: 'Saved', icon: Bookmark },
-  { id: 'history', label: 'History', rail: 'History', icon: Clock3 },
+  { id: 'dashboard', label: 'Home', rail: 'Home', icon: Home, accent: 'text-blue-600 bg-blue-100/80' },
+  { id: 'search', label: 'Search Papers', rail: 'Search', icon: Search, accent: 'text-fuchsia-600 bg-fuchsia-100/80' },
+  { id: 'chat', label: 'AI Research Assistant', rail: 'Chat', icon: MessageSquare, accent: 'text-violet-600 bg-violet-100/80' },
+  { id: 'graph', label: 'Knowledge Graph', rail: 'Graph', icon: Network, accent: 'text-emerald-600 bg-emerald-100/80' },
+  { id: 'compare', label: 'Compare Papers', rail: 'Compare', icon: GitCompare, accent: 'text-orange-500 bg-orange-100/80' },
+  { id: 'literature', label: 'Literature Review', rail: 'Review', icon: BookOpen, accent: 'text-purple-600 bg-purple-100/80' },
+  { id: 'gaps', label: 'Research Gaps', rail: 'Gaps', icon: Activity, accent: 'text-cyan-600 bg-cyan-100/80' },
+  { id: 'saved', label: 'Saved Papers', rail: 'Saved', icon: Bookmark, accent: 'text-rose-600 bg-rose-100/80' },
+  { id: 'history', label: 'History', rail: 'History', icon: Clock3, accent: 'text-amber-500 bg-amber-100/80' },
 ] as const;
 
 export const Sidebar: React.FC = () => {
@@ -40,7 +40,7 @@ export const Sidebar: React.FC = () => {
     if (isSidebarOpen) toggleSidebar();
   }, [isSidebarOpen, setActivePage, toggleSidebar]);
 
-  const utilityButton = (label: string, Icon: typeof Settings, onClick: () => void) => (
+  const utilityButton = (label: string, Icon: typeof Settings, onClick: () => void, accent: string) => (
     <button
       key={label}
       type="button"
@@ -52,7 +52,9 @@ export const Sidebar: React.FC = () => {
       onBlur={() => setTooltip(null)}
       className={`relative flex h-10 items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSidebarOpen ? 'w-full gap-3 px-3' : 'mx-auto w-10 justify-center'}`}
     >
-      <Icon className="h-[18px] w-[18px] shrink-0 stroke-[1.8]" />
+      <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${accent}`}>
+        <Icon className="h-[18px] w-[18px] stroke-[1.9]" />
+      </span>
       <span className={`overflow-hidden whitespace-nowrap text-left text-xs font-medium transition-all duration-200 ${isSidebarOpen ? 'max-w-44 opacity-100' : 'max-w-0 opacity-0'}`}>{label}</span>
     </button>
   );
@@ -61,7 +63,7 @@ export const Sidebar: React.FC = () => {
     <>
       <nav aria-label="Primary navigation" className="scrollbar-thin flex-1 overflow-y-auto overflow-x-hidden py-3">
         <div className="flex flex-col gap-1 px-2">
-          {navItems.map(({ id, label, rail, icon: Icon }) => {
+          {navItems.map(({ id, label, rail, icon: Icon, accent }) => {
             const isActive = activePage === id || (id === 'search' && (activePage === 'papers' || activePage === 'details'));
             return (
               <button
@@ -76,7 +78,9 @@ export const Sidebar: React.FC = () => {
                 onBlur={() => setTooltip(null)}
                 className={`relative flex items-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSidebarOpen ? 'h-10 w-full gap-3 px-3' : 'mx-auto h-[64px] w-full flex-col justify-center gap-1 px-1'} ${isActive ? 'bg-blue-50 text-blue-700 before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-full before:bg-blue-600' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`}
               >
-                <Icon className="h-5 w-5 shrink-0 stroke-[1.8]" />
+                <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${accent}`}>
+                  <Icon className="h-[18px] w-[18px] stroke-[1.9]" />
+                </span>
                 <span className={`overflow-hidden font-medium transition-all duration-200 ${isSidebarOpen ? 'max-w-48 whitespace-nowrap text-left text-xs opacity-100' : 'max-w-full whitespace-normal text-center text-[10px] leading-tight opacity-100'}`}>{isSidebarOpen ? label : rail}</span>
               </button>
             );
@@ -85,8 +89,8 @@ export const Sidebar: React.FC = () => {
       </nav>
       <div className="shrink-0 border-t border-slate-200 px-2.5 py-3">
         <div className="flex flex-col gap-1">
-          {utilityButton('Profile', UserRound, () => setIsProfileOpen(true))}
-          {utilityButton('Settings', Settings, () => setIsSettingsOpen(true))}
+          {utilityButton('Profile', UserRound, () => setIsProfileOpen(true), 'text-sky-600 bg-sky-100/80')}
+          {utilityButton('Settings', Settings, () => setIsSettingsOpen(true), 'text-violet-600 bg-violet-100/80')}
         </div>
       </div>
     </>
@@ -118,3 +122,4 @@ export const Sidebar: React.FC = () => {
     </>
   );
 };
+
