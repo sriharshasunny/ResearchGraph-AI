@@ -5,13 +5,16 @@ import { Mail, Lock, User, ArrowRight, Sparkles, ArrowLeft, Info, KeyRound, Chec
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
 import { supabase } from '../../lib/supabase';
+import { useApp } from '../../context/AppContext';
 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
 
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
+  const { setActivePage, setSearchQuery } = useApp();
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
+  const [searchAfterAuth, setSearchAfterAuth] = useState(false);
 
   // Authentication State
   const [fullName, setFullName] = useState('');
@@ -49,6 +52,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           }
         });
         if (error) throw error;
+        if (searchAfterAuth) setActivePage('search');
         // Proceed to platform if successful
         onAuthComplete();
       } else {
@@ -57,6 +61,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           password
         });
         if (error) throw error;
+        if (searchAfterAuth) setActivePage('search');
         // Proceed to platform if successful
         onAuthComplete();
       }
@@ -71,6 +76,12 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const triggerTraversal = (destination: PageState, mode?: AuthMode) => {
     setPageState(destination);
     if (mode) setAuthMode(mode);
+  };
+
+  const searchAfterLogin = (query: string) => {
+    setSearchQuery(query);
+    setSearchAfterAuth(true);
+    triggerTraversal('AUTH', 'LOGIN');
   };
 
 
@@ -102,6 +113,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               <LandingExperience
                 onLogin={() => triggerTraversal('AUTH', 'LOGIN')}
                 onRegister={() => triggerTraversal('AUTH', 'REGISTER')}
+                onSearch={searchAfterLogin}
               />
             </motion.div>
           )}
