@@ -85,11 +85,9 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
-  const [query, setQuery] = useState('');
   const [supportsWebGL, setSupportsWebGL] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [graphInView, setGraphInView] = useState(true);
-  const searchRef = useRef<HTMLInputElement>(null);
   const demoCloseRef = useRef<HTMLButtonElement>(null);
   const graphRef = useRef<HTMLDivElement>(null);
   const workflowRef = useRef<HTMLElement>(null);
@@ -187,27 +185,9 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [demoOpen]);
 
-  useEffect(() => {
-    const focusSearchShortcut = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        document.getElementById('home')?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
-        window.setTimeout(() => searchRef.current?.focus(), reducedMotion ? 0 : 250);
-      }
-    };
-    window.addEventListener('keydown', focusSearchShortcut);
-    return () => window.removeEventListener('keydown', focusSearchShortcut);
-  }, [reducedMotion]);
-
   const goTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
     setMobileMenuOpen(false);
-  };
-
-  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmedQuery = query.trim();
-    if (trimmedQuery) onSearch(trimmedQuery);
   };
 
   const showInteractiveGraph = supportsWebGL && !reducedMotion && graphInView;
@@ -225,7 +205,6 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
             {sections.map((section) => <button type="button" key={section.id} className={activeSection === section.id ? 'active' : ''} onClick={() => goTo(section.id)}>{section.label}</button>)}
           </div>
           <div className="landing-nav-actions">
-            <button type="button" className="landing-icon-button" aria-label="Focus research search" onClick={() => { goTo('home'); window.setTimeout(() => searchRef.current?.focus(), reducedMotion ? 0 : 250); }}><Search size={18} /></button>
             <button type="button" className="landing-login" onClick={onLogin}>Log In</button>
             <button type="button" className="landing-signup" onClick={onRegister}>Sign Up Free <ArrowRight size={16} /></button>
           </div>
@@ -241,17 +220,11 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
       <section id="home" className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero-copy">
           <div className="landing-eyebrow"><span /> RESEARCH INTELLIGENCE, REIMAGINED</div>
-          <h1 id="landing-title">A Universe of <span className="landing-gradient-text">Connected Knowledge</span></h1>
-          <p className="landing-hero-description">Discover scholarly work, follow the relationships between ideas, and build a clearer view of your research landscape. ResearchGraph AI brings literature discovery and evidence-focused tools into one workspace.</p>
-          <form className="landing-search" role="search" onSubmit={submitSearch}>
-            <Search size={19} aria-hidden="true" />
-            <input ref={searchRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search papers, authors, topics, institutions..." aria-label="Search papers, authors, topics, and institutions" />
-            <kbd aria-hidden="true">Ctrl K</kbd>
-            <button type="submit" aria-label="Search"><ArrowRight size={19} /></button>
-          </form>
-          <div className="landing-topic-row" aria-label="Suggested research topics">
-            <span>Explore</span>
-            {suggestedTopics.map((topic) => <button type="button" key={topic} onClick={() => { setQuery(topic); searchRef.current?.focus(); }}>{topic}</button>)}
+          <h1 id="landing-title">Research, <span className="landing-gradient-text">connected.</span></h1>
+          <p className="landing-hero-description">Discover papers, people, and ideas—and see how they connect across the research universe.</p>
+          <div className="landing-topic-row" aria-label="Explore popular research topics">
+            <span>Explore a topic</span>
+            {suggestedTopics.map((topic) => <button type="button" key={topic} onClick={() => onSearch(topic)}>{topic}</button>)}
           </div>
           <div className="landing-hero-actions">
             <button type="button" className="landing-primary" onClick={onRegister}><Network size={17} /> Explore 3D Graph <ArrowRight size={17} /></button>
