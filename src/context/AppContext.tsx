@@ -54,6 +54,9 @@ interface AppContextType {
   allPapers: Paper[];
   addCustomPaper: (paper: Paper) => void;
   addSearchResults: (papers: Paper[]) => void;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -80,6 +83,43 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setUIModeState(mode);
     localStorage.setItem('rg_uiMode', mode);
   };
+
+  // Dark Mode Theme State
+  const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
+    try {
+      const saved = localStorage.getItem('rg_theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  const setTheme = useCallback((newTheme: 'light' | 'dark') => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem('rg_theme', newTheme);
+    } catch {
+      // ignore
+    }
+    if (newTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
 
 
 
@@ -224,7 +264,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setChatScope,
         allPapers,
         addCustomPaper,
-        addSearchResults
+        addSearchResults,
+        theme,
+        toggleTheme,
+        setTheme,
       }}
     >
       {children}
