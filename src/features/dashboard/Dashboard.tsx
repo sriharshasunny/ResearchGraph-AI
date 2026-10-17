@@ -22,12 +22,12 @@ import type { PageType } from '../../types';
 import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
 const shortcuts: Array<{ title: string; description: string; icon: typeof Search; page: PageType; tone: string }> = [
-  { title: 'Search Papers', description: 'Discover relevant research', icon: FileSearch, page: 'search', tone: 'bg-blue-50 text-blue-700' },
-  { title: 'AI Research Assistant', description: 'Ask questions across papers', icon: MessageSquareText, page: 'chat', tone: 'bg-violet-50 text-violet-700' },
-  { title: 'Knowledge Graph', description: 'Explore connected ideas', icon: Network, page: 'graph', tone: 'bg-cyan-50 text-cyan-700' },
-  { title: 'Compare Papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare', tone: 'bg-indigo-50 text-indigo-700' },
-  { title: 'Literature Review', description: 'Build a focused literature review', icon: BookOpen, page: 'literature', tone: 'bg-blue-50 text-blue-700' },
-  { title: 'Research Gaps', description: 'Find open questions and directions', icon: Sparkles, page: 'gaps', tone: 'bg-violet-50 text-violet-700' },
+  { title: 'Search Papers', description: 'Discover relevant research', icon: FileSearch, page: 'search', tone: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300' },
+  { title: 'AI Research Assistant', description: 'Ask questions across papers', icon: MessageSquareText, page: 'chat', tone: 'bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300' },
+  { title: 'Knowledge Graph', description: 'Explore connected ideas', icon: Network, page: 'graph', tone: 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300' },
+  { title: 'Compare Papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare', tone: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300' },
+  { title: 'Literature Review', description: 'Build a focused literature review', icon: BookOpen, page: 'literature', tone: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300' },
+  { title: 'Research Gaps', description: 'Find open questions and directions', icon: Sparkles, page: 'gaps', tone: 'bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300' },
 ];
 
 const suggestedQueries = [
@@ -41,6 +41,7 @@ const suggestedQueries = [
 
 export const Dashboard: React.FC = () => {
   const {
+    theme,
     setActivePage,
     setSearchQuery,
     savedPaperIds,
@@ -77,10 +78,10 @@ export const Dashboard: React.FC = () => {
   };
 
   const stats: Array<{ label: string; value: number; icon: typeof Search; tone: string; page: PageType }> = [
-    { label: 'Saved papers', value: savedPaperIds.length, icon: Bookmark, tone: 'bg-cyan-50 text-cyan-700', page: 'saved' },
-    { label: 'Papers in workspace', value: allPapers.length, icon: Layers3, tone: 'bg-blue-50 text-blue-700', page: 'papers' },
-    { label: 'Reading now', value: readingNowCount, icon: BookOpen, tone: 'bg-violet-50 text-violet-700', page: 'papers' },
-    { label: 'Comparisons', value: comparisonPaperIds.length, icon: GitCompare, tone: 'bg-indigo-50 text-indigo-700', page: 'compare' },
+    { label: 'Saved papers', value: savedPaperIds.length, icon: Bookmark, tone: 'bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300', page: 'saved' },
+    { label: 'Papers in workspace', value: allPapers.length, icon: Layers3, tone: 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300', page: 'papers' },
+    { label: 'Reading now', value: readingNowCount, icon: BookOpen, tone: 'bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300', page: 'papers' },
+    { label: 'Comparisons', value: comparisonPaperIds.length, icon: GitCompare, tone: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300', page: 'compare' },
   ];
 
   return (
@@ -91,12 +92,17 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[445px] lg:min-h-[475px] overflow-hidden rounded-[26px] border border-blue-200/60 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-5 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)]"
+          className="relative isolate min-h-[445px] lg:min-h-[475px] overflow-hidden rounded-[26px] border border-blue-200/60 dark:border-indigo-500/30 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] dark:from-[#080E1A] dark:to-[#0B132B] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-5 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_16px_50px_-10px_rgba(2,6,23,0.85)] transition-all duration-300"
           style={{
-            backgroundImage: `
-              linear-gradient(90deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.38) 36%, rgba(255, 255, 255, 0.08) 58%, transparent 75%),
-              url(/hero_academic_bg.jpg)
-            `,
+            backgroundImage: theme === 'dark'
+              ? `
+                linear-gradient(90deg, rgba(8, 14, 26, 0.94) 0%, rgba(11, 20, 38, 0.88) 36%, rgba(15, 23, 42, 0.65) 60%, rgba(8, 14, 26, 0.85) 100%),
+                url(/hero_academic_bg.jpg)
+              `
+              : `
+                linear-gradient(90deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.38) 36%, rgba(255, 255, 255, 0.08) 58%, transparent 75%),
+                url(/hero_academic_bg.jpg)
+              `,
             backgroundPosition: 'center',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
@@ -105,19 +111,19 @@ export const Dashboard: React.FC = () => {
           <div className="grid min-h-[365px] lg:min-h-[405px] items-center gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:gap-6">
             <div className="relative z-10 max-w-[580px]">
               {/* Badge */}
-              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 bg-white/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] shadow-[0_2px_10px_rgba(37,99,235,0.12)] backdrop-blur-md">
-                <Sparkles className="h-3 w-3 text-[#4F46E5]" />
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 dark:border-indigo-400/40 bg-white/90 dark:bg-slate-900/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] dark:text-indigo-300 shadow-[0_2px_10px_rgba(37,99,235,0.12)] dark:shadow-[0_2px_14px_rgba(99,102,241,0.25)] backdrop-blur-md transition-colors duration-200">
+                <Sparkles className="h-3 w-3 text-[#4F46E5] dark:text-indigo-300" />
                 <span>RESEARCH INTELLIGENCE, REIMAGINED</span>
               </div>
 
               {/* Title */}
-              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] sm:text-[31px] lg:text-[35px] xl:text-[38px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">
+              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] dark:text-white sm:text-[31px] lg:text-[35px] xl:text-[38px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] transition-colors duration-200">
                 Discover. Connect. Advance<br />
-                <span className="bg-gradient-to-r from-[#2563EB] to-[#7C3AED] bg-clip-text text-transparent">Research</span> with AI.
+                <span className="bg-gradient-to-r from-[#2563EB] to-[#7C3AED] dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">Research</span> with AI.
               </h1>
 
               {/* Subtitle */}
-              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#1E293B] sm:text-[13px] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
+              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#1E293B] dark:text-slate-300 sm:text-[13px] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] dark:drop-shadow-none transition-colors duration-200">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -128,19 +134,19 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-3.5 flex h-[48px] max-w-[540px] items-center gap-2 rounded-full border border-blue-200/70 bg-white/95 p-1 pl-4 shadow-[0_6px_25px_rgba(30,60,120,0.1)] backdrop-blur-xl focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20"
+                className="mt-3.5 flex h-[48px] max-w-[540px] items-center gap-2 rounded-full border border-blue-200/70 dark:border-slate-700/80 bg-white/95 dark:bg-[#0B132B]/90 p-1 pl-4 shadow-[0_6px_25px_rgba(30,60,120,0.1)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl focus-within:border-blue-500 dark:focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-blue-500/20 dark:focus-within:ring-indigo-500/30 transition-all duration-200"
               >
-                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
+                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
                 <input
                   aria-label="Search academic papers, authors, and topics"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
                   placeholder="Ask anything about academic research..."
-                  className="min-w-0 flex-1 bg-transparent py-1.5 text-[12.5px] font-medium text-slate-900 outline-none placeholder:text-slate-400 sm:text-[13px]"
+                  className="min-w-0 flex-1 bg-transparent py-1.5 text-[12.5px] font-medium text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 sm:text-[13px]"
                 />
                 <button
                   type="submit"
-                  className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-full bg-[#2563EB] px-5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:text-xs"
+                  className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-full bg-[#2563EB] dark:bg-gradient-to-r dark:from-blue-600 dark:to-indigo-600 px-5 text-xs font-bold text-white shadow-md shadow-blue-500/25 dark:shadow-indigo-500/30 transition hover:bg-[#1D4ED8] dark:hover:from-blue-500 dark:hover:to-indigo-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:text-xs"
                 >
                   Search <ArrowRight className="h-3.5 w-3.5" />
                 </button>
@@ -148,13 +154,13 @@ export const Dashboard: React.FC = () => {
 
               {/* Try Queries */}
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10.5px] sm:text-[11px]">
-                <span className="font-semibold text-slate-600 mr-0.5">Try:</span>
+                <span className="font-semibold text-slate-600 dark:text-slate-400 mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
                     key={term}
                     type="button"
                     onClick={() => openSearch(term)}
-                    className="rounded-full border border-slate-200/80 bg-white/85 px-2.5 py-0.5 font-medium text-slate-700 shadow-xs backdrop-blur-md transition hover:border-blue-300 hover:bg-white hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="rounded-full border border-slate-200/80 dark:border-slate-700 bg-white/85 dark:bg-slate-800/80 px-2.5 py-0.5 font-medium text-slate-700 dark:text-slate-300 shadow-xs backdrop-blur-md transition hover:border-blue-300 dark:hover:border-indigo-400 hover:bg-white dark:hover:bg-slate-700 hover:text-blue-700 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                   >
                     {term}
                   </button>
@@ -163,33 +169,33 @@ export const Dashboard: React.FC = () => {
 
               {/* 3 Bottom Feature Cards */}
               <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-2.5">
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2 shadow-sm backdrop-blur-md">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
+                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 dark:border-slate-700/70 bg-white/85 dark:bg-[#0E172A]/85 px-3.5 py-2 shadow-sm backdrop-blur-md transition-colors duration-200">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-300">
                     <BookOpen className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold text-slate-900 leading-tight">200M+ Papers</span>
-                    <span className="block text-[9.5px] text-slate-500 font-medium">from arXiv & OpenAlex</span>
+                    <span className="block text-[11px] font-bold text-slate-900 dark:text-white leading-tight">200M+ Papers</span>
+                    <span className="block text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">from arXiv & OpenAlex</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2 shadow-sm backdrop-blur-md">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
+                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 dark:border-slate-700/70 bg-white/85 dark:bg-[#0E172A]/85 px-3.5 py-2 shadow-sm backdrop-blur-md transition-colors duration-200">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-300">
                     <Network className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold text-slate-900 leading-tight">Knowledge Graph</span>
-                    <span className="block text-[9.5px] text-slate-500 font-medium">Discover hidden connections</span>
+                    <span className="block text-[11px] font-bold text-slate-900 dark:text-white leading-tight">Knowledge Graph</span>
+                    <span className="block text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Discover hidden connections</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2 shadow-sm backdrop-blur-md">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 dark:border-slate-700/70 bg-white/85 dark:bg-[#0E172A]/85 px-3.5 py-2 shadow-sm backdrop-blur-md transition-colors duration-200">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-300">
                     <Sparkles className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold text-slate-900 leading-tight">AI Insights</span>
-                    <span className="block text-[9.5px] text-slate-500 font-medium">Summarize, analyze, explore</span>
+                    <span className="block text-[11px] font-bold text-slate-900 dark:text-white leading-tight">AI Insights</span>
+                    <span className="block text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Summarize, analyze, explore</span>
                   </div>
                 </div>
               </div>

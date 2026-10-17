@@ -912,6 +912,52 @@ function initResearchGraphGlobe(
           stroke-width: 2.2;
           fill: none;
         }
+
+        /* ── DARK THEME ADAPTATION ── */
+        :global(html.dark) .rg-card,
+        .dark .rg-card {
+          background: rgba(14, 23, 42, 0.88);
+          border: 1px solid rgba(99, 102, 241, 0.32);
+          box-shadow: 0 12px 35px -4px rgba(0, 0, 0, 0.7), 0 0 18px rgba(99, 102, 241, 0.16);
+        }
+        :global(html.dark) .rg-card:hover,
+        .dark .rg-card:hover {
+          border-color: rgba(129, 140, 248, 0.6);
+          box-shadow: 0 18px 42px -4px rgba(0, 0, 0, 0.85), 0 0 25px rgba(99, 102, 241, 0.3);
+        }
+        :global(html.dark) .rg-card .src,
+        .dark .rg-card .src {
+          color: #ffffff;
+        }
+        :global(html.dark) .rg-card h3,
+        .dark .rg-card h3 {
+          color: #f8fafc;
+        }
+        :global(html.dark) .rg-card .au,
+        .dark .rg-card .au {
+          color: #94a3b8;
+        }
+        :global(html.dark) .rg-card .au b,
+        .dark .rg-card .au b {
+          color: #e2e8f0;
+        }
+        :global(html.dark) .rg-card .meta,
+        .dark .rg-card .meta {
+          color: #94a3b8;
+        }
+        :global(html.dark) .rg-card .meta-stats svg,
+        .dark .rg-card .meta-stats svg {
+          stroke: #94a3b8;
+        }
+        :global(html.dark) .rg-paper,
+        .dark .rg-paper {
+          background: rgba(15, 23, 42, 0.85);
+          border-color: rgba(99, 102, 241, 0.35);
+        }
+        :global(html.dark) .rg-paper .line,
+        .dark .rg-paper .line {
+          background: rgba(148, 163, 184, 0.4);
+        }
       `}</style>
 
       <div className="rg-stage" id="stage" ref={stageRef}>

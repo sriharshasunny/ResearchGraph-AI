@@ -240,7 +240,7 @@ export const ChatPage: React.FC = () => {
     <div className="flex h-[calc(100vh-56px)] w-full overflow-hidden bg-transparent">
       
       {/* ── LEFT PANEL: RESEARCH SESSIONS (260px) ── */}
-      <aside className="w-64 shrink-0 bg-white dark:bg-[#111D35] border-r border-gray-200 dark:border-white/[0.06] flex flex-col justify-between hidden md:flex">
+      <aside className="w-64 shrink-0 bg-white dark:bg-[#0E172A] border-r border-gray-200 dark:border-slate-800 flex flex-col justify-between hidden md:flex transition-colors duration-200">
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-[13px] font-bold text-gray-900 dark:text-white">
@@ -254,7 +254,7 @@ export const ChatPage: React.FC = () => {
                 setActiveSessionId(newId);
               }}
               title="Start New Research Session"
-              className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+              className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -280,8 +280,8 @@ export const ChatPage: React.FC = () => {
                 onClick={() => setActiveSessionId(s.id)}
                 className={`group relative w-full text-left p-3 rounded-xl transition-all cursor-pointer ${
                   activeSessionId === s.id
-                    ? 'bg-blue-50/80 border border-blue-200 text-blue-900 shadow-sm'
-                    : 'hover:bg-gray-50 dark:bg-white/[0.04] text-gray-700 dark:text-gray-200 border border-transparent'
+                    ? 'bg-blue-50/80 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-700/60 text-blue-900 dark:text-blue-200 shadow-sm'
+                    : 'hover:bg-gray-50 dark:hover:bg-slate-800/60 text-gray-700 dark:text-slate-300 border border-transparent'
                 }`}
               >
                 {editingSessionId === s.id ? (
@@ -295,11 +295,11 @@ export const ChatPage: React.FC = () => {
                         if (e.key === 'Escape') setEditingSessionId(null);
                       }}
                       autoFocus
-                      className="flex-1 px-1.5 py-0.5 text-[12px] bg-white dark:bg-[#111D35] border border-blue-400 rounded focus:outline-none"
+                      className="flex-1 px-1.5 py-0.5 text-[12px] bg-white dark:bg-slate-800 border border-blue-400 dark:border-blue-500 text-gray-900 dark:text-white rounded focus:outline-none"
                     />
                     <button
                       onClick={() => handleSaveRename(s.id)}
-                      className="p-1 text-emerald-600 hover:text-emerald-700"
+                      className="p-1 text-emerald-600 dark:text-emerald-400 hover:text-emerald-700"
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
@@ -309,9 +309,9 @@ export const ChatPage: React.FC = () => {
                     <div className="flex items-center justify-between gap-1">
                       <div className="flex items-center gap-2 min-w-0">
                         {s.pinned ? (
-                          <Pin className="w-3.5 h-3.5 text-blue-600 shrink-0 fill-current" />
+                          <Pin className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 fill-current" />
                         ) : (
-                          <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${activeSessionId === s.id ? 'text-blue-600' : 'text-gray-400'}`} />
+                          <MessageSquare className={`w-3.5 h-3.5 shrink-0 ${activeSessionId === s.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-slate-500'}`} />
                         )}
                         <span className="text-[13px] font-semibold truncate leading-tight">{s.title}</span>
                       </div>
@@ -321,14 +321,14 @@ export const ChatPage: React.FC = () => {
                         <button
                           onClick={(e) => handlePinSession(s.id, e)}
                           title={s.pinned ? 'Unpin' : 'Pin session'}
-                          className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                          className="p-1 text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                         >
                           <Pin className="w-3 h-3" />
                         </button>
                         <button
                           onClick={(e) => handleStartRename(s, e)}
                           title="Rename session"
-                          className="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200 transition-colors"
+                          className="p-1 text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-200 transition-colors"
                         >
                           <Edit2 className="w-3 h-3" />
                         </button>
@@ -338,13 +338,13 @@ export const ChatPage: React.FC = () => {
                             setSessionToDelete(s.id);
                           }}
                           title="Delete session"
-                          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                          className="p-1 text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                         >
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </div>
                     </div>
-                    <div className="text-[11px] text-gray-400 mt-1 pl-5.5 font-medium">{s.date}</div>
+                    <div className="text-[11px] text-gray-400 dark:text-slate-500 mt-1 pl-5.5 font-medium">{s.date}</div>
                   </>
                 )}
               </div>
@@ -353,10 +353,10 @@ export const ChatPage: React.FC = () => {
         </div>
 
         {/* Bottom Actions */}
-        <div className="p-3 border-t border-gray-100 dark:border-white/[0.04] flex items-center gap-1.5 bg-gray-50 dark:bg-white/[0.04]/50">
+        <div className="p-3 border-t border-gray-100 dark:border-slate-800 flex items-center gap-1.5 bg-gray-50 dark:bg-[#080E1A]/60 transition-colors duration-200">
           <button
             onClick={handleExportChat}
-            className="flex-1 py-1.5 px-2 rounded-lg hover:bg-gray-200/60 text-gray-600 dark:text-gray-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            className="flex-1 py-1.5 px-2 rounded-lg hover:bg-gray-200/60 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors"
             title="Export as Markdown (.md)"
           >
             <Download className="w-3.5 h-3.5" />
@@ -364,7 +364,7 @@ export const ChatPage: React.FC = () => {
           </button>
           <button
             onClick={handlePrintChat}
-            className="py-1.5 px-2 rounded-lg hover:bg-gray-200/60 text-gray-600 dark:text-gray-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
+            className="py-1.5 px-2 rounded-lg hover:bg-gray-200/60 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-300 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors"
             title="Print or Save as PDF"
           >
             <Printer className="w-3.5 h-3.5" />
@@ -372,7 +372,7 @@ export const ChatPage: React.FC = () => {
           <button
             onClick={clearChat}
             title="Clear Chat History"
-            className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-gray-400 dark:text-slate-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -383,10 +383,10 @@ export const ChatPage: React.FC = () => {
       <main className="flex-1 flex flex-col h-full overflow-hidden bg-transparent relative">
         
         {/* Chat Header */}
-        <div className="px-6 py-3.5 bg-white dark:bg-[#111D35] border-b border-gray-200 dark:border-white/[0.06] flex items-center justify-between shrink-0">
+        <div className="px-6 py-3.5 bg-white dark:bg-[#0E172A] border-b border-gray-200 dark:border-slate-800 flex items-center justify-between shrink-0 transition-colors duration-200">
           <div>
             <h1 className="text-[16px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-blue-600" />
+              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               AI Research Assistant
             </h1>
             <p className="text-[12px] text-gray-500 dark:text-gray-400">
@@ -397,12 +397,12 @@ export const ChatPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowMobileSources(!showMobileSources)}
-              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 text-gray-700 dark:text-gray-200 text-[11px] font-semibold"
+              className="lg:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 text-[11px] font-semibold"
             >
-              <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+              <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
               <span>Sources ({latestCitations.length})</span>
             </button>
-            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+            <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-[11px] font-semibold border border-emerald-200 dark:border-emerald-800/60">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Citations appear when indexed evidence is available
             </span>
@@ -415,7 +415,7 @@ export const ChatPage: React.FC = () => {
           {/* EMPTY STATE SUGGESTED PROMPTS */}
           {chatMessages.length <= 1 && (
             <div className="max-w-2xl mx-auto py-8 text-center space-y-6">
-              <div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-blue-600 shadow-xs">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-100 dark:border-blue-900/60 flex items-center justify-center mx-auto text-blue-600 dark:text-blue-400 shadow-xs">
                 <Sparkles className="w-6 h-6" />
               </div>
               <div>
@@ -430,13 +430,13 @@ export const ChatPage: React.FC = () => {
                   <div
                     key={idx}
                     onClick={() => handleSendMessage(item.title)}
-                    className="p-3.5 rounded-2xl bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] hover:border-blue-300 hover:shadow-md transition-all cursor-pointer group"
+                    className="p-3.5 rounded-2xl bg-white dark:bg-[#0E172A] border border-gray-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-md transition-all cursor-pointer group"
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="p-1 rounded-lg bg-gray-50 dark:bg-white/[0.04] group-hover:bg-blue-50 transition-colors">
+                      <div className="p-1 rounded-lg bg-gray-50 dark:bg-slate-800 group-hover:bg-blue-50 dark:group-hover:bg-blue-950/60 transition-colors">
                         {item.icon}
                       </div>
-                      <h4 className="text-[13px] font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                      <h4 className="text-[13px] font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {item.title}
                       </h4>
                     </div>
@@ -458,31 +458,31 @@ export const ChatPage: React.FC = () => {
                 className={`max-w-[88%] sm:max-w-[80%] rounded-2xl p-4 sm:p-5 text-[13px] sm:text-[14px] leading-relaxed ${
                   msg.sender === 'user'
                     ? 'bg-blue-600 text-white font-medium rounded-br-none shadow-sm'
-                    : 'bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] text-gray-800 rounded-bl-none shadow-sm font-sans'
+                    : 'bg-white dark:bg-[#0E172A] border border-gray-200 dark:border-slate-800 text-gray-800 dark:text-slate-100 rounded-bl-none shadow-sm font-sans'
                 }`}
               >
                 {/* Assistant Label Header */}
                 {msg.sender === 'assistant' && (
-                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+                  <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-gray-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold text-blue-600 tracking-wider">
+                      <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 tracking-wider">
                         {msg.answerType === 'retrieval_only' ? 'Retrieved research evidence' : msg.answerType === 'insufficient_context' ? 'Evidence check' : msg.answerType === 'error' ? 'Research service' : 'ResearchGraph grounded answer'}
                       </span>
-                      <span className="text-[11px] text-gray-400">· {msg.timestamp}</span>
+                      <span className="text-[11px] text-gray-400 dark:text-slate-500">· {msg.timestamp}</span>
                     </div>
 
                     {/* Message Actions */}
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCopyMessage(msg.id, msg.content)}
-                        className="p-1 text-gray-400 hover:text-gray-700 dark:text-gray-200 rounded transition-colors"
+                        className="p-1 text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-200 rounded transition-colors"
                         title="Copy message"
                       >
-                        {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedMsgId === msg.id ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
                       <button
                         onClick={() => handleSendMessage(prompt || 'Regenerate synthesis')}
-                        className="p-1 text-gray-400 hover:text-blue-600 rounded transition-colors"
+                        className="p-1 text-gray-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 rounded transition-colors"
                         title="Regenerate response"
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
@@ -492,12 +492,12 @@ export const ChatPage: React.FC = () => {
                 )}
 
                 {/* Formatted Markdown Content */}
-                <div className="space-y-3 whitespace-pre-wrap">
+                <div className="space-y-3 whitespace-pre-wrap text-gray-800 dark:text-slate-100">
                   {msg.content.split('\n\n').map((block, i) => {
                     if (block.startsWith('|')) {
                       return (
                         <div key={i} className="my-3 overflow-x-auto">
-                          <pre className="font-mono text-[12px] bg-gray-50 dark:bg-white/[0.04] p-3 rounded-xl border border-gray-200 dark:border-white/[0.06] text-gray-800">
+                          <pre className="font-mono text-[12px] bg-gray-50 dark:bg-[#080E1A] p-3 rounded-xl border border-gray-200 dark:border-slate-800 text-gray-800 dark:text-slate-200">
                             {block}
                           </pre>
                         </div>
@@ -507,16 +507,16 @@ export const ChatPage: React.FC = () => {
                   })}
                 </div>
 
-                {msg.citations && msg.citations.length > 0 && <div className="mt-4 border-t border-gray-100 pt-3">
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500">Retrieved sources</p>
+                {msg.citations && msg.citations.length > 0 && <div className="mt-4 border-t border-gray-100 dark:border-slate-800 pt-3">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-slate-400">Retrieved sources</p>
                   <div className="flex flex-col gap-2">
-                    {msg.citations.map(citation => <div key={`${msg.id}-${citation.index}`} className="rounded-lg border border-blue-100 bg-blue-50/60 p-2.5 text-[11px]">
+                    {msg.citations.map(citation => <div key={`${msg.id}-${citation.index}`} className="rounded-lg border border-blue-100 dark:border-blue-900/60 bg-blue-50/60 dark:bg-blue-950/40 p-2.5 text-[11px]">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <button type="button" onClick={() => handleOpenSource(citation.id)} className="text-left font-semibold text-blue-800 hover:underline">[{citation.index}] {citation.title}</button>
-                        <span className="text-gray-500">{citation.page ? `Page ${citation.page}` : citation.section || 'Paper passage'}</span>
+                        <button type="button" onClick={() => handleOpenSource(citation.id)} className="text-left font-semibold text-blue-800 dark:text-blue-300 hover:underline">[{citation.index}] {citation.title}</button>
+                        <span className="text-gray-500 dark:text-slate-400">{citation.page ? `Page ${citation.page}` : citation.section || 'Paper passage'}</span>
                       </div>
-                      {citation.supportingPassage && <p className="mt-1 line-clamp-3 text-gray-600">{citation.supportingPassage}</p>}
-                      {citation.url && <a href={citation.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-blue-700 hover:underline"><ExternalLink className="h-3 w-3" /> Original source</a>}
+                      {citation.supportingPassage && <p className="mt-1 line-clamp-3 text-gray-600 dark:text-slate-300">{citation.supportingPassage}</p>}
+                      {citation.url && <a href={citation.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-blue-700 dark:text-blue-400 hover:underline"><ExternalLink className="h-3 w-3" /> Original source</a>}
                     </div>)}
                   </div>
                 </div>}
@@ -532,7 +532,7 @@ export const ChatPage: React.FC = () => {
 
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl rounded-bl-none p-4 shadow-sm flex items-center gap-3">
+              <div className="bg-white dark:bg-[#0E172A] border border-gray-200 dark:border-slate-800 rounded-2xl rounded-bl-none p-4 shadow-sm flex items-center gap-3">
                 <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
                 <span className="text-[12px] text-gray-500 dark:text-gray-400 font-medium animate-pulse">
                   Retrieving papers, cross-referencing citations &amp; generating synthesis...
@@ -546,20 +546,20 @@ export const ChatPage: React.FC = () => {
 
         {/* ── EDITABLE RESEARCH CONTEXT BAR ── */}
         <div className="px-4 sm:px-6 pt-2 shrink-0">
-          <div className="bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl p-2.5 shadow-sm">
+          <div className="bg-white dark:bg-[#0E172A] border border-gray-200 dark:border-slate-800 rounded-2xl p-2.5 shadow-sm transition-colors duration-200">
             <div className="flex items-center justify-between">
               <button
                 onClick={() => setShowContextDetails(!showContextDetails)}
-                className="flex items-center gap-2 text-[12px] font-semibold text-gray-700 dark:text-gray-200 hover:text-blue-600 transition-colors"
+                className="flex items-center gap-2 text-[12px] font-semibold text-gray-700 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
-                <Layers className="w-3.5 h-3.5 text-blue-600" />
+                <Layers className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                 <span>Research Context: {contextPaperIds.length} papers active</span>
                 {showContextDetails ? <ChevronUp className="w-3.5 h-3.5 text-gray-400" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400" />}
               </button>
 
               <button
                 onClick={() => setIsAddContextModalOpen(true)}
-                className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 px-2 py-1 rounded-lg hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 px-2 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-950/60 transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add paper</span>
@@ -572,7 +572,7 @@ export const ChatPage: React.FC = () => {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="pt-2.5 mt-2 border-t border-gray-100 dark:border-white/[0.04] space-y-2"
+                  className="pt-2.5 mt-2 border-t border-gray-100 dark:border-slate-800 space-y-2"
                 >
                   <div className="flex flex-wrap items-center gap-1.5">
                     {contextPaperIds.map(pId => {
@@ -580,13 +580,13 @@ export const ChatPage: React.FC = () => {
                       return (
                         <span
                           key={pId}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-50 dark:bg-white/[0.04] border border-gray-200 dark:border-white/[0.06] text-[11px] text-gray-700 dark:text-gray-200"
+                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-[11px] text-gray-700 dark:text-slate-200"
                         >
-                          <BookOpen className="w-3 h-3 text-blue-600 shrink-0" />
+                          <BookOpen className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
                           <span className="max-w-[180px] truncate font-medium">{paperObj?.title || pId}</span>
                           <button
                             onClick={() => handleRemoveContextPaper(pId)}
-                            className="p-0.5 text-gray-400 hover:text-red-500 rounded transition-colors"
+                            className="p-0.5 text-gray-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 rounded transition-colors"
                             title="Remove from context"
                           >
                             <X className="w-3 h-3" />
@@ -596,13 +596,13 @@ export const ChatPage: React.FC = () => {
                     })}
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-gray-500 dark:text-gray-400 pt-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-gray-500 dark:text-slate-400 pt-1">
                     <div className="flex items-center gap-1.5">
-                      <Database className="w-3 h-3 text-blue-600" />
+                      <Database className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                       <span>Vector Retrieval: Top-k dense embeddings enabled</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Network className="w-3 h-3 text-purple-600" />
+                      <Network className="w-3 h-3 text-purple-600 dark:text-purple-400" />
                       <span>Knowledge Graph: 2-hop topological traversal enabled</span>
                     </div>
                   </div>
@@ -619,7 +619,7 @@ export const ChatPage: React.FC = () => {
               e.preventDefault();
               handleSendMessage();
             }}
-            className="relative flex items-center bg-white dark:bg-[#111D35] border border-gray-200 dark:border-white/[0.06] rounded-2xl p-2 shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all"
+            className="relative flex items-center bg-white dark:bg-[#0E172A] border border-gray-200 dark:border-slate-800 rounded-2xl p-2 shadow-sm focus-within:border-blue-500 dark:focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 dark:focus-within:ring-blue-500/20 transition-all"
           >
             <textarea
               rows={1}
@@ -632,14 +632,14 @@ export const ChatPage: React.FC = () => {
                   handleSendMessage();
                 }
               }}
-              className="flex-1 px-3 py-2 text-[14px] text-gray-900 dark:text-white placeholder-gray-400 bg-transparent resize-none focus:outline-none max-h-32"
+              className="flex-1 px-3 py-2 text-[14px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 bg-transparent resize-none focus:outline-none max-h-32"
             />
 
             {isStreaming ? (
               <button
                 type="button"
                 onClick={handleStopStreaming}
-                className="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 font-semibold text-[12px] flex items-center gap-1.5 transition-all shrink-0 border border-red-200"
+                className="px-3 py-2 rounded-xl bg-red-50 dark:bg-red-950/60 hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-300 font-semibold text-[12px] flex items-center gap-1.5 transition-all shrink-0 border border-red-200 dark:border-red-800/60"
                 title="Stop generating"
               >
                 <Square className="w-3.5 h-3.5 fill-current" />
@@ -652,7 +652,7 @@ export const ChatPage: React.FC = () => {
                 className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0 shadow-sm ${
                   prompt.trim() && !isTyping
                     ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer hover:scale-105 active:scale-95'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50'
+                    : 'bg-gray-100 dark:bg-slate-800 text-gray-400 dark:text-slate-600 cursor-not-allowed opacity-50'
                 }`}
                 title="Send inquiry (Enter)"
               >
@@ -660,24 +660,24 @@ export const ChatPage: React.FC = () => {
               </button>
             )}
           </form>
-          <div className="text-[11px] text-gray-400 text-right mt-1.5 pr-2">
-            Press <span className="font-mono bg-gray-100 px-1 rounded">Enter</span> to send, <span className="font-mono bg-gray-100 px-1 rounded">Shift + Enter</span> for new line
+          <div className="text-[11px] text-gray-400 dark:text-slate-500 text-right mt-1.5 pr-2">
+            Press <span className="font-mono bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-1 rounded">Enter</span> to send, <span className="font-mono bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-slate-300 px-1 rounded">Shift + Enter</span> for new line
           </div>
         </div>
 
       </main>
 
       {/* ── RIGHT PANEL: GROUNDED SOURCES (300px) ── */}
-      <aside className={`w-72 shrink-0 bg-white dark:bg-[#111D35] border-l border-gray-200 dark:border-white/[0.06] p-5 flex flex-col justify-between overflow-y-auto scrollbar-thin ${
+      <aside className={`w-72 shrink-0 bg-white dark:bg-[#0E172A] border-l border-gray-200 dark:border-slate-800 p-5 flex flex-col justify-between overflow-y-auto scrollbar-thin transition-colors duration-200 ${
         showMobileSources ? 'fixed inset-y-0 right-0 z-40 shadow-2xl block' : 'hidden lg:flex'
       }`}>
         <div className="space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+          <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800">
             <h2 className="text-[13px] font-bold text-gray-900 dark:text-white">
               Sources &amp; Grounding
             </h2>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+              <span className="text-[10px] font-mono font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800/60">
                 {latestCitations.length} SOURCES
               </span>
               {showMobileSources && (
@@ -691,7 +691,7 @@ export const ChatPage: React.FC = () => {
             </div>
           </div>
 
-          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+          <p className="text-[11px] text-gray-500 dark:text-slate-400">
             Sources from the latest answer are shown here with retrieved passages:
           </p>
 
@@ -699,33 +699,33 @@ export const ChatPage: React.FC = () => {
             {latestCitations.map(src => (
               <div
                 key={`${src.index}-${src.id}`}
-                className="p-3.5 rounded-2xl border border-gray-200 dark:border-white/[0.06] bg-gray-50 dark:bg-white/[0.04]/70 hover:bg-white dark:bg-[#111D35] hover:border-blue-300 hover:shadow-sm transition-all space-y-2"
+                className="p-3.5 rounded-2xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900/70 hover:bg-white dark:hover:bg-slate-800/90 hover:border-blue-300 dark:hover:border-blue-500/50 hover:shadow-sm transition-all space-y-2"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-mono font-extrabold text-blue-600 bg-white dark:bg-[#111D35] px-2 py-0.5 rounded-md border border-gray-200 dark:border-white/[0.06]">
+                  <span className="text-[11px] font-mono font-extrabold text-blue-600 dark:text-blue-400 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-gray-200 dark:border-slate-700">
                     [{src.index}]
                   </span>
-                  <span className="text-[10px] font-medium text-gray-400">{src.page ? `Page ${src.page}` : src.section || 'Passage'}</span>
+                  <span className="text-[10px] font-medium text-gray-400 dark:text-slate-500">{src.page ? `Page ${src.page}` : src.section || 'Passage'}</span>
                 </div>
 
                 <h4 className="text-[13px] font-bold text-gray-900 dark:text-white leading-snug line-clamp-2">
                   {src.title}
                 </h4>
 
-                {src.supportingPassage && <p className="line-clamp-4 text-[11px] leading-relaxed text-gray-600 dark:text-gray-300">{src.supportingPassage}</p>}
+                {src.supportingPassage && <p className="line-clamp-4 text-[11px] leading-relaxed text-gray-600 dark:text-slate-300">{src.supportingPassage}</p>}
 
                 <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] font-medium text-gray-400">Indexed evidence passage</span>
+                  <span className="text-[10px] font-medium text-gray-400 dark:text-slate-500">Indexed evidence passage</span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => toggleComparisonPaper(src.id)}
-                      className="text-[11px] font-semibold text-purple-600 hover:text-purple-700 transition-colors"
+                      className="text-[11px] font-semibold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
                     >
                       {comparisonPaperIds.includes(src.id) ? 'In Compare' : '+ Compare'}
                     </button>
                     <button
                       onClick={() => handleOpenSource(src.id)}
-                      className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-700"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                     >
                       <span>Open</span>
                       <ExternalLink className="w-3 h-3" />
@@ -737,8 +737,8 @@ export const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-100 dark:border-white/[0.04]">
-          <div className="p-3 rounded-xl bg-blue-50/60 border border-blue-100 text-[11px] text-blue-900 leading-relaxed">
+        <div className="pt-4 border-t border-gray-100 dark:border-slate-800">
+          <div className="p-3 rounded-xl bg-blue-50/60 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 text-[11px] text-blue-900 dark:text-blue-200 leading-relaxed">
             <span className="font-bold block mb-0.5">Academic Verification</span>
             Answers are generated only when matching indexed passages are available. Check each source passage before relying on a claim.
           </div>
@@ -747,16 +747,16 @@ export const ChatPage: React.FC = () => {
 
       {/* ── MODAL: DELETE SESSION CONFIRMATION ── */}
       {sessionToDelete && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-sm w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 space-y-4">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0E172A] rounded-3xl max-w-sm w-full border border-gray-200 dark:border-slate-800 shadow-2xl p-6 space-y-4">
             <h3 className="text-[16px] font-bold text-gray-900 dark:text-white">Delete research session?</h3>
-            <p className="text-[13px] text-gray-500 dark:text-gray-400">
+            <p className="text-[13px] text-gray-500 dark:text-slate-400">
               This will remove the conversation history for this inquest. This action cannot be undone.
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setSessionToDelete(null)}
-                className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-[12px] font-semibold transition-colors"
+                className="px-4 py-2 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 text-gray-700 dark:text-slate-200 text-[12px] font-semibold transition-colors"
               >
                 Cancel
               </button>
@@ -773,16 +773,16 @@ export const ChatPage: React.FC = () => {
 
       {/* ── MODAL: ADD PAPER TO CONTEXT ── */}
       {isAddContextModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#111D35] rounded-3xl max-w-md w-full border border-gray-200 dark:border-white/[0.06] shadow-2xl p-6 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-white/[0.04]">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#0E172A] rounded-3xl max-w-md w-full border border-gray-200 dark:border-slate-800 shadow-2xl p-6 space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-slate-800">
               <h3 className="text-[16px] font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-blue-600" />
+                <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 Add Paper to Research Context
               </h3>
               <button
                 onClick={() => setIsAddContextModalOpen(false)}
-                className="p-1 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-700 dark:text-gray-200 transition-colors"
+                className="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -797,16 +797,16 @@ export const ChatPage: React.FC = () => {
                     onClick={() => !isAlreadyIn && handleAddContextPaper(p)}
                     className={`p-3 rounded-2xl border transition-all flex items-center justify-between ${
                       isAlreadyIn
-                        ? 'bg-gray-50 dark:bg-white/[0.04] border-gray-200 dark:border-white/[0.06] opacity-60 cursor-default'
-                        : 'bg-white dark:bg-[#111D35] border-gray-200 dark:border-white/[0.06] hover:border-blue-300 hover:bg-blue-50/40 cursor-pointer'
+                        ? 'bg-gray-50 dark:bg-slate-800/60 border-gray-200 dark:border-slate-800 opacity-60 cursor-default'
+                        : 'bg-white dark:bg-slate-800/80 border-gray-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500/50 hover:bg-blue-50/40 dark:hover:bg-slate-700/60 cursor-pointer'
                     }`}
                   >
                     <div>
                       <h4 className="text-[13px] font-bold text-gray-900 dark:text-white line-clamp-1">{p.title}</h4>
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400">{p.authors[0]} et al. · {p.year}</p>
+                      <p className="text-[11px] text-gray-500 dark:text-slate-400">{p.authors[0]} et al. · {p.year}</p>
                     </div>
                     {isAlreadyIn ? (
-                      <span className="text-[11px] text-gray-400 font-semibold">Active</span>
+                      <span className="text-[11px] text-gray-400 dark:text-slate-500 font-semibold">Active</span>
                     ) : (
                       <button className="px-2.5 py-1 rounded-lg bg-blue-600 text-white text-[11px] font-semibold">
                         Add

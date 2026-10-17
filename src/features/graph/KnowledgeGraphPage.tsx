@@ -249,24 +249,24 @@ const GraphCanvas = () => {
       {/* ── TOP CONTROL HUD ── */}
       <Panel position="top-left" className="m-4 z-20 flex flex-col gap-3">
         {/* Title & Back */}
-        <div className="flex items-center gap-3 bg-white dark:bg-[#111D35]/90 dark:bg-[#09152E]/90 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-md pointer-events-auto">
+        <div className="flex items-center gap-3 bg-white dark:bg-[#0E172A]/90 border border-gray-200 dark:border-slate-800 px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-md pointer-events-auto transition-colors duration-200">
           <button
             onClick={() => setActivePage('dashboard')}
-            className="p-1 rounded-lg text-gray-500 dark:text-gray-400 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white dark:bg-[#111D35]/10 transition-colors"
+            className="p-1 rounded-lg text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
             title="Return to Home"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex items-center gap-2">
-            <Network className="w-4 h-4 text-blue-600 dark:text-cyan-400" />
-            <h1 className="text-[14px] font-bold text-gray-900 dark:text-white dark:text-white tracking-tight">Knowledge Graph {uiMode === 'expert' ? '(Expert Mode)' : ''}</h1>
+            <Network className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <h1 className="text-[14px] font-bold text-gray-900 dark:text-white tracking-tight">Knowledge Graph {uiMode === 'expert' ? '(Expert Mode)' : ''}</h1>
           </div>
         </div>
 
         {/* Search & Filter pills */}
         <div className="flex items-center gap-2 flex-wrap pointer-events-auto">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-gray-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search entities..."
@@ -276,14 +276,14 @@ const GraphCanvas = () => {
                 const match = graphItems.find(n => n.label.toLowerCase().includes(e.target.value.toLowerCase()));
                 if (match && e.target.value.length > 2) setSelectedNodeId(match.id);
               }}
-              className="pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#111D35]/90 dark:bg-[#09152E]/90 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 text-[12px] text-gray-900 dark:text-white dark:text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 backdrop-blur-md w-48 sm:w-60 shadow-lg"
+              className="pl-8 pr-3 py-1.5 rounded-xl bg-white dark:bg-[#0E172A]/90 border border-gray-200 dark:border-slate-800 text-[12px] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:border-blue-500 backdrop-blur-md w-48 sm:w-60 shadow-lg"
             />
           </div>
 
-          <button onClick={() => setIsLegendOpen(!isLegendOpen)} className="p-1.5 rounded-xl bg-white dark:bg-[#111D35]/90 dark:bg-[#09152E]/90 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:text-gray-400 dark:hover:text-white shadow-lg">
+          <button onClick={() => setIsLegendOpen(!isLegendOpen)} className="p-1.5 rounded-xl bg-white dark:bg-[#0E172A]/90 border border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white shadow-lg">
             <Filter className="w-4 h-4" />
           </button>
-          <button onClick={handleExport} className="p-1.5 rounded-xl bg-white dark:bg-[#111D35]/90 dark:bg-[#09152E]/90 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white dark:text-gray-400 dark:hover:text-white shadow-lg" title="Export JSON">
+          <button onClick={handleExport} className="p-1.5 rounded-xl bg-white dark:bg-[#0E172A]/90 border border-gray-200 dark:border-slate-800 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white shadow-lg" title="Export JSON">
             <Download className="w-4 h-4" />
           </button>
         </div>
@@ -291,8 +291,8 @@ const GraphCanvas = () => {
         {/* Legend */}
         <AnimatePresence>
           {isLegendOpen && (
-            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white dark:bg-[#111D35]/90 dark:bg-[#09152E]/90 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 p-3 rounded-2xl shadow-xl backdrop-blur-md flex flex-col gap-2 w-48">
-              <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400 dark:text-gray-400 uppercase tracking-wider">Entity Types</span>
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-white dark:bg-[#0E172A]/90 border border-gray-200 dark:border-slate-800 p-3 rounded-2xl shadow-xl backdrop-blur-md flex flex-col gap-2 w-48">
+              <span className="text-[10px] font-bold text-gray-500 dark:text-slate-400 uppercase tracking-wider">Entity Types</span>
               <div className="flex flex-wrap gap-1.5">
                 {['All', 'Model', 'Paper', 'Concept', 'Dataset', 'Author', 'Method'].map(t => (
                   <button
@@ -301,7 +301,7 @@ const GraphCanvas = () => {
                     className={`px-2 py-0.5 rounded-lg font-medium text-[10px] transition-all ${
                       filterType === t 
                         ? 'bg-blue-600 text-white shadow-md' 
-                        : 'text-gray-600 dark:text-gray-300 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white dark:bg-[#111D35]/10'
+                        : 'text-gray-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     {t}
@@ -323,23 +323,23 @@ const GraphCanvas = () => {
         onNodeClick={onNodeClick}
         onPaneClick={onPaneClick}
         fitView
-        className="bg-gray-50 dark:bg-white/[0.04] dark:bg-[#06111F]"
+        className="bg-gray-50 dark:bg-[#080E1A]"
         minZoom={0.2}
         maxZoom={3}
         proOptions={{ hideAttribution: true }}
       >
-        <Background color={'#E2E8F0'} gap={16} />
-        <Controls className="bg-white dark:bg-[#111D35] dark:bg-[#09152E] border-gray-200 dark:border-white/[0.06] dark:border-gray-800 rounded-xl shadow-lg fill-gray-600 dark:fill-gray-400" />
+        <Background color={'#94A3B8'} gap={16} className="opacity-25" />
+        <Controls className="bg-white dark:bg-[#0E172A] border-gray-200 dark:border-slate-800 rounded-xl shadow-lg fill-gray-600 dark:fill-slate-300" />
         <MiniMap 
           nodeColor={(n: any) => (nodeColorMap[n.data.type as keyof typeof nodeColorMap] || nodeColorMap.Concept).bg}
-          maskColor={'rgba(249, 250, 251, 0.7)'}
-          className="bg-white dark:bg-[#111D35] dark:bg-[#09152E] border-gray-200 dark:border-white/[0.06] dark:border-gray-800 rounded-xl shadow-lg"
+          maskColor={'rgba(15, 23, 42, 0.6)'}
+          className="bg-white dark:bg-[#0E172A] border-gray-200 dark:border-slate-800 rounded-xl shadow-lg"
         />
       </ReactFlow>
 
-      {(graphLoading || graphError || graphItems.length === 0) && <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/80 p-6 backdrop-blur-[2px] dark:bg-[#06111F]/80">
-        <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-lg dark:border-white/10 dark:bg-[#111D35]">
-          <Network className="mx-auto h-8 w-8 text-blue-600" />
+      {(graphLoading || graphError || graphItems.length === 0) && <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/80 dark:bg-[#080E1A]/80 p-6 backdrop-blur-[2px]">
+        <div className="max-w-md rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E172A] p-6 text-center shadow-lg">
+          <Network className="mx-auto h-8 w-8 text-blue-600 dark:text-blue-400" />
           <h2 className="mt-3 text-base font-bold text-slate-900 dark:text-white">{graphLoading ? 'Loading indexed research graph…' : graphError ? 'Knowledge graph is unavailable' : 'Your graph is ready to grow'}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{graphLoading ? 'Loading real entities and relationships from the research database.' : graphError || 'No indexed paper relationships are available yet. Add an open-access paper from Research Search to build a graph with evidence.'}</p>
           {!graphLoading && <button type="button" onClick={() => setActivePage('search')} className="mt-4 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Search papers</button>}
@@ -353,39 +353,39 @@ const GraphCanvas = () => {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 20 }}
-            className="absolute bottom-6 right-6 top-20 sm:top-auto z-30 w-80 sm:w-96 bg-white dark:bg-[#111D35]/95 dark:bg-[#09152E]/95 border border-gray-200 dark:border-white/[0.06] dark:border-white/15 rounded-2xl p-5 shadow-2xl backdrop-blur-xl space-y-4 flex flex-col"
+            className="absolute bottom-6 right-6 top-20 sm:top-auto z-30 w-80 sm:w-96 bg-white dark:bg-[#0E172A]/95 border border-gray-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xl backdrop-blur-xl space-y-4 flex flex-col transition-colors duration-200"
           >
             <div className="flex items-start justify-between">
               <div>
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 border border-blue-200 dark:border-blue-500/30">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
                   {selectedNodeData.type}
                 </span>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white dark:text-white mt-1.5 leading-snug">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mt-1.5 leading-snug">
                   {selectedNodeData.label}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedNodeId(null)}
-                className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-white dark:bg-[#111D35]/10 transition-colors"
+                className="p-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:text-white dark:hover:bg-slate-800 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-3 text-[12px] pt-2 border-t border-gray-100 dark:border-white/[0.04] dark:border-white/10 text-gray-600 dark:text-gray-300 dark:text-gray-300 flex-1 overflow-y-auto">
+            <div className="space-y-3 text-[12px] pt-2 border-t border-gray-100 dark:border-slate-800 text-gray-600 dark:text-slate-300 flex-1 overflow-y-auto">
               {selectedNodeData.usedBy && (
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400 block text-[10px] uppercase font-bold">Adoption / Metrics:</span>
-                  <span className="font-medium text-gray-900 dark:text-white dark:text-white">{selectedNodeData.usedBy}</span>
+                  <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">Adoption / Metrics:</span>
+                  <span className="font-medium text-gray-900 dark:text-white">{selectedNodeData.usedBy}</span>
                 </div>
               )}
 
               {selectedNodeData.related && (
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400 block text-[10px] uppercase font-bold">Related Concepts:</span>
+                  <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">Related Concepts:</span>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {selectedNodeData.related.map((r, i) => (
-                      <span key={i} className="px-2.5 py-1 rounded-md bg-gray-100 dark:bg-white dark:bg-[#111D35]/5 border border-gray-200 dark:border-white/[0.06] dark:border-white/10 text-[11px] font-medium text-gray-700 dark:text-gray-200 dark:text-gray-300">
+                      <span key={i} className="px-2.5 py-1 rounded-md bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-[11px] font-medium text-gray-700 dark:text-slate-200">
                         {r}
                       </span>
                     ))}
@@ -395,10 +395,10 @@ const GraphCanvas = () => {
 
               {selectedNodeData.datasets && (
                 <div>
-                  <span className="text-gray-500 dark:text-gray-400 block text-[10px] uppercase font-bold">Primary Datasets:</span>
+                  <span className="text-gray-500 dark:text-slate-400 block text-[10px] uppercase font-bold">Primary Datasets:</span>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {selectedNodeData.datasets.map((d, i) => (
-                      <span key={i} className="px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">
+                      <span key={i} className="px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 text-[11px] font-medium text-emerald-700 dark:text-emerald-300">
                         {d}
                       </span>
                     ))}
@@ -408,10 +408,10 @@ const GraphCanvas = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="pt-3 border-t border-gray-100 dark:border-white/[0.04] dark:border-white/10 flex flex-wrap items-center gap-2">
+            <div className="pt-3 border-t border-gray-100 dark:border-slate-800 flex flex-wrap items-center gap-2">
               {uiMode === 'expert' && (
                 <button
-                  className="w-full py-1.5 px-3 bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold rounded-xl border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center gap-1.5 transition-colors mb-1"
+                  className="w-full py-1.5 px-3 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300 text-[11px] font-semibold rounded-xl border border-indigo-200 dark:border-indigo-800/60 flex items-center justify-center gap-1.5 transition-colors mb-1"
                 >
                   <PlusCircle className="w-3 h-3" />
                   Expand Node (1-hop)
@@ -427,7 +427,7 @@ const GraphCanvas = () => {
                     setActivePage('search');
                   }
                 }}
-                className="flex-1 py-2 px-3 bg-gray-50 dark:bg-white/[0.04] dark:bg-white dark:bg-[#111D35]/10 hover:bg-gray-100 dark:hover:bg-white dark:bg-[#111D35]/15 text-gray-900 dark:text-white dark:text-white text-[12px] font-semibold rounded-xl border border-gray-200 dark:border-white/[0.06] dark:border-white/15 flex items-center justify-center gap-1.5 transition-colors"
+                className="flex-1 py-2 px-3 bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-900 dark:text-white text-[12px] font-semibold rounded-xl border border-gray-200 dark:border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>{selectedNodeData.paperId ? 'Open Paper' : 'Search'}</span>

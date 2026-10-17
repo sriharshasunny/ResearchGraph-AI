@@ -4,7 +4,7 @@ import {
   Network, Mail, Lock, User, ArrowRight, BrainCircuit, Sparkles, ArrowLeft, 
   Zap, Database, Layers, Info, X, Compass, Award, KeyRound, CheckCircle2,
   Play, ChevronDown, Activity, Cpu, Share2, Radio, FileText,
-  Microscope, Binary, Eye, EyeOff, Loader2
+  Microscope, Binary, Eye, EyeOff, Loader2, Clock3
 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
@@ -49,9 +49,14 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topologySectionRef = useRef<HTMLDivElement>(null);
+  const videoSectionRef = useRef<HTMLDivElement>(null);
   const sourcesSectionRef = useRef<HTMLDivElement>(null);
   const pipelineSectionRef = useRef<HTMLDivElement>(null);
   const sandboxSectionRef = useRef<HTMLDivElement>(null);
+
+  const [selectedVideoIdx, setSelectedVideoIdx] = useState(0);
+  const [activeSimChapter, setActiveSimChapter] = useState(0);
+  const [isSimPlaying, setIsSimPlaying] = useState(true);
 
   // Scroll Progress Bar
   const { scrollYProgress } = useScroll({ container: scrollContainerRef });
@@ -178,6 +183,92 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     }
   ];
 
+  const landingVideos = [
+    {
+      id: 'tour',
+      youtubeId: null,
+      title: 'Autonomous ResearchGraph Tour & 3D Synthesis',
+      publisher: 'ResearchGraph Core Team',
+      duration: '3:24',
+      badge: 'Interactive Walkthrough',
+      tagColor: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10',
+      description: 'See live 3D graph vectorization, 45+ repository ingestion, and multi-LLM consensus synthesis operating in real-time.',
+      highlights: ['Sub-15ms Latency', 'Multi-Hop Graph Walks', '1536-Dim GNN Embeddings', 'Verifiable Citations']
+    },
+    {
+      id: 'neo4j',
+      youtubeId: 'YVLwu3jE09c',
+      title: 'What is a Knowledge Graph?',
+      publisher: 'Neo4j Graph Database',
+      duration: '2:36',
+      badge: 'Graph Foundations',
+      tagColor: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
+      description: 'An authoritative introduction to nodes, edges, relationships, and how connected data transforms scientific discovery.',
+      highlights: ['Semantic Property Graphs', 'Entities & Relationships', 'Relational vs Graph', 'Multi-Hop Traversal']
+    },
+    {
+      id: 'ibm',
+      youtubeId: 'y7sXDpffzQQ',
+      title: 'Knowledge Graphs, Clearly Explained',
+      publisher: 'IBM Technology',
+      duration: '6:12',
+      badge: 'AI & Context',
+      tagColor: 'text-purple-400 border-purple-500/40 bg-purple-500/10',
+      description: 'IBM Technology explains how connected information and ontological structures anchor LLMs to ground truth with zero hallucination.',
+      highlights: ['Contextual Grounding', 'Entity Disambiguation', 'Ontology Engineering', 'LLM Integration']
+    },
+    {
+      id: 'stanford',
+      youtubeId: 'JtDgmmQ60x8',
+      title: 'Graph Neural Networks & Machine Learning on Graphs',
+      publisher: 'Stanford Online • CS224W',
+      duration: '4:50',
+      badge: 'Deep Learning',
+      tagColor: 'text-amber-400 border-amber-500/40 bg-amber-500/10',
+      description: 'Stanford CS224W lecture on Graph Neural Networks (GNNs), message passing algorithms, and topological embeddings for scientific discovery.',
+      highlights: ['Message Passing (MPNN)', 'Permutation Invariance', 'Graph Convolutional Networks', 'Biomedical Discovery']
+    }
+  ];
+
+  const simulationChapters = [
+    {
+      title: '01 • Multimodal Document Ingestion',
+      metric: '45+ Sources Active',
+      detail: 'Continuous stream parsing LaTeX equations, tables, figures, and author networks across arXiv, PubMed, and IEEE.',
+      badge: 'Ingestion Phase',
+      color: 'from-blue-500 to-cyan-400'
+    },
+    {
+      title: '02 • 3D Topology & GNN Clustering',
+      metric: '204.8M Nodes Mapped',
+      detail: 'Spatial projection into 1536-dimensional manifold where conceptual similarity translates to geometric Euclidean distance.',
+      badge: 'Graph Engine',
+      color: 'from-cyan-400 to-emerald-400'
+    },
+    {
+      title: '03 • Hybrid Dense & Graph Retrieval',
+      metric: '14ms Traversal',
+      detail: 'Traversing multi-hop citation paths across interdisciplinary bridge papers to uncover hidden cross-domain solutions.',
+      badge: 'Retrieval Phase',
+      color: 'from-purple-400 to-pink-400'
+    },
+    {
+      title: '04 • Multi-LLM Consensus Synthesis',
+      metric: '100% Citation Grounding',
+      detail: 'Ensemble consensus of GPT-4o, Claude 3.5, and Gemini generating verifiable literature reviews with direct DOI links.',
+      badge: 'Synthesis Phase',
+      color: 'from-emerald-400 to-teal-300'
+    }
+  ];
+
+  useEffect(() => {
+    if (!isSimPlaying || landingVideos[selectedVideoIdx].id !== 'tour') return;
+    const timer = setInterval(() => {
+      setActiveSimChapter(prev => (prev + 1) % 4);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [isSimPlaying, selectedVideoIdx]);
+
   return (
     <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
       
@@ -257,6 +348,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </button>
 
                   <button 
+                    onClick={() => scrollToSection(videoSectionRef)}
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-cyan-200 rounded-full hover:bg-cyan-500/15 transition-all flex items-center gap-2 group"
+                  >
+                    <Play className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400 group-hover:scale-110 transition-transform" />
+                    <span>Watch Tour</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 font-mono font-bold">4 Videos</span>
+                  </button>
+
+                  <button 
                     onClick={() => scrollToSection(pipelineSectionRef)}
                     className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-purple-200 rounded-full hover:bg-purple-500/15 transition-all flex items-center gap-2 group"
                   >
@@ -331,6 +431,12 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       className="text-left py-2.5 px-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-500/15 rounded-xl flex items-center gap-2.5"
                     >
                       <Network className="w-4 h-4 text-indigo-400" /> 3D Topology
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection(videoSectionRef); setMobileMenuOpen(false); }}
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-500/15 rounded-xl flex items-center gap-2.5"
+                    >
+                      <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" /> Watch Videos & Tour
                     </button>
                     <button 
                       onClick={() => { scrollToSection(pipelineSectionRef); setMobileMenuOpen(false); }}
@@ -762,6 +868,221 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       );
                     })}
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION: INTERACTIVE VIDEO SHOWCASE & SCIENTIFIC WALKTHROUGH          */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div 
+                ref={videoSectionRef}
+                className="w-full py-24 px-4 sm:px-8 bg-gradient-to-b from-[#04091a] via-[#050e26] to-[#030612] relative z-20 border-t border-cyan-500/25 overflow-hidden"
+              >
+                {/* Floating ambient glow orbs */}
+                <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none"></div>
+                <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-purple-500/10 blur-[130px] pointer-events-none"></div>
+
+                <div className="max-w-7xl mx-auto relative z-10">
+                  
+                  {/* Section Eyebrow & Header */}
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase mb-3 shadow-lg backdrop-blur-md">
+                      <Play className="w-3.5 h-3.5 fill-cyan-400" /> Watch &amp; Explore
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-4">
+                      See Connected Knowledge<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
+                        In Action
+                      </span>
+                    </h2>
+                    <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                      Watch authoritative technical walkthroughs and explore how ResearchGraph AI unifies high-dimensional vector graphs, multi-hop citation traversals, and multi-LLM consensus synthesis.
+                    </p>
+                  </div>
+
+                  {/* Video Selector Tabs */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8">
+                    {landingVideos.map((video, idx) => {
+                      const isSelected = selectedVideoIdx === idx;
+                      return (
+                        <button
+                          key={video.id}
+                          onClick={() => setSelectedVideoIdx(idx)}
+                          className={`p-4 rounded-2xl text-left transition-all duration-300 border flex flex-col justify-between relative overflow-hidden group ${
+                            isSelected
+                              ? 'bg-[#081533] border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.35)] scale-[1.02]'
+                              : 'bg-[#060c20]/80 border-white/10 hover:border-cyan-500/40 hover:bg-[#08122a] text-gray-300'
+                          }`}
+                        >
+                          {isSelected && (
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-500"></div>
+                          )}
+
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold border ${video.tagColor}`}>
+                                {video.badge}
+                              </span>
+                              <span className="text-[11px] font-mono text-cyan-400 font-semibold flex items-center gap-1">
+                                <Clock3 className="w-3 h-3" /> {video.duration}
+                              </span>
+                            </div>
+
+                            <h4 className={`text-sm font-bold line-clamp-2 mb-1.5 transition-colors ${isSelected ? 'text-white' : 'text-gray-200 group-hover:text-white'}`}>
+                              {video.title}
+                            </h4>
+
+                            <span className="text-[11px] font-mono text-gray-400 block mb-2">
+                              {video.publisher}
+                            </span>
+                          </div>
+
+                          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-semibold">
+                            <span className={isSelected ? 'text-cyan-300 flex items-center gap-1.5' : 'text-gray-400 group-hover:text-gray-200'}>
+                              {isSelected ? (
+                                <>
+                                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                                  Now Playing
+                                </>
+                              ) : (
+                                'Click to Watch'
+                              )}
+                            </span>
+                            <Play className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'text-cyan-400 fill-cyan-400' : 'text-gray-500 group-hover:text-cyan-300 group-hover:scale-110'}`} />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* High-Tech Main Theater Display Deck */}
+                  <div className="relative rounded-3xl border-2 border-cyan-400/50 bg-[#050b1d]/95 backdrop-blur-2xl shadow-[0_0_60px_rgba(6,182,212,0.25)] overflow-hidden p-4 sm:p-7">
+                    
+                    {/* Top Cockpit Telemetry Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-white/10 text-xs font-mono">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                          THEATER // {landingVideos[selectedVideoIdx].badge.toUpperCase()}
+                        </div>
+                        <span className="text-gray-400 hidden sm:inline">•</span>
+                        <span className="text-white font-bold hidden sm:inline">{landingVideos[selectedVideoIdx].title}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-400">Duration: <strong className="text-cyan-400">{landingVideos[selectedVideoIdx].duration}</strong></span>
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">1080p HD</span>
+                      </div>
+                    </div>
+
+                    {/* VIDEO CONTAINER */}
+                    <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/90 border border-white/10 shadow-2xl flex items-center justify-center">
+                      {landingVideos[selectedVideoIdx].youtubeId ? (
+                        <iframe
+                          src={`https://www.youtube-nocookie.com/embed/${landingVideos[selectedVideoIdx].youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                          title={landingVideos[selectedVideoIdx].title}
+                          className="w-full h-full border-none"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        /* LIVE INTERACTIVE SIMULATED NEURAL WALKTHROUGH */
+                        <div className="relative w-full h-full bg-gradient-to-br from-[#030718] via-[#06122e] to-[#020510] flex flex-col justify-between p-6 sm:p-10 select-none overflow-hidden">
+                          {/* Animated Background Vector Lines */}
+                          <div className="absolute inset-0 pointer-events-none opacity-30">
+                            <svg className="w-full h-full" viewBox="0 0 800 450">
+                              <circle cx="200" cy="180" r="140" fill="none" stroke="#06b6d4" strokeWidth="0.8" strokeDasharray="4 4" className="animate-spin" style={{ animationDuration: '40s' }} />
+                              <circle cx="600" cy="220" r="160" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeDasharray="6 6" className="animate-spin" style={{ animationDuration: '50s', animationDirection: 'reverse' }} />
+                              <line x1="200" y1="180" x2="600" y2="220" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="6 4" />
+                              <circle cx="360" cy="195" r="4" fill="#38bdf8">
+                                <animate attributeName="cx" values="200;600;200" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="cy" values="180;220;180" dur="4s" repeatCount="indefinite" />
+                              </circle>
+                            </svg>
+                          </div>
+
+                          {/* Top Simulation HUD */}
+                          <div className="relative z-10 flex items-center justify-between text-xs font-mono">
+                            <div className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                              <span className="text-cyan-300 font-bold uppercase tracking-widest">REAL-TIME TRAVERSAL ENGINE</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setIsSimPlaying(!isSimPlaying)}
+                                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-gray-200 text-[11px] font-mono flex items-center gap-1.5 transition-colors"
+                              >
+                                {isSimPlaying ? 'Pause Walkthrough' : 'Play Walkthrough'}
+                              </button>
+                              <div className="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full border border-white/10">
+                                <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-400 font-bold">14ms GRAPH LATENCY</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Center Active Chapter Visualizer */}
+                          <div className="relative z-10 my-auto text-center max-w-2xl mx-auto">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-cyan-300 text-xs font-mono font-bold mb-3 backdrop-blur-md">
+                              <span>CHAPTER {activeSimChapter + 1} OF 4</span> • <span>{simulationChapters[activeSimChapter].badge}</span>
+                            </div>
+                            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3">
+                              {simulationChapters[activeSimChapter].title}
+                            </h3>
+                            <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">
+                              {simulationChapters[activeSimChapter].detail}
+                            </p>
+                            
+                            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-mono text-xs sm:text-sm shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                              <Sparkles className="w-4 h-4 text-cyan-300" />
+                              <span>Live Metric: <strong>{simulationChapters[activeSimChapter].metric}</strong></span>
+                            </div>
+                          </div>
+
+                          {/* Bottom Chapter Steps Progress Track */}
+                          <div className="relative z-10 grid grid-cols-4 gap-2 pt-4 border-t border-white/10">
+                            {simulationChapters.map((chap, cIdx) => (
+                              <button
+                                key={cIdx}
+                                onClick={() => setActiveSimChapter(cIdx)}
+                                className={`text-left p-2 rounded-xl transition-all ${
+                                  activeSimChapter === cIdx
+                                    ? 'bg-white/15 border border-cyan-400/70 text-white'
+                                    : 'bg-black/30 border border-white/5 text-gray-400 hover:text-gray-200'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[10px] font-mono font-bold">0{cIdx + 1}</span>
+                                  {activeSimChapter === cIdx && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>}
+                                </div>
+                                <span className="text-[11px] font-bold block truncate">{chap.badge}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Metadata & Highlights Row */}
+                    <div className="mt-6 pt-5 border-t border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-base font-bold text-white mb-1">{landingVideos[selectedVideoIdx].title}</h4>
+                        <p className="text-xs text-gray-300 max-w-2xl">{landingVideos[selectedVideoIdx].description}</p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {landingVideos[selectedVideoIdx].highlights.map((item, hIdx) => (
+                          <span key={hIdx} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono font-semibold text-gray-300 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3 h-3 text-cyan-400" />
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
                   </div>
 
                 </div>
@@ -1349,44 +1670,75 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       )}
 
-                      {/* --- MODAL 4: INTERACTIVE DEMO WALKTHROUGH --- */}
+                      {/* --- MODAL 4: INTERACTIVE DEMO & VIDEO WALKTHROUGH --- */}
                       {activeModal === 'DEMO' && (
                         <div>
                           <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2">
                             <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" /> Interactive Platform Demonstration
                           </div>
-                          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Cockpit Research Traversal</h2>
+                          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Cockpit Research Traversal & Video Tour</h2>
                           <p className="text-gray-300 text-sm leading-relaxed mb-6">
                             Experience how ResearchGraph AI automates months of literature discovery into seconds of deep graph traversal.
                           </p>
 
+                          {/* Embedded Video / Interactive Player */}
+                          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/90 border border-cyan-500/40 mb-6 shadow-2xl">
+                            <iframe
+                              src="https://www.youtube-nocookie.com/embed/YVLwu3jE09c?autoplay=1&rel=0&modestbranding=1"
+                              title="What is a Knowledge Graph?"
+                              className="w-full h-full border-none"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          </div>
+
                           <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/30 mb-6">
                             <div className="flex items-center justify-between mb-3 text-xs font-mono text-gray-400">
                               <span className="text-cyan-400 font-bold">SIMULATION: GNN DRUG DISCOVERY</span>
-                              <span className="text-emerald-400 font-bold">● ACTIVE SYNTHESIS</span>
+                              <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                ACTIVE SYNTHESIS
+                              </span>
                             </div>
 
-                            <div className="space-y-3 text-xs">
-                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                                <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 1 • Parallel Query Dispatch</span>
-                                <span className="text-white font-semibold">Broadcasting to arXiv, PubMed, IEEE, CrossRef (1,420 matched candidates)</span>
+                            <div className="space-y-2.5 text-xs">
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+                                <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono text-[10px] font-bold">01</span>
+                                <div>
+                                  <span className="text-white font-semibold block">Parallel Ingestion Stream</span>
+                                  <span className="text-gray-400 text-[11px]">Broadcasting query to arXiv, PubMed, IEEE, CrossRef (1,420 matched candidates)</span>
+                                </div>
                               </div>
-                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                                <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 2 • 3D Topology Clustering</span>
-                                <span className="text-cyan-300 font-semibold">Extracting ADMET prediction cluster & E(3)-equivariant graph neural networks</span>
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+                                <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold">02</span>
+                                <div>
+                                  <span className="text-cyan-300 font-semibold block">3D Topology & GNN Message Passing</span>
+                                  <span className="text-gray-400 text-[11px]">Extracting ADMET prediction cluster & E(3)-equivariant graph neural networks</span>
+                                </div>
                               </div>
-                              <div className="p-3 rounded-xl bg-white/5 border border-white/10">
-                                <span className="text-[10px] text-gray-400 uppercase font-mono block">Step 3 • Multi-LLM Consensus Synthesis</span>
-                                <span className="text-emerald-300 font-semibold">Ensemble generated 4 key hypotheses with 100% verified citation anchors</span>
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+                                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold">03</span>
+                                <div>
+                                  <span className="text-emerald-300 font-semibold block">Multi-LLM Consensus Synthesis</span>
+                                  <span className="text-gray-400 text-[11px]">Ensemble generated 4 key hypotheses with 100% verified citation anchors</span>
+                                </div>
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                            <span className="text-xs text-gray-400">Ready to explore with your own research queries?</span>
+                          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
+                            <button
+                              onClick={() => {
+                                setActiveModal(null);
+                                scrollToSection(videoSectionRef);
+                              }}
+                              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5"
+                            >
+                              <Play className="w-3.5 h-3.5" /> Watch all 4 videos in full theater
+                            </button>
                             <button 
                               onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
+                              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 w-full sm:w-auto justify-center"
                             >
                               Launch Explorer Now <ArrowRight className="w-3.5 h-3.5" />
                             </button>
