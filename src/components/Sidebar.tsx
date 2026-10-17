@@ -4,7 +4,9 @@ import {
   Activity,
   BookOpen,
   Bookmark,
+  ChevronRight,
   Clock3,
+  Crown,
   GitCompare,
   Home,
   MessageSquare,
@@ -18,15 +20,15 @@ import { ProfileModal } from './ProfileModal';
 import { SettingsModal } from './SettingsModal';
 
 const navItems = [
-  { id: 'dashboard', label: 'Home', rail: 'Home', icon: Home, accent: 'text-blue-600 bg-blue-100/80' },
-  { id: 'search', label: 'Search Papers', rail: 'Search', icon: Search, accent: 'text-fuchsia-600 bg-fuchsia-100/80' },
-  { id: 'chat', label: 'AI Research Assistant', rail: 'Chat', icon: MessageSquare, accent: 'text-violet-600 bg-violet-100/80' },
-  { id: 'graph', label: 'Knowledge Graph', rail: 'Graph', icon: Network, accent: 'text-emerald-600 bg-emerald-100/80' },
-  { id: 'compare', label: 'Compare Papers', rail: 'Compare', icon: GitCompare, accent: 'text-orange-500 bg-orange-100/80' },
-  { id: 'literature', label: 'Literature Review', rail: 'Review', icon: BookOpen, accent: 'text-purple-600 bg-purple-100/80' },
-  { id: 'gaps', label: 'Research Gaps', rail: 'Gaps', icon: Activity, accent: 'text-cyan-600 bg-cyan-100/80' },
-  { id: 'saved', label: 'Saved Papers', rail: 'Saved', icon: Bookmark, accent: 'text-rose-600 bg-rose-100/80' },
-  { id: 'history', label: 'History', rail: 'History', icon: Clock3, accent: 'text-amber-500 bg-amber-100/80' },
+  { id: 'dashboard', label: 'Home', rail: 'Home', description: 'Dashboard & overview', icon: Home, accent: 'text-blue-600 bg-blue-100/80' },
+  { id: 'search', label: 'Search', rail: 'Search', description: 'Find papers & authors', icon: Search, accent: 'text-fuchsia-600 bg-fuchsia-100/80' },
+  { id: 'chat', label: 'Chat', rail: 'Chat', description: 'Ask research questions', icon: MessageSquare, accent: 'text-violet-600 bg-violet-100/80' },
+  { id: 'graph', label: 'Graph', rail: 'Graph', description: 'Explore knowledge graph', icon: Network, accent: 'text-emerald-600 bg-emerald-100/80' },
+  { id: 'compare', label: 'Compare', rail: 'Compare', description: 'Compare papers & methods', icon: GitCompare, accent: 'text-orange-500 bg-orange-100/80' },
+  { id: 'literature', label: 'Review', rail: 'Review', description: 'Read & take notes', icon: BookOpen, accent: 'text-purple-600 bg-purple-100/80' },
+  { id: 'gaps', label: 'Gaps', rail: 'Gaps', description: 'Find research opportunities', icon: Activity, accent: 'text-cyan-600 bg-cyan-100/80' },
+  { id: 'saved', label: 'Saved', rail: 'Saved', description: 'Your saved papers', icon: Bookmark, accent: 'text-rose-600 bg-rose-100/80' },
+  { id: 'history', label: 'History', rail: 'History', description: 'Recent activity', icon: Clock3, accent: 'text-amber-500 bg-amber-100/80' },
 ] as const;
 
 export const Sidebar: React.FC = () => {
@@ -40,7 +42,7 @@ export const Sidebar: React.FC = () => {
     if (isSidebarOpen) toggleSidebar();
   }, [isSidebarOpen, setActivePage, toggleSidebar]);
 
-  const utilityButton = (label: string, Icon: typeof Settings, onClick: () => void, accent: string) => (
+  const utilityButton = (label: string, description: string, Icon: typeof Settings, onClick: () => void, accent: string) => (
     <button
       key={label}
       type="button"
@@ -50,20 +52,24 @@ export const Sidebar: React.FC = () => {
       onMouseLeave={() => setTooltip(null)}
       onFocus={event => !isSidebarOpen && setTooltip({ label, top: event.currentTarget.getBoundingClientRect().top + 20 })}
       onBlur={() => setTooltip(null)}
-      className={`relative flex h-10 items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSidebarOpen ? 'w-full gap-3 px-3' : 'mx-auto w-10 justify-center'}`}
+      className={`relative flex items-center rounded-xl text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSidebarOpen ? 'min-h-[58px] w-full gap-3 px-3.5' : 'mx-auto h-10 w-10 justify-center'}`}
     >
       <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${accent}`}>
         <Icon className="h-[18px] w-[18px] stroke-[1.9]" />
       </span>
-      <span className={`overflow-hidden whitespace-nowrap text-left text-xs font-medium transition-all duration-200 ${isSidebarOpen ? 'max-w-44 opacity-100' : 'max-w-0 opacity-0'}`}>{label}</span>
+      <span className={`min-w-0 overflow-hidden text-left transition-all duration-200 ${isSidebarOpen ? 'max-w-52 opacity-100' : 'max-w-0 opacity-0'}`}>
+        <span className="block truncate text-[13px] font-semibold text-slate-800">{label}</span>
+        <span className="mt-0.5 block truncate text-[11px] text-slate-500">{description}</span>
+      </span>
+      {isSidebarOpen && <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-400" />}
     </button>
   );
 
   const navigation = (
     <>
       <nav aria-label="Primary navigation" className="scrollbar-thin flex-1 overflow-y-auto overflow-x-hidden py-3">
-        <div className="flex flex-col gap-1 px-2">
-          {navItems.map(({ id, label, rail, icon: Icon, accent }) => {
+        <div className="flex flex-col gap-1.5 px-2.5">
+          {navItems.map(({ id, label, rail, description, icon: Icon, accent }) => {
             const isActive = activePage === id || (id === 'search' && (activePage === 'papers' || activePage === 'details'));
             return (
               <button
@@ -76,12 +82,16 @@ export const Sidebar: React.FC = () => {
                 onMouseLeave={() => setTooltip(null)}
                 onFocus={event => !isSidebarOpen && setTooltip({ label, top: event.currentTarget.getBoundingClientRect().top + 20 })}
                 onBlur={() => setTooltip(null)}
-                className={`relative flex items-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSidebarOpen ? 'h-10 w-full gap-3 px-3' : 'mx-auto h-[64px] w-full flex-col justify-center gap-1 px-1'} ${isActive ? 'bg-blue-50 text-blue-700 before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-full before:bg-blue-600' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`}
+                className={`relative flex items-center rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${isSidebarOpen ? 'min-h-[62px] w-full gap-3 px-3.5' : 'mx-auto h-[64px] w-full flex-col justify-center gap-1 px-1'} ${isActive ? 'bg-[linear-gradient(105deg,#EFF5FF,#E9F1FF)] text-blue-700 shadow-[0_5px_14px_-12px_rgba(37,99,235,.55)] before:absolute before:inset-y-2 before:left-0 before:w-[3px] before:rounded-r-full before:bg-blue-600' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`}
               >
                 <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${accent}`}>
                   <Icon className="h-[18px] w-[18px] stroke-[1.9]" />
                 </span>
-                <span className={`overflow-hidden font-medium transition-all duration-200 ${isSidebarOpen ? 'max-w-48 whitespace-nowrap text-left text-xs opacity-100' : 'max-w-full whitespace-normal text-center text-[10px] leading-tight opacity-100'}`}>{isSidebarOpen ? label : rail}</span>
+                <span className={`min-w-0 overflow-hidden font-medium transition-all duration-200 ${isSidebarOpen ? 'max-w-52 text-left opacity-100' : 'max-w-full whitespace-normal text-center text-[10px] leading-tight opacity-100'}`}>
+                  <span className={`block truncate ${isSidebarOpen ? 'text-[13px] font-semibold text-slate-800' : ''}`}>{isSidebarOpen ? label : rail}</span>
+                  {isSidebarOpen && <span className="mt-0.5 block truncate text-[11px] font-normal text-slate-500">{description}</span>}
+                </span>
+                {isSidebarOpen && <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-400" />}
               </button>
             );
           })}
@@ -89,8 +99,16 @@ export const Sidebar: React.FC = () => {
       </nav>
       <div className="shrink-0 border-t border-slate-200 px-2.5 py-3">
         <div className="flex flex-col gap-1">
-          {utilityButton('Profile', UserRound, () => setIsProfileOpen(true), 'text-sky-600 bg-sky-100/80')}
-          {utilityButton('Settings', Settings, () => setIsSettingsOpen(true), 'text-violet-600 bg-violet-100/80')}
+          {isSidebarOpen && <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Account</p>}
+          {utilityButton('Profile', 'View and edit profile', UserRound, () => setIsProfileOpen(true), 'text-sky-600 bg-sky-100/80')}
+          {utilityButton('Settings', 'Preferences & privacy', Settings, () => setIsSettingsOpen(true), 'text-violet-600 bg-violet-100/80')}
+          {isSidebarOpen && (
+            <button type="button" onClick={() => setIsSettingsOpen(true)} className="mt-2 flex items-center gap-3 overflow-hidden rounded-xl bg-[linear-gradient(120deg,#2A56EE,#7B4CF5_60%,#D35AF7)] px-3.5 py-3 text-left text-white shadow-[0_10px_18px_-13px_rgba(92,70,239,.72)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/15"><Crown className="h-5 w-5 text-amber-200" /></span>
+              <span className="min-w-0 flex-1"><span className="block text-xs font-bold">Upgrade to Pro</span><span className="mt-0.5 block text-[10px] text-blue-50">Unlock advanced insights</span></span>
+              <ChevronRight className="h-4 w-4 shrink-0" />
+            </button>
+          )}
         </div>
       </div>
     </>
@@ -103,7 +121,7 @@ export const Sidebar: React.FC = () => {
       <div className="relative z-40 hidden w-[88px] shrink-0 md:block">
         <aside
           aria-label="Primary navigation"
-          className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-slate-200 bg-white text-slate-900 shadow-[8px_0_28px_-24px_rgba(15,23,42,0.35)] transition-[width] duration-[240ms] ease-out ${isSidebarOpen ? 'w-[250px]' : 'w-[88px]'}`}
+          className={`absolute inset-y-0 left-0 flex flex-col overflow-hidden border-r border-slate-200 bg-white text-slate-900 shadow-[12px_0_34px_-26px_rgba(15,23,42,0.42)] transition-[width] duration-[240ms] ease-out ${isSidebarOpen ? 'w-[340px]' : 'w-[88px]'}`}
         >
           {navigation}
         </aside>
@@ -111,7 +129,7 @@ export const Sidebar: React.FC = () => {
 
       <aside
         aria-label="Mobile navigation"
-        className={`fixed bottom-0 left-0 top-[68px] z-40 flex w-[250px] flex-col border-r border-slate-200 bg-white text-slate-900 shadow-2xl transition-transform duration-[240ms] ease-out md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed bottom-0 left-0 top-[68px] z-40 flex w-[340px] max-w-[88vw] flex-col border-r border-slate-200 bg-white text-slate-900 shadow-2xl transition-transform duration-[240ms] ease-out md:hidden ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         {navigation}
       </aside>
