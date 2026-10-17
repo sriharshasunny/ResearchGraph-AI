@@ -280,9 +280,6 @@ export const ResearchKnowledgeCore: React.FC = () => {
 
   return (
     <div ref={hostRef} className="relative h-[480px] sm:h-[520px] lg:h-[560px] w-full touch-pan-y select-none" aria-label="Interactive research knowledge globe">
-      
-      {/* Ambient Radial Blue Backglow */}
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[75%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(59,130,246,0.28)_0%,rgba(147,51,234,0.15)_45%,transparent_70%)] blur-2xl" aria-hidden="true" />
 
       {/* Floating 3D Background Document Sheet (Top Right) */}
       <div 

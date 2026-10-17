@@ -96,18 +96,11 @@ export const Dashboard: React.FC = () => {
           aria-labelledby="dashboard-search-title"
           className="relative isolate min-h-[480px] lg:min-h-[520px] xl:min-h-[550px] overflow-hidden rounded-[24px] border border-[#D0DEF7] bg-[#EAF0FF] px-6 py-6 text-[#18223B] shadow-[0_16px_40px_-25px_rgba(49,75,125,0.38)] sm:px-8 lg:px-10 lg:py-8"
           style={{
-            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,.76) 0%, rgba(249,252,255,.45) 45%, rgba(226,232,255,.08) 100%), url(/hero-bg-light.webp)',
-            backgroundPosition: 'center',
+            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 40%, rgba(255,255,255,0.05) 70%), url(/hero-bg-light.webp)',
+            backgroundPosition: 'center right',
             backgroundSize: 'cover',
           }}
         >
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10"
-            style={{ backgroundImage: 'radial-gradient(ellipse at 75% 40%, rgba(35,91,255,0.25), transparent 45%), radial-gradient(ellipse at 92% 63%, rgba(170,90,255,0.18), transparent 40%), radial-gradient(ellipse at 40% 95%, rgba(130,175,255,.2), transparent 50%)' }}
-          />
-          <div aria-hidden="true" className="absolute -right-20 top-1/2 -z-10 h-[420px] w-[420px] -translate-y-1/2 rounded-full border border-blue-300/30 bg-blue-300/10 blur-[1px]" />
-          
           <div className="grid min-h-[440px] lg:min-h-[470px] xl:min-h-[500px] items-center gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:gap-8">
             <div className="relative z-10 max-w-[650px] py-2">
               {/* Badge */}
