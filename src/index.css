@@ -186,7 +186,7 @@
 .landing-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #18B9D7; }
 .landing-hero-visual { position: relative; z-index: 1; display: grid; min-width: 0; min-height: 510px; place-items: center; }
 .landing-visual-frame { position: relative; display: grid; width: 100%; max-width: 690px; min-height: 510px; place-items: center; overflow: hidden; border: 0; border-radius: 0; background: radial-gradient(ellipse at 52% 48%, rgba(29, 81, 160, .19), rgba(11, 31, 69, .05) 43%, transparent 74%); box-shadow: none; isolation: isolate; }
-.landing-visual-frame iframe { position: absolute; z-index: 1; top: -35%; left: -35%; width: 170%; max-width: none; height: 170%; border: 0; background: transparent; }
+.landing-visual-frame iframe { position: absolute; z-index: 1; top: -22.5%; left: -22.5%; width: 145%; max-width: none; height: 145%; border: 0; background: transparent; }
 .landing-visual-orbit { position: absolute; z-index: 0; width: 70%; aspect-ratio: 1.5; border: 1px solid rgba(111, 166, 255, .1); border-radius: 50%; pointer-events: none; transform: rotate(-20deg); }
 .landing-orbit-two { width: 86%; aspect-ratio: 1.8; border-color: rgba(90, 207, 255, .09); transform: rotate(23deg); }
 .landing-visual-caption { position: absolute; right: 18px; bottom: 16px; z-index: 3; display: flex; align-items: center; gap: 7px; min-height: 34px; border: 1px solid rgba(161, 190, 235, .24); border-radius: 999px; padding: 5px 11px; background: rgba(7, 18, 39, .76); color: #DCE9FA; font-size: 10px; box-shadow: 0 8px 22px -13px rgba(0, 0, 0, .72); backdrop-filter: blur(10px); }
@@ -312,7 +312,7 @@
   .landing-hero h1 { font-size: clamp(44px, 5.2vw, 60px); }
   .landing-hero-visual { min-height: 440px; }
   .landing-visual-frame { min-height: 440px; }
-  .landing-visual-frame iframe { position: absolute; inset: auto; top: -35%; left: -35%; width: 170%; max-width: none; height: 170%; }
+  .landing-visual-frame iframe { position: absolute; inset: auto; top: -22.5%; left: -22.5%; width: 145%; max-width: none; height: 145%; }
   .landing-workflow-track { margin-right: 4%; margin-left: 4%; }
   .landing-step { padding: 15px; }
   .landing-final-cta { margin-right: 24px; margin-left: 24px; }
@@ -322,7 +322,7 @@
   .landing-hero-copy { max-width: 680px; }
   .landing-hero-visual { width: 100%; min-height: 0; }
   .landing-visual-frame { min-height: 0; aspect-ratio: 1.22; }
-  .landing-visual-frame iframe { position: absolute; inset: auto; top: -35%; left: -35%; width: 170%; max-width: none; height: 170%; min-height: 0; }
+  .landing-visual-frame iframe { position: absolute; inset: auto; top: -22.5%; left: -22.5%; width: 145%; max-width: none; height: 145%; min-height: 0; }
   .landing-static-graph { width: 94%; }
   .landing-scroll-cue { margin-top: 0; }
   .landing-topology-grid { grid-template-columns: 1fr 1fr; gap: 25px; }
@@ -362,7 +362,7 @@
   .landing-data-note { margin-top: 14px; font-size: 9px; }
   .landing-hero-visual { width: 100%; min-height: 0; margin-top: 0; }
   .landing-visual-frame { width: 100%; aspect-ratio: 1 / 1.02; min-height: 0; border-radius: 18px; }
-  .landing-visual-frame iframe { position: absolute; inset: auto; top: -20%; left: -20%; width: 140%; max-width: none; height: 140%; min-height: 0; }
+  .landing-visual-frame iframe { position: absolute; inset: auto; top: -12.5%; left: -12.5%; width: 125%; max-width: none; height: 125%; min-height: 0; }
   .landing-visual-caption { right: 8px; bottom: 8px; min-height: 30px; padding: 4px 8px; font-size: 8px; }
   .landing-visual-caption span { font-size: 8px; }
   .landing-static-label { gap: 4px; padding: 6px 8px; font-size: 8px; }
