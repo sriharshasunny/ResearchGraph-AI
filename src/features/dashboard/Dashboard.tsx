@@ -30,15 +30,10 @@ const shortcuts: Array<{ title: string; description: string; icon: typeof Search
   { title: 'Research Gaps', description: 'Find open questions and directions', icon: Sparkles, page: 'gaps', tone: 'bg-violet-50 text-violet-700' },
 ];
 
-const suggestedRow1 = [
+const suggestedQueries = [
   'Vision Transformers',
   'Graph Neural Networks',
   'Self-supervised Learning',
-];
-
-const suggestedRow2 = [
-  'Research gaps in medical imaging',
-  'Compare DINOv2 and MAE',
   'Climate Change',
 ];
 
@@ -94,29 +89,27 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[480px] lg:min-h-[520px] xl:min-h-[550px] overflow-hidden rounded-[24px] border border-[#D0DEF7] bg-[#EAF0FF] px-6 py-6 text-[#18223B] shadow-[0_16px_40px_-25px_rgba(49,75,125,0.38)] sm:px-8 lg:px-10 lg:py-8"
+          className="relative isolate min-h-[380px] lg:min-h-[400px] overflow-hidden rounded-[22px] border border-[#D5E2F8] bg-[#F2F6FE] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-5 text-[#18223B] shadow-[0_10px_30px_-15px_rgba(37,99,235,0.12)]"
           style={{
-            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.65) 40%, rgba(255,255,255,0.05) 70%), url(/hero-bg-light.webp)',
-            backgroundPosition: 'center right',
-            backgroundSize: 'cover',
+            backgroundImage: 'radial-gradient(ellipse at 85% 35%, rgba(199,223,255,0.45), transparent 60%), radial-gradient(ellipse at 15% 90%, rgba(224,235,255,0.6), transparent 50%), linear-gradient(135deg, #F8FAFF 0%, #EDF3FE 50%, #F5F8FF 100%)',
           }}
         >
-          <div className="grid min-h-[440px] lg:min-h-[470px] xl:min-h-[500px] items-center gap-4 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:gap-8">
-            <div className="relative z-10 max-w-[650px] py-2">
+          <div className="grid min-h-[340px] lg:min-h-[360px] items-center gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] xl:gap-6">
+            <div className="relative z-10 max-w-[620px]">
               {/* Badge */}
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-blue-200/60 bg-white/80 px-3 py-1 text-[10px] font-bold tracking-[0.08em] text-[#3B5B8E] shadow-[0_2px_8px_rgba(75,110,170,.08)] backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5 text-[#3B82F6]" />
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/70 bg-white/85 px-2.5 py-0.5 text-[9.5px] font-bold tracking-[0.08em] text-[#3B5B8E] shadow-[0_2px_8px_rgba(75,110,170,.06)] backdrop-blur-sm">
+                <Sparkles className="h-3 w-3 text-[#3B82F6]" />
                 <span>RESEARCH INTELLIGENCE, REIMAGINED</span>
               </div>
 
               {/* Title */}
-              <h1 id="dashboard-search-title" className="text-[28px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] sm:text-[34px] lg:text-[40px] xl:text-[44px]">
+              <h1 id="dashboard-search-title" className="text-[25px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] sm:text-[29px] lg:text-[33px] xl:text-[36px]">
                 Discover. Connect. Advance<br />
                 <span className="text-[#2563EB]">Research</span> with AI.
               </h1>
 
               {/* Subtitle */}
-              <p className="mt-2.5 max-w-[500px] text-[13px] leading-relaxed text-[#4B5A74] sm:text-[14px]">
+              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#4B5A74] sm:text-[13px]">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -127,92 +120,61 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-4 flex h-[50px] max-w-[580px] items-center gap-2 rounded-2xl border border-white/90 bg-white/90 p-1.5 pl-4 shadow-[0_8px_24px_rgba(37,99,235,0.08)] backdrop-blur-md focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100/50"
+                className="mt-3.5 flex h-[46px] max-w-[540px] items-center gap-2 rounded-xl border border-white/95 bg-white/95 p-1 pl-3.5 shadow-[0_4px_16px_rgba(37,99,235,0.06)] backdrop-blur-md focus-within:border-blue-400 focus-within:ring-4 focus-within:ring-blue-100/40"
               >
-                <Search aria-hidden="true" className="h-4.5 w-4.5 shrink-0 text-slate-400" />
+                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
                   aria-label="Search academic papers, authors, and topics"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
                   placeholder="Ask anything about academic research..."
-                  className="min-w-0 flex-1 bg-transparent py-2 text-[13px] font-medium text-slate-800 outline-none placeholder:text-slate-400 sm:text-[14px]"
+                  className="min-w-0 flex-1 bg-transparent py-1.5 text-[12.5px] font-medium text-slate-800 outline-none placeholder:text-slate-400 sm:text-[13px]"
                 />
                 <button
                   type="submit"
-                  className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-xl bg-[#2563EB] px-5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:text-sm"
+                  className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-lg bg-[#2563EB] px-4 text-xs font-bold text-white shadow-xs transition hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:text-xs"
                 >
-                  Search <ArrowRight className="h-4 w-4" />
+                  Search <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </form>
 
-              {/* Try Queries (Two Rows) */}
-              <div className="mt-3.5 space-y-1.5 max-w-[620px]">
-                <div className="flex flex-wrap items-center gap-1.5 text-[11px] sm:text-[11.5px]">
-                  <span className="font-semibold text-slate-700 mr-0.5">Try:</span>
-                  {suggestedRow1.map(term => (
-                    <button
-                      key={term}
-                      type="button"
-                      onClick={() => openSearch(term)}
-                      className="rounded-full border border-white/80 bg-white/70 px-3 py-1 font-medium text-slate-700 shadow-xs backdrop-blur-xs transition hover:border-blue-300 hover:bg-white hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
-                <div className="flex flex-wrap items-center gap-1.5 pl-8 text-[11px] sm:text-[11.5px]">
-                  {suggestedRow2.map(term => (
-                    <button
-                      key={term}
-                      type="button"
-                      onClick={() => openSearch(term)}
-                      className="rounded-full border border-white/80 bg-white/70 px-3 py-1 font-medium text-slate-700 shadow-xs backdrop-blur-xs transition hover:border-blue-300 hover:bg-white hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-                    >
-                      {term}
-                    </button>
-                  ))}
-                </div>
+              {/* Try Queries */}
+              <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10.5px] sm:text-[11px]">
+                <span className="font-semibold text-slate-700 mr-0.5">Try:</span>
+                {suggestedQueries.map(term => (
+                  <button
+                    key={term}
+                    type="button"
+                    onClick={() => openSearch(term)}
+                    className="rounded-full border border-white/90 bg-white/80 px-2.5 py-0.5 font-medium text-slate-700 shadow-xs transition hover:border-blue-300 hover:bg-white hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
+                  >
+                    {term}
+                  </button>
+                ))}
               </div>
 
-              {/* 3 Bottom Feature Cards */}
-              <div className="mt-6 flex flex-wrap items-center gap-3">
-                {/* Card 1: 200M+ Papers */}
-                <div className="flex items-center gap-3 rounded-2xl border border-white/90 bg-white/80 px-4 py-2.5 shadow-[0_4px_16px_rgba(40,67,118,0.06)] backdrop-blur-md">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-100">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 leading-tight">200M+ Papers</div>
-                    <div className="text-[10px] font-medium text-slate-500">from arXiv & OpenAlex</div>
-                  </div>
+              {/* 3 Bottom Feature Pills (Clean Single Row) */}
+              <div className="mt-3.5 flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <div className="flex items-center gap-2 rounded-xl border border-white/90 bg-white/80 px-3 py-1.5 shadow-xs backdrop-blur-xs">
+                  <BookOpen className="h-3.5 w-3.5 text-purple-600" />
+                  <span className="text-[11px] font-bold text-slate-900">200M+ Papers</span>
+                  <span className="text-[9.5px] text-slate-400 hidden sm:inline">• arXiv & OpenAlex</span>
                 </div>
-
-                {/* Card 2: Knowledge Graph */}
-                <div className="flex items-center gap-3 rounded-2xl border border-white/90 bg-white/80 px-4 py-2.5 shadow-[0_4px_16px_rgba(40,67,118,0.06)] backdrop-blur-md">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
-                    <Network className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 leading-tight">Knowledge Graph</div>
-                    <div className="text-[10px] font-medium text-slate-500">Discover hidden connections</div>
-                  </div>
+                <div className="flex items-center gap-2 rounded-xl border border-white/90 bg-white/80 px-3 py-1.5 shadow-xs backdrop-blur-xs">
+                  <Network className="h-3.5 w-3.5 text-emerald-600" />
+                  <span className="text-[11px] font-bold text-slate-900">Knowledge Graph</span>
+                  <span className="text-[9.5px] text-slate-400 hidden sm:inline">• Connected</span>
                 </div>
-
-                {/* Card 3: AI Insights */}
-                <div className="flex items-center gap-3 rounded-2xl border border-white/90 bg-white/80 px-4 py-2.5 shadow-[0_4px_16px_rgba(40,67,118,0.06)] backdrop-blur-md">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-500 border border-amber-100">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-slate-900 leading-tight">AI Insights</div>
-                    <div className="text-[10px] font-medium text-slate-500">Summarize, analyze, explore</div>
-                  </div>
+                <div className="flex items-center gap-2 rounded-xl border border-white/90 bg-white/80 px-3 py-1.5 shadow-xs backdrop-blur-xs">
+                  <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="text-[11px] font-bold text-slate-900">AI Insights</span>
+                  <span className="text-[9.5px] text-slate-400 hidden sm:inline">• Synthesis</span>
                 </div>
               </div>
             </div>
 
-            {/* Right Side: Interactive 3D Globe with 4 Realistic Paper Cards & Category Pills */}
-            <div className="relative mx-auto flex h-[480px] sm:h-[510px] lg:h-[540px] xl:h-[560px] w-full items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
+            {/* Right Side: Clean 3D Knowledge Core */}
+            <div className="relative mx-auto flex h-[340px] sm:h-[360px] lg:h-[380px] w-full items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
               <ResearchKnowledgeCore />
             </div>
           </div>

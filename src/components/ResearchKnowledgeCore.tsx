@@ -1,27 +1,123 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import {
   FileText,
   Network,
-  Sparkles,
-  Globe2,
   ArrowRight,
   Quote,
 } from 'lucide-react';
-import { originalHubPoints } from './researchCoreModelData';
 import { useApp } from '../context/AppContext';
 
-const MODEL_ORIGIN = { x: 1210, y: 444 };
-const MODEL_BOUNDS = { width: 800, height: 580 };
-const MODEL_RADIUS = 141;
-const SPHERE_RADIUS = 2.4;
-const MODEL_ZOOM = 0.98;
+// Hub locations for real-world academic connections (lat, lng, name)
+const HUBS = [
+  { lat: 42.36, lng: -71.09, name: 'MIT/Harvard' },
+  { lat: 37.43, lng: -122.17, name: 'Stanford' },
+  { lat: 51.51, lng: -0.12, name: 'London/Imperial' },
+  { lat: 47.37, lng: 8.55, name: 'ETH Zurich' },
+  { lat: 35.68, lng: 139.77, name: 'Tokyo' },
+  { lat: 1.35, lng: 103.82, name: 'Singapore' },
+  { lat: -33.87, lng: 151.21, name: 'Sydney' },
+  { lat: 39.90, lng: 116.40, name: 'Tsinghua' },
+  { lat: 48.85, lng: 2.35, name: 'Paris/Sorbonne' },
+  { lat: 37.77, lng: -122.42, name: 'UC Berkeley' },
+];
+
+function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector3 {
+  const phi = (90 - lat) * (Math.PI / 180);
+  const theta = (lng + 180) * (Math.PI / 180);
+  return new THREE.Vector3(
+    -radius * Math.sin(phi) * Math.cos(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta),
+  );
+}
+
+// Generate crisp high-res world map texture with continents & grid
+function createCrispEarthTexture(): THREE.CanvasTexture {
+  const canvas = document.createElement('canvas');
+  canvas.width = 2048;
+  canvas.height = 1024;
+  const ctx = canvas.getContext('2d')!;
+
+  // Deep oceanic gradient
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bgGrad.addColorStop(0, '#0a1638');
+  bgGrad.addColorStop(0.5, '#0d1f4d');
+  bgGrad.addColorStop(1, '#081330');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Subtle coordinate grid
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.12)';
+  ctx.lineWidth = 1;
+
+  // Latitudes
+  for (let lat = -80; lat <= 80; lat += 20) {
+    const y = ((90 - lat) / 180) * canvas.height;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvas.width, y);
+    ctx.stroke();
+  }
+  // Longitudes
+  for (let lng = -180; lng <= 180; lng += 30) {
+    const x = ((lng + 180) / 360) * canvas.width;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+
+  // Equator emphasis
+  ctx.strokeStyle = 'rgba(59, 130, 246, 0.28)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height / 2);
+  ctx.lineTo(canvas.width, canvas.height / 2);
+  ctx.stroke();
+
+  // Continent vector approximations (high-tech stylized dot clusters)
+  ctx.fillStyle = '#22d3ee';
+  const drawCluster = (cx: number, cy: number, rx: number, ry: number, density = 450) => {
+    for (let i = 0; i < density; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.sqrt(Math.random());
+      const px = cx + Math.cos(angle) * rx * dist + (Math.random() - 0.5) * 15;
+      const py = cy + Math.sin(angle) * ry * dist + (Math.random() - 0.5) * 15;
+      const size = 1.2 + Math.random() * 2.2;
+      const alpha = 0.35 + Math.random() * 0.55;
+      ctx.fillStyle = `rgba(56, 189, 248, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(px, py, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+
+  // North America
+  drawCluster(520, 320, 190, 110, 600);
+  drawCluster(440, 220, 130, 80, 350);
+  // South America
+  drawCluster(680, 680, 120, 180, 450);
+  // Europe
+  drawCluster(1060, 280, 110, 80, 500);
+  // Africa
+  drawCluster(1080, 560, 130, 170, 550);
+  // Asia
+  drawCluster(1420, 320, 260, 150, 900);
+  drawCluster(1360, 480, 120, 100, 400); // India
+  // Australia
+  drawCluster(1660, 720, 120, 90, 350);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  return texture;
+}
 
 export const ResearchKnowledgeCore: React.FC = () => {
   const { setActivePage, setSearchQuery } = useApp();
   const hostRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<THREE.Group | null>(null);
-  const [modelScale, setModelScale] = useState(0.5);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -29,249 +125,249 @@ export const ResearchKnowledgeCore: React.FC = () => {
 
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' });
     } catch {
       return;
     }
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 300);
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    camera.position.set(0, 0, 7.2);
+
     const globe = new THREE.Group();
     globeRef.current = globe;
     scene.add(globe);
 
-    const uniforms = {
-      time: { value: 0 },
-      pointScale: { value: 1 },
-      tintMix: { value: 0 },
-      tint: { value: new THREE.Color(0x2563eb) },
-    };
+    const SPHERE_RADIUS = 2.15;
 
-    const textureLoader = new THREE.TextureLoader();
-    const anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const coreTexture = textureLoader.load('/research-core/core-texture.webp');
-    coreTexture.anisotropy = anisotropy;
-    coreTexture.colorSpace = THREE.SRGBColorSpace;
-    const core = new THREE.Mesh(
-      new THREE.SphereGeometry(SPHERE_RADIUS, 160, 160),
-      new THREE.MeshBasicMaterial({ map: coreTexture }),
+    // 1. Earth Core Sphere with sharp texture
+    const earthTexture = createCrispEarthTexture();
+    const coreMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(SPHERE_RADIUS, 64, 64),
+      new THREE.MeshBasicMaterial({ map: earthTexture }),
     );
-    globe.add(core);
+    globe.add(coreMesh);
 
-    // Geodesic connection arcs
-    const hubDirections = originalHubPoints.map(([x, y, z]) => new THREE.Vector3(x, y, z).normalize());
-    const edgePositions: number[] = [];
-    const edgeColors: number[] = [];
-    const edgePalette = [new THREE.Color('#38bdf8'), new THREE.Color('#3b82f6'), new THREE.Color('#8b5cf6')];
-    const edgePairs = new Set<string>();
-    hubDirections.forEach((direction, nodeIndex) => {
-      hubDirections
-        .map((candidate, candidateIndex) => ({ candidate, candidateIndex, distance: direction.distanceToSquared(candidate) }))
-        .filter(({ candidateIndex }) => candidateIndex !== nodeIndex)
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 2)
-        .forEach(({ candidate, candidateIndex }) => {
-          const key = [nodeIndex, candidateIndex].sort((a, b) => a - b).join(':');
-          if (edgePairs.has(key)) return;
-          edgePairs.add(key);
-          const start = direction.clone();
-          const end = candidate.clone();
-          const angle = start.angleTo(end);
-          const divisions = 12;
-          const color = edgePalette[(nodeIndex + candidateIndex) % edgePalette.length];
-          let previous = start.clone().multiplyScalar(SPHERE_RADIUS * 1.012);
-          for (let step = 1; step <= divisions; step += 1) {
-            const progress = step / divisions;
-            const next = start.clone().multiplyScalar(Math.sin((1 - progress) * angle))
-              .add(end.clone().multiplyScalar(Math.sin(progress * angle)))
-              .divideScalar(Math.sin(angle))
-              .multiplyScalar(SPHERE_RADIUS * 1.012);
-            edgePositions.push(previous.x, previous.y, previous.z, next.x, next.y, next.z);
-            const intensity = 0.55 + 0.25 * (1 - Math.abs(progress - 0.5) * 2);
-            edgeColors.push(color.r * intensity, color.g * intensity, color.b * intensity, color.r * intensity, color.g * intensity, color.b * intensity);
-            previous = next;
+    // 2. Hub nodes (glowing points on key universities/cities)
+    const hubPoints: THREE.Vector3[] = [];
+    const hubGeometry = new THREE.BufferGeometry();
+    const hubPositions: number[] = [];
+
+    HUBS.forEach(hub => {
+      const pos = latLngToVector3(hub.lat, hub.lng, SPHERE_RADIUS * 1.01);
+      hubPoints.push(pos);
+      hubPositions.push(pos.x, pos.y, pos.z);
+    });
+
+    hubGeometry.setAttribute('position', new THREE.Float32BufferAttribute(hubPositions, 3));
+    const hubMaterial = new THREE.PointsMaterial({
+      color: 0x67e8f9,
+      size: 0.16,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+    });
+    const hubs = new THREE.Points(hubGeometry, hubMaterial);
+    globe.add(hubs);
+
+    // 3. Geodesic Connection Arcs
+    const arcPositions: number[] = [];
+    const arcColors: number[] = [];
+    const colorCyan = new THREE.Color(0x38bdf8);
+    const colorBlue = new THREE.Color(0x3b82f6);
+
+    for (let i = 0; i < hubPoints.length; i++) {
+      for (let j = i + 1; j < hubPoints.length; j++) {
+        const start = hubPoints[i];
+        const end = hubPoints[j];
+        const distance = start.distanceTo(end);
+
+        if (distance > 1.2 && distance < 3.8) {
+          const divisions = 24;
+          const mid = start.clone().add(end).multiplyScalar(0.5);
+          const altitude = SPHERE_RADIUS + distance * 0.22;
+          mid.normalize().multiplyScalar(altitude);
+
+          const curve = new THREE.QuadraticBezierCurve3(start, mid, end);
+          const points = curve.getPoints(divisions);
+
+          for (let p = 0; p < points.length - 1; p++) {
+            arcPositions.push(points[p].x, points[p].y, points[p].z);
+            arcPositions.push(points[p + 1].x, points[p + 1].y, points[p + 1].z);
+
+            const t = p / divisions;
+            const c = colorCyan.clone().lerp(colorBlue, t);
+            arcColors.push(c.r, c.g, c.b, c.r, c.g, c.b);
           }
-        });
-    });
+        }
+      }
+    }
 
-    const networkGeometry = new THREE.BufferGeometry();
-    networkGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
-    networkGeometry.setAttribute('color', new THREE.Float32BufferAttribute(edgeColors, 3));
-    const network = new THREE.LineSegments(networkGeometry, new THREE.LineBasicMaterial({
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.95,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    }));
-    network.renderOrder = 3;
-    globe.add(network);
-
-    // Glowing Orbital Rings
-    const orbitMaterials = [0x38bdf8, 0x60a5fa, 0xa855f7].map(color => new THREE.MeshBasicMaterial({
-      color,
-      transparent: true,
-      opacity: 0.25,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    }));
-    const orbitTracks = [
-      { radius: 3.20, tube: 0.009, rotation: [0.18, 0.22, -0.28] },
-      { radius: 3.45, tube: 0.008, rotation: [0.95, 0.35, 0.15] },
-      { radius: 3.70, tube: 0.007, rotation: [0.62, -0.68, 0.32] },
-    ] as const;
-    orbitTracks.forEach((track, index) => {
-      const orbit = new THREE.Mesh(new THREE.TorusGeometry(track.radius, track.tube, 4, 160), orbitMaterials[index]);
-      orbit.rotation.set(track.rotation[0], track.rotation[1], track.rotation[2]);
-      orbit.renderOrder = 1;
-      scene.add(orbit);
-    });
-
-    // Luminous Atmospheric Rim
-    const baseRimColor = new THREE.Color(0xdbeafe);
-    const rim = new THREE.Mesh(
-      new THREE.SphereGeometry(SPHERE_RADIUS * 1.004, 96, 96),
-      new THREE.ShaderMaterial({
-        uniforms: { color: { value: baseRimColor.clone() } },
+    const arcGeo = new THREE.BufferGeometry();
+    arcGeo.setAttribute('position', new THREE.Float32BufferAttribute(arcPositions, 3));
+    arcGeo.setAttribute('color', new THREE.Float32BufferAttribute(arcColors, 3));
+    const arcMesh = new THREE.LineSegments(
+      arcGeo,
+      new THREE.LineBasicMaterial({
+        vertexColors: true,
         transparent: true,
-        depthWrite: false,
-        vertexShader: 'varying vec3 normalView;void main(){normalView=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-        fragmentShader: 'varying vec3 normalView;uniform vec3 color;void main(){float rim=pow(1.0-abs(dot(normalView,vec3(0.0,0.0,1.0))),3.0)*0.9;gl_FragColor=vec4(color,rim);}',
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
       }),
     );
-    rim.renderOrder = 6;
-    scene.add(rim);
+    globe.add(arcMesh);
 
-    // Node hub points
-    const positions: number[] = [];
-    const colors: number[] = [];
-    const phases: number[] = [];
-    const sizes: number[] = [];
-    originalHubPoints.forEach(([x, y, z, color, size], index) => {
-      positions.push(x * SPHERE_RADIUS * 1.004, y * SPHERE_RADIUS * 1.004, z * SPHERE_RADIUS * 1.004);
-      const nodeColor = new THREE.Color(color);
-      colors.push(nodeColor.r, nodeColor.g, nodeColor.b);
-      phases.push(index * 1.7);
-      sizes.push(size * 0.18);
-    });
-    const hubsGeometry = new THREE.BufferGeometry();
-    hubsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    hubsGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    hubsGeometry.setAttribute('phase', new THREE.Float32BufferAttribute(phases, 1));
-    hubsGeometry.setAttribute('size', new THREE.Float32BufferAttribute(sizes, 1));
-    const hubs = new THREE.Points(hubsGeometry, new THREE.ShaderMaterial({
-      uniforms: { ...uniforms },
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      vertexShader: `attribute vec3 color;attribute float phase,size;uniform float pointScale,time;varying vec3 nodeColor;varying float visibility;void main(){vec3 n=normalize(normalMatrix*normalize(position));visibility=mix(0.16,1.0,smoothstep(-0.2,0.35,n.z));nodeColor=color;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=size*(1.0+0.12*sin(time*1.6+phase))*pointScale/-mv.z;gl_Position=projectionMatrix*mv;}`,
-      fragmentShader: 'varying vec3 nodeColor;varying float visibility;uniform float tintMix;uniform vec3 tint;void main(){float d=length(gl_PointCoord-0.5)*2.0;if(d>1.0)discard;float core=1.0-smoothstep(0.05,0.2,d),ring=(1.0-smoothstep(0.0,0.07,abs(d-0.5)))*0.85,halo=pow(1.0-d,3.0)*0.5;float alpha=(core+ring+halo)*visibility;vec3 color=mix(mix(nodeColor,tint,tintMix),vec3(1.0),core);gl_FragColor=vec4(color,min(alpha,1.0));}',
-    }));
-    hubs.renderOrder = 4;
-    globe.add(hubs);
+    // 4. Concentric High-Tech Orbiting Rings with Satellite Beacons
+    const ringGroup = new THREE.Group();
+    scene.add(ringGroup);
+
+    // Orbit Ring 1 (Cyan)
+    const ring1 = new THREE.Mesh(
+      new THREE.TorusGeometry(3.05, 0.012, 16, 120),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending }),
+    );
+    ring1.rotation.set(0.65, 0.35, 0.2);
+    ringGroup.add(ring1);
+
+    const satellite1 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.08, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0x67e8f9 }),
+    );
+    ringGroup.add(satellite1);
+
+    // Orbit Ring 2 (Royal Blue / Violet)
+    const ring2 = new THREE.Mesh(
+      new THREE.TorusGeometry(3.35, 0.01, 16, 120),
+      new THREE.MeshBasicMaterial({ color: 0x818cf8, transparent: true, opacity: 0.45, blending: THREE.AdditiveBlending }),
+    );
+    ring2.rotation.set(-0.75, 0.45, -0.3);
+    ringGroup.add(ring2);
+
+    const satellite2 = new THREE.Mesh(
+      new THREE.SphereGeometry(0.07, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xc084fc }),
+    );
+    ringGroup.add(satellite2);
+
+    // 5. Crisp Atmospheric Rim Glow
+    const rimMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(SPHERE_RADIUS * 1.015, 64, 64),
+      new THREE.ShaderMaterial({
+        transparent: true,
+        depthWrite: false,
+        vertexShader: `
+          varying vec3 vNormal;
+          void main() {
+            vNormal = normalize(normalMatrix * normal);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `,
+        fragmentShader: `
+          varying vec3 vNormal;
+          void main() {
+            float rim = 1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+            rim = pow(rim, 3.2);
+            gl_FragColor = vec4(0.25, 0.65, 1.0, rim * 0.85);
+          }
+        `,
+      }),
+    );
+    globe.add(rimMesh);
 
     renderer.setClearColor(0x000000, 0);
     renderer.domElement.className = 'absolute inset-0 h-full w-full';
-    renderer.domElement.setAttribute('aria-hidden', 'true');
     host.prepend(renderer.domElement);
 
-    let frame = 0;
-    let elapsed = 0;
-    let lastFrameTime = 0;
-    let yawVelocity = 0.0016;
-    let dragState: { x: number; y: number } | null = null;
-    let pointerX = 0;
-    let pointerY = 0;
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-    const mousePosition = (event: PointerEvent) => {
-      const bounds = host.getBoundingClientRect();
-      pointerX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
-      pointerY = ((event.clientY - bounds.top) / bounds.height) * 2 - 1;
-    };
-    const onPointerDown = (event: PointerEvent) => {
-      if ((event.target as HTMLElement).closest('button')) return;
-      dragState = { x: event.clientX, y: event.clientY };
-      host.setPointerCapture?.(event.pointerId);
-    };
-    const onPointerMove = (event: PointerEvent) => {
-      mousePosition(event);
-      if (!dragState) return;
-      const dx = event.clientX - dragState.x;
-      const dy = event.clientY - dragState.y;
-      globe.rotation.y += dx * 0.006;
-      globe.rotation.x = THREE.MathUtils.clamp(globe.rotation.x + dy * 0.006, -0.9, 0.9);
-      yawVelocity = dx * 0.0045;
-      dragState = { x: event.clientX, y: event.clientY };
-    };
-    const onPointerUp = () => { dragState = null; };
-
+    // Resize handling
     const resize = () => {
       const width = host.clientWidth;
       const height = host.clientHeight;
       if (!width || !height) return;
-      const scale = Math.min(width / MODEL_BOUNDS.width, height / MODEL_BOUNDS.height);
-      setModelScale(scale);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(width, height, false);
       camera.aspect = width / height;
-      camera.position.set(0, 0, SPHERE_RADIUS * (height / 2) / (MODEL_RADIUS * scale * MODEL_ZOOM * Math.tan(Math.PI / 9)));
       camera.updateProjectionMatrix();
-      uniforms.pointScale.value = renderer.getPixelRatio() * height / (2 * Math.tan(Math.PI / 9));
     };
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
 
+    // Interaction (drag to rotate)
+    let isDragging = false;
+    let prevPointer = { x: 0, y: 0 };
+
+    const onPointerDown = (e: PointerEvent) => {
+      if ((e.target as HTMLElement).closest('button')) return;
+      isDragging = true;
+      prevPointer = { x: e.clientX, y: e.clientY };
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (!isDragging) return;
+      const dx = e.clientX - prevPointer.x;
+      const dy = e.clientY - prevPointer.y;
+      globe.rotation.y += dx * 0.005;
+      globe.rotation.x = THREE.MathUtils.clamp(globe.rotation.x + dy * 0.005, -0.6, 0.6);
+      prevPointer = { x: e.clientX, y: e.clientY };
+    };
+
+    const onPointerUp = () => {
+      isDragging = false;
+    };
+
     host.addEventListener('pointerdown', onPointerDown);
-    host.addEventListener('pointermove', onPointerMove);
-    host.addEventListener('pointerup', onPointerUp);
-    host.addEventListener('pointercancel', onPointerUp);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
 
-    const animate = (time = performance.now()) => {
-      frame = window.requestAnimationFrame(animate);
-      const delta = lastFrameTime ? Math.min((time - lastFrameTime) / 16.667, 2) : 1;
-      lastFrameTime = time;
-      if (!reduceMotion.matches) elapsed += 0.016 * delta;
-      uniforms.time.value = elapsed;
+    // Animation Loop
+    let frameId = 0;
+    let angle1 = 0;
+    let angle2 = Math.PI;
 
-      if (!dragState) {
-        globe.rotation.y += yawVelocity * delta;
-        yawVelocity += ((reduceMotion.matches ? 0 : 0.0016) - yawVelocity) * (1 - Math.pow(0.97, delta));
-        globe.rotation.x += (0 - globe.rotation.x) * (1 - Math.pow(0.99, delta));
+    const animate = () => {
+      frameId = requestAnimationFrame(animate);
+
+      if (!isDragging) {
+        globe.rotation.y += 0.0025;
+        globe.rotation.x *= 0.96;
       }
 
-      scene.rotation.y = pointerX * 0.04;
-      scene.rotation.x = pointerY * 0.02;
+      // Orbit satellites along rings
+      angle1 += 0.012;
+      const r1 = 3.05;
+      const p1 = new THREE.Vector3(Math.cos(angle1) * r1, Math.sin(angle1) * r1, 0);
+      p1.applyEuler(ring1.rotation);
+      satellite1.position.copy(p1);
+
+      angle2 -= 0.009;
+      const r2 = 3.35;
+      const p2 = new THREE.Vector3(Math.cos(angle2) * r2, Math.sin(angle2) * r2, 0);
+      p2.applyEuler(ring2.rotation);
+      satellite2.position.copy(p2);
+
       renderer.render(scene, camera);
     };
     animate();
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      cancelAnimationFrame(frameId);
       observer.disconnect();
       host.removeEventListener('pointerdown', onPointerDown);
-      host.removeEventListener('pointermove', onPointerMove);
-      host.removeEventListener('pointerup', onPointerUp);
-      host.removeEventListener('pointercancel', onPointerUp);
-      scene.traverse(object => {
-        if (object instanceof THREE.Mesh || object instanceof THREE.Points || object instanceof THREE.Line) {
-          object.geometry.dispose();
-          const materials = Array.isArray(object.material) ? object.material : [object.material];
-          materials.forEach(material => material.dispose());
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+
+      scene.traverse(obj => {
+        if (obj instanceof THREE.Mesh || obj instanceof THREE.Points || obj instanceof THREE.LineSegments) {
+          obj.geometry.dispose();
+          const mat = obj.material;
+          if (Array.isArray(mat)) mat.forEach(m => m.dispose());
+          else mat.dispose();
         }
       });
-      orbitMaterials.forEach(material => material.dispose());
-      coreTexture.dispose();
+      earthTexture.dispose();
       renderer.dispose();
       renderer.domElement.remove();
-      globeRef.current = null;
     };
   }, []);
-
-  const offset = (coordinate: number, axis: 'x' | 'y') =>
-    `calc(50% + ${(coordinate - MODEL_ORIGIN[axis]) * modelScale}px)`;
-  const scale = Math.max(0.72, Math.min(modelScale, 1));
 
   const handleSearch = (term: string) => {
     setSearchQuery(term);
@@ -279,263 +375,87 @@ export const ResearchKnowledgeCore: React.FC = () => {
   };
 
   return (
-    <div ref={hostRef} className="relative h-[480px] sm:h-[520px] lg:h-[560px] w-full touch-pan-y select-none" aria-label="Interactive research knowledge globe">
+    <div
+      ref={hostRef}
+      className="relative flex h-[350px] sm:h-[370px] lg:h-[390px] w-full items-center justify-center select-none"
+      aria-label="Interactive academic knowledge core"
+    >
+      {/* ═══════════════════════════════════════════════════════════════ */}
+      {/*          SIMPLE, CLEAN & ELEGANT SURROUNDING ELEMENTS          */}
+      {/* ═══════════════════════════════════════════════════════════════ */}
 
-      {/* Floating 3D Background Document Sheet (Top Right) */}
-      <div 
-        className="pointer-events-none absolute hidden xl:block rounded-xl bg-white/70 border border-white/80 p-3 shadow-md backdrop-blur-xs opacity-75"
-        style={{
-          left: offset(1430, 'x'),
-          top: offset(210, 'y'),
-          width: `${85 * scale}px`,
-          height: `${110 * scale}px`,
-          transform: 'translate(-50%, -50%) rotate(15deg)',
-        }}
-      >
-        <div className="space-y-1.5 opacity-40">
-          <div className="h-1.5 w-12 bg-slate-400 rounded-full"></div>
-          <div className="h-1 w-full bg-slate-300 rounded-full"></div>
-          <div className="h-1 w-full bg-slate-300 rounded-full"></div>
-          <div className="h-1 w-10 bg-slate-300 rounded-full"></div>
-        </div>
-      </div>
-
-      {/* Floating 3D Background Document Sheet (Bottom Right) */}
-      <div 
-        className="pointer-events-none absolute hidden xl:block rounded-xl bg-white/70 border border-white/80 p-3 shadow-md backdrop-blur-xs opacity-70"
-        style={{
-          left: offset(1470, 'x'),
-          top: offset(460, 'y'),
-          width: `${80 * scale}px`,
-          height: `${100 * scale}px`,
-          transform: 'translate(-50%, -50%) rotate(-14deg)',
-        }}
-      >
-        <div className="space-y-1.5 opacity-40">
-          <div className="h-1.5 w-10 bg-slate-400 rounded-full"></div>
-          <div className="h-1 w-full bg-slate-300 rounded-full"></div>
-          <div className="h-1 w-8 bg-slate-300 rounded-full"></div>
-        </div>
-      </div>
-
-      {/* ═════════════════════════════════════════════════════════════ */}
-      {/*               4 REALISTIC FLOATING PAPER CARDS                */}
-      {/* ═════════════════════════════════════════════════════════════ */}
-
-      {/* Card 1: Top-Left arXiv 2024 - Survey on Vision Transformers */}
+      {/* Top-Left Card: arXiv Survey on Vision Transformers */}
       <div
         onClick={() => handleSearch('A Survey on Vision Transformers')}
-        className="absolute z-20 cursor-pointer rounded-2xl border border-white/90 bg-white/95 p-3.5 shadow-[0_15px_35px_-10px_rgba(30,58,138,0.22)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group"
-        style={{
-          left: offset(980, 'x'),
-          top: offset(290, 'y'),
-          width: `${210 * scale}px`,
-          transform: 'translate(-50%, -50%) rotate(-6deg)',
-        }}
+        className="group absolute left-[4%] top-[8%] z-20 w-[190px] cursor-pointer rounded-xl border border-white/95 bg-white/95 p-3 shadow-[0_10px_24px_-8px_rgba(30,58,138,0.18)] backdrop-blur-md transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:left-[6%] sm:w-[205px]"
+        style={{ transform: 'rotate(-4deg)' }}
       >
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="font-serif font-black text-sm text-[#B31B1B] tracking-tight">arXiv</span>
-          <span className="font-mono text-[10px] font-semibold text-slate-400">2024</span>
+        <div className="mb-1 flex items-center justify-between">
+          <span className="font-serif font-black text-xs tracking-tight text-[#B31B1B]">arXiv</span>
+          <span className="font-mono text-[9.5px] font-semibold text-slate-400">2024</span>
         </div>
-        <h4 className="font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors" style={{ fontSize: `${12 * scale}px` }}>
+        <h4 className="line-clamp-2 text-[11.5px] font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-600 sm:text-[12px]">
           A Survey on Vision Transformers
         </h4>
-        <span className="block text-slate-500 font-medium my-1.5" style={{ fontSize: `${10 * scale}px` }}>
-          A. Dosovitskiy et al.
-        </span>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-slate-600" style={{ fontSize: `${10.5 * scale}px` }}>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <Quote className="w-3 h-3 text-slate-400" /> 1.2K
-            </span>
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <FileText className="w-3 h-3 text-slate-400" /> PDF
-            </span>
+        <span className="my-1 block text-[10px] text-slate-500">A. Dosovitskiy et al.</span>
+        <div className="flex items-center justify-between border-t border-slate-100 pt-1.5 text-[10px] text-slate-600">
+          <div className="flex items-center gap-2 font-semibold">
+            <span className="flex items-center gap-0.5"><Quote className="h-2.5 w-2.5 text-slate-400" /> 1.2K</span>
+            <span className="flex items-center gap-0.5"><FileText className="h-2.5 w-2.5 text-slate-400" /> PDF</span>
           </div>
-          <div className="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
-            <ArrowRight className="w-3 h-3" />
-          </div>
+          <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#2563EB] text-white shadow-xs transition group-hover:scale-110">
+            <ArrowRight className="h-2.5 w-2.5" />
+          </span>
         </div>
       </div>
 
-      {/* Card 2: Bottom-Left arXiv 2024 - Self-Supervised Learning for Medical Image Analysis */}
-      <div
-        onClick={() => handleSearch('Self-Supervised Learning for Medical Image Analysis')}
-        className="absolute z-20 cursor-pointer rounded-2xl border border-white/90 bg-white/95 p-3.5 shadow-[0_15px_35px_-10px_rgba(30,58,138,0.22)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group"
-        style={{
-          left: offset(1005, 'x'),
-          top: offset(560, 'y'),
-          width: `${215 * scale}px`,
-          transform: 'translate(-50%, -50%) rotate(-4deg)',
-        }}
-      >
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="font-serif font-black text-sm text-[#B31B1B] tracking-tight">arXiv</span>
-          <span className="font-mono text-[10px] font-semibold text-slate-400">2024</span>
-        </div>
-        <h4 className="font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors" style={{ fontSize: `${12 * scale}px` }}>
-          Self-Supervised Learning for Medical Image Analysis
-        </h4>
-        <span className="block text-slate-500 font-medium my-1.5" style={{ fontSize: `${10 * scale}px` }}>
-          J. Chen et al.
-        </span>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-slate-600" style={{ fontSize: `${10.5 * scale}px` }}>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <Quote className="w-3 h-3 text-slate-400" /> 642
-            </span>
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <FileText className="w-3 h-3 text-slate-400" /> PDF
-            </span>
-          </div>
-          <div className="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
-            <ArrowRight className="w-3 h-3" />
-          </div>
-        </div>
-      </div>
-
-      {/* Card 3: Top-Right OpenAlex 2023 - Graph Neural Networks for Social Recommendation */}
-      <div
-        onClick={() => handleSearch('Graph Neural Networks for Social Recommendation')}
-        className="absolute z-20 cursor-pointer rounded-2xl border border-white/90 bg-white/95 p-3.5 shadow-[0_15px_35px_-10px_rgba(30,58,138,0.22)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group"
-        style={{
-          left: offset(1440, 'x'),
-          top: offset(310, 'y'),
-          width: `${215 * scale}px`,
-          transform: 'translate(-50%, -50%) rotate(5deg)',
-        }}
-      >
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-900"></span>
-            <span className="font-bold text-xs text-slate-900">OpenAlex</span>
-          </div>
-          <span className="font-mono text-[10px] font-semibold text-slate-400">2023</span>
-        </div>
-        <h4 className="font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors" style={{ fontSize: `${12 * scale}px` }}>
-          Graph Neural Networks for Social Recommendation
-        </h4>
-        <span className="block text-slate-500 font-medium my-1.5" style={{ fontSize: `${10 * scale}px` }}>
-          Y. Wu et al.
-        </span>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-slate-600" style={{ fontSize: `${10.5 * scale}px` }}>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <Quote className="w-3 h-3 text-slate-400" /> 856
-            </span>
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <FileText className="w-3 h-3 text-slate-400" /> PDF
-            </span>
-          </div>
-          <div className="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
-            <ArrowRight className="w-3 h-3" />
-          </div>
-        </div>
-      </div>
-
-      {/* Card 4: Bottom-Right OpenAlex 2023 - Large Language Models in Scientific Research */}
-      <div
-        onClick={() => handleSearch('Large Language Models in Scientific Research')}
-        className="absolute z-20 cursor-pointer rounded-2xl border border-white/90 bg-white/95 p-3.5 shadow-[0_15px_35px_-10px_rgba(30,58,138,0.22)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group"
-        style={{
-          left: offset(1435, 'x'),
-          top: offset(575, 'y'),
-          width: `${215 * scale}px`,
-          transform: 'translate(-50%, -50%) rotate(4deg)',
-        }}
-      >
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-900"></span>
-            <span className="font-bold text-xs text-slate-900">OpenAlex</span>
-          </div>
-          <span className="font-mono text-[10px] font-semibold text-slate-400">2023</span>
-        </div>
-        <h4 className="font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors" style={{ fontSize: `${12 * scale}px` }}>
-          Large Language Models in Scientific Research
-        </h4>
-        <span className="block text-slate-500 font-medium my-1.5" style={{ fontSize: `${10 * scale}px` }}>
-          T. Brown et al.
-        </span>
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-slate-600" style={{ fontSize: `${10.5 * scale}px` }}>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <Quote className="w-3 h-3 text-slate-400" /> 1.1K
-            </span>
-            <span className="flex items-center gap-1 font-bold text-slate-700">
-              <FileText className="w-3 h-3 text-slate-400" /> PDF
-            </span>
-          </div>
-          <div className="w-5 h-5 rounded-full bg-[#2563EB] text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform">
-            <ArrowRight className="w-3 h-3" />
-          </div>
-        </div>
-      </div>
-
-      {/* ═════════════════════════════════════════════════════════════ */}
-      {/*               4 FLOATING CATEGORY BADGES / PILLS              */}
-      {/* ═════════════════════════════════════════════════════════════ */}
-
-      {/* Top: Knowledge Graph (Purple) */}
+      {/* Top-Right Badge: Knowledge Graph */}
       <button
         type="button"
         onClick={() => setActivePage('graph')}
-        className="absolute z-30 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-purple-400/40 bg-[#7C3AED] px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-purple-600/35 transition hover:scale-105"
-        style={{
-          left: offset(1245, 'x'),
-          top: offset(248, 'y'),
-          fontSize: `${12 * scale}px`,
-        }}
+        className="absolute right-[8%] top-[12%] z-20 inline-flex items-center gap-1.5 rounded-full border border-purple-300/50 bg-[#7C3AED] px-3 py-1.5 text-[11px] font-bold text-white shadow-md shadow-purple-600/25 transition hover:scale-105 sm:right-[12%]"
       >
-        <Network className="w-3.5 h-3.5 text-purple-200" />
+        <Network className="h-3 w-3 text-purple-200" />
         <span>Knowledge Graph</span>
       </button>
 
-      {/* Left: Research Papers (Royal Blue) */}
+      {/* Bottom-Left Badge: Research Papers */}
       <button
         type="button"
         onClick={() => setActivePage('search')}
-        className="absolute z-30 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-blue-400/40 bg-[#1D4ED8] px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-blue-600/35 transition hover:scale-105"
-        style={{
-          left: offset(1075, 'x'),
-          top: offset(434, 'y'),
-          fontSize: `${12 * scale}px`,
-        }}
+        className="absolute bottom-[14%] left-[10%] z-20 inline-flex items-center gap-1.5 rounded-full border border-blue-300/50 bg-[#1D4ED8] px-3 py-1.5 text-[11px] font-bold text-white shadow-md shadow-blue-600/25 transition hover:scale-105 sm:left-[14%]"
       >
-        <FileText className="w-3.5 h-3.5 text-blue-200" />
+        <FileText className="h-3 w-3 text-blue-200" />
         <span>Research Papers</span>
       </button>
 
-      {/* Right: AI Insights (Emerald Green) */}
-      <button
-        type="button"
-        onClick={() => setActivePage('chat')}
-        className="absolute z-30 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-emerald-400/40 bg-[#059669] px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-emerald-600/35 transition hover:scale-105"
-        style={{
-          left: offset(1370, 'x'),
-          top: offset(454, 'y'),
-          fontSize: `${12 * scale}px`,
-        }}
+      {/* Bottom-Right Card: OpenAlex LLMs in Science */}
+      <div
+        onClick={() => handleSearch('Large Language Models in Scientific Research')}
+        className="group absolute bottom-[6%] right-[4%] z-20 w-[190px] cursor-pointer rounded-xl border border-white/95 bg-white/95 p-3 shadow-[0_10px_24px_-8px_rgba(30,58,138,0.18)] backdrop-blur-md transition-all duration-200 hover:-translate-y-1 hover:shadow-lg sm:right-[6%] sm:w-[205px]"
+        style={{ transform: 'rotate(3deg)' }}
       >
-        <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
-        <span>AI Insights</span>
-      </button>
-
-      {/* Bottom: Global Connections (Blue) */}
-      <button
-        type="button"
-        onClick={() => setActivePage('graph')}
-        className="absolute z-30 inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 rounded-full border border-blue-400/40 bg-[#1E40AF] px-4 py-1.5 text-xs font-bold text-white shadow-lg shadow-blue-800/35 transition hover:scale-105"
-        style={{
-          left: offset(1235, 'x'),
-          top: offset(640, 'y'),
-          fontSize: `${12 * scale}px`,
-        }}
-      >
-        <Globe2 className="w-3.5 h-3.5 text-blue-200" />
-        <span>Global Connections</span>
-      </button>
-
+        <div className="mb-1 flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <span className="h-2 w-2 rounded-full bg-slate-900" />
+            <span className="text-[11px] font-bold text-slate-900">OpenAlex</span>
+          </div>
+          <span className="font-mono text-[9.5px] font-semibold text-slate-400">2023</span>
+        </div>
+        <h4 className="line-clamp-2 text-[11.5px] font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-600 sm:text-[12px]">
+          Large Language Models in Science
+        </h4>
+        <span className="my-1 block text-[10px] text-slate-500">T. Brown et al.</span>
+        <div className="flex items-center justify-between border-t border-slate-100 pt-1.5 text-[10px] text-slate-600">
+          <div className="flex items-center gap-2 font-semibold">
+            <span className="flex items-center gap-0.5"><Quote className="h-2.5 w-2.5 text-slate-400" /> 1.1K</span>
+            <span className="flex items-center gap-0.5"><FileText className="h-2.5 w-2.5 text-slate-400" /> PDF</span>
+          </div>
+          <span className="flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#2563EB] text-white shadow-xs transition group-hover:scale-110">
+            <ArrowRight className="h-2.5 w-2.5" />
+          </span>
+        </div>
+      </div>
     </div>
   );
 };
