@@ -2,35 +2,31 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import {
   Activity,
-  Database,
-  FileText,
   Lightbulb,
   Network,
   Quote,
-  Settings2,
   Sparkles,
-  Users,
 } from 'lucide-react';
-import { originalHubPoints, originalOrbitSprites } from './researchCoreModelData';
+import { originalHubPoints } from './researchCoreModelData';
 
 const MODEL_ORIGIN = { x: 1210, y: 444 };
 const MODEL_BOUNDS = { width: 800, height: 540 };
 const MODEL_RADIUS = 141;
 const SPHERE_RADIUS = 2.4;
-// The dashboard hero gives the live graph more visual presence while leaving
-// enough room for its surrounding labels and document previews.
-const MODEL_ZOOM = 1.16;
+// Reduced globe zoom from 1.16 to 0.84 so the 3D globe is smaller, proportional,
+// and leaves ample breathing room without dominating or colliding with cards.
+const MODEL_ZOOM = 0.84;
 
+// Essential, non-overlapping labels positioned cleanly outside card boundaries:
+// Left preview card ends around x: 960, top: 8%-40%
+// Right preview card is around x: 1450-1600, top: 10%-42%
+// Overlapping labels (Methods, Authors, Datasets, Papers) have been removed.
 const labelData = [
-  { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
-  { id: 'papers', label: 'Papers', Icon: FileText, x: 1034, y: 258, color: '#4777ff', tone: 'from-blue-500 to-sky-400', query: 'Transformers' },
-  { id: 'authors', label: 'Authors', Icon: Users, x: 1437, y: 296, color: '#718de8', tone: 'from-blue-500 to-indigo-400', query: 'Ashish Vaswani' },
-  { id: 'methods', label: 'Methods', Icon: Settings2, x: 962, y: 349, color: '#4777ff', tone: 'from-blue-500 to-sky-400', query: 'Self-Supervised' },
-  { id: 'datasets', label: 'Datasets', Icon: Database, x: 1516, y: 388, color: '#36b9d8', tone: 'from-cyan-400 to-sky-400', query: 'ImageNet' },
-  { id: 'citations', label: 'Citations', Icon: Quote, x: 960, y: 453, color: '#36b9d8', tone: 'from-cyan-400 to-sky-400', query: 'Attention Is All You Need' },
-  { id: 'concepts', label: 'Concepts', Icon: Lightbulb, x: 1498, y: 493, color: '#8b70e8', tone: 'from-violet-500 to-indigo-400', query: 'Multi-Head Attention' },
-  { id: 'chat', label: 'AI Insights', Icon: Sparkles, x: 990, y: 566, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
-  { id: 'gaps', label: 'Research Gaps', Icon: Activity, x: 1244, y: 659, color: '#36b9d8', tone: 'from-cyan-400 to-blue-400' },
+  { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1210, y: 235, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
+  { id: 'citations', label: 'Citations', Icon: Quote, x: 985, y: 440, color: '#36b9d8', tone: 'from-cyan-400 to-sky-400', query: 'Attention Is All You Need' },
+  { id: 'concepts', label: 'Concepts', Icon: Lightbulb, x: 1435, y: 440, color: '#8b70e8', tone: 'from-violet-500 to-indigo-400', query: 'Multi-Head Attention' },
+  { id: 'chat', label: 'AI Insights', Icon: Sparkles, x: 1030, y: 565, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
+  { id: 'gaps', label: 'Research Gaps', Icon: Activity, x: 1210, y: 625, color: '#36b9d8', tone: 'from-cyan-400 to-blue-400' },
 ] as const;
 
 type ModelLabel = (typeof labelData)[number];
@@ -57,16 +53,18 @@ export const ResearchKnowledgeCore: React.FC = () => {
     }
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 300);
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 300);
     const globe = new THREE.Group();
     globeRef.current = globe;
     scene.add(globe);
+
     const uniforms = {
       time: { value: 0 },
       pointScale: { value: 1 },
       tintMix: { value: 0 },
       tint: { value: new THREE.Color(0x2563eb) },
     };
+
     const textureLoader = new THREE.TextureLoader();
     const anisotropy = renderer.capabilities.getMaxAnisotropy();
     const coreTexture = textureLoader.load('/research-core/core-texture.webp');
@@ -78,9 +76,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
     );
     globe.add(core);
 
-    // Connect each source hub to its two nearest neighbors along the sphere surface.
-    // Sampling great-circle arcs keeps the mesh on the globe instead of drawing
-    // straight chords through its center.
+    // Surface Network Mesh Arcs
     const hubDirections = originalHubPoints.map(([x, y, z]) => new THREE.Vector3(x, y, z).normalize());
     const edgePositions: number[] = [];
     const edgeColors: number[] = [];
@@ -115,6 +111,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
           }
         });
     });
+
     const networkGeometry = new THREE.BufferGeometry();
     networkGeometry.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
     networkGeometry.setAttribute('color', new THREE.Float32BufferAttribute(edgeColors, 3));
@@ -128,26 +125,27 @@ export const ResearchKnowledgeCore: React.FC = () => {
     network.renderOrder = 3;
     globe.add(network);
 
-    // Tilted orbital tracks add depth without competing with the category labels.
+    // Subtle orbital guiding rings
     const orbitMaterials = [0x42cfff, 0x6a8dff, 0xa276ff].map(color => new THREE.MeshBasicMaterial({
       color,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.22,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     }));
     const orbitTracks = [
-      { radius: 3.05, tube: 0.012, rotation: [0.16, 0.18, -0.22] },
-      { radius: 3.2, tube: 0.009, rotation: [1.03, 0.38, 0.1] },
-      { radius: 3.35, tube: 0.008, rotation: [0.66, -0.72, 0.24] },
+      { radius: 3.25, tube: 0.010, rotation: [0.18, 0.22, -0.28] },
+      { radius: 3.50, tube: 0.008, rotation: [0.95, 0.35, 0.15] },
+      { radius: 3.75, tube: 0.007, rotation: [0.62, -0.68, 0.32] },
     ] as const;
     orbitTracks.forEach((track, index) => {
-      const orbit = new THREE.Mesh(new THREE.TorusGeometry(track.radius, track.tube, 5, 180), orbitMaterials[index]);
+      const orbit = new THREE.Mesh(new THREE.TorusGeometry(track.radius, track.tube, 4, 160), orbitMaterials[index]);
       orbit.rotation.set(track.rotation[0], track.rotation[1], track.rotation[2]);
       orbit.renderOrder = 1;
       scene.add(orbit);
     });
 
+    // Outer Rim Fresnel Aura
     const baseRimColor = new THREE.Color(0xe9f2ff);
     const rim = new THREE.Mesh(
       new THREE.SphereGeometry(SPHERE_RADIUS * 1.003, 96, 96),
@@ -162,7 +160,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
     rim.renderOrder = 6;
     scene.add(rim);
 
-    // These 48 positions and their pulse sizes come from the supplied model's original shader geometry.
+    // Glowing Hub Points on Globe
     const positions: number[] = [];
     const colors: number[] = [];
     const phases: number[] = [];
@@ -172,9 +170,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
       const nodeColor = new THREE.Color(color);
       colors.push(nodeColor.r, nodeColor.g, nodeColor.b);
       phases.push(index * 1.7);
-      // Source values were authored for a much smaller overlay. At the new display
-      // size, scale them back so each hub reads as a node instead of a white ring.
-      sizes.push(size * 0.18);
+      sizes.push(size * 0.16);
     });
     const hubsGeometry = new THREE.BufferGeometry();
     hubsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
@@ -192,21 +188,153 @@ export const ResearchKnowledgeCore: React.FC = () => {
     hubs.renderOrder = 4;
     globe.add(hubs);
 
+    // Glow Canvas Texture
     const glowCanvas = document.createElement('canvas');
     glowCanvas.width = glowCanvas.height = 64;
     const glowContext = glowCanvas.getContext('2d');
     if (glowContext) {
       const gradient = glowContext.createRadialGradient(32, 32, 0, 32, 32, 32);
       gradient.addColorStop(0, 'rgba(255,255,255,1)');
-      gradient.addColorStop(0.3, 'rgba(255,255,255,.6)');
+      gradient.addColorStop(0.35, 'rgba(255,255,255,.65)');
       gradient.addColorStop(1, 'rgba(255,255,255,0)');
       glowContext.fillStyle = gradient;
       glowContext.fillRect(0, 0, 64, 64);
     }
     const glowTexture = new THREE.CanvasTexture(glowCanvas);
+
+    // =========================================================================
+    // REAL 3D ROTATING CELESTIAL SATELLITE BALLS THAT OPEN UP WITH LANES & STAR BLOOM
+    // =========================================================================
+    interface CelestialSatellite {
+      radiusX: number;
+      radiusZ: number;
+      tiltX: number;
+      tiltZ: number;
+      speed: number;
+      angle: number;
+      baseColor: THREE.Color;
+      starColor: THREE.Color;
+      group: THREE.Group;
+      ballMesh: THREE.Mesh;
+      glowSprite: THREE.Sprite;
+      starFlareSprite: THREE.Sprite;
+      lanesMesh: THREE.LineSegments;
+    }
+
+    const satelliteConfigs = [
+      {
+        radiusX: 3.35,
+        radiusZ: 3.05,
+        tiltX: 0.25,
+        tiltZ: -0.32,
+        speed: 0.85,
+        angle: 0.0,
+        baseColor: new THREE.Color('#38bdf8'),
+        starColor: new THREE.Color('#fbbf24'), // radiant golden star
+      },
+      {
+        radiusX: 3.65,
+        radiusZ: 3.35,
+        tiltX: -0.42,
+        tiltZ: 0.35,
+        speed: -0.68,
+        angle: Math.PI * 0.7,
+        baseColor: new THREE.Color('#22d3ee'),
+        starColor: new THREE.Color('#38bdf8'), // brilliant hyper-cyan star
+      },
+      {
+        radiusX: 3.95,
+        radiusZ: 3.60,
+        tiltX: 0.55,
+        tiltZ: 0.42,
+        speed: 0.95,
+        angle: Math.PI * 1.4,
+        baseColor: new THREE.Color('#a855f7'),
+        starColor: new THREE.Color('#f472b6'), // celestial pink/violet star
+      },
+    ];
+
+    const satellites: CelestialSatellite[] = satelliteConfigs.map((cfg) => {
+      const satGroup = new THREE.Group();
+
+      // 1. Core Sphere Ball
+      const ballGeo = new THREE.SphereGeometry(0.13, 24, 24);
+      const ballMat = new THREE.MeshBasicMaterial({ color: cfg.baseColor.clone() });
+      const ballMesh = new THREE.Mesh(ballGeo, ballMat);
+      satGroup.add(ballMesh);
+
+      // 2. Halo Glow Sprite
+      const glowMat = new THREE.SpriteMaterial({
+        map: glowTexture,
+        color: cfg.baseColor.clone(),
+        transparent: true,
+        opacity: 0.85,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const glowSprite = new THREE.Sprite(glowMat);
+      glowSprite.scale.set(0.65, 0.65, 1);
+      satGroup.add(glowSprite);
+
+      // 3. Sparkling Star Flare Sprite (activates when in front)
+      const starFlareMat = new THREE.SpriteMaterial({
+        map: glowTexture,
+        color: cfg.starColor.clone(),
+        transparent: true,
+        opacity: 0.0,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      });
+      const starFlareSprite = new THREE.Sprite(starFlareMat);
+      starFlareSprite.scale.set(1.4, 1.4, 1);
+      satGroup.add(starFlareSprite);
+
+      // 4. Opening "Lanes" / Constellation Beams
+      // Geometric radiant lanes connecting outward and back towards the globe
+      const lanePositions: number[] = [];
+      const laneColors: number[] = [];
+      const numLanes = 8;
+      for (let i = 0; i < numLanes; i++) {
+        const phi = (i / numLanes) * Math.PI * 2;
+        const length = 0.75 + (i % 2) * 0.45;
+        const targetX = Math.cos(phi) * length;
+        const targetY = Math.sin(phi) * length;
+        const targetZ = (i % 2 === 0 ? 0.3 : -0.3) * length;
+
+        lanePositions.push(0, 0, 0, targetX, targetY, targetZ);
+        laneColors.push(cfg.starColor.r, cfg.starColor.g, cfg.starColor.b);
+        laneColors.push(cfg.baseColor.r, cfg.baseColor.g, cfg.baseColor.b);
+      }
+      const laneGeo = new THREE.BufferGeometry();
+      laneGeo.setAttribute('position', new THREE.Float32BufferAttribute(lanePositions, 3));
+      laneGeo.setAttribute('color', new THREE.Float32BufferAttribute(laneColors, 3));
+      const laneMat = new THREE.LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.0,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      });
+      const lanesMesh = new THREE.LineSegments(laneGeo, laneMat);
+      lanesMesh.scale.set(0.001, 0.001, 0.001);
+      satGroup.add(lanesMesh);
+
+      scene.add(satGroup);
+
+      return {
+        ...cfg,
+        group: satGroup,
+        ballMesh,
+        glowSprite,
+        starFlareSprite,
+        lanesMesh,
+      };
+    });
+
+    // Surface Energy Dust Arcs
     const randomDirection = () => new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
-    const arcs = Array.from({ length: 12 }, (_, arcIndex) => {
-      const particles = Array.from({ length: 7 }, () => {
+    const arcs = Array.from({ length: 10 }, (_, arcIndex) => {
+      const particles = Array.from({ length: 6 }, () => {
         const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
           map: glowTexture,
           color: arcIndex % 2 ? 0x9fd0ff : 0xffb8f0,
@@ -218,7 +346,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
         globe.add(sprite);
         return sprite;
       });
-      return { particles, from: randomDirection(), to: randomDirection(), progress: -Math.random() * 1.2, speed: 0.22 + Math.random() * 0.3 };
+      return { particles, from: randomDirection(), to: randomDirection(), progress: -Math.random() * 1.2, speed: 0.20 + Math.random() * 0.28 };
     });
 
     renderer.setClearColor(0x000000, 0);
@@ -234,6 +362,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
     let pointerX = 0;
     let pointerY = 0;
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
     const mousePosition = (event: PointerEvent) => {
       const bounds = host.getBoundingClientRect();
       pointerX = ((event.clientX - bounds.left) / bounds.width) * 2 - 1;
@@ -255,6 +384,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
       dragState = { x: event.clientX, y: event.clientY };
     };
     const onPointerUp = () => { dragState = null; };
+
     const resize = () => {
       const width = host.clientWidth;
       const height = host.clientHeight;
@@ -271,6 +401,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
     const observer = new ResizeObserver(resize);
     observer.observe(host);
     resize();
+
     host.addEventListener('pointerdown', onPointerDown);
     host.addEventListener('pointermove', onPointerMove);
     host.addEventListener('pointerup', onPointerUp);
@@ -282,6 +413,8 @@ export const ResearchKnowledgeCore: React.FC = () => {
       lastFrameTime = time;
       if (!reduceMotion.matches) elapsed += 0.016 * delta;
       uniforms.time.value = elapsed;
+
+      // Globe continuous rotation
       if (!dragState) {
         if (rotationTargetRef.current !== null && !reduceMotion.matches) {
           const remaining = rotationTargetRef.current - globe.rotation.y;
@@ -298,13 +431,63 @@ export const ResearchKnowledgeCore: React.FC = () => {
         }
         globe.rotation.x += (0 - globe.rotation.x) * (1 - Math.pow(0.99, delta));
       }
+
+      // =======================================================================
+      // CELESTIAL SATELLITES ANIMATION: ORBIT, OPEN LANES & STAR BLOOM IN FRONT
+      // =======================================================================
+      satellites.forEach((sat) => {
+        if (!reduceMotion.matches) {
+          sat.angle += sat.speed * 0.012 * delta;
+        }
+
+        // Orbital parametric coordinate
+        const unrotatedX = Math.cos(sat.angle) * sat.radiusX;
+        const unrotatedZ = Math.sin(sat.angle) * sat.radiusZ;
+
+        // Apply orbit inclination tilt
+        const posX = unrotatedX * Math.cos(sat.tiltZ) - unrotatedZ * Math.sin(sat.tiltZ);
+        const posY = unrotatedX * Math.sin(sat.tiltX) + Math.sin(sat.angle * 2) * 0.18;
+        const posZ = unrotatedZ * Math.cos(sat.tiltX);
+
+        sat.group.position.set(posX, posY, posZ);
+
+        // When in front of the globe (posZ > 0):
+        // Blossom open, reveal glowing lanes, and shine with star color!
+        const frontRatio = THREE.MathUtils.clamp(posZ / (sat.radiusZ * 0.9), 0, 1);
+        const openCurve = THREE.MathUtils.smoothstep(frontRatio, 0.15, 0.85);
+
+        // 1. Ball scale: expands up to 1.55x in front
+        const ballScale = 1.0 + openCurve * 0.55;
+        sat.ballMesh.scale.setScalar(ballScale);
+
+        // 2. Color transition from base orbital hue to radiant star hue
+        const currentMat = sat.ballMesh.material as THREE.MeshBasicMaterial;
+        currentMat.color.copy(sat.baseColor).lerp(sat.starColor, openCurve);
+
+        // 3. Star flare bloom opacity & pulsing
+        const starGlowMat = sat.starFlareSprite.material;
+        starGlowMat.opacity = openCurve * (0.8 + 0.2 * Math.sin(elapsed * 5.0 + sat.angle));
+        sat.starFlareSprite.scale.setScalar(1.2 + openCurve * 0.6);
+
+        // 4. "Lanes" opening and closing:
+        // When coming in front, lanes fan out to scale 1.0 with vivid opacity!
+        // When going to the sides/back, lanes contract back to 0.0!
+        sat.lanesMesh.scale.setScalar(Math.max(0.001, openCurve));
+        (sat.lanesMesh.material as THREE.LineBasicMaterial).opacity = openCurve * 0.9;
+        sat.lanesMesh.rotation.z += 0.01 * delta;
+
+        // Adjust renderOrder so it cleanly renders behind/in front
+        sat.group.renderOrder = posZ > 0 ? 8 : 0;
+      });
+
+      // Surface Dust Arcs
       arcs.forEach(arc => {
         arc.progress += reduceMotion.matches ? 0 : 0.016 * delta * arc.speed;
         if (arc.progress > 1.3) {
           arc.from = randomDirection();
           arc.to = arc.from.clone().add(randomDirection().multiplyScalar(0.8)).normalize();
           arc.progress = -Math.random() * 1.2;
-          arc.speed = 0.22 + Math.random() * 0.3;
+          arc.speed = 0.20 + Math.random() * 0.28;
         }
         arc.particles.forEach((particle, index) => {
           const progress = arc.progress - index * 0.025;
@@ -318,10 +501,13 @@ export const ResearchKnowledgeCore: React.FC = () => {
           (particle.material as THREE.SpriteMaterial).opacity = (1 - index / 7) * 0.9;
         });
       });
+
+      // Hub tinting on label hover
       const tintUniform = hubs.material as THREE.ShaderMaterial;
       tintUniform.uniforms.tintMix.value += ((hoveredTintRef.current ? 1 : 0) - tintUniform.uniforms.tintMix.value) * (1 - Math.pow(0.9, delta));
       if (hoveredTintRef.current) tintUniform.uniforms.tint.value.copy(hoveredTintRef.current);
       rim.material.uniforms.color.value.lerp(hoveredTintRef.current ?? baseRimColor, 1 - Math.pow(0.92, delta));
+
       scene.rotation.y = pointerX * 0.05;
       scene.rotation.x = pointerY * 0.03;
       renderer.render(scene, camera);
@@ -375,30 +561,11 @@ export const ResearchKnowledgeCore: React.FC = () => {
 
   const offset = (coordinate: number, axis: 'x' | 'y') =>
     `calc(50% + ${(coordinate - MODEL_ORIGIN[axis]) * modelScale}px)`;
-  const labelScale = Math.max(0.72, Math.min(modelScale, 1));
+  const labelScale = Math.max(0.68, Math.min(modelScale * 0.94, 0.95));
 
   return (
-    <div ref={hostRef} className="relative h-[300px] w-full touch-pan-y select-none sm:h-[360px] lg:h-[430px] xl:h-[440px]" aria-label="Interactive research knowledge core">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[62%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(71,119,255,0.12)_0%,rgba(34,211,238,0.045)_48%,transparent_72%)] blur-xl" aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        {originalOrbitSprites.map(sprite => (
-          <img
-            key={sprite.n}
-            src={`/research-core/${sprite.n}.webp`}
-            alt=""
-            draggable={false}
-            className="research-core-orbit-sprite absolute object-contain"
-            style={{
-              left: offset(sprite.cx, 'x'),
-              top: offset(sprite.cy, 'y'),
-              width: sprite.w * modelScale,
-              height: sprite.h * modelScale,
-              animationDuration: `${sprite.dur}s`,
-              animationDelay: `${-sprite.dl}s`,
-            }}
-          />
-        ))}
-      </div>
+    <div ref={hostRef} className="relative h-[260px] w-full touch-pan-y select-none sm:h-[300px] lg:h-[340px] xl:h-[350px]" aria-label="Interactive research knowledge core">
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[55%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(71,119,255,0.12)_0%,rgba(34,211,238,0.045)_48%,transparent_72%)] blur-xl" aria-hidden="true" />
 
       {rippleEffect && (
         <div
@@ -423,8 +590,8 @@ export const ResearchKnowledgeCore: React.FC = () => {
       )}
 
       <div className="pointer-events-none absolute left-1/2 top-1/2 z-[1] flex -translate-x-1/2 -translate-y-1/2 flex-col items-center text-center drop-shadow-[0_1px_5px_rgba(3,10,30,0.95)]" aria-hidden="true">
-        <span className="text-[12px] font-extrabold tracking-[0.12em] text-white sm:text-[14px]">RESEARCH</span>
-        <span className="text-[11px] font-bold tracking-[0.2em] text-cyan-200 sm:text-[12px]">CORE</span>
+        <span className="text-[11px] font-extrabold tracking-[0.12em] text-white sm:text-[13px]">RESEARCH</span>
+        <span className="text-[10px] font-bold tracking-[0.2em] text-cyan-200 sm:text-[11px]">CORE</span>
       </div>
 
       {labelData.map(({ id, label, Icon, x, y, color, tone }) => (
@@ -441,16 +608,16 @@ export const ResearchKnowledgeCore: React.FC = () => {
           style={{
             left: offset(x, 'x'),
             top: offset(y, 'y'),
-            gap: 7 * labelScale,
-            padding: `${4.5 * labelScale}px ${9 * labelScale}px`,
-            fontSize: `${Math.max(11, 12.9 * labelScale)}px`,
+            gap: 6 * labelScale,
+            padding: `${4 * labelScale}px ${8 * labelScale}px`,
+            fontSize: `${Math.max(10, 11.8 * labelScale)}px`,
             borderColor: `${color}bf`,
-            boxShadow: `0 5px 18px ${color}36`,
+            boxShadow: `0 4px 14px ${color}36`,
             ['--label-glow' as string]: `${color}8c`,
           }}
         >
-          <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white ${tone}`} style={{ width: Math.max(19, 26.5 * labelScale), height: Math.max(19, 26.5 * labelScale) }}>
-            <Icon style={{ width: Math.max(12, 15.5 * labelScale), height: Math.max(12, 15.5 * labelScale) }} />
+          <span className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br text-white ${tone}`} style={{ width: Math.max(18, 23 * labelScale), height: Math.max(18, 23 * labelScale) }}>
+            <Icon style={{ width: Math.max(11, 13.5 * labelScale), height: Math.max(11, 13.5 * labelScale) }} />
           </span>
           <span className="whitespace-nowrap">{label}</span>
         </button>
@@ -458,4 +625,3 @@ export const ResearchKnowledgeCore: React.FC = () => {
     </div>
   );
 };
-

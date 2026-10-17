@@ -43,13 +43,13 @@ const heroPreviewCards = [
     title: 'Research preview',
     detail: 'Your papers and sources appear here as you build a workspace.',
     meta: 'CONNECTED EVIDENCE',
-    className: 'left-[2%] top-[10%] -rotate-[7deg]',
+    className: 'left-[1%] top-[8%] -rotate-[6deg]',
   },
   {
     title: 'Knowledge context',
     detail: 'Follow papers, authors, methods, and citations in one view.',
     meta: 'RESEARCH NETWORK',
-    className: 'right-[1%] top-[15%] rotate-[6deg]',
+    className: 'right-[1%] top-[10%] rotate-[5deg]',
   },
 ] as const;
 
@@ -98,14 +98,14 @@ export const Dashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-full bg-[#F5F7FB] px-4 py-4 sm:px-6 lg:px-7 lg:py-5">
-      <div className="mx-auto max-w-[1520px] space-y-4">
+    <div className="min-h-full bg-[#F5F7FB] px-4 py-3 sm:px-6 lg:px-7 lg:py-4">
+      <div className="mx-auto max-w-[1520px] space-y-3.5">
         <motion.section
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[490px] overflow-hidden rounded-[22px] border border-[#D7E2FA] bg-[#EAF0FF] px-5 py-6 text-[#18223B] shadow-[0_20px_52px_-30px_rgba(49,75,125,0.48)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
+          className="relative isolate min-h-[350px] lg:min-h-[370px] overflow-hidden rounded-[20px] border border-[#D7E2FA] bg-[#EAF0FF] px-5 py-4 text-[#18223B] shadow-[0_16px_40px_-25px_rgba(49,75,125,0.42)] sm:px-6 lg:px-8 lg:py-3.5 xl:px-10"
           style={{
             backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,.72) 0%, rgba(249,252,255,.4) 42%, rgba(226,232,255,.06) 100%), url(/hero-bg-light.webp)',
             backgroundPosition: 'center',
@@ -115,21 +115,21 @@ export const Dashboard: React.FC = () => {
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10"
-            style={{ backgroundImage: 'radial-gradient(ellipse at 75% 40%, rgba(35,91,255,0.31), transparent 42%), radial-gradient(ellipse at 92% 63%, rgba(170,90,255,0.24), transparent 38%), radial-gradient(ellipse at 40% 95%, rgba(130,175,255,.24), transparent 50%), linear-gradient(110deg, rgba(255,255,255,.08), rgba(222,234,255,.08))' }}
+            style={{ backgroundImage: 'radial-gradient(ellipse at 75% 40%, rgba(35,91,255,0.28), transparent 42%), radial-gradient(ellipse at 92% 63%, rgba(170,90,255,0.22), transparent 38%), radial-gradient(ellipse at 40% 95%, rgba(130,175,255,.22), transparent 50%), linear-gradient(110deg, rgba(255,255,255,.08), rgba(222,234,255,.08))' }}
           />
-          <div aria-hidden="true" className="absolute -right-24 top-1/2 -z-10 h-[420px] w-[420px] -translate-y-1/2 rounded-full border border-blue-300/40 bg-blue-300/10 blur-[1px]" />
+          <div aria-hidden="true" className="absolute -right-24 top-1/2 -z-10 h-[360px] w-[360px] -translate-y-1/2 rounded-full border border-blue-300/40 bg-blue-300/10 blur-[1px]" />
           <div aria-hidden="true" className="absolute right-[22%] top-[7%] -z-10 h-2 w-2 rounded-full bg-white shadow-[0_0_22px_7px_rgba(255,255,255,.85)]" />
           <div aria-hidden="true" className="absolute right-[42%] bottom-[14%] -z-10 h-2.5 w-2.5 rounded-full bg-cyan-100 shadow-[0_0_20px_7px_rgba(44,176,255,.48)]" />
-          <div className="grid min-h-[438px] items-center gap-1 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] xl:gap-5">
-            <div className="relative z-10 max-w-[700px] py-1 lg:py-5">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/75 px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-[#3E5E91] shadow-[0_2px_8px_rgba(75,110,170,.06)]">
-                <Sparkles className="h-3.5 w-3.5 text-[#4777FF]" />
+          <div className="grid min-h-[320px] lg:min-h-[340px] items-center gap-1 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] xl:gap-4">
+            <div className="relative z-10 max-w-[660px] py-1 lg:py-2">
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-white/80 px-2.5 py-1 text-[9.5px] font-semibold tracking-[0.08em] text-[#3E5E91] shadow-[0_2px_8px_rgba(75,110,170,.06)]">
+                <Sparkles className="h-3 w-3 text-[#4777FF]" />
                 RESEARCH INTELLIGENCE, REIMAGINED
               </div>
-              <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.048em] text-[#18223B] sm:text-[38px] lg:text-[48px]">
+              <h1 id="dashboard-search-title" className="max-w-[660px] text-[24px] font-bold leading-[1.12] tracking-[-0.04em] text-[#18223B] sm:text-[30px] lg:text-[34px]">
                 Discover. Connect. Advance<br className="hidden sm:block" /> <span className="bg-gradient-to-r from-[#4777FF] to-[#6685F2] bg-clip-text text-transparent">Research</span> with AI.
               </h1>
-              <p className="mt-3 max-w-[540px] text-[14px] leading-6 text-[#66748C] sm:text-[16px] sm:leading-7">
+              <p className="mt-2 max-w-[500px] text-[12.5px] leading-5 text-[#66748C] sm:text-[13.5px] sm:leading-6">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -139,29 +139,29 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-5 flex h-[54px] max-w-[680px] items-center gap-2 rounded-xl border border-[#DFE6F1] bg-white/90 p-1.5 pl-4 shadow-[0_6px_22px_rgba(40,67,118,.07)] backdrop-blur-sm focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-200/35 sm:h-[60px]"
+                className="mt-3.5 flex h-[46px] max-w-[620px] items-center gap-2 rounded-xl border border-[#DFE6F1] bg-white/95 p-1 pl-3.5 shadow-[0_4px_18px_rgba(40,67,118,.06)] backdrop-blur-sm focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-200/35 sm:h-[48px]"
               >
-                <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-[#78849B]" />
+                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-[#78849B]" />
                 <input
                   aria-label="Search academic papers, authors, and topics"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
                   placeholder="Ask anything about academic research..."
-                  className="min-w-0 flex-1 bg-transparent py-2.5 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 sm:text-[15px]"
+                  className="min-w-0 flex-1 bg-transparent py-2 text-[12.5px] text-slate-900 outline-none placeholder:text-slate-400 sm:text-[13.5px]"
                 />
-                <button type="submit" className="inline-flex h-full shrink-0 items-center gap-2 rounded-lg bg-[#4777FF] px-4 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(71,119,255,.22)] transition hover:bg-[#3565ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:px-5">
-                  Search <ArrowRight className="h-4 w-4" />
+                <button type="submit" className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-lg bg-[#4777FF] px-3.5 text-xs font-semibold text-white shadow-[0_3px_10px_rgba(71,119,255,.22)] transition hover:bg-[#3565ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:px-4 sm:text-sm">
+                  Search <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </form>
 
-              <div className="mt-4 flex max-w-[700px] flex-wrap items-center gap-2 text-[11px] text-[#78849B] sm:mt-4 sm:text-xs">
+              <div className="mt-2.5 flex max-w-[660px] flex-wrap items-center gap-1.5 text-[10.5px] text-[#78849B] sm:text-[11px]">
                 <span className="mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
                     key={term}
                     type="button"
                     onClick={() => openSearch(term)}
-                    className="rounded-full border border-[#DCE4F0] bg-white/65 px-3 py-2 text-[#40506B] shadow-[0_1px_3px_rgba(40,67,118,.04)] transition hover:border-[#AFC3F7] hover:bg-[#EEF3FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                    className="rounded-full border border-[#DCE4F0] bg-white/70 px-2.5 py-1 text-[#40506B] shadow-[0_1px_2px_rgba(40,67,118,.04)] transition hover:border-[#AFC3F7] hover:bg-[#EEF3FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                   >
                     {term}
                   </button>
@@ -169,14 +169,14 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative mx-auto flex h-[320px] w-full items-center justify-center overflow-visible sm:h-[390px] lg:h-[474px] xl:h-[486px]" aria-label="Interactive research knowledge core">
+            <div className="relative mx-auto flex h-[260px] w-full items-center justify-center overflow-visible sm:h-[300px] lg:h-[340px] xl:h-[350px]" aria-label="Interactive research knowledge core">
               <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
                 {heroPreviewCards.map(card => (
-                  <div key={card.title} className={`absolute z-0 hidden w-[166px] rounded-2xl border border-white/80 bg-white/75 p-3 shadow-[0_18px_36px_-22px_rgba(33,63,140,.7)] backdrop-blur-md xl:block ${card.className}`}>
-                    <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.08em] text-blue-700"><FileText className="h-3 w-3" /> {card.meta}</div>
-                    <p className="mt-3 text-[12px] font-bold leading-4 text-slate-800">{card.title}</p>
-                    <p className="mt-1.5 text-[9px] leading-3.5 text-slate-500">{card.detail}</p>
-                    <span className="mt-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white"><ArrowRight className="h-3 w-3" /></span>
+                  <div key={card.title} className={`absolute z-0 hidden w-[145px] rounded-xl border border-white/80 bg-white/80 p-2.5 shadow-[0_12px_28px_-18px_rgba(33,63,140,.55)] backdrop-blur-md xl:block ${card.className}`}>
+                    <div className="flex items-center gap-1 text-[8.5px] font-bold tracking-[0.08em] text-blue-700"><FileText className="h-2.5 w-2.5" /> {card.meta}</div>
+                    <p className="mt-2 text-[11px] font-bold leading-3.5 text-slate-800">{card.title}</p>
+                    <p className="mt-1 text-[8.5px] leading-3 text-slate-500">{card.detail}</p>
+                    <span className="mt-2 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-600 text-white"><ArrowRight className="h-2.5 w-2.5" /></span>
                   </div>
                 ))}
               </div>
