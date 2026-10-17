@@ -6,7 +6,6 @@ import {
   Bookmark,
   ChevronRight,
   Clock3,
-  Crown,
   GitCompare,
   Home,
   MessageSquare,
@@ -102,13 +101,6 @@ export const Sidebar: React.FC = () => {
           {isSidebarOpen && <p className="px-2 pb-1 text-[10px] font-bold uppercase tracking-[0.12em] text-slate-400">Account</p>}
           {utilityButton('Profile', 'View and edit profile', UserRound, () => setIsProfileOpen(true), 'text-sky-600 bg-sky-100/80')}
           {utilityButton('Settings', 'Preferences & privacy', Settings, () => setIsSettingsOpen(true), 'text-violet-600 bg-violet-100/80')}
-          {isSidebarOpen && (
-            <button type="button" onClick={() => setIsSettingsOpen(true)} className="mt-2 flex items-center gap-3 overflow-hidden rounded-xl bg-[linear-gradient(120deg,#2A56EE,#7B4CF5_60%,#D35AF7)] px-3.5 py-3 text-left text-white shadow-[0_10px_18px_-13px_rgba(92,70,239,.72)] transition hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400/60">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/15"><Crown className="h-5 w-5 text-amber-200" /></span>
-              <span className="min-w-0 flex-1"><span className="block text-xs font-bold">Upgrade to Pro</span><span className="mt-0.5 block text-[10px] text-blue-50">Unlock advanced insights</span></span>
-              <ChevronRight className="h-4 w-4 shrink-0" />
-            </button>
-          )}
         </div>
       </div>
     </>
