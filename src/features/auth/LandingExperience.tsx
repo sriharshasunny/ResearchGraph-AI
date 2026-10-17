@@ -46,14 +46,30 @@ const workflow = [
   { number: '04', title: 'Understand', detail: 'Ask questions grounded in retrieved evidence and available graph links.', icon: Lightbulb },
 ];
 
+const featuredVideos = [
+  {
+    id: 'YVLwu3jE09c',
+    title: 'What is a knowledge graph?',
+    publisher: 'Neo4j',
+    detail: 'A concise introduction to entities, relationships, and connected data.',
+    duration: '2:36',
+  },
+  {
+    id: 'y7sXDpffzQQ',
+    title: 'Knowledge graphs, clearly explained',
+    publisher: 'IBM Technology',
+    detail: 'See how connected information helps systems understand context.',
+  },
+];
+
+type FeaturedVideo = (typeof featuredVideos)[number];
+
 const KnowledgeGraphFallback = () => (
   <div className="landing-static-graph" role="img" aria-label="Illustrative static knowledge graph preview">
     <svg viewBox="0 0 620 500" aria-hidden="true">
       <g className="landing-static-edges">
         <path d="M305 250 176 124M305 250 463 115M305 250 508 250M305 250 449 384M305 250 177 382M305 250 94 250M176 124 305 84M463 115 523 174M508 250 463 337M449 384 319 424M177 382 105 321M94 250 122 161M176 124 112 190M463 115 386 183M508 250 401 265M449 384 371 323M177 382 247 321" />
       </g>
-      <circle className="landing-static-orbit landing-static-orbit-one" cx="305" cy="250" r="166" />
-      <circle className="landing-static-orbit landing-static-orbit-two" cx="305" cy="250" r="212" />
       <g className="landing-static-paper" transform="translate(58 122) rotate(-8)">
         <rect width="100" height="68" rx="9" /><path d="M13 19h48M13 28h67M13 37h55M13 50h30" />
       </g>
@@ -85,6 +101,7 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [demoOpen, setDemoOpen] = useState(false);
+  const [activeVideo, setActiveVideo] = useState<FeaturedVideo | null>(null);
   const [activeSection, setActiveSection] = useState('home');
   const [supportsWebGL, setSupportsWebGL] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
@@ -94,6 +111,7 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
   const graphRef = useRef<HTMLDivElement>(null);
   const workflowRef = useRef<HTMLElement>(null);
   const workflowLineRef = useRef<HTMLSpanElement>(null);
+  const scrollProgressRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -146,11 +164,19 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
     }
     const updateWorkflowProgress = () => {
       scrollFrame = 0;
-      if (!workflowElement || !line) return;
-      const rect = workflowElement.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      const progress = Math.max(0, Math.min(1, (viewportHeight - rect.top) / (viewportHeight + rect.height * 0.45)));
-      line.style.transform = 'scaleX(' + progress + ')';
+      if (workflowElement && line) {
+        const rect = workflowElement.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const progress = Math.max(0, Math.min(1, (viewportHeight - rect.top) / (viewportHeight + rect.height * 0.45)));
+        line.style.transform = 'scaleX(' + progress + ')';
+      }
+      const progressElement = scrollTarget === window ? document.documentElement : scrollTarget as HTMLElement;
+      const scrollTop = scrollTarget === window ? window.scrollY : progressElement.scrollTop;
+      const scrollLength = scrollTarget === window
+        ? progressElement.scrollHeight - window.innerHeight
+        : progressElement.scrollHeight - progressElement.clientHeight;
+      const pageProgress = scrollLength > 0 ? Math.max(0, Math.min(1, scrollTop / scrollLength)) : 0;
+      if (scrollProgressRef.current) scrollProgressRef.current.style.transform = 'scaleX(' + pageProgress + ')';
     };
     const scheduleWorkflowProgress = () => {
       if (!scrollFrame) scrollFrame = window.requestAnimationFrame(updateWorkflowProgress);
@@ -178,14 +204,17 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
   }, []);
 
   useEffect(() => {
-    if (!demoOpen) return;
+    if (!demoOpen && !activeVideo) return;
     demoCloseRef.current?.focus();
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setDemoOpen(false);
+      if (event.key === 'Escape') {
+        setDemoOpen(false);
+        setActiveVideo(null);
+      }
     };
     window.addEventListener('keydown', closeOnEscape);
     return () => window.removeEventListener('keydown', closeOnEscape);
-  }, [demoOpen]);
+  }, [demoOpen, activeVideo]);
 
   const goTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
@@ -207,6 +236,7 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
 
   return (
     <main className="landing-shell">
+      <div className="landing-scroll-progress" aria-hidden="true"><span ref={scrollProgressRef} /></div>
       <header className="landing-nav-wrap">
         <nav className="landing-nav" aria-label="Main navigation">
           <button type="button" className="landing-brand" onClick={() => goTo('home')} aria-label="ResearchGraph AI home">
@@ -235,14 +265,17 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
         <div className="landing-hero-copy">
           <div className="landing-eyebrow"><span /> RESEARCH INTELLIGENCE, REIMAGINED</div>
           <h1 id="landing-title">Research,<br /><span className="landing-gradient-text">connected.</span></h1>
-          <p className="landing-hero-description">Discover research papers, people, and ideas — and see how they connect across the global research universe using semantic search, AI, and knowledge graphs.</p>
+          <p className="landing-hero-description">Discover research papers, people, and ideas — and see how they connect across the research universe.</p>
           <form className="landing-search-form" onSubmit={submitSearch} role="search">
             <Search size={21} aria-hidden="true" />
             <input ref={searchInputRef} type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search papers, authors, concepts..." aria-label="Search papers, authors, and concepts" />
             <button type="submit" aria-label="Search research"><ArrowRight size={24} /></button>
           </form>
-          <div className="landing-topic-row" aria-label="Explore popular research topics">
-            {suggestedTopics.map((topic) => <button type="button" key={topic} onClick={() => onSearch(topic)}>{topic}</button>)}
+          <div className="landing-topic-group">
+            <span className="landing-topic-lead">Explore a topic</span>
+            <div className="landing-topic-row" aria-label="Explore popular research topics">
+              {suggestedTopics.map((topic) => <button type="button" key={topic} onClick={() => onSearch(topic)}>{topic}</button>)}
+            </div>
           </div>
           <div className="landing-hero-actions">
             <button type="button" className="landing-primary" onClick={onRegister}><Network size={17} /> Explore 3D Graph <ArrowRight size={17} /></button>
@@ -252,8 +285,6 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
 
         <div ref={graphRef} className="landing-hero-visual" role="group" aria-label="Research knowledge graph preview">
           <div className="landing-visual-frame">
-            <div className="landing-visual-orbit landing-orbit-one" aria-hidden="true" />
-            <div className="landing-visual-orbit landing-orbit-two" aria-hidden="true" />
             {showInteractiveGraph ? <iframe title="Interactive illustrative ResearchGraph knowledge core" src="/knowledge_globe.html" loading="eager" allow="autoplay" /> : <KnowledgeGraphFallback />}
           </div>
         </div>
@@ -264,7 +295,7 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
         <div className="landing-section-heading landing-reveal">
           <div className="landing-eyebrow"><span /> CONNECT THE LITERATURE</div>
           <h2 id="topology-title">From papers to a living <span className="landing-gradient-text">knowledge graph</span></h2>
-          <p>Research becomes easier to navigate when its relationships are visible. Follow works, authors, topics, citations, and datasets as connected parts of a larger scholarly landscape.</p>
+          <p>Start with a paper or topic, then follow the authors, methods, datasets, and citations connected to it. Each link adds context to the research landscape.</p>
         </div>
         <div className="landing-topology-grid">
           <div className="landing-network-card landing-reveal" role="img" aria-label="Illustrative connection map linking papers, authors, topics, citations, and datasets">
@@ -278,11 +309,35 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
             <div className="landing-network-node upper-left"><Database size={14} /> Datasets</div>
           </div>
           <div className="landing-topology-copy landing-reveal">
-            <article className="landing-feature-line"><span><BookOpen size={19} /></span><div><h3>Start with scholarly records</h3><p>Search real paper metadata and follow source links when available.</p></div></article>
-            <article className="landing-feature-line"><span><Network size={19} /></span><div><h3>Follow meaningful relationships</h3><p>Move between papers and related entities as graph data is indexed.</p></div></article>
-            <article className="landing-feature-line"><span><FileText size={19} /></span><div><h3>Keep evidence in view</h3><p>Review retrieved passages alongside the papers they came from.</p></div></article>
+            <article className="landing-feature-line"><span><BookOpen size={19} /></span><div><h3>Start with scholarly records</h3><p>Find paper metadata from supported sources and open the original record.</p></div></article>
+            <article className="landing-feature-line"><span><Network size={19} /></span><div><h3>Trace related ideas</h3><p>Follow citations and shared concepts to discover adjacent work.</p></div></article>
+            <article className="landing-feature-line"><span><FileText size={19} /></span><div><h3>Keep evidence close</h3><p>Review available passages alongside the paper they came from.</p></div></article>
             <button type="button" className="landing-text-link" onClick={onRegister}>Explore the workspace <ArrowRight size={16} /></button>
           </div>
+        </div>
+      </section>
+
+      <section className="landing-section landing-videos" aria-labelledby="videos-title">
+        <div className="landing-section-heading landing-reveal">
+          <div className="landing-eyebrow"><span /> WATCH &amp; EXPLORE</div>
+          <h2 id="videos-title">See how connected knowledge <span className="landing-gradient-text">changes the view</span></h2>
+          <p>Short explainers from graph and AI teams introduce the ideas behind linked research. Open a video when you are ready to watch.</p>
+        </div>
+        <div className="landing-video-grid">
+          {featuredVideos.map((video) => (
+            <article className="landing-video-card landing-reveal" key={video.id}>
+              <button type="button" className="landing-video-preview" onClick={() => setActiveVideo(video)} aria-label={`Play ${video.title} by ${video.publisher}`}>
+                <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" />
+                <span className="landing-video-play"><Play size={19} fill="currentColor" /></span>
+                {video.duration && <span className="landing-video-duration">{video.duration}</span>}
+              </button>
+              <div className="landing-video-copy">
+                <span className="landing-video-publisher">{video.publisher}</span>
+                <h3>{video.title}</h3>
+                <p>{video.detail}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
@@ -352,6 +407,13 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
           <p>Search supported scholarly sources, inspect paper records, and use retrieval tools when their required services are configured.</p>
           <div className="landing-demo-list"><div><Search size={18} /><span><b>Discover</b><small>Search scholarly metadata.</small></span></div><div><FileText size={18} /><span><b>Review</b><small>Inspect source records and available documents.</small></span></div><div><Network size={18} /><span><b>Connect</b><small>Explore related research in your workspace.</small></span></div></div>
           <button type="button" className="landing-primary" onClick={() => { setDemoOpen(false); onRegister(); }}>Explore 3D Graph <ArrowRight size={17} /></button>
+        </section>
+      </div>}
+      {activeVideo && <div className="landing-modal-backdrop landing-video-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setActiveVideo(null); }}>
+        <section className="landing-video-modal" role="dialog" aria-modal="true" aria-labelledby="landing-video-title">
+          <button ref={demoCloseRef} type="button" className="landing-modal-close" onClick={() => setActiveVideo(null)} aria-label="Close video"><X size={19} /></button>
+          <div className="landing-video-player"><iframe title={activeVideo.title} src={`https://www.youtube-nocookie.com/embed/${activeVideo.id}?autoplay=1&rel=0`} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /></div>
+          <div className="landing-video-modal-copy"><span className="landing-video-publisher">{activeVideo.publisher}</span><h2 id="landing-video-title">{activeVideo.title}</h2></div>
         </section>
       </div>}
     </main>
