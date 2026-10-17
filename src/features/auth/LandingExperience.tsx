@@ -83,12 +83,14 @@ const KnowledgeGraphFallback = () => (
 
 const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegister, onSearch }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [demoOpen, setDemoOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
   const [supportsWebGL, setSupportsWebGL] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const [graphInView, setGraphInView] = useState(true);
   const demoCloseRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const graphRef = useRef<HTMLDivElement>(null);
   const workflowRef = useRef<HTMLElement>(null);
   const workflowLineRef = useRef<HTMLSpanElement>(null);
@@ -190,6 +192,17 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
     setMobileMenuOpen(false);
   };
 
+  const submitSearch = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    if (query) onSearch(query);
+  };
+
+  const focusResearchSearch = () => {
+    goTo('home');
+    searchInputRef.current?.focus({ preventScroll: true });
+  };
+
   const showInteractiveGraph = supportsWebGL && !reducedMotion && graphInView;
 
   return (
@@ -205,6 +218,7 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
             {sections.map((section) => <button type="button" key={section.id} className={activeSection === section.id ? 'active' : ''} onClick={() => goTo(section.id)}>{section.label}</button>)}
           </div>
           <div className="landing-nav-actions">
+            <button type="button" className="landing-nav-search" onClick={focusResearchSearch} aria-label="Focus research search"><Search size={20} /></button>
             <button type="button" className="landing-login" onClick={onLogin}>Log In</button>
             <button type="button" className="landing-signup" onClick={onRegister}>Sign Up Free <ArrowRight size={16} /></button>
           </div>
@@ -220,17 +234,20 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
       <section id="home" className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-hero-copy">
           <div className="landing-eyebrow"><span /> RESEARCH INTELLIGENCE, REIMAGINED</div>
-          <h1 id="landing-title">Research, <span className="landing-gradient-text">connected.</span></h1>
-          <p className="landing-hero-description">Discover papers, people, and ideas—and see how they connect across the research universe.</p>
+          <h1 id="landing-title">Research,<br /><span className="landing-gradient-text">connected.</span></h1>
+          <p className="landing-hero-description">Discover research papers, people, and ideas — and see how they connect across the global research universe using semantic search, AI, and knowledge graphs.</p>
+          <form className="landing-search-form" onSubmit={submitSearch} role="search">
+            <Search size={21} aria-hidden="true" />
+            <input ref={searchInputRef} type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search papers, authors, concepts..." aria-label="Search papers, authors, and concepts" />
+            <button type="submit" aria-label="Search research"><ArrowRight size={24} /></button>
+          </form>
           <div className="landing-topic-row" aria-label="Explore popular research topics">
-            <span>Explore a topic</span>
             {suggestedTopics.map((topic) => <button type="button" key={topic} onClick={() => onSearch(topic)}>{topic}</button>)}
           </div>
           <div className="landing-hero-actions">
             <button type="button" className="landing-primary" onClick={onRegister}><Network size={17} /> Explore 3D Graph <ArrowRight size={17} /></button>
             <button type="button" className="landing-secondary" onClick={() => setDemoOpen(true)}><Play size={15} fill="currentColor" /> Watch Demo</button>
           </div>
-          <p className="landing-data-note"><span className="landing-status-dot" /> Scholarly discovery powered by supported research sources</p>
         </div>
 
         <div ref={graphRef} className="landing-hero-visual" role="group" aria-label="Research knowledge graph preview">
@@ -238,7 +255,6 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
             <div className="landing-visual-orbit landing-orbit-one" aria-hidden="true" />
             <div className="landing-visual-orbit landing-orbit-two" aria-hidden="true" />
             {showInteractiveGraph ? <iframe title="Interactive illustrative ResearchGraph knowledge core" src="/knowledge_globe.html" loading="eager" allow="autoplay" /> : <KnowledgeGraphFallback />}
-            <div className="landing-visual-caption"><Network size={14} /> Knowledge graph preview <span>Illustrative</span></div>
           </div>
         </div>
         <button type="button" className="landing-scroll-cue" onClick={() => goTo('topology')}><span><ArrowDown size={16} /></span> EXPLORE THE WORKFLOW</button>
