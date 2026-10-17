@@ -90,21 +90,26 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate overflow-hidden rounded-[22px] border border-[#E2E8F2] bg-[linear-gradient(118deg,#FFFFFF_0%,#F8FAFE_55%,#F2F6FD_100%)] px-5 py-6 text-[#18223B] shadow-[0_16px_42px_-32px_rgba(49,75,125,0.4)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
+          className="relative isolate min-h-[458px] overflow-hidden rounded-[22px] border border-[#DCE6F8] bg-[#F6F8FF] px-5 py-6 text-[#18223B] shadow-[0_18px_45px_-30px_rgba(49,75,125,0.42)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
+          style={{
+            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,.92) 0%, rgba(250,252,255,.7) 42%, rgba(236,241,255,.12) 100%), url(/hero-bg-light.webp)',
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+          }}
         >
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10"
-            style={{ backgroundImage: 'radial-gradient(ellipse at 78% 45%, rgba(71,119,255,0.075), transparent 40%), radial-gradient(ellipse at 90% 60%, rgba(34,211,238,0.045), transparent 34%), linear-gradient(110deg, rgba(255,255,255,0.88), rgba(245,248,253,0.92))' }}
+            style={{ backgroundImage: 'radial-gradient(ellipse at 76% 40%, rgba(77,110,255,0.16), transparent 43%), radial-gradient(ellipse at 92% 70%, rgba(159,113,255,0.13), transparent 37%), linear-gradient(110deg, rgba(255,255,255,.18), rgba(240,245,255,.12))' }}
           />
           <div aria-hidden="true" className="absolute -right-20 -top-40 -z-10 h-[500px] w-[500px] rounded-full border border-blue-200/25" />
-          <div className="grid items-center gap-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:gap-5">
-            <div className="relative z-10 max-w-[700px] py-1 lg:py-3">
+          <div className="grid min-h-[406px] items-center gap-1 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] xl:gap-5">
+            <div className="relative z-10 max-w-[700px] py-1 lg:py-5">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/75 px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-[#3E5E91] shadow-[0_2px_8px_rgba(75,110,170,.06)]">
                 <Sparkles className="h-3.5 w-3.5 text-[#4777FF]" />
                 YOUR RESEARCH WORKSPACE
               </div>
-              <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.045em] text-[#18223B] sm:text-[38px] lg:text-[46px]">
+              <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.048em] text-[#18223B] sm:text-[38px] lg:text-[48px]">
                 Discover. Connect. Advance<br className="hidden sm:block" /> <span className="bg-gradient-to-r from-[#4777FF] to-[#6685F2] bg-clip-text text-transparent">Research</span> with AI.
               </h1>
               <p className="mt-3 max-w-[540px] text-[14px] leading-6 text-[#66748C] sm:text-[16px] sm:leading-7">
@@ -147,7 +152,7 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative mx-auto flex h-[310px] w-full items-center justify-center overflow-visible sm:h-[370px] lg:h-[430px] xl:h-[440px]" aria-label="Interactive research knowledge core">
+            <div className="relative mx-auto flex h-[310px] w-full items-center justify-center overflow-visible sm:h-[370px] lg:h-[448px] xl:h-[462px]" aria-label="Interactive research knowledge core">
               <ResearchKnowledgeCore />
             </div>
           </div>
@@ -307,3 +312,4 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+
