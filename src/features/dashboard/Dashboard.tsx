@@ -25,9 +25,9 @@ const shortcuts: Array<{ title: string; description: string; icon: typeof Search
   { title: 'Search Papers', description: 'Discover relevant research', icon: FileSearch, page: 'search', tone: 'bg-blue-50 text-blue-700' },
   { title: 'AI Research Assistant', description: 'Ask questions across papers', icon: MessageSquareText, page: 'chat', tone: 'bg-violet-50 text-violet-700' },
   { title: 'Knowledge Graph', description: 'Explore connected ideas', icon: Network, page: 'graph', tone: 'bg-cyan-50 text-cyan-700' },
-  { title: 'Compare Papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare', tone: 'bg-emerald-50 text-emerald-700' },
-  { title: 'Literature Review', description: 'Build a focused literature review', icon: BookOpen, page: 'literature', tone: 'bg-amber-50 text-amber-700' },
-  { title: 'Research Gaps', description: 'Find open questions and directions', icon: Sparkles, page: 'gaps', tone: 'bg-rose-50 text-rose-700' },
+  { title: 'Compare Papers', description: 'Review methods side by side', icon: GitCompare, page: 'compare', tone: 'bg-indigo-50 text-indigo-700' },
+  { title: 'Literature Review', description: 'Build a focused literature review', icon: BookOpen, page: 'literature', tone: 'bg-blue-50 text-blue-700' },
+  { title: 'Research Gaps', description: 'Find open questions and directions', icon: Sparkles, page: 'gaps', tone: 'bg-violet-50 text-violet-700' },
 ];
 
 const suggestedQueries = [
@@ -76,10 +76,10 @@ export const Dashboard: React.FC = () => {
   };
 
   const stats: Array<{ label: string; value: number; icon: typeof Search; tone: string; page: PageType }> = [
-    { label: 'Saved papers', value: savedPaperIds.length, icon: Bookmark, tone: 'bg-emerald-50 text-emerald-700', page: 'saved' },
+    { label: 'Saved papers', value: savedPaperIds.length, icon: Bookmark, tone: 'bg-cyan-50 text-cyan-700', page: 'saved' },
     { label: 'Papers in workspace', value: allPapers.length, icon: Layers3, tone: 'bg-blue-50 text-blue-700', page: 'papers' },
     { label: 'Reading now', value: readingNowCount, icon: BookOpen, tone: 'bg-violet-50 text-violet-700', page: 'papers' },
-    { label: 'Comparisons', value: comparisonPaperIds.length, icon: GitCompare, tone: 'bg-orange-50 text-orange-700', page: 'compare' },
+    { label: 'Comparisons', value: comparisonPaperIds.length, icon: GitCompare, tone: 'bg-indigo-50 text-indigo-700', page: 'compare' },
   ];
 
   return (
@@ -90,24 +90,24 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate overflow-hidden rounded-[22px] bg-[#07152D] px-5 py-6 text-white shadow-[0_18px_45px_-28px_rgba(15,35,65,0.72)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
+          className="relative isolate overflow-hidden rounded-[22px] border border-[#E2E8F2] bg-[linear-gradient(118deg,#FFFFFF_0%,#F8FAFE_55%,#F2F6FD_100%)] px-5 py-6 text-[#18223B] shadow-[0_16px_42px_-32px_rgba(49,75,125,0.4)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
         >
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10"
-            style={{ backgroundImage: 'radial-gradient(ellipse at 76% 50%, rgba(14,116,220,0.24), transparent 37%), radial-gradient(ellipse at 94% 28%, rgba(6,182,212,0.12), transparent 32%), radial-gradient(1px 1px at 64% 18%, rgba(191,219,254,.72) 50%, transparent 100%), radial-gradient(1px 1px at 83% 14%, rgba(147,197,253,.65) 50%, transparent 100%), radial-gradient(1.5px 1.5px at 94% 63%, rgba(125,211,252,.65) 50%, transparent 100%), radial-gradient(1px 1px at 71% 78%, rgba(191,219,254,.55) 50%, transparent 100%), linear-gradient(110deg, #07152D, #06162F 70%, #0A2040)' }}
+            style={{ backgroundImage: 'radial-gradient(ellipse at 78% 45%, rgba(71,119,255,0.075), transparent 40%), radial-gradient(ellipse at 90% 60%, rgba(34,211,238,0.045), transparent 34%), linear-gradient(110deg, rgba(255,255,255,0.88), rgba(245,248,253,0.92))' }}
           />
-          <div aria-hidden="true" className="absolute -right-20 -top-40 -z-10 h-[500px] w-[500px] rounded-full border border-cyan-100/[0.08]" />
+          <div aria-hidden="true" className="absolute -right-20 -top-40 -z-10 h-[500px] w-[500px] rounded-full border border-blue-200/25" />
           <div className="grid items-center gap-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:gap-5">
             <div className="relative z-10 max-w-[700px] py-1 lg:py-3">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-200/15 bg-blue-400/[0.09] px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-blue-100">
-                <Sparkles className="h-3.5 w-3.5 text-cyan-300" />
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/75 px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-[#3E5E91] shadow-[0_2px_8px_rgba(75,110,170,.06)]">
+                <Sparkles className="h-3.5 w-3.5 text-[#4777FF]" />
                 YOUR RESEARCH WORKSPACE
               </div>
-              <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.035em] sm:text-[38px] lg:text-[46px]">
-                Discover. Connect. Advance<br className="hidden sm:block" /> <span className="bg-gradient-to-r from-sky-400 to-blue-400 bg-clip-text text-transparent">Research</span> with AI.
+              <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.045em] text-[#18223B] sm:text-[38px] lg:text-[46px]">
+                Discover. Connect. Advance<br className="hidden sm:block" /> <span className="bg-gradient-to-r from-[#4777FF] to-[#6685F2] bg-clip-text text-transparent">Research</span> with AI.
               </h1>
-              <p className="mt-3 max-w-[540px] text-[14px] leading-6 text-slate-300 sm:text-[16px] sm:leading-7">
+              <p className="mt-3 max-w-[540px] text-[14px] leading-6 text-[#66748C] sm:text-[16px] sm:leading-7">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -117,9 +117,9 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-5 flex h-[54px] max-w-[680px] items-center gap-2 rounded-xl border border-white/70 bg-white p-1.5 pl-4 shadow-lg shadow-slate-950/15 focus-within:ring-4 focus-within:ring-blue-300/20 sm:h-[60px]"
+                className="mt-5 flex h-[54px] max-w-[680px] items-center gap-2 rounded-xl border border-[#DFE6F1] bg-white/90 p-1.5 pl-4 shadow-[0_6px_22px_rgba(40,67,118,.07)] backdrop-blur-sm focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-200/35 sm:h-[60px]"
               >
-                <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-slate-400" />
+                <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-[#78849B]" />
                 <input
                   aria-label="Search academic papers, authors, and topics"
                   value={query}
@@ -127,19 +127,19 @@ export const Dashboard: React.FC = () => {
                   placeholder="Ask anything about academic research..."
                   className="min-w-0 flex-1 bg-transparent py-2.5 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 sm:text-[15px]"
                 />
-                <button type="submit" className="inline-flex h-full shrink-0 items-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:px-5">
+                <button type="submit" className="inline-flex h-full shrink-0 items-center gap-2 rounded-lg bg-[#4777FF] px-4 text-sm font-semibold text-white shadow-[0_4px_12px_rgba(71,119,255,.22)] transition hover:bg-[#3565ed] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 sm:px-5">
                   Search <ArrowRight className="h-4 w-4" />
                 </button>
               </form>
 
-              <div className="mt-4 flex max-w-[700px] flex-wrap items-center gap-2 text-[11px] text-blue-100/75 sm:mt-4 sm:text-xs">
+              <div className="mt-4 flex max-w-[700px] flex-wrap items-center gap-2 text-[11px] text-[#78849B] sm:mt-4 sm:text-xs">
                 <span className="mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
                     key={term}
                     type="button"
                     onClick={() => openSearch(term)}
-                    className="rounded-full border border-white/15 bg-white/[0.055] px-3 py-2 text-slate-100 transition hover:border-blue-300/50 hover:bg-blue-400/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                    className="rounded-full border border-[#DCE4F0] bg-white/65 px-3 py-2 text-[#40506B] shadow-[0_1px_3px_rgba(40,67,118,.04)] transition hover:border-[#AFC3F7] hover:bg-[#EEF3FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
                   >
                     {term}
                   </button>
