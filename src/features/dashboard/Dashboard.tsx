@@ -91,7 +91,7 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[460px] lg:min-h-[490px] overflow-hidden rounded-[26px] border border-blue-200/60 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] px-5 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-6 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)]"
+          className="relative isolate min-h-[445px] lg:min-h-[475px] overflow-hidden rounded-[26px] border border-blue-200/60 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-5 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)]"
           style={{
             backgroundImage: `
               linear-gradient(90deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.38) 36%, rgba(255, 255, 255, 0.08) 58%, transparent 75%),
@@ -102,7 +102,7 @@ export const Dashboard: React.FC = () => {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="grid min-h-[380px] lg:min-h-[420px] items-center gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:gap-6">
+          <div className="grid min-h-[365px] lg:min-h-[405px] items-center gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:gap-6">
             <div className="relative z-10 max-w-[580px]">
               {/* Badge */}
               <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 bg-white/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] shadow-[0_2px_10px_rgba(37,99,235,0.12)] backdrop-blur-md">
