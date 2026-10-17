@@ -727,123 +727,190 @@ function initResearchGraphGlobe(
         @keyframes rg-pl {
           50% { transform: scale(1.7); opacity: .15; }
         }
-        .rg-tag {
+        .rg-pill-badge {
           position: absolute;
           display: flex;
           align-items: center;
-          justify-content: flex-start;
-          gap: 1.2cqw;
-          padding: 0 0 0 2.1cqw;
-          height: 4.6cqw;
+          gap: .6cqw;
+          padding: .6cqw 1.3cqw;
           border-radius: 5cqw;
-          font-weight: 600;
-          font-size: 1.68cqw;
+          font-weight: 700;
+          font-size: 1.15cqw;
           white-space: nowrap;
-          background: color-mix(in srgb, var(--c) 14%, #07112b);
-          border: 1.5px solid var(--c);
-          color: #f0f5ff;
-          box-shadow: 0 0 2.6cqw -.4cqw var(--c);
-          transform: translate(-50%,-50%);
+          color: #ffffff;
+          transform: translate(-50%, -50%);
+          z-index: 25;
+          cursor: pointer;
+          transition: transform .2s, box-shadow .2s;
+        }
+        .rg-pill-badge:hover {
+          transform: translate(-50%, -50%) scale(1.06);
+        }
+        .rg-pill-badge svg {
+          width: 1.4cqw;
+          height: 1.4cqw;
+          stroke: #ffffff;
+          fill: none;
+          stroke-width: 2;
+        }
+        .rg-pill-purple {
+          background: linear-gradient(135deg, #8b5cf6, #6366f1);
+          box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45);
+        }
+        .rg-pill-blue {
+          background: #2563eb;
+          box-shadow: 0 4px 16px rgba(37, 99, 235, 0.45);
+        }
+        .rg-pill-green {
+          background: #059669;
+          box-shadow: 0 4px 16px rgba(5, 150, 105, 0.45);
+        }
+        .rg-paper {
+          position: absolute;
+          width: 4.4cqw;
+          height: 5.8cqw;
+          background: rgba(255, 255, 255, 0.94);
+          backdrop-filter: blur(8px);
+          border-radius: .3cqw;
+          box-shadow: 0 8px 20px rgba(10, 20, 50, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.85);
+          pointer-events: none;
+          z-index: 15;
+          padding: .6cqw .5cqw;
+          display: flex;
+          flex-direction: column;
+          gap: .35cqw;
+          animation: rg-float 6s ease-in-out infinite;
+        }
+        .rg-paper.p1 { animation-delay: 0s; }
+        .rg-paper.p2 { animation-delay: -2s; }
+        .rg-paper.p3 { animation-delay: -4s; }
+        @keyframes rg-float {
+          0%, 100% { transform: translateY(0) rotate(var(--pr, 0deg)); }
+          50% { transform: translateY(-5px) rotate(calc(var(--pr, 0deg) + 2deg)); }
+        }
+        .rg-paper .line {
+          height: .25cqw;
+          background: #cbd5e1;
+          border-radius: .15cqw;
+        }
+        .rg-paper .line.short {
+          width: 55%;
+        }
+        .rg-card {
+          position: absolute;
+          width: 20.8%;
+          padding: 1.1cqw 1.3cqw;
+          border-radius: 1.2cqw;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(14px);
+          border: 1px solid rgba(255, 255, 255, 0.98);
+          box-shadow: 0 10px 30px -4px rgba(15, 25, 60, 0.16), 0 2px 6px rgba(0,0,0,0.04);
+          transform: rotate(var(--r));
           z-index: 20;
           cursor: pointer;
           transition: transform .2s, box-shadow .2s;
         }
-        .rg-tag:hover {
-          transform: translate(-50%,-50%) scale(1.05);
-          box-shadow: 0 0 3.5cqw 0 var(--c);
-        }
-        .rg-tag svg {
-          width: 2.25cqw;
-          height: 2.25cqw;
-          stroke: var(--c);
-          fill: none;
-          stroke-width: 1.8;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-        }
-        .rg-card {
-          position: absolute;
-          width: 25.6%;
-          padding: 1.9cqw 2.1cqw;
-          border-radius: 1.7cqw;
-          background: linear-gradient(160deg, rgba(14,28,68,.92), rgba(6,16,42,.92));
-          border: 1px solid rgba(120,160,240,.32);
-          box-shadow: 0 1.8cqw 5cqw rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,0.1);
-          transform: rotate(var(--r));
-          z-index: 20;
-          cursor: pointer;
-          transition: transform .2s, box-shadow .2s, border-color .2s;
-        }
         .rg-card:hover {
           transform: rotate(var(--r)) translateY(-4px) scale(1.02);
-          box-shadow: 0 2.4cqw 6cqw rgba(0,0,0,.7);
-          border-color: rgba(90,160,255,.6);
+          box-shadow: 0 16px 36px -4px rgba(15, 25, 60, 0.22);
         }
         .rg-card .top {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          font-size: 1.3cqw;
-          color: #aab6d3;
+          font-size: 1.1cqw;
+          color: #64748b;
+          font-weight: 600;
         }
         .rg-card .src {
-          font-family: Georgia, serif;
-          font-size: 2cqw;
-          color: #e8edf9;
-          letter-spacing: .05cqw;
+          font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+          font-size: 1.4cqw;
+          font-weight: 800;
+          color: #0f172a;
+          letter-spacing: -0.02em;
         }
         .rg-card .src i {
-          color: #e34c3a;
+          color: #e11d48;
           font-style: normal;
         }
         .rg-card .oa {
           display: flex;
-          gap: .7cqw;
+          gap: .4cqw;
           align-items: center;
-          color: #5fa8ff;
-          font-size: 1.25cqw;
+          color: #059669;
+          font-size: 1.2cqw;
+          font-weight: 700;
         }
         .rg-card .oa svg {
-          width: 1.8cqw;
-          height: 1.8cqw;
+          width: 1.35cqw;
+          height: 1.35cqw;
+          stroke: #059669;
         }
         .rg-card h3 {
-          font-size: 1.85cqw;
-          font-weight: 600;
-          line-height: 1.28;
-          margin: 1.1cqw 0 .9cqw;
-          border-top: 1px solid rgba(120,150,220,.22);
-          padding-top: 1.2cqw;
-          color: #f0f5ff;
+          font-size: 1.28cqw;
+          font-weight: 700;
+          line-height: 1.25;
+          margin: .6cqw 0 .3cqw;
+          color: #0f172a;
         }
         .rg-card .au {
-          font-size: 1.4cqw;
-          color: #9aa8c8;
+          font-size: 1.05cqw;
+          color: #64748b;
         }
         .rg-card .au b {
-          font-weight: 400;
-          color: #c7d1ea;
+          font-weight: 600;
+          color: #334155;
         }
         .rg-card .meta {
           display: flex;
-          gap: 2.4cqw;
-          margin-top: 1.3cqw;
-          font-size: 1.4cqw;
-          color: #aab6d3;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: .7cqw;
+          font-size: 1.05cqw;
+          color: #475569;
+          font-weight: 600;
         }
-        .rg-card .meta span {
+        .rg-card .meta-stats {
           display: flex;
-          gap: .7cqw;
+          gap: 1.2cqw;
           align-items: center;
         }
-        .rg-card .meta svg {
-          width: 1.8cqw;
-          height: 1.8cqw;
-          stroke: #aab6d3;
+        .rg-card .meta-stats span {
+          display: flex;
+          gap: .4cqw;
+          align-items: center;
+        }
+        .rg-card .meta-stats svg {
+          width: 1.25cqw;
+          height: 1.25cqw;
+          stroke: #64748b;
           fill: none;
-          stroke-width: 1.6;
+          stroke-width: 1.8;
           stroke-linecap: round;
           stroke-linejoin: round;
+        }
+        .rg-card .btn-arrow {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2.2cqw;
+          height: 2.2cqw;
+          border-radius: 50%;
+          background: #2563eb;
+          color: #ffffff;
+          box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+          transition: background .15s, transform .15s;
+        }
+        .rg-card:hover .btn-arrow {
+          background: #1d4ed8;
+          transform: scale(1.08);
+        }
+        .rg-card .btn-arrow svg {
+          width: 1.1cqw;
+          height: 1.1cqw;
+          stroke: #ffffff;
+          stroke-width: 2.2;
+          fill: none;
         }
       `}</style>
 
@@ -858,55 +925,81 @@ function initResearchGraphGlobe(
         />
 
         <svg className="rg-links-svg" viewBox="0 0 1000 585" aria-hidden="true">
-          <g style={{ color: '#f5b335' }} className="g">
-            <line x1="382" y1="101" x2="415" y2="160" stroke="#f5b335" />
-            <circle cx="415" cy="160" r="3.4" fill="#fff" />
-            <circle className="p" cx="382" cy="101" r="9" fill="#f5b335" opacity=".3" />
-            <circle cx="382" cy="101" r="4.6" fill="#f5b335" />
+          {/* Link to Knowledge Graph pill (top) */}
+          <g style={{ color: '#a855f7' }} className="g">
+            <line x1="535" y1="95" x2="535" y2="180" stroke="#a855f7" />
+            <circle cx="535" cy="180" r="3.4" fill="#fff" />
+            <circle className="p" cx="535" cy="95" r="9" fill="#a855f7" opacity=".3" />
+            <circle cx="535" cy="95" r="4.6" fill="#a855f7" />
           </g>
-          <g style={{ color: '#2dd4a8' }} className="g">
-            <line x1="587" y1="101" x2="560" y2="150" stroke="#2dd4a8" />
-            <circle cx="560" cy="150" r="3.4" fill="#fff" />
-            <circle className="p" cx="587" cy="101" r="9" fill="#2dd4a8" opacity=".3" />
-            <circle cx="587" cy="101" r="4.6" fill="#2dd4a8" />
+
+          {/* Link to Research Papers pill (left) */}
+          <g style={{ color: '#38bdf8' }} className="g">
+            <line x1="435" y1="245" x2="480" y2="280" stroke="#38bdf8" />
+            <circle cx="480" cy="280" r="3.4" fill="#fff" />
+            <circle className="p" cx="435" cy="245" r="9" fill="#38bdf8" opacity=".3" />
+            <circle cx="435" cy="245" r="4.6" fill="#38bdf8" />
           </g>
-          <g style={{ color: '#35c6ff' }} className="g">
-            <line x1="301" y1="267" x2="345" y2="268" stroke="#35c6ff" />
-            <circle cx="345" cy="268" r="3.4" fill="#fff" />
-            <circle className="p" cx="301" cy="267" r="9" fill="#35c6ff" opacity=".3" />
-            <circle cx="301" cy="267" r="4.6" fill="#35c6ff" />
+
+          {/* Link to AI Insights pill (right) */}
+          <g style={{ color: '#34d399' }} className="g">
+            <line x1="690" y1="250" x2="615" y2="280" stroke="#34d399" />
+            <circle cx="615" cy="280" r="3.4" fill="#fff" />
+            <circle className="p" cx="690" cy="250" r="9" fill="#34d399" opacity=".3" />
+            <circle cx="690" cy="250" r="4.6" fill="#34d399" />
           </g>
-          <g style={{ color: '#e08cff' }} className="g">
-            <line x1="678" y1="270" x2="603" y2="265" stroke="#e08cff" />
-            <circle cx="603" cy="265" r="3.4" fill="#fff" />
-            <circle className="p" cx="678" cy="270" r="9" fill="#e08cff" opacity=".3" />
-            <circle cx="678" cy="270" r="4.6" fill="#e08cff" />
+
+          {/* Link to Global Connections pill (bottom) */}
+          <g style={{ color: '#60a5fa' }} className="g">
+            <line x1="565" y1="440" x2="540" y2="395" stroke="#60a5fa" />
+            <circle cx="540" cy="395" r="3.4" fill="#fff" />
+            <circle className="p" cx="565" cy="440" r="9" fill="#60a5fa" opacity=".3" />
+            <circle cx="565" cy="440" r="4.6" fill="#60a5fa" />
           </g>
-          <g style={{ color: '#a67bf5' }} className="g">
-            <line x1="314" y1="430" x2="365" y2="373" stroke="#a67bf5" />
-            <circle cx="365" cy="373" r="3.4" fill="#fff" />
-            <circle className="p" cx="314" cy="430" r="9" fill="#a67bf5" opacity=".3" />
-            <circle cx="314" cy="430" r="4.6" fill="#a67bf5" />
+
+          {/* Connecting line to Card 1 */}
+          <g style={{ color: '#60a5fa' }} className="g">
+            <line x1="215" y1="130" x2="430" y2="210" stroke="#60a5fa" strokeDasharray="3 3" opacity=".6" />
           </g>
-          <g style={{ color: '#35c6ff' }} className="g">
-            <line x1="650" y1="426" x2="595" y2="380" stroke="#35c6ff" />
-            <circle cx="595" cy="380" r="3.4" fill="#fff" />
-            <circle className="p" cx="650" cy="426" r="9" fill="#35c6ff" opacity=".3" />
-            <circle cx="650" cy="426" r="4.6" fill="#35c6ff" />
+
+          {/* Connecting line to Card 2 */}
+          <g style={{ color: '#818cf8' }} className="g">
+            <line x1="740" y1="140" x2="620" y2="210" stroke="#818cf8" strokeDasharray="3 3" opacity=".6" />
           </g>
-          <g style={{ color: '#35c6ff' }} className="g">
-            <line x1="490" y1="527" x2="483" y2="385" stroke="#35c6ff" />
-            <circle cx="483" cy="385" r="3.4" fill="#fff" />
-            <circle className="p" cx="490" cy="527" r="9" fill="#35c6ff" opacity=".3" />
-            <circle cx="490" cy="527" r="4.6" fill="#35c6ff" />
+
+          {/* Connecting line to Card 3 */}
+          <g style={{ color: '#38bdf8' }} className="g">
+            <line x1="225" y1="420" x2="440" y2="360" stroke="#38bdf8" strokeDasharray="3 3" opacity=".6" />
+          </g>
+
+          {/* Connecting line to Card 4 */}
+          <g style={{ color: '#34d399' }} className="g">
+            <line x1="750" y1="420" x2="630" y2="360" stroke="#34d399" strokeDasharray="3 3" opacity=".6" />
           </g>
         </svg>
+
+        {/* Floating Paper Sheets in Orbit */}
+        <div className="rg-paper p1" style={{ left: '72%', top: '15%', '--pr': '18deg' } as React.CSSProperties}>
+          <div className="line" />
+          <div className="line" />
+          <div className="line short" />
+        </div>
+        <div className="rg-paper p2" style={{ left: '69%', top: '65%', '--pr': '-12deg' } as React.CSSProperties}>
+          <div className="line" />
+          <div className="line" />
+          <div className="line short" />
+        </div>
+        <div className="rg-paper p3" style={{ left: '81%', top: '51%', '--pr': '15deg' } as React.CSSProperties}>
+          <div className="line" />
+          <div className="line" />
+          <div className="line short" />
+        </div>
 
         {/* Card 1: arXiv Vision Transformers */}
         <div
           onClick={() => handleSearch('A Survey on Vision Transformers')}
           className="rg-card"
-          style={{ left: '.2%', top: '1.2%', '--r': '-5deg' } as React.CSSProperties}
+          style={{ left: '4%', top: '7%', '--r': '-4deg' } as React.CSSProperties}
         >
           <div className="top">
             <span className="src">ar<i>X</i>iv</span>
@@ -915,13 +1008,18 @@ function initResearchGraphGlobe(
           <h3>A Survey on Vision Transformers</h3>
           <div className="au">A. Dosovitskiy <b>et al.</b></div>
           <div className="meta">
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
-              1.2K
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
-              PDF
+            <div className="meta-stats">
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
+                1.2K
+              </span>
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
+                PDF
+              </span>
+            </div>
+            <span className="btn-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </span>
           </div>
         </div>
@@ -930,11 +1028,11 @@ function initResearchGraphGlobe(
         <div
           onClick={() => handleSearch('Graph Neural Networks for Social Recommendation')}
           className="rg-card"
-          style={{ left: '73.5%', top: '.9%', '--r': '4deg' } as React.CSSProperties}
+          style={{ left: '74%', top: '8%', '--r': '4deg' } as React.CSSProperties}
         >
           <div className="top">
             <span className="oa">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#5fa8ff" strokeWidth="1.8">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" />
               </svg>
@@ -945,13 +1043,18 @@ function initResearchGraphGlobe(
           <h3>Graph Neural Networks for Social Recommendation</h3>
           <div className="au">Y. Wu <b>et al.</b></div>
           <div className="meta">
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
-              856
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
-              PDF
+            <div className="meta-stats">
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
+                856
+              </span>
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
+                PDF
+              </span>
+            </div>
+            <span className="btn-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </span>
           </div>
         </div>
@@ -960,7 +1063,7 @@ function initResearchGraphGlobe(
         <div
           onClick={() => handleSearch('Self-Supervised Learning for Medical Image Analysis')}
           className="rg-card"
-          style={{ left: '1.5%', top: '61%', '--r': '-6deg' } as React.CSSProperties}
+          style={{ left: '6%', top: '57%', '--r': '-3deg' } as React.CSSProperties}
         >
           <div className="top">
             <span className="src">ar<i>X</i>iv</span>
@@ -969,13 +1072,18 @@ function initResearchGraphGlobe(
           <h3>Self-Supervised Learning for Medical Image Analysis</h3>
           <div className="au">J. Chen <b>et al.</b></div>
           <div className="meta">
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
-              642
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
-              PDF
+            <div className="meta-stats">
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
+                642
+              </span>
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
+                PDF
+              </span>
+            </div>
+            <span className="btn-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </span>
           </div>
         </div>
@@ -984,11 +1092,11 @@ function initResearchGraphGlobe(
         <div
           onClick={() => handleSearch('Large Language Models in Scientific Research')}
           className="rg-card"
-          style={{ left: '75.7%', top: '65%', width: '24.4%', '--r': '6deg' } as React.CSSProperties}
+          style={{ left: '75%', top: '59%', '--r': '3deg' } as React.CSSProperties}
         >
           <div className="top">
             <span className="oa">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#5fa8ff" strokeWidth="1.8">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" />
               </svg>
@@ -999,97 +1107,28 @@ function initResearchGraphGlobe(
           <h3>Large Language Models in Scientific Research</h3>
           <div className="au">T. Brown <b>et al.</b></div>
           <div className="meta">
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
-              1.1K
-            </span>
-            <span>
-              <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
-              PDF
+            <div className="meta-stats">
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" /></svg>
+                1.1K
+              </span>
+              <span>
+                <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5" /></svg>
+                PDF
+              </span>
+            </div>
+            <span className="btn-arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
             </span>
           </div>
         </div>
 
-        {/* 7 Interactive Tags */}
-        <button
-          type="button"
-          onClick={() => handleSearch('Authors')}
-          className="rg-tag"
-          style={{ '--c': '#f5b335', left: '37.4%', top: '11.2%', width: '14.4cqw' } as React.CSSProperties}
-        >
-          <svg viewBox="0 0 24 24" style={{ fill: '#f5b335' }}>
-            <circle cx="12" cy="8" r="4.2" />
-            <path d="M4 21c1-6 15-6 16 0z" />
-          </svg>
-          Authors
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSearch('Datasets')}
-          className="rg-tag"
-          style={{ '--c': '#2dd4a8', left: '61.2%', top: '11.2%', width: '14.4cqw' } as React.CSSProperties}
-        >
-          <svg viewBox="0 0 24 24" style={{ fill: '#2dd4a8' }}>
-            <ellipse cx="12" cy="6" rx="7" ry="3" />
-            <path d="M5 6v12c0 1.7 3 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3 3 7 3s7-1.3 7-3" />
-          </svg>
-          Datasets
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActivePage('search')}
-          className="rg-tag"
-          style={{ '--c': '#3a8dff', left: '20.6%', top: '45.5%', width: '13.8cqw' } as React.CSSProperties}
-        >
-          <svg viewBox="0 0 24 24">
-            <path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7" />
-          </svg>
-          Papers
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSearch('Citations')}
-          className="rg-tag"
-          style={{ '--c': '#e08cff', left: '79.1%', top: '45.5%', width: '16.4cqw' } as React.CSSProperties}
-        >
-          <svg viewBox="0 0 24 24" style={{ fill: '#e08cff' }}>
-            <path d="M7 7c-2 1-3 3-3 6h4v4H4M17 7c-2 1-3 3-3 6h4v4h-4" />
-          </svg>
-          Citations
-        </button>
-
+        {/* 4 Interactive Feature Badges Floating Around Globe */}
         <button
           type="button"
           onClick={() => setActivePage('graph')}
-          className="rg-tag"
-          style={{ '--c': '#b86cf5', left: '35.7%', top: '79.5%', width: '15.2cqw' } as React.CSSProperties}
-        >
-          <svg viewBox="0 0 24 24" style={{ fill: '#b86cf5' }}>
-            <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10c1 1 1 2 1 3h6c0-1 0-2 1-3a6 6 0 0 0-4-10z" />
-          </svg>
-          Concepts
-        </button>
-
-        <button
-          type="button"
-          onClick={() => handleSearch('Research Trends')}
-          className="rg-tag"
-          style={{ '--c': '#3a8dff', left: '65.3%', top: '79.5%', width: '18.4cqw' } as React.CSSProperties}
-        >
-          <svg viewBox="0 0 24 24">
-            <path d="M5 20V12M12 20V5M19 20v-9" strokeWidth="3.2" />
-          </svg>
-          Research Trends
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setActivePage('graph')}
-          className="rg-tag"
-          style={{ '--c': '#35c6ff', left: '49.4%', top: '96.2%', width: '22.1cqw' } as React.CSSProperties}
+          className="rg-pill-badge rg-pill-purple"
+          style={{ left: '54%', top: '14%' }}
         >
           <svg viewBox="0 0 24 24">
             <circle cx="12" cy="5" r="2.5" />
@@ -1098,6 +1137,43 @@ function initResearchGraphGlobe(
             <path d="m11 7.5-5 8M13 7.5l5 8M8 18h8" />
           </svg>
           Knowledge Graph
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActivePage('search')}
+          className="rg-pill-badge rg-pill-blue"
+          style={{ left: '44%', top: '42%' }}
+        >
+          <svg viewBox="0 0 24 24">
+            <path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7" />
+          </svg>
+          Research Papers
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleSearch('AI Insights')}
+          className="rg-pill-badge rg-pill-green"
+          style={{ left: '79%', top: '43%' }}
+        >
+          <svg viewBox="0 0 24 24">
+            <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2-4.5-4.4 6.2-.9z" strokeWidth="1.8" />
+          </svg>
+          AI Insights
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActivePage('graph')}
+          className="rg-pill-badge rg-pill-blue"
+          style={{ left: '57%', top: '78%' }}
+        >
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+          </svg>
+          Global Connections
         </button>
 
         <div className="rg-tip" id="tip" ref={tipRef} role="status" />

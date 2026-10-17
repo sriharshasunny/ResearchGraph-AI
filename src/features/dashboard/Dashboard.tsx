@@ -91,35 +91,33 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[460px] lg:min-h-[490px] overflow-hidden rounded-[26px] border border-blue-500/20 bg-[#040b1f] px-5 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-6 text-white shadow-[0_20px_50px_-15px_rgba(0,0,0,0.6)]"
+          className="relative isolate min-h-[460px] lg:min-h-[490px] overflow-hidden rounded-[26px] border border-blue-200/60 bg-gradient-to-r from-white via-sky-50/40 to-[#0b193d] px-5 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-6 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)]"
           style={{
             backgroundImage: `
-              radial-gradient(ellipse at 90% 25%, rgba(120, 70, 215, 0.28) 0%, transparent 40%),
-              radial-gradient(ellipse at 75% 70%, rgba(40, 90, 220, 0.25) 0%, transparent 45%),
-              linear-gradient(90deg, rgba(4, 11, 31, 0.98) 0%, rgba(4, 11, 31, 0.92) 36%, rgba(4, 11, 31, 0.5) 60%, rgba(4, 11, 31, 0.15) 100%),
-              url(/user_custom_bg_2.jpg)
+              linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.84) 38%, rgba(255, 255, 255, 0.22) 58%, transparent 72%),
+              url(/hero_academic_bg.jpg)
             `,
-            backgroundPosition: 'center right',
+            backgroundPosition: 'center',
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="grid min-h-[380px] lg:min-h-[420px] items-center gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:gap-6">
+          <div className="grid min-h-[380px] lg:min-h-[420px] items-center gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:gap-6">
             <div className="relative z-10 max-w-[580px]">
               {/* Badge */}
-              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-cyan-400/30 bg-cyan-950/60 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#38BDF8] shadow-[0_0_15px_rgba(56,189,248,0.25)] backdrop-blur-md">
-                <Sparkles className="h-3 w-3 text-[#38BDF8]" />
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/80 bg-white/80 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] shadow-xs backdrop-blur-md">
+                <Sparkles className="h-3 w-3 text-[#4F46E5]" />
                 <span>RESEARCH INTELLIGENCE, REIMAGINED</span>
               </div>
 
               {/* Title */}
-              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-white sm:text-[31px] lg:text-[35px] xl:text-[38px]">
+              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] sm:text-[31px] lg:text-[35px] xl:text-[38px]">
                 Discover. Connect. Advance<br />
-                <span className="bg-gradient-to-r from-[#38BDF8] via-[#60A5FA] to-[#A78BFA] bg-clip-text text-transparent">Research</span> with AI.
+                <span className="bg-gradient-to-r from-[#2563EB] to-[#7C3AED] bg-clip-text text-transparent">Research</span> with AI.
               </h1>
 
               {/* Subtitle */}
-              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#94A3B8] sm:text-[13px] font-medium">
+              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#475569] sm:text-[13px] font-medium">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -130,19 +128,19 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-3.5 flex h-[48px] max-w-[540px] items-center gap-2 rounded-full border border-white/20 bg-white/10 p-1 pl-4 shadow-[0_8px_24px_rgba(0,0,0,0.3)] backdrop-blur-xl focus-within:border-cyan-400 focus-within:ring-4 focus-within:ring-cyan-500/25"
+                className="mt-3.5 flex h-[48px] max-w-[540px] items-center gap-2 rounded-full border border-blue-200/70 bg-white/95 p-1 pl-4 shadow-[0_6px_25px_rgba(30,60,120,0.1)] backdrop-blur-xl focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-500/20"
               >
-                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-cyan-300/80" />
+                <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
                 <input
                   aria-label="Search academic papers, authors, and topics"
                   value={query}
                   onChange={event => setQuery(event.target.value)}
                   placeholder="Ask anything about academic research..."
-                  className="min-w-0 flex-1 bg-transparent py-1.5 text-[12.5px] font-medium text-white outline-none placeholder:text-slate-400 sm:text-[13px]"
+                  className="min-w-0 flex-1 bg-transparent py-1.5 text-[12.5px] font-medium text-slate-900 outline-none placeholder:text-slate-400 sm:text-[13px]"
                 />
                 <button
                   type="submit"
-                  className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-r from-[#2563EB] to-[#0284C7] px-5 text-xs font-bold text-white shadow-md shadow-blue-500/30 transition hover:from-[#1D4ED8] hover:to-[#0369A1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 sm:text-xs"
+                  className="inline-flex h-full shrink-0 items-center gap-1.5 rounded-full bg-[#2563EB] px-5 text-xs font-bold text-white shadow-md shadow-blue-500/25 transition hover:bg-[#1D4ED8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 sm:text-xs"
                 >
                   Search <ArrowRight className="h-3.5 w-3.5" />
                 </button>
@@ -150,13 +148,13 @@ export const Dashboard: React.FC = () => {
 
               {/* Try Queries */}
               <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10.5px] sm:text-[11px]">
-                <span className="font-semibold text-slate-300 mr-0.5">Try:</span>
+                <span className="font-semibold text-slate-600 mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
                     key={term}
                     type="button"
                     onClick={() => openSearch(term)}
-                    className="rounded-full border border-white/15 bg-white/5 px-2.5 py-0.5 font-medium text-slate-200 shadow-xs backdrop-blur-md transition hover:border-cyan-400 hover:bg-white/15 hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                    className="rounded-full border border-slate-200/80 bg-white/85 px-2.5 py-0.5 font-medium text-slate-700 shadow-xs backdrop-blur-md transition hover:border-blue-300 hover:bg-white hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
                   >
                     {term}
                   </button>
@@ -165,33 +163,33 @@ export const Dashboard: React.FC = () => {
 
               {/* 3 Bottom Feature Cards */}
               <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-2.5">
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/15 bg-white/10 px-3.5 py-2 shadow-xs backdrop-blur-md">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-500/20 text-purple-300">
+                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2 shadow-sm backdrop-blur-md">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-100 text-purple-600">
                     <BookOpen className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold text-white leading-tight">200M+ Papers</span>
-                    <span className="block text-[9.5px] text-slate-300 font-medium">from arXiv & OpenAlex</span>
+                    <span className="block text-[11px] font-bold text-slate-900 leading-tight">200M+ Papers</span>
+                    <span className="block text-[9.5px] text-slate-500 font-medium">from arXiv & OpenAlex</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/15 bg-white/10 px-3.5 py-2 shadow-xs backdrop-blur-md">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300">
+                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2 shadow-sm backdrop-blur-md">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600">
                     <Network className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold text-white leading-tight">Knowledge Graph</span>
-                    <span className="block text-[9.5px] text-slate-300 font-medium">Discover hidden connections</span>
+                    <span className="block text-[11px] font-bold text-slate-900 leading-tight">Knowledge Graph</span>
+                    <span className="block text-[9.5px] text-slate-500 font-medium">Discover hidden connections</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/15 bg-white/10 px-3.5 py-2 shadow-xs backdrop-blur-md">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300">
+                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 bg-white/85 px-3.5 py-2 shadow-sm backdrop-blur-md">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
                     <Sparkles className="h-3.5 w-3.5" />
                   </span>
                   <div>
-                    <span className="block text-[11px] font-bold text-white leading-tight">AI Insights</span>
-                    <span className="block text-[9.5px] text-slate-300 font-medium">Summarize, analyze, explore</span>
+                    <span className="block text-[11px] font-bold text-slate-900 leading-tight">AI Insights</span>
+                    <span className="block text-[9.5px] text-slate-500 font-medium">Summarize, analyze, explore</span>
                   </div>
                 </div>
               </div>
