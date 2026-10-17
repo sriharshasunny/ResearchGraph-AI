@@ -38,6 +38,21 @@ const suggestedQueries = [
   'Compare DINOv2 and MAE',
 ];
 
+const heroPreviewCards = [
+  {
+    title: 'Research preview',
+    detail: 'Your papers and sources appear here as you build a workspace.',
+    meta: 'CONNECTED EVIDENCE',
+    className: 'left-[2%] top-[10%] -rotate-[7deg]',
+  },
+  {
+    title: 'Knowledge context',
+    detail: 'Follow papers, authors, methods, and citations in one view.',
+    meta: 'RESEARCH NETWORK',
+    className: 'right-[1%] top-[15%] rotate-[6deg]',
+  },
+] as const;
+
 export const Dashboard: React.FC = () => {
   const {
     setActivePage,
@@ -90,9 +105,9 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[458px] overflow-hidden rounded-[22px] border border-[#DCE6F8] bg-[#F6F8FF] px-5 py-6 text-[#18223B] shadow-[0_18px_45px_-30px_rgba(49,75,125,0.42)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
+          className="relative isolate min-h-[490px] overflow-hidden rounded-[22px] border border-[#D7E2FA] bg-[#EAF0FF] px-5 py-6 text-[#18223B] shadow-[0_20px_52px_-30px_rgba(49,75,125,0.48)] sm:px-7 lg:px-10 lg:py-5 xl:px-12"
           style={{
-            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,.92) 0%, rgba(250,252,255,.7) 42%, rgba(236,241,255,.12) 100%), url(/hero-bg-light.webp)',
+            backgroundImage: 'linear-gradient(90deg, rgba(255,255,255,.72) 0%, rgba(249,252,255,.4) 42%, rgba(226,232,255,.06) 100%), url(/hero-bg-light.webp)',
             backgroundPosition: 'center',
             backgroundSize: 'cover',
           }}
@@ -100,14 +115,16 @@ export const Dashboard: React.FC = () => {
           <div
             aria-hidden="true"
             className="absolute inset-0 -z-10"
-            style={{ backgroundImage: 'radial-gradient(ellipse at 76% 40%, rgba(77,110,255,0.16), transparent 43%), radial-gradient(ellipse at 92% 70%, rgba(159,113,255,0.13), transparent 37%), linear-gradient(110deg, rgba(255,255,255,.18), rgba(240,245,255,.12))' }}
+            style={{ backgroundImage: 'radial-gradient(ellipse at 75% 40%, rgba(35,91,255,0.31), transparent 42%), radial-gradient(ellipse at 92% 63%, rgba(170,90,255,0.24), transparent 38%), radial-gradient(ellipse at 40% 95%, rgba(130,175,255,.24), transparent 50%), linear-gradient(110deg, rgba(255,255,255,.08), rgba(222,234,255,.08))' }}
           />
-          <div aria-hidden="true" className="absolute -right-20 -top-40 -z-10 h-[500px] w-[500px] rounded-full border border-blue-200/25" />
-          <div className="grid min-h-[406px] items-center gap-1 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] xl:gap-5">
+          <div aria-hidden="true" className="absolute -right-24 top-1/2 -z-10 h-[420px] w-[420px] -translate-y-1/2 rounded-full border border-blue-300/40 bg-blue-300/10 blur-[1px]" />
+          <div aria-hidden="true" className="absolute right-[22%] top-[7%] -z-10 h-2 w-2 rounded-full bg-white shadow-[0_0_22px_7px_rgba(255,255,255,.85)]" />
+          <div aria-hidden="true" className="absolute right-[42%] bottom-[14%] -z-10 h-2.5 w-2.5 rounded-full bg-cyan-100 shadow-[0_0_20px_7px_rgba(44,176,255,.48)]" />
+          <div className="grid min-h-[438px] items-center gap-1 lg:grid-cols-[minmax(0,1.02fr)_minmax(0,1fr)] xl:gap-5">
             <div className="relative z-10 max-w-[700px] py-1 lg:py-5">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white/75 px-3 py-1.5 text-[10px] font-semibold tracking-[0.08em] text-[#3E5E91] shadow-[0_2px_8px_rgba(75,110,170,.06)]">
                 <Sparkles className="h-3.5 w-3.5 text-[#4777FF]" />
-                YOUR RESEARCH WORKSPACE
+                RESEARCH INTELLIGENCE, REIMAGINED
               </div>
               <h1 id="dashboard-search-title" className="max-w-[700px] text-[30px] font-bold leading-[1.08] tracking-[-0.048em] text-[#18223B] sm:text-[38px] lg:text-[48px]">
                 Discover. Connect. Advance<br className="hidden sm:block" /> <span className="bg-gradient-to-r from-[#4777FF] to-[#6685F2] bg-clip-text text-transparent">Research</span> with AI.
@@ -152,8 +169,20 @@ export const Dashboard: React.FC = () => {
               </div>
             </div>
 
-            <div className="relative mx-auto flex h-[310px] w-full items-center justify-center overflow-visible sm:h-[370px] lg:h-[448px] xl:h-[462px]" aria-label="Interactive research knowledge core">
-              <ResearchKnowledgeCore />
+            <div className="relative mx-auto flex h-[320px] w-full items-center justify-center overflow-visible sm:h-[390px] lg:h-[474px] xl:h-[486px]" aria-label="Interactive research knowledge core">
+              <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+                {heroPreviewCards.map(card => (
+                  <div key={card.title} className={`absolute z-0 hidden w-[166px] rounded-2xl border border-white/80 bg-white/75 p-3 shadow-[0_18px_36px_-22px_rgba(33,63,140,.7)] backdrop-blur-md xl:block ${card.className}`}>
+                    <div className="flex items-center gap-1.5 text-[9px] font-bold tracking-[0.08em] text-blue-700"><FileText className="h-3 w-3" /> {card.meta}</div>
+                    <p className="mt-3 text-[12px] font-bold leading-4 text-slate-800">{card.title}</p>
+                    <p className="mt-1.5 text-[9px] leading-3.5 text-slate-500">{card.detail}</p>
+                    <span className="mt-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white"><ArrowRight className="h-3 w-3" /></span>
+                  </div>
+                ))}
+              </div>
+              <div className="relative z-10 flex h-full w-full items-center justify-center">
+                <ResearchKnowledgeCore />
+              </div>
             </div>
           </div>
         </motion.section>
