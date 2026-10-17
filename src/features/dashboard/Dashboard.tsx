@@ -91,10 +91,10 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[460px] lg:min-h-[490px] overflow-hidden rounded-[26px] border border-blue-200/60 bg-gradient-to-r from-white via-sky-50/40 to-[#0b193d] px-5 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-6 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)]"
+          className="relative isolate min-h-[460px] lg:min-h-[490px] overflow-hidden rounded-[26px] border border-blue-200/60 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] px-5 py-5 sm:px-7 sm:py-6 lg:px-8 lg:py-6 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)]"
           style={{
             backgroundImage: `
-              linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.84) 38%, rgba(255, 255, 255, 0.22) 58%, transparent 72%),
+              linear-gradient(90deg, rgba(255, 255, 255, 0.52) 0%, rgba(255, 255, 255, 0.38) 36%, rgba(255, 255, 255, 0.08) 58%, transparent 75%),
               url(/hero_academic_bg.jpg)
             `,
             backgroundPosition: 'center',
@@ -105,19 +105,19 @@ export const Dashboard: React.FC = () => {
           <div className="grid min-h-[380px] lg:min-h-[420px] items-center gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:gap-6">
             <div className="relative z-10 max-w-[580px]">
               {/* Badge */}
-              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/80 bg-white/80 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] shadow-xs backdrop-blur-md">
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 bg-white/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] shadow-[0_2px_10px_rgba(37,99,235,0.12)] backdrop-blur-md">
                 <Sparkles className="h-3 w-3 text-[#4F46E5]" />
                 <span>RESEARCH INTELLIGENCE, REIMAGINED</span>
               </div>
 
               {/* Title */}
-              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] sm:text-[31px] lg:text-[35px] xl:text-[38px]">
+              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] sm:text-[31px] lg:text-[35px] xl:text-[38px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)]">
                 Discover. Connect. Advance<br />
                 <span className="bg-gradient-to-r from-[#2563EB] to-[#7C3AED] bg-clip-text text-transparent">Research</span> with AI.
               </h1>
 
               {/* Subtitle */}
-              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#475569] sm:text-[13px] font-medium">
+              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#1E293B] sm:text-[13px] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)]">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
