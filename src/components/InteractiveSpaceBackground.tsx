@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 interface InteractiveSpaceBackgroundProps {
@@ -11,7 +11,9 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   authMode
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+  const landingBackgroundRef = useRef<HTMLDivElement>(null);
+  const loginBackgroundRef = useRef<HTMLDivElement>(null);
+  const registerBackgroundRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -30,11 +32,6 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     const handleMouseMove = (e: MouseEvent) => {
       targetMouseX = (e.clientX / window.innerWidth - 0.5) * 35;
       targetMouseY = (e.clientY / window.innerHeight - 0.5) * 35;
-      // Also update subtle background parallax state smoothly
-      setParallax({
-        x: (e.clientX / window.innerWidth - 0.5) * -18,
-        y: (e.clientY / window.innerHeight - 0.5) * -18,
-      });
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
@@ -108,6 +105,12 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
       mouseX += (targetMouseX - mouseX) * 0.05;
       mouseY += (targetMouseY - mouseY) * 0.05;
+
+      const parallaxX = mouseX * -0.52;
+      const parallaxY = mouseY * -0.52;
+      if (landingBackgroundRef.current) landingBackgroundRef.current.style.translate = `${parallaxX * 0.35}px ${parallaxY * 0.35}px`;
+      if (loginBackgroundRef.current) loginBackgroundRef.current.style.translate = `${parallaxX}px ${parallaxY}px`;
+      if (registerBackgroundRef.current) registerBackgroundRef.current.style.translate = `${parallaxX}px ${parallaxY}px`;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -188,10 +191,10 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       
       {/* Layer 1: Previous Space Background (Subdued/Dulled for optimal UI clarity and depth) */}
       <motion.div 
+        ref={landingBackgroundRef}
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: "url('/user_custom_bg.jpg')",
-          transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
           filter: 'brightness(0.4) saturate(1.2)'
         }}
         initial={false}
@@ -204,10 +207,10 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
       {/* Layer 2: Login Background (Photorealistic Planetary Arc & Cosmos Vista) */}
       <motion.div 
+        ref={loginBackgroundRef}
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: "url('/login_bg.jpg')",
-          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
+          backgroundImage: "url('/login_bg.jpg')"
         }}
         initial={false}
         animate={{ 
@@ -222,10 +225,10 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
       {/* Layer 3: Register Background (Photorealistic Interstellar Nebula Star Cluster) */}
       <motion.div 
+        ref={registerBackgroundRef}
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
-          backgroundImage: "url('/register_bg.jpg')",
-          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
+          backgroundImage: "url('/register_bg.jpg')"
         }}
         initial={false}
         animate={{ 
@@ -266,3 +269,4 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     </div>
   );
 };
+
