@@ -20,15 +20,15 @@ const SPHERE_RADIUS = 2.4;
 const MODEL_ZOOM = 0.9;
 
 const labelData = [
-  { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#6d4dff', tone: 'from-violet-500 to-indigo-500' },
-  { id: 'papers', label: 'Papers', Icon: FileText, x: 1034, y: 258, color: '#3b82f6', tone: 'from-blue-500 to-sky-400', query: 'Transformers' },
-  { id: 'authors', label: 'Authors', Icon: Users, x: 1437, y: 296, color: '#ff8a1f', tone: 'from-orange-400 to-amber-400', query: 'Ashish Vaswani' },
-  { id: 'methods', label: 'Methods', Icon: Settings2, x: 962, y: 349, color: '#3b82f6', tone: 'from-blue-500 to-sky-400', query: 'Self-Supervised' },
-  { id: 'datasets', label: 'Datasets', Icon: Database, x: 1516, y: 388, color: '#3b82f6', tone: 'from-blue-500 to-sky-400', query: 'ImageNet' },
-  { id: 'citations', label: 'Citations', Icon: Quote, x: 960, y: 453, color: '#22b8ff', tone: 'from-cyan-400 to-sky-400', query: 'Attention Is All You Need' },
-  { id: 'concepts', label: 'Concepts', Icon: Lightbulb, x: 1498, y: 493, color: '#ff4fc3', tone: 'from-pink-500 to-fuchsia-400', query: 'Multi-Head Attention' },
-  { id: 'chat', label: 'AI Insights', Icon: Sparkles, x: 990, y: 566, color: '#8b3df0', tone: 'from-violet-500 to-purple-400' },
-  { id: 'gaps', label: 'Research Gaps', Icon: Activity, x: 1244, y: 659, color: '#ff3fc0', tone: 'from-pink-500 to-rose-400' },
+  { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
+  { id: 'papers', label: 'Papers', Icon: FileText, x: 1034, y: 258, color: '#4777ff', tone: 'from-blue-500 to-sky-400', query: 'Transformers' },
+  { id: 'authors', label: 'Authors', Icon: Users, x: 1437, y: 296, color: '#718de8', tone: 'from-blue-500 to-indigo-400', query: 'Ashish Vaswani' },
+  { id: 'methods', label: 'Methods', Icon: Settings2, x: 962, y: 349, color: '#4777ff', tone: 'from-blue-500 to-sky-400', query: 'Self-Supervised' },
+  { id: 'datasets', label: 'Datasets', Icon: Database, x: 1516, y: 388, color: '#36b9d8', tone: 'from-cyan-400 to-sky-400', query: 'ImageNet' },
+  { id: 'citations', label: 'Citations', Icon: Quote, x: 960, y: 453, color: '#36b9d8', tone: 'from-cyan-400 to-sky-400', query: 'Attention Is All You Need' },
+  { id: 'concepts', label: 'Concepts', Icon: Lightbulb, x: 1498, y: 493, color: '#8b70e8', tone: 'from-violet-500 to-indigo-400', query: 'Multi-Head Attention' },
+  { id: 'chat', label: 'AI Insights', Icon: Sparkles, x: 990, y: 566, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
+  { id: 'gaps', label: 'Research Gaps', Icon: Activity, x: 1244, y: 659, color: '#36b9d8', tone: 'from-cyan-400 to-blue-400' },
 ] as const;
 
 type ModelLabel = (typeof labelData)[number];
@@ -377,7 +377,7 @@ export const ResearchKnowledgeCore: React.FC = () => {
 
   return (
     <div ref={hostRef} className="relative h-[300px] w-full touch-pan-y select-none sm:h-[360px] lg:h-[430px] xl:h-[440px]" aria-label="Interactive research knowledge core">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[68%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(37,99,235,0.24)_0%,rgba(34,211,238,0.12)_48%,transparent_72%)] blur-2xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute left-1/2 top-1/2 h-[62%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(71,119,255,0.12)_0%,rgba(34,211,238,0.045)_48%,transparent_72%)] blur-xl" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         {originalOrbitSprites.map(sprite => (
           <img
