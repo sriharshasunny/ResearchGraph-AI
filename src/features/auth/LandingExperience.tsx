@@ -46,7 +46,15 @@ const workflow = [
   { number: '04', title: 'Understand', detail: 'Ask questions grounded in retrieved evidence and available graph links.', icon: Lightbulb },
 ];
 
-const featuredVideos = [
+const featuredVideos: Array<{ id: string; title: string; publisher: string; detail: string; duration?: string; productTour?: boolean }> = [
+  {
+    id: 'researchgraph-product-tour',
+    title: 'A tour of ResearchGraph AI',
+    publisher: 'ResearchGraph AI',
+    detail: 'A short visual tour of paper discovery, connected research context, and graph exploration.',
+    duration: '0:18',
+    productTour: true,
+  },
   {
     id: 'YVLwu3jE09c',
     title: 'What is a knowledge graph?',
@@ -63,6 +71,67 @@ const featuredVideos = [
 ];
 
 type FeaturedVideo = (typeof featuredVideos)[number];
+
+const tourChapters = [
+  { title: 'Find the work that matters', detail: 'Search scholarly papers and research topics.', tag: 'PAPER DISCOVERY', icon: Search },
+  { title: 'See the research around it', detail: 'Explore authors, concepts, methods, and citations.', tag: 'CONNECTED CONTEXT', icon: Network },
+  { title: 'Follow evidence to insight', detail: 'Keep source material close as your questions evolve.', tag: 'EVIDENCE FIRST', icon: FileText },
+  { title: 'Build a workspace for ideas', detail: 'Bring connected research into one place.', tag: 'YOUR WORKSPACE', icon: Sparkles },
+];
+
+function ProductTourPoster() {
+  return <div className="landing-tour-poster" aria-hidden="true">
+    <div className="landing-tour-poster-copy"><span>RESEARCHGRAPH AI</span><strong>Research,<br /><b>connected.</b></strong><small>Explore the research universe.</small></div>
+    <div className="landing-tour-poster-graph"><span className="tour-poster-orbit" /><span className="tour-poster-core">RG</span><span className="tour-poster-node n1" /><span className="tour-poster-node n2" /><span className="tour-poster-node n3" /><span className="tour-poster-node n4" /></div>
+    <span className="landing-tour-poster-play"><Play size={18} fill="currentColor" /></span>
+  </div>;
+}
+
+function ProductTourPlayer() {
+  const [elapsed, setElapsed] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const duration = 18;
+  const chapter = tourChapters[Math.min(Math.floor(elapsed / (duration / tourChapters.length)), tourChapters.length - 1)];
+  const ChapterIcon = chapter.icon;
+
+  useEffect(() => {
+    if (!playing) return;
+    const startedAt = Date.now() - elapsed * 1000;
+    let timer = 0;
+    const tick = () => {
+      const next = Math.min(duration, (Date.now() - startedAt) / 1000);
+      setElapsed(next);
+      if (next >= duration) setPlaying(false);
+      else timer = window.setTimeout(tick, 100);
+    };
+    timer = window.setTimeout(tick, 100);
+    return () => window.clearTimeout(timer);
+  }, [playing]);
+
+  return <div className={`landing-tour-player${playing ? ' is-playing' : ''}`}>
+    <div className="landing-tour-scene">
+      <div className="landing-tour-scene-stars" />
+      <div className="landing-tour-scene-brand"><Network size={16} /><span>ResearchGraph <b>AI</b></span></div>
+      <div className="landing-tour-scene-copy" key={chapter.title}>
+        <span className="landing-tour-scene-tag"><ChapterIcon size={13} />{chapter.tag}</span>
+        <h3>{chapter.title}</h3>
+        <p>{chapter.detail}</p>
+      </div>
+      <div className="landing-tour-scene-graph" aria-hidden="true">
+        <span className="tour-scene-orbit orbit-a" /><span className="tour-scene-orbit orbit-b" />
+        <span className="tour-scene-core"><Network size={27} /><small>RESEARCH<br />CORE</small></span>
+        <span className="tour-scene-node node-a"><FileText size={13} />Papers</span><span className="tour-scene-node node-b"><Building2 size={13} />Authors</span>
+        <span className="tour-scene-node node-c"><Lightbulb size={13} />Concepts</span><span className="tour-scene-node node-d"><Quote size={13} />Citations</span>
+        <svg viewBox="0 0 430 320" preserveAspectRatio="none"><path d="M215 159 94 82M215 159 335 76M215 159 349 236M215 159 94 242M94 82 335 76M94 242 349 236" /></svg>
+      </div>
+    </div>
+    <div className="landing-tour-controls">
+      <button type="button" className="landing-tour-play-toggle" onClick={() => { if (elapsed >= duration) setElapsed(0); setPlaying(value => !value); }} aria-label={playing ? 'Pause product tour' : 'Play product tour'}>{playing ? 'Ⅱ' : <Play size={13} fill="currentColor" />}</button>
+      <input type="range" min="0" max={duration} step="0.1" value={elapsed} aria-label="Product tour progress" onChange={event => { setElapsed(Number(event.currentTarget.value)); setPlaying(false); }} />
+      <span>{`0:${String(Math.floor(elapsed)).padStart(2, '0')} / 0:18`}</span>
+    </div>
+  </div>;
+}
 
 const KnowledgeGraphFallback = () => (
   <div className="landing-static-graph" role="img" aria-label="Illustrative static knowledge graph preview">
@@ -327,8 +396,8 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
           {featuredVideos.map((video) => (
             <article className="landing-video-card landing-reveal" key={video.id}>
               <button type="button" className="landing-video-preview" onClick={() => setActiveVideo(video)} aria-label={`Play ${video.title} by ${video.publisher}`}>
-                <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" />
-                <span className="landing-video-play"><Play size={19} fill="currentColor" /></span>
+                {video.productTour ? <ProductTourPoster /> : <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" />}
+                {!video.productTour && <span className="landing-video-play"><Play size={19} fill="currentColor" /></span>}
                 {video.duration && <span className="landing-video-duration">{video.duration}</span>}
               </button>
               <div className="landing-video-copy">
@@ -376,11 +445,22 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
             <button type="button" className="landing-dark-action" onClick={onRegister}>Explore your research graph <ArrowRight size={17} /></button>
           </div>
           <div className="landing-exploration-visual landing-reveal" role="img" aria-label="Illustrative research relationship network">
+            <div className="landing-exploration-meta"><span><Sparkles size={13} /> RESEARCH MAP</span><span>ILLUSTRATIVE PREVIEW</span></div>
             <svg viewBox="0 0 520 340" aria-hidden="true">
+              <defs>
+                <radialGradient id="landing-graph-core" cx="36%" cy="30%"><stop offset="0%" stopColor="#1B4D88" /><stop offset="100%" stopColor="#09172E" /></radialGradient>
+                <linearGradient id="landing-graph-edge"><stop stopColor="#36D6F2" stopOpacity=".1" /><stop offset="50%" stopColor="#61ACFF" stopOpacity=".72" /><stop offset="100%" stopColor="#A783FF" stopOpacity=".18" /></linearGradient>
+                <filter id="landing-graph-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="5" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+              </defs>
+              <ellipse className="landing-exploration-orbit orbit-one" cx="260" cy="168" rx="198" ry="126" />
+              <ellipse className="landing-exploration-orbit orbit-two" cx="260" cy="168" rx="151" ry="109" />
               <g className="landing-exploration-links"><path d="M260 168 110 82M260 168 405 75M260 168 445 202M260 168 366 290M260 168 138 286M260 168 71 210M110 82 260 38M405 75 445 202M445 202 366 290M366 290 138 286M138 286 71 210M71 210 110 82" /></g>
-              <circle className="landing-exploration-core" cx="260" cy="168" r="48" />
+              <g className="landing-exploration-signals"><path d="M110 82 260 38 405 75M71 210 138 286 366 290M405 75 445 202" /></g>
+              <circle className="landing-exploration-core-halo" cx="260" cy="168" r="66" />
+              <circle className="landing-exploration-core" cx="260" cy="168" r="48" fill="url(#landing-graph-core)" />
+              <circle className="landing-exploration-core-ring" cx="260" cy="168" r="38" />
               <text className="landing-exploration-core-label" x="260" y="164">Research</text><text className="landing-exploration-core-label" x="260" y="181">network</text>
-              <circle cx="110" cy="82" r="8" /><circle cx="405" cy="75" r="8" /><circle cx="445" cy="202" r="8" /><circle cx="366" cy="290" r="8" /><circle cx="138" cy="286" r="8" /><circle cx="71" cy="210" r="8" /><circle cx="260" cy="38" r="7" />
+              <g className="landing-exploration-points" filter="url(#landing-graph-glow)"><circle cx="110" cy="82" r="7" /><circle cx="405" cy="75" r="7" /><circle cx="445" cy="202" r="7" /><circle cx="366" cy="290" r="7" /><circle cx="138" cy="286" r="7" /><circle cx="71" cy="210" r="7" /><circle cx="260" cy="38" r="6" /></g>
             </svg>
             <span className="landing-explore-pill pill-one"><FileText size={14} /> Papers</span>
             <span className="landing-explore-pill pill-two"><Building2 size={14} /> Authors</span>
@@ -412,7 +492,9 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
       {activeVideo && <div className="landing-modal-backdrop landing-video-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setActiveVideo(null); }}>
         <section className="landing-video-modal" role="dialog" aria-modal="true" aria-labelledby="landing-video-title">
           <button ref={demoCloseRef} type="button" className="landing-modal-close" onClick={() => setActiveVideo(null)} aria-label="Close video"><X size={19} /></button>
-          <div className="landing-video-player"><iframe title={activeVideo.title} src={`https://www.youtube-nocookie.com/embed/${activeVideo.id}?autoplay=1&rel=0`} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen /></div>
+          <div className="landing-video-player">{activeVideo.productTour
+            ? <ProductTourPlayer />
+            : <iframe title={activeVideo.title} src={`https://www.youtube-nocookie.com/embed/${activeVideo.id}?autoplay=1&rel=0`} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen />}</div>
           <div className="landing-video-modal-copy"><span className="landing-video-publisher">{activeVideo.publisher}</span><h2 id="landing-video-title">{activeVideo.title}</h2></div>
         </section>
       </div>}
