@@ -17,7 +17,9 @@ const MODEL_ORIGIN = { x: 1210, y: 444 };
 const MODEL_BOUNDS = { width: 800, height: 540 };
 const MODEL_RADIUS = 141;
 const SPHERE_RADIUS = 2.4;
-const MODEL_ZOOM = 0.9;
+// The dashboard hero gives the live graph more visual presence while leaving
+// enough room for its surrounding labels and document previews.
+const MODEL_ZOOM = 1.16;
 
 const labelData = [
   { id: 'graph', label: 'Knowledge Graph', Icon: Network, x: 1228, y: 188, color: '#7769e8', tone: 'from-violet-500 to-indigo-400' },
@@ -456,3 +458,4 @@ export const ResearchKnowledgeCore: React.FC = () => {
     </div>
   );
 };
+
