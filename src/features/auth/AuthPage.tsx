@@ -463,9 +463,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (SEARCH BAR REMOVED)              */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div className="relative w-full min-h-[780px] flex flex-col justify-start overflow-hidden bg-[radial-gradient(circle_at_77%_34%,rgba(99,239,255,.52),transparent_23%),radial-gradient(circle_at_20%_84%,rgba(255,158,217,.48),transparent_33%),linear-gradient(118deg,#f3fbff_0%,#d8ecff_32%,#9d8ce4_70%,#5d54b8_100%)]">
-                <div aria-hidden="true" className="absolute inset-0 opacity-40 bg-cover bg-center mix-blend-screen" style={{ backgroundImage: "url('/user_custom_bg.jpg')" }} />
-                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(108deg,rgba(249,253,255,.8)_0%,rgba(235,246,255,.4)_42%,rgba(120,86,199,.05)_100%)]" />
+              <div className="relative w-full min-h-[780px] flex flex-col justify-start overflow-hidden bg-[radial-gradient(circle_at_82%_29%,rgba(37,215,238,.58),transparent_22%),radial-gradient(circle_at_64%_86%,rgba(255,164,105,.35),transparent_25%),radial-gradient(circle_at_13%_76%,rgba(255,125,205,.36),transparent_29%),linear-gradient(118deg,#f1fbff_0%,#c7edff_30%,#8ca6e8_59%,#7a62bd_100%)]">
+                <div aria-hidden="true" className="absolute inset-0 opacity-50 bg-cover bg-center mix-blend-screen" style={{ backgroundImage: "url('/user_custom_bg.jpg')" }} />
+                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(108deg,rgba(249,253,255,.78)_0%,rgba(223,249,255,.3)_39%,rgba(104,92,194,.05)_100%)]" />
+                <div aria-hidden="true" className="absolute right-[16%] top-[19%] h-64 w-64 rounded-full bg-teal-200/45 blur-[90px] animate-pulse-slow" />
+                <div aria-hidden="true" className="absolute right-[3%] bottom-[8%] h-56 w-56 rounded-full bg-orange-200/35 blur-[100px] animate-pulse-slow" />
                 
                 {/* Top Canopy Arch Beam */}
                 <div className="hidden absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
@@ -570,16 +572,15 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       aria-hidden="true"
                       animate={{ scale: [1, 1.04, 1], rotate: [0, 1.25, 0] }}
                       transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
-                      className="absolute inset-[3%] rounded-[40px] border border-white/50 bg-cover bg-center opacity-85 blur-[1px]"
+                      className="hidden absolute inset-[3%] rounded-[40px] border border-white/50 bg-cover bg-center opacity-85 blur-[1px]"
                       style={{ backgroundImage: "linear-gradient(135deg, rgba(217,250,255,.18), rgba(124,84,207,.25)), url('/user_custom_bg.jpg')" }}
                     />
-                    <div className="absolute inset-[8%] rounded-[36px] border border-white/50 bg-[radial-gradient(circle_at_55%_46%,rgba(255,193,238,.18),transparent_44%),rgba(240,248,255,.05)] shadow-[0_28px_80px_-40px_rgba(74,38,143,.75),inset_0_1px_0_rgba(255,255,255,.8)] backdrop-blur-[1px]"></div>
-                    <div className="absolute w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(47,222,255,0.4)_0%,rgba(239,111,204,0.2)_48%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
-                    <div aria-hidden="true" className="absolute inset-[16%] rounded-full border border-cyan-100/80 animate-[spin_32s_linear_infinite]"></div>
-                    <div aria-hidden="true" className="absolute inset-[23%] rounded-full border border-dashed border-fuchsia-200/80 animate-[spin_42s_linear_infinite_reverse]"></div>
+                    <div className="absolute w-[74%] h-[74%] rounded-full bg-[radial-gradient(circle,rgba(47,222,255,0.52)_0%,rgba(117,111,255,0.2)_45%,rgba(255,168,102,0.12)_62%,transparent_74%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
+                    <div aria-hidden="true" className="absolute inset-[15%] rounded-full border border-cyan-100/75 animate-[spin_32s_linear_infinite]"></div>
+                    <div aria-hidden="true" className="absolute inset-[23%] rounded-full border border-dashed border-fuchsia-100/70 animate-[spin_42s_linear_infinite_reverse]"></div>
 
                     <div className="absolute inset-[-15%] z-10">
-                      <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto mix-blend-screen opacity-95" style={{ background: 'transparent' }} title="Knowledge Globe" />
+                      <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto opacity-100" style={{ background: 'transparent' }} title="Knowledge Globe" />
                     </div>
 
                     <div className="absolute z-20 bottom-[5%] left-1/2 -translate-x-1/2 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/75 bg-white/55 px-4 py-2 text-[10px] font-semibold tracking-[0.13em] text-indigo-800 shadow-[0_14px_28px_-18px_rgba(74,38,143,.95)] backdrop-blur-xl">
