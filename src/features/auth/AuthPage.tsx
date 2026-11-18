@@ -466,7 +466,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-transparent">
                 
                 {/* Top Canopy Arch Beam */}
-                <div className="absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
+                <div className="hidden absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
                   <div className="flex items-center gap-2.5 text-[9px] font-mono text-cyan-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
                     <span className="tracking-wider">COCKPIT BRIDGE // 3D HUD ONLINE</span>
@@ -479,14 +479,14 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
 
                 {/* Left & Right Canopy Structural Pillar Struts */}
-                <div className="absolute top-0 left-0 bottom-28 w-10 sm:w-14 pointer-events-none z-20 hidden md:block">
+                <div className="hidden absolute top-0 left-0 bottom-28 w-10 sm:w-14 pointer-events-none z-20">
                   <div className="w-full h-full bg-gradient-to-r from-[#030612]/95 via-[#050b1a]/40 to-transparent border-r border-cyan-500/15 relative">
                     <div className="absolute top-1/4 left-1.5 w-1 h-14 bg-cyan-500/40 rounded-full"></div>
                     <div className="absolute top-1/2 left-1.5 w-1 h-20 bg-purple-500/40 rounded-full"></div>
                   </div>
                 </div>
 
-                <div className="absolute top-0 right-0 bottom-28 w-10 sm:w-14 pointer-events-none z-20 hidden md:block">
+                <div className="hidden absolute top-0 right-0 bottom-28 w-10 sm:w-14 pointer-events-none z-20">
                   <div className="w-full h-full bg-gradient-to-l from-[#030612]/95 via-[#050b1a]/40 to-transparent border-l border-cyan-500/15 relative">
                     <div className="absolute top-1/3 right-1.5 w-1 h-16 bg-cyan-500/40 rounded-full"></div>
                     <div className="absolute bottom-1/3 right-1.5 w-1 h-24 bg-purple-500/40 rounded-full"></div>
@@ -494,10 +494,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
 
                 {/* Ambient Radial Nebula Glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[650px] rounded-full bg-gradient-to-br from-cyan-500/15 via-purple-500/10 to-transparent blur-[120px] pointer-events-none z-0"></div>
+                <div className="absolute top-[44%] left-[64%] -translate-x-1/2 -translate-y-1/2 w-[680px] h-[680px] rounded-full bg-gradient-to-br from-cyan-500/12 via-blue-500/8 to-transparent blur-[130px] pointer-events-none z-0"></div>
 
                 {/* ─── HERO STAGE: LEFT HERO COPY + CENTER 3D KNOWLEDGE SPHERE ─── */}
-                <div className="relative z-20 w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-8 sm:pt-14 lg:pt-16 pb-4 flex-1 flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10">
+                <div className="relative z-20 w-full max-w-[1280px] mx-auto px-5 sm:px-8 lg:px-10 pt-12 sm:pt-16 lg:pt-20 pb-8 flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14">
                   
                   {/* LEFT: HERO COPY & CALL TO ACTIONS */}
                   <motion.div 
@@ -507,25 +507,23 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     className="flex-1 flex flex-col items-start text-left max-w-xl z-30"
                   >
                     {/* Brand Pill */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-400 text-xs font-mono font-bold tracking-widest uppercase mb-3 shadow-lg backdrop-blur-md">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-300/25 text-cyan-200 text-[10px] font-semibold tracking-[0.18em] uppercase mb-4 backdrop-blur-md">
                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                      AUTONOMOUS SCIENTIFIC INTELLIGENCE
+                      RESEARCH INTELLIGENCE, REIMAGINED
                     </div>
 
                     {/* Massive Punchy Headline */}
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.08] mb-4 text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)]">
-                      A Universe<br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">
-                        of Connected
+                    <h1 className="text-[46px] sm:text-5xl lg:text-[64px] font-black tracking-[-0.055em] leading-[.98] mb-5 text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.75)]">
+                      Discover. Connect.<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300">
+                        Advance research
                       </span><br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-fuchsia-400">
-                        Knowledge
-                      </span>
+                      with AI.
                     </h1>
 
                     {/* Subtitle Description */}
-                    <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-5 max-w-md drop-shadow">
-                      RAG-powered research intelligence with high-dimensional knowledge graphs, 45+ academic repositories, and multi-LLMs to help you discover, connect and synthesize scientific breakthroughs.
+                    <p className="text-slate-200/85 text-sm sm:text-[15px] leading-relaxed mb-6 max-w-[480px] drop-shadow">
+                      Discover papers, follow meaningful connections, and turn a research question into source-aware context.
                     </p>
 
                     {/* Action Buttons */}
@@ -535,7 +533,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs sm:text-sm transition-all shadow-xl shadow-cyan-500/30 flex items-center gap-2 border border-cyan-400/40 hover:scale-[1.03] active:scale-[0.98]"
                       >
                         <Compass className="w-4 h-4 text-cyan-200" />
-                        <span>Explore 3D Graph</span>
+                        <span>Explore research graph</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
 
@@ -544,33 +542,29 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         className="px-5 py-3 rounded-xl bg-[#060c20]/90 border border-white/20 hover:border-cyan-400/50 text-gray-200 hover:text-white font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xl hover:bg-white/10 shadow-lg"
                       >
                         <Play className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
-                        <span>Live Simulation</span>
+                        <span>Watch overview</span>
                       </button>
                     </div>
 
                     {/* 4 Stats Grid with Glowing Accents */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full pt-3 border-t border-white/15">
+                    <div className="grid grid-cols-3 gap-2.5 w-full pt-1">
                       <div className="bg-[#050b1a]/90 border border-cyan-500/20 hover:border-cyan-500/50 rounded-xl p-2.5 backdrop-blur-md shadow-md transition-all group">
-                        <span className="text-base sm:text-lg font-black text-cyan-400 block tracking-tight group-hover:scale-105 transition-transform">204M+</span>
-                        <span className="text-gray-400 text-[10px] leading-tight block">Research Papers</span>
+                        <span className="text-sm font-bold text-cyan-200 block tracking-tight">Discover</span>
+                        <span className="text-gray-400 text-[10px] leading-tight block">Search scholarly work</span>
                       </div>
                       <div className="bg-[#050b1a]/90 border border-purple-500/20 hover:border-purple-500/50 rounded-xl p-2.5 backdrop-blur-md shadow-md transition-all group">
-                        <span className="text-base sm:text-lg font-black text-purple-400 block tracking-tight group-hover:scale-105 transition-transform">45+</span>
-                        <span className="text-gray-400 text-[10px] leading-tight block">Data Sources</span>
+                        <span className="text-sm font-bold text-violet-200 block tracking-tight">Connect</span>
+                        <span className="text-gray-400 text-[10px] leading-tight block">Explore related ideas</span>
                       </div>
                       <div className="bg-[#050b1a]/90 border border-emerald-500/20 hover:border-emerald-500/50 rounded-xl p-2.5 backdrop-blur-md shadow-md transition-all group">
-                        <span className="text-base sm:text-lg font-black text-emerald-400 block tracking-tight group-hover:scale-105 transition-transform">Multi-LLM</span>
-                        <span className="text-gray-400 text-[10px] leading-tight block">Zero Hallucination</span>
-                      </div>
-                      <div className="bg-[#050b1a]/90 border border-sky-500/20 hover:border-sky-500/50 rounded-xl p-2.5 backdrop-blur-md shadow-md transition-all group">
-                        <span className="text-base sm:text-lg font-black text-sky-400 block tracking-tight group-hover:scale-105 transition-transform">14ms</span>
-                        <span className="text-gray-400 text-[10px] leading-tight block">Graph Latency</span>
+                        <span className="text-sm font-bold text-emerald-200 block tracking-tight">Understand</span>
+                        <span className="text-gray-400 text-[10px] leading-tight block">Keep evidence in view</span>
                       </div>
                     </div>
                   </motion.div>
 
                   {/* ─── CENTER: 3D KNOWLEDGE SPHERE ─── */}
-                  <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[500px] lg:h-[500px] flex items-center justify-center flex-shrink-0 my-1">
+                    <div className="relative w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] lg:w-[460px] lg:h-[460px] flex items-center justify-center flex-shrink-0 my-1">
                     <div className="absolute w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.3)_0%,rgba(99,102,241,0.18)_45%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
 
                     <div className="absolute inset-[-30%] z-10">
@@ -582,7 +576,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       aria-hidden="true"
                       animate={{ y: [0, -8, 0] }}
                       transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut' }}
-                      className="hidden lg:flex absolute z-20 -left-5 top-16 items-center gap-2.5 rounded-2xl border border-cyan-300/30 bg-[#06152f]/80 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                      className="hidden absolute z-20 -left-5 top-16 items-center gap-2.5 rounded-2xl border border-cyan-300/30 bg-[#06152f]/80 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
                     >
                       <span className="grid h-8 w-8 place-items-center rounded-xl border border-cyan-400/35 bg-cyan-400/10"><FileText className="w-4 h-4 text-cyan-300" /></span>
                       <span className="grid"><b className="text-[10px] tracking-wide text-white">Evidence trail</b><small className="text-[9px] text-cyan-100/60">papers in context</small></span>
@@ -591,7 +585,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       aria-hidden="true"
                       animate={{ y: [0, 7, 0] }}
                       transition={{ duration: 7.1, repeat: Infinity, ease: 'easeInOut', delay: .8 }}
-                      className="hidden lg:flex absolute z-20 -right-6 top-24 items-center gap-2.5 rounded-2xl border border-violet-300/30 bg-[#10113a]/78 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                      className="hidden absolute z-20 -right-6 top-24 items-center gap-2.5 rounded-2xl border border-violet-300/30 bg-[#10113a]/78 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
                     >
                       <span className="grid h-8 w-8 place-items-center rounded-xl border border-violet-400/35 bg-violet-400/10"><Network className="w-4 h-4 text-violet-300" /></span>
                       <span className="grid"><b className="text-[10px] tracking-wide text-white">Knowledge map</b><small className="text-[9px] text-violet-100/60">linked relationships</small></span>
@@ -600,7 +594,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       aria-hidden="true"
                       animate={{ y: [0, -6, 0] }}
                       transition={{ duration: 6.6, repeat: Infinity, ease: 'easeInOut', delay: 1.7 }}
-                      className="hidden lg:flex absolute z-20 right-2 bottom-14 items-center gap-2 rounded-full border border-emerald-300/25 bg-[#061d25]/80 px-3 py-2 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                      className="hidden absolute z-20 right-2 bottom-14 items-center gap-2 rounded-full border border-emerald-300/25 bg-[#061d25]/80 px-3 py-2 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
                     >
                       <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,.95)]" />
                       <span className="text-[9px] font-bold tracking-wider text-emerald-100">LIVE RESEARCH SIGNALS</span>
@@ -614,7 +608,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.45, duration: 0.6 }}
-                  className="relative z-30 w-full mt-1"
+                  className="hidden"
                 >
                   {/* Glowing 3D Curved Arc Tracer Line */}
                   <div className="relative w-full h-8 sm:h-10 flex justify-center items-end overflow-hidden pointer-events-none">
@@ -767,6 +761,14 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     <ChevronDown className="w-3.5 h-3.5 animate-bounce text-cyan-400" />
                   </div>
                 </motion.div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(topologySectionRef)}
+                  className="relative z-30 mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/45 px-4 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-300 backdrop-blur-md transition hover:border-cyan-300/35 hover:text-cyan-100"
+                >
+                  EXPLORE THE RESEARCH UNIVERSE <ChevronDown className="h-3.5 w-3.5 animate-bounce text-cyan-300" />
+                </button>
 
               </div>
 
