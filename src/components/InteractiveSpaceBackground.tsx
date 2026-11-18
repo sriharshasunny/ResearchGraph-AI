@@ -195,7 +195,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: "url('/user_custom_bg.jpg')",
-          filter: 'brightness(0.4) saturate(1.2)'
+          filter: 'brightness(0.56) saturate(1.12) contrast(1.04)'
         }}
         initial={false}
         animate={{ 
@@ -269,4 +269,5 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     </div>
   );
 };
+
 
