@@ -92,7 +92,7 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[445px] lg:min-h-[475px] overflow-hidden rounded-[26px] border border-blue-200/60 dark:border-indigo-500/30 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] dark:from-[#080E1A] dark:to-[#0B132B] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-5 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_16px_50px_-10px_rgba(2,6,23,0.85)] transition-all duration-300"
+          className="relative isolate min-h-[382px] lg:min-h-[405px] overflow-hidden rounded-[26px] border border-blue-200/60 dark:border-indigo-500/30 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] dark:from-[#080E1A] dark:to-[#0B132B] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-4 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_16px_50px_-10px_rgba(2,6,23,0.85)] transition-all duration-300"
           style={{
             backgroundImage: theme === 'dark'
               ? `
@@ -108,7 +108,7 @@ export const Dashboard: React.FC = () => {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="grid min-h-[365px] lg:min-h-[405px] items-center gap-4 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:gap-6">
+          <div className="grid min-h-[312px] lg:min-h-[330px] items-center gap-3 lg:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)] xl:gap-4">
             <div className="relative z-10 max-w-[580px]">
               {/* Badge */}
               <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 dark:border-indigo-400/40 bg-white/90 dark:bg-slate-900/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] dark:text-indigo-300 shadow-[0_2px_10px_rgba(37,99,235,0.12)] dark:shadow-[0_2px_14px_rgba(99,102,241,0.25)] backdrop-blur-md transition-colors duration-200">
@@ -117,7 +117,7 @@ export const Dashboard: React.FC = () => {
               </div>
 
               {/* Title */}
-              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.12] tracking-[-0.035em] text-[#0F172A] dark:text-white sm:text-[31px] lg:text-[35px] xl:text-[38px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] transition-colors duration-200">
+              <h1 id="dashboard-search-title" className="text-[26px] font-black leading-[1.1] tracking-[-0.035em] text-[#0F172A] dark:text-white sm:text-[29px] lg:text-[32px] xl:text-[34px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] transition-colors duration-200">
                 Discover. Connect. Advance<br />
                 <span className="bg-gradient-to-r from-[#2563EB] to-[#7C3AED] dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">Research</span> with AI.
               </h1>
@@ -167,42 +167,10 @@ export const Dashboard: React.FC = () => {
                 ))}
               </div>
 
-              {/* 3 Bottom Feature Cards */}
-              <div className="mt-4 flex flex-wrap items-center gap-2 sm:gap-2.5">
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 dark:border-slate-700/70 bg-white/85 dark:bg-[#0E172A]/85 px-3.5 py-2 shadow-sm backdrop-blur-md transition-colors duration-200">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-600 dark:text-purple-300">
-                    <BookOpen className="h-3.5 w-3.5" />
-                  </span>
-                  <div>
-                    <span className="block text-[11px] font-bold text-slate-900 dark:text-white leading-tight">200M+ Papers</span>
-                    <span className="block text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">from arXiv & OpenAlex</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 dark:border-slate-700/70 bg-white/85 dark:bg-[#0E172A]/85 px-3.5 py-2 shadow-sm backdrop-blur-md transition-colors duration-200">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-emerald-100 dark:bg-emerald-950/70 text-emerald-600 dark:text-emerald-300">
-                    <Network className="h-3.5 w-3.5" />
-                  </span>
-                  <div>
-                    <span className="block text-[11px] font-bold text-slate-900 dark:text-white leading-tight">Knowledge Graph</span>
-                    <span className="block text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Discover hidden connections</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5 rounded-2xl border border-white/80 dark:border-slate-700/70 bg-white/85 dark:bg-[#0E172A]/85 px-3.5 py-2 shadow-sm backdrop-blur-md transition-colors duration-200">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-950/70 text-amber-600 dark:text-amber-300">
-                    <Sparkles className="h-3.5 w-3.5" />
-                  </span>
-                  <div>
-                    <span className="block text-[11px] font-bold text-slate-900 dark:text-white leading-tight">AI Insights</span>
-                    <span className="block text-[9.5px] text-slate-500 dark:text-slate-400 font-medium">Summarize, analyze, explore</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Right Side: Exact ResearchGraph Model & Interactive Stage */}
-            <div className="relative mx-auto flex w-full items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
+            <div className="relative mx-auto flex w-full max-w-[650px] items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
               <ResearchKnowledgeCore />
             </div>
           </div>
@@ -362,4 +330,5 @@ export const Dashboard: React.FC = () => {
     </div>
   );
 };
+
 
