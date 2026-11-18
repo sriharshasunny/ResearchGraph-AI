@@ -354,7 +354,15 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
 
         <div ref={graphRef} className="landing-hero-visual" role="group" aria-label="Research knowledge graph preview">
           <div className="landing-visual-frame">
+            <div className="landing-visual-atmosphere" aria-hidden="true">
+              <span className="landing-comet landing-comet-a" />
+              <span className="landing-comet landing-comet-b" />
+              <span className="landing-signal-wave landing-signal-wave-a" />
+              <span className="landing-signal-wave landing-signal-wave-b" />
+            </div>
             {showInteractiveGraph ? <iframe title="Interactive illustrative ResearchGraph knowledge core" src="/knowledge_globe.html" loading="eager" allow="autoplay" /> : <KnowledgeGraphFallback />}
+            <div className="landing-visual-insight landing-visual-insight-papers" aria-hidden="true"><FileText size={15} /><span><b>Evidence</b><small>connected sources</small></span></div>
+            <div className="landing-visual-insight landing-visual-insight-network" aria-hidden="true"><GitBranch size={15} /><span><b>Context</b><small>relationships in view</small></span></div>
           </div>
         </div>
         <button type="button" className="landing-scroll-cue" onClick={() => goTo('topology')}><span><ArrowDown size={16} /></span> EXPLORE THE WORKFLOW</button>
@@ -503,4 +511,5 @@ const LandingExperience: React.FC<LandingExperienceProps> = ({ onLogin, onRegist
 };
 
 export default LandingExperience;
+
 
