@@ -463,7 +463,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (SEARCH BAR REMOVED)              */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-[radial-gradient(ellipse_at_72%_42%,rgba(36,107,255,.14),transparent_36%),linear-gradient(180deg,rgba(2,8,21,.06),rgba(2,8,21,.38))]">
+              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-[radial-gradient(circle_at_79%_42%,rgba(89,232,255,.48),transparent_24%),radial-gradient(circle_at_20%_88%,rgba(255,147,199,.42),transparent_34%),linear-gradient(118deg,#eef8ff_0%,#c9e8ff_33%,#9677db_70%,#374b9c_100%)]">
+                <div aria-hidden="true" className="absolute inset-0 opacity-35 bg-cover bg-center mix-blend-screen" style={{ backgroundImage: "url('/user_custom_bg.jpg')" }} />
+                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,252,255,.82)_0%,rgba(235,246,255,.46)_40%,rgba(84,72,177,.08)_100%)]" />
                 
                 {/* Top Canopy Arch Beam */}
                 <div className="hidden absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
@@ -494,7 +496,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
 
                 {/* Ambient Radial Nebula Glow */}
-                <div className="absolute top-[44%] left-[64%] -translate-x-1/2 -translate-y-1/2 w-[680px] h-[680px] rounded-full bg-gradient-to-br from-cyan-500/12 via-blue-500/8 to-transparent blur-[130px] pointer-events-none z-0"></div>
+                <div className="absolute top-[44%] left-[64%] -translate-x-1/2 -translate-y-1/2 w-[720px] h-[720px] rounded-full bg-gradient-to-br from-cyan-300/35 via-fuchsia-300/20 to-amber-200/20 blur-[120px] pointer-events-none z-0"></div>
 
                 {/* ─── HERO STAGE: LEFT HERO COPY + CENTER 3D KNOWLEDGE SPHERE ─── */}
                 <div className="relative z-20 w-full max-w-[1370px] mx-auto px-5 sm:px-8 lg:px-10 pt-12 sm:pt-16 lg:pt-20 pb-8 flex-1 grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] items-center gap-10 lg:gap-6">
@@ -507,21 +509,21 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     className="flex-1 flex flex-col items-start text-left max-w-xl z-30"
                   >
                     {/* Brand Pill */}
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/35 border border-cyan-200/25 text-cyan-100 text-[10px] font-semibold tracking-[0.2em] uppercase mb-5 backdrop-blur-xl shadow-[0_10px_30px_-18px_rgba(33,185,255,.75)]">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/60 border border-white/80 text-indigo-700 text-[10px] font-bold tracking-[0.2em] uppercase mb-5 backdrop-blur-xl shadow-[0_12px_30px_-18px_rgba(89,85,194,.7)]">
+                      <span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></span>
                       RESEARCH INTELLIGENCE, REIMAGINED
                     </div>
 
                     {/* Massive Punchy Headline */}
-                    <h1 className="text-[48px] sm:text-[58px] lg:text-[70px] font-black tracking-[-0.065em] leading-[.94] mb-6 text-white drop-shadow-[0_5px_20px_rgba(0,0,0,0.7)]">
+                    <h1 className="text-[46px] sm:text-[56px] lg:text-[64px] font-black tracking-[-0.06em] leading-[.96] mb-6 text-slate-950 drop-shadow-[0_5px_18px_rgba(255,255,255,.38)]">
                       Research,<br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-500">
                         connected.
                       </span>
                     </h1>
 
                     {/* Subtitle Description */}
-                    <p className="text-slate-100/85 text-[15px] sm:text-[17px] leading-relaxed mb-7 max-w-[520px] drop-shadow">
+                    <p className="text-slate-700 text-[15px] sm:text-[17px] font-medium leading-relaxed mb-7 max-w-[520px]">
                       Discover papers, people, and ideas — then see how they connect across a living research universe.
                     </p>
 
@@ -529,35 +531,35 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     <div className="flex flex-wrap items-center gap-3 mb-5">
                       <button 
                         onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs sm:text-sm transition-all shadow-xl shadow-cyan-500/30 flex items-center gap-2 border border-cyan-400/40 hover:scale-[1.03] active:scale-[0.98]"
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-500 hover:from-blue-500 hover:to-fuchsia-400 text-white font-extrabold text-xs sm:text-sm transition-all shadow-xl shadow-violet-500/35 flex items-center gap-2 border border-white/45 hover:scale-[1.03] active:scale-[0.98]"
                       >
-                        <Compass className="w-4 h-4 text-cyan-200" />
+                        <Compass className="w-4 h-4 text-white" />
                         <span>Explore research graph</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
 
                       <button 
                         onClick={() => setActiveModal('DEMO')}
-                        className="px-5 py-3 rounded-xl bg-[#060c20]/90 border border-white/20 hover:border-cyan-400/50 text-gray-200 hover:text-white font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xl hover:bg-white/10 shadow-lg"
+                        className="px-5 py-3 rounded-xl bg-white/65 border border-white/90 hover:border-violet-300 text-slate-800 hover:text-violet-700 font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xl hover:bg-white shadow-lg"
                       >
-                        <Play className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
+                        <Play className="w-3.5 h-3.5 text-violet-600 fill-violet-600" />
                         <span>Watch overview</span>
                       </button>
                     </div>
 
                     {/* 4 Stats Grid with Glowing Accents */}
                     <div className="flex flex-wrap gap-2.5 w-full pt-1">
-                      <div className="bg-slate-950/40 border border-cyan-300/15 hover:border-cyan-300/40 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.95)] transition-all group">
-                        <span className="text-xs font-bold text-cyan-100 block tracking-tight">Discover</span>
-                        <span className="text-slate-400 text-[10px] leading-tight block">Find relevant work</span>
+                      <div className="bg-white/55 border border-white/90 hover:border-cyan-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(54,60,136,.7)] transition-all group">
+                        <span className="text-xs font-bold text-cyan-700 block tracking-tight">Discover</span>
+                        <span className="text-slate-600 text-[10px] leading-tight block">Find relevant work</span>
                       </div>
-                      <div className="bg-slate-950/40 border border-violet-300/15 hover:border-violet-300/40 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.95)] transition-all group">
-                        <span className="text-xs font-bold text-violet-100 block tracking-tight">Connect</span>
-                        <span className="text-slate-400 text-[10px] leading-tight block">Follow context</span>
+                      <div className="bg-white/55 border border-white/90 hover:border-violet-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(54,60,136,.7)] transition-all group">
+                        <span className="text-xs font-bold text-violet-700 block tracking-tight">Connect</span>
+                        <span className="text-slate-600 text-[10px] leading-tight block">Follow context</span>
                       </div>
-                      <div className="bg-slate-950/40 border border-emerald-300/15 hover:border-emerald-300/40 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.95)] transition-all group">
-                        <span className="text-xs font-bold text-emerald-100 block tracking-tight">Understand</span>
-                        <span className="text-slate-400 text-[10px] leading-tight block">Keep evidence close</span>
+                      <div className="bg-white/55 border border-white/90 hover:border-rose-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(54,60,136,.7)] transition-all group">
+                        <span className="text-xs font-bold text-rose-600 block tracking-tight">Understand</span>
+                        <span className="text-slate-600 text-[10px] leading-tight block">Keep evidence close</span>
                       </div>
                     </div>
                   </motion.div>
@@ -568,20 +570,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       aria-hidden="true"
                       animate={{ scale: [1, 1.04, 1], rotate: [0, 1.25, 0] }}
                       transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
-                      className="absolute inset-[5%] rounded-[32px] border border-cyan-100/10 bg-cover bg-center opacity-40 blur-[1px]"
-                      style={{ backgroundImage: "linear-gradient(135deg, rgba(3,12,36,.14), rgba(7,20,55,.68)), url('/cockpit_landing_hero.jpg')" }}
+                      className="absolute inset-[3%] rounded-[40px] border border-white/50 bg-cover bg-center opacity-85 blur-[1px]"
+                      style={{ backgroundImage: "linear-gradient(135deg, rgba(217,250,255,.18), rgba(124,84,207,.25)), url('/user_custom_bg.jpg')" }}
                     />
-                    <div className="absolute inset-[8%] rounded-[28px] border border-white/10 bg-[radial-gradient(circle_at_55%_46%,rgba(31,153,255,.18),transparent_44%),rgba(3,12,32,.38)] shadow-[0_28px_80px_-40px_rgba(0,0,0,.95),inset_0_1px_0_rgba(255,255,255,.09)] backdrop-blur-[3px]"></div>
-                    <div className="absolute w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.28)_0%,rgba(99,102,241,0.16)_45%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
-                    <div aria-hidden="true" className="absolute inset-[16%] rounded-full border border-cyan-300/15 animate-[spin_32s_linear_infinite]"></div>
-                    <div aria-hidden="true" className="absolute inset-[23%] rounded-full border border-dashed border-violet-300/15 animate-[spin_42s_linear_infinite_reverse]"></div>
+                    <div className="absolute inset-[8%] rounded-[36px] border border-white/50 bg-[radial-gradient(circle_at_55%_46%,rgba(255,193,238,.32),transparent_44%),rgba(240,248,255,.18)] shadow-[0_28px_80px_-40px_rgba(74,38,143,.9),inset_0_1px_0_rgba(255,255,255,.8)] backdrop-blur-[3px]"></div>
+                    <div className="absolute w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(47,222,255,0.4)_0%,rgba(239,111,204,0.2)_48%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
+                    <div aria-hidden="true" className="absolute inset-[16%] rounded-full border border-cyan-100/80 animate-[spin_32s_linear_infinite]"></div>
+                    <div aria-hidden="true" className="absolute inset-[23%] rounded-full border border-dashed border-fuchsia-200/80 animate-[spin_42s_linear_infinite_reverse]"></div>
 
                     <div className="absolute inset-[-17%] z-10">
                       <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto" style={{ background: 'transparent' }} title="Knowledge Globe" />
                     </div>
 
-                    <div className="absolute z-20 bottom-[5%] left-1/2 -translate-x-1/2 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/15 bg-[#06142e]/75 px-4 py-2 text-[10px] font-semibold tracking-[0.13em] text-cyan-100 shadow-[0_14px_28px_-18px_rgba(0,0,0,.95)] backdrop-blur-xl">
-                      <Network className="h-3.5 w-3.5 text-cyan-300" /> INTERACTIVE KNOWLEDGE NETWORK
+                    <div className="absolute z-20 bottom-[5%] left-1/2 -translate-x-1/2 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/75 bg-white/55 px-4 py-2 text-[10px] font-semibold tracking-[0.13em] text-indigo-800 shadow-[0_14px_28px_-18px_rgba(74,38,143,.95)] backdrop-blur-xl">
+                      <Network className="h-3.5 w-3.5 text-fuchsia-600" /> INTERACTIVE KNOWLEDGE NETWORK
                     </div>
 
                     {/* The cards are deliberately small and decorative: the live globe remains the interaction surface. */}
