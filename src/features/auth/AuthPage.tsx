@@ -303,7 +303,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               className="w-full flex flex-col relative"
             >
               {/* ═══════════════ PRO TOP NAVBAR WITH VIBRANT COLORED ICONS ═══════════════ */}
-              <nav className="w-full px-4 sm:px-8 py-3 flex items-center justify-between bg-[#040816]/90 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50 shadow-2xl shadow-black/80">
+              <nav className="w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[1520px] mx-auto mt-3 px-4 sm:px-7 py-2.5 flex items-center justify-between rounded-2xl bg-[#050b1c]/75 backdrop-blur-2xl border border-cyan-200/15 sticky top-3 z-50 shadow-[0_18px_42px_-25px_rgba(0,0,0,0.95)]">
                 {/* Brand Logo with Glowing Aura */}
                 <div 
                   className="flex items-center gap-3 cursor-pointer group" 
@@ -570,12 +570,41 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </motion.div>
 
                   {/* ─── CENTER: 3D KNOWLEDGE SPHERE ─── */}
-                  <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[520px] lg:h-[520px] flex items-center justify-center flex-shrink-0 my-1">
+                  <div className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[500px] lg:h-[500px] flex items-center justify-center flex-shrink-0 my-1">
                     <div className="absolute w-[80%] h-[80%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.3)_0%,rgba(99,102,241,0.18)_45%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
 
                     <div className="absolute inset-[-30%] z-10">
                       <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto" style={{ background: 'transparent' }} title="Knowledge Globe" />
                     </div>
+
+                    {/* The cards are deliberately small and decorative: the live globe remains the interaction surface. */}
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="hidden lg:flex absolute z-20 -left-5 top-16 items-center gap-2.5 rounded-2xl border border-cyan-300/30 bg-[#06152f]/80 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                    >
+                      <span className="grid h-8 w-8 place-items-center rounded-xl border border-cyan-400/35 bg-cyan-400/10"><FileText className="w-4 h-4 text-cyan-300" /></span>
+                      <span className="grid"><b className="text-[10px] tracking-wide text-white">Evidence trail</b><small className="text-[9px] text-cyan-100/60">papers in context</small></span>
+                    </motion.div>
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ y: [0, 7, 0] }}
+                      transition={{ duration: 7.1, repeat: Infinity, ease: 'easeInOut', delay: .8 }}
+                      className="hidden lg:flex absolute z-20 -right-6 top-24 items-center gap-2.5 rounded-2xl border border-violet-300/30 bg-[#10113a]/78 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                    >
+                      <span className="grid h-8 w-8 place-items-center rounded-xl border border-violet-400/35 bg-violet-400/10"><Network className="w-4 h-4 text-violet-300" /></span>
+                      <span className="grid"><b className="text-[10px] tracking-wide text-white">Knowledge map</b><small className="text-[9px] text-violet-100/60">linked relationships</small></span>
+                    </motion.div>
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ duration: 6.6, repeat: Infinity, ease: 'easeInOut', delay: 1.7 }}
+                      className="hidden lg:flex absolute z-20 right-2 bottom-14 items-center gap-2 rounded-full border border-emerald-300/25 bg-[#061d25]/80 px-3 py-2 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                    >
+                      <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,.95)]" />
+                      <span className="text-[9px] font-bold tracking-wider text-emerald-100">LIVE RESEARCH SIGNALS</span>
+                    </motion.div>
                   </div>
 
                 </div>
@@ -2019,3 +2048,4 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     </div>
   );
 };
+
