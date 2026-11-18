@@ -25,7 +25,8 @@ function initResearchGraphGlobe(
     const MW = 1440;
     const MH = 720;
     const W = 1200;
-    const R = 430;
+    // A compact globe leaves clear space for the surrounding evidence cards.
+    const R = 360;
     const cx = W / 2;
     const cy = W / 2;
     const D = Math.PI / 180;
@@ -469,22 +470,63 @@ function initResearchGraphGlobe(
         x.stroke();
       }
 
-      // Orbital Rings with Rotating Satellites
+      // Orbital rings with rotating research signals. A signal stays closed at
+      // the back of the globe, then opens into a small coloured star of links
+      // only as it reaches the front-facing arc.
       x.strokeStyle = 'rgba(90,185,255,.4)';
       x.lineWidth = 1.3;
       x.beginPath();
-      x.ellipse(cx, cy, R * 1.22, R * 0.34, -0.35, 0, 7);
+      x.ellipse(cx, cy, R * 1.27, R * 0.34, -0.35, 0, 7);
       x.stroke();
 
-      for (let k = 0; k < 3; k++) {
-        const a = T * 0.006 + k * 2.09;
-        const qx = Math.cos(a) * R * 1.22;
+      const orbitColors = ['#77d7ff', '#a98bff', '#5de0c5', '#ff8dd8'];
+      for (let k = 0; k < 4; k++) {
+        const a = T * 0.006 + k * (TAU / 4);
+        const qx = Math.cos(a) * R * 1.27;
         const qy = Math.sin(a) * R * 0.34;
         const rx = cx + qx * Math.cos(-0.35) - qy * Math.sin(-0.35);
         const ry = cy + qx * Math.sin(-0.35) + qy * Math.cos(-0.35);
-        x.fillStyle = '#9fe8ff';
+        const inFront = (Math.sin(a) + 1) / 2;
+        const open = Math.max(0, Math.min(1, (inFront - 0.66) / 0.34));
+        const pulse = 0.55 + Math.sin(T * 0.08 + k * 1.7) * 0.45;
+        const spread = open * open * pulse;
+        const color = orbitColors[k];
+
+        const glow = x.createRadialGradient(rx, ry, 0, rx, ry, 24 + spread * 26);
+        glow.addColorStop(0, color);
+        glow.addColorStop(0.3, color + 'aa');
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        x.fillStyle = glow;
         x.beginPath();
-        x.arc(rx, ry, 4.5, 0, 7);
+        x.arc(rx, ry, 24 + spread * 26, 0, TAU);
+        x.fill();
+
+        if (spread > 0.02) {
+          x.save();
+          x.translate(rx, ry);
+          x.rotate(T * 0.025 + k);
+          x.strokeStyle = color;
+          x.globalAlpha = 0.2 + spread * 0.72;
+          x.lineWidth = 1.4;
+          for (let ray = 0; ray < 6; ray++) {
+            const theta = ray * TAU / 6;
+            const length = 10 + spread * 38;
+            x.beginPath();
+            x.moveTo(Math.cos(theta) * 5, Math.sin(theta) * 5);
+            x.lineTo(Math.cos(theta) * length, Math.sin(theta) * length);
+            x.stroke();
+          }
+          x.restore();
+          x.globalAlpha = 1;
+        }
+
+        x.fillStyle = color;
+        x.beginPath();
+        x.arc(rx, ry, 4.2 + spread * 3.6, 0, TAU);
+        x.fill();
+        x.fillStyle = '#ffffff';
+        x.beginPath();
+        x.arc(rx, ry, 1.5 + spread * 1.2, 0, TAU);
         x.fill();
       }
       x.globalCompositeOperation = 'source-over';
@@ -640,9 +682,9 @@ function initResearchGraphGlobe(
         }
         .rg-stage canvas {
           position: absolute;
-          left: 48.7%;
-          top: 56.8%;
-          width: 56%;
+          left: 50%;
+          top: 55%;
+          width: 50%;
           aspect-ratio: 1;
           transform: translate(-50%, -50%);
           cursor: grab;
@@ -798,8 +840,8 @@ function initResearchGraphGlobe(
         }
         .rg-card {
           position: absolute;
-          width: 20.8%;
-          padding: 1.1cqw 1.3cqw;
+          width: 18.5%;
+          padding: .95cqw 1.1cqw;
           border-radius: 1.2cqw;
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(14px);
@@ -847,14 +889,14 @@ function initResearchGraphGlobe(
           stroke: #059669;
         }
         .rg-card h3 {
-          font-size: 1.28cqw;
+          font-size: 1.16cqw;
           font-weight: 700;
           line-height: 1.25;
           margin: .6cqw 0 .3cqw;
           color: #0f172a;
         }
         .rg-card .au {
-          font-size: 1.05cqw;
+          font-size: .98cqw;
           color: #64748b;
         }
         .rg-card .au b {
@@ -1199,19 +1241,19 @@ function initResearchGraphGlobe(
 
         <button
           type="button"
-          onClick={() => handleSearch('AI Insights')}
+          onClick={() => handleSearch('Research authors')}
           className="rg-pill-badge rg-pill-green"
           style={{ left: '79%', top: '43%' }}
         >
           <svg viewBox="0 0 24 24">
             <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2-4.5-4.4 6.2-.9z" strokeWidth="1.8" />
           </svg>
-          AI Insights
+          Authors
         </button>
 
         <button
           type="button"
-          onClick={() => setActivePage('graph')}
+          onClick={() => handleSearch('Citation networks')}
           className="rg-pill-badge rg-pill-blue"
           style={{ left: '57%', top: '78%' }}
         >
@@ -1219,7 +1261,7 @@ function initResearchGraphGlobe(
             <circle cx="12" cy="12" r="9" />
             <path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
           </svg>
-          Global Connections
+          Citations
         </button>
 
         <div className="rg-tip" id="tip" ref={tipRef} role="status" />
@@ -1234,3 +1276,4 @@ function initResearchGraphGlobe(
     </div>
   );
 };
+
