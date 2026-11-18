@@ -1177,3 +1177,76 @@
   .landing-tour-scene-copy { animation: none !important; }
 }
 
+/* Public landing-page art direction: one intentional research-universe scene,
+   with only lightweight visual overlays around the live graph. */
+.landing-shell {
+  background-image:
+    linear-gradient(180deg, rgba(2, 8, 21, .16) 0%, rgba(2, 8, 21, .54) 53%, rgba(2, 8, 21, .78) 100%),
+    url("/landing-space-background-v2.jpg");
+  background-position: center, center top;
+  background-size: cover, cover;
+}
+.landing-hero::before {
+  background-image:
+    radial-gradient(ellipse at 72% 45%, rgba(42, 118, 255, .13), transparent 42%),
+    linear-gradient(90deg, rgba(2, 8, 20, .56) 0%, rgba(2, 8, 20, .2) 52%, rgba(2, 8, 20, .05));
+}
+.landing-hero-copy { text-shadow: 0 3px 18px rgba(0, 8, 28, .3); }
+.landing-hero-description { max-width: 580px; }
+.landing-visual-frame {
+  background:
+    radial-gradient(circle at 53% 49%, rgba(64, 151, 255, .18), transparent 31%),
+    radial-gradient(ellipse at 50% 53%, rgba(24, 88, 192, .16), rgba(3, 12, 31, 0) 68%);
+}
+.landing-visual-frame::before,
+.landing-visual-frame::after { display: block !important; pointer-events: none; }
+.landing-visual-frame::before {
+  width: 72%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(103, 187, 255, .16);
+  border-radius: 50%;
+  box-shadow: 0 0 72px rgba(39, 133, 255, .09), inset 0 0 40px rgba(42, 161, 255, .05);
+}
+.landing-visual-frame::after {
+  width: 91%;
+  aspect-ratio: 1;
+  border: 1px dashed rgba(117, 173, 255, .12);
+  border-radius: 50%;
+  animation: landing-atmosphere-turn 36s linear infinite;
+}
+.landing-visual-atmosphere { position: absolute; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; }
+.landing-comet { position: absolute; width: 74px; height: 1px; border-radius: 999px; background: linear-gradient(90deg, transparent, rgba(110, 215, 255, .04), rgba(143, 224, 255, .92)); box-shadow: 0 0 12px rgba(75, 197, 255, .78); transform: rotate(-34deg); opacity: .72; }
+.landing-comet-a { top: 24%; left: 5%; animation: landing-comet-drift 9s ease-in-out infinite; }
+.landing-comet-b { right: 3%; bottom: 23%; width: 54px; opacity: .55; animation: landing-comet-drift 12s ease-in-out -5s infinite reverse; }
+.landing-signal-wave { position: absolute; border: 1px solid rgba(90, 198, 255, .25); border-radius: 50%; opacity: 0; }
+.landing-signal-wave-a { top: 39%; left: 47%; width: 90px; height: 90px; animation: landing-signal-out 5s ease-out infinite; }
+.landing-signal-wave-b { top: 48%; left: 48%; width: 66px; height: 66px; border-color: rgba(157, 131, 255, .26); animation: landing-signal-out 5s ease-out 2.5s infinite; }
+.landing-visual-insight { position: absolute; z-index: 4; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(150, 204, 255, .26); border-radius: 12px; padding: 8px 11px 8px 9px; background: rgba(5, 19, 45, .77); color: #EAF5FF; box-shadow: 0 13px 30px -20px rgba(0, 5, 21, .95), inset 0 1px 0 rgba(255,255,255,.07); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); pointer-events: none; animation: landing-insight-float 6.5s ease-in-out infinite; }
+.landing-visual-insight svg { color: #66D7FF; }
+.landing-visual-insight span { display: grid; gap: 2px; }
+.landing-visual-insight b { font-size: 10px; letter-spacing: .02em; }
+.landing-visual-insight small { color: #A8C1E3; font-size: 8px; }
+.landing-visual-insight-papers { top: 19%; left: 2%; }
+.landing-visual-insight-network { right: 1%; bottom: 18%; animation-delay: -3.2s; }
+.landing-section::before { background: linear-gradient(180deg, rgba(3, 11, 28, .2), rgba(3, 11, 28, .48) 52%, rgba(3, 11, 28, .28)); }
+.landing-video-card { background: linear-gradient(145deg, rgba(9, 27, 59, .9), rgba(4, 15, 37, .88)); }
+.landing-pipeline-steps > * { background: rgba(7, 20, 45, .72); backdrop-filter: blur(10px); }
+@keyframes landing-atmosphere-turn { to { transform: rotate(360deg); } }
+@keyframes landing-comet-drift { 0%, 100% { translate: 0 0; opacity: .2; } 45% { opacity: .85; } 60% { translate: 105px -52px; opacity: .38; } }
+@keyframes landing-signal-out { 0% { transform: scale(.36); opacity: 0; } 18% { opacity: .72; } 100% { transform: scale(3.1); opacity: 0; } }
+@keyframes landing-insight-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@media (max-width: 700px) {
+  .landing-visual-insight { padding: 6px 8px 6px 7px; }
+  .landing-visual-insight small { display: none; }
+  .landing-visual-insight-papers { top: 14%; left: 1%; }
+  .landing-visual-insight-network { right: 1%; bottom: 14%; }
+  .landing-comet { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-visual-frame::after,
+  .landing-comet,
+  .landing-signal-wave,
+  .landing-visual-insight { animation: none !important; }
+}
+
+
