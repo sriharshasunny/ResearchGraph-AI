@@ -463,9 +463,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (SEARCH BAR REMOVED)              */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-[radial-gradient(circle_at_79%_42%,rgba(89,232,255,.48),transparent_24%),radial-gradient(circle_at_20%_88%,rgba(255,147,199,.42),transparent_34%),linear-gradient(118deg,#eef8ff_0%,#c9e8ff_33%,#9677db_70%,#374b9c_100%)]">
-                <div aria-hidden="true" className="absolute inset-0 opacity-35 bg-cover bg-center mix-blend-screen" style={{ backgroundImage: "url('/user_custom_bg.jpg')" }} />
-                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(248,252,255,.82)_0%,rgba(235,246,255,.46)_40%,rgba(84,72,177,.08)_100%)]" />
+              <div className="relative w-full min-h-[780px] flex flex-col justify-start overflow-hidden bg-[radial-gradient(circle_at_77%_34%,rgba(99,239,255,.52),transparent_23%),radial-gradient(circle_at_20%_84%,rgba(255,158,217,.48),transparent_33%),linear-gradient(118deg,#f3fbff_0%,#d8ecff_32%,#9d8ce4_70%,#5d54b8_100%)]">
+                <div aria-hidden="true" className="absolute inset-0 opacity-40 bg-cover bg-center mix-blend-screen" style={{ backgroundImage: "url('/user_custom_bg.jpg')" }} />
+                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(108deg,rgba(249,253,255,.8)_0%,rgba(235,246,255,.4)_42%,rgba(120,86,199,.05)_100%)]" />
                 
                 {/* Top Canopy Arch Beam */}
                 <div className="hidden absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
@@ -499,7 +499,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 <div className="absolute top-[44%] left-[64%] -translate-x-1/2 -translate-y-1/2 w-[720px] h-[720px] rounded-full bg-gradient-to-br from-cyan-300/35 via-fuchsia-300/20 to-amber-200/20 blur-[120px] pointer-events-none z-0"></div>
 
                 {/* ─── HERO STAGE: LEFT HERO COPY + CENTER 3D KNOWLEDGE SPHERE ─── */}
-                <div className="relative z-20 w-full max-w-[1370px] mx-auto px-5 sm:px-8 lg:px-10 pt-12 sm:pt-16 lg:pt-20 pb-8 flex-1 grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] items-center gap-10 lg:gap-6">
+                <div className="relative z-20 w-full max-w-[1370px] mx-auto px-5 sm:px-8 lg:px-10 pt-10 sm:pt-12 lg:pt-14 pb-3 grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] items-center gap-6 lg:gap-6">
                   
                   {/* LEFT: HERO COPY & CALL TO ACTIONS */}
                   <motion.div 
@@ -565,7 +565,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </motion.div>
 
                   {/* ─── CENTER: 3D KNOWLEDGE SPHERE ─── */}
-                  <div className="relative mx-auto w-full max-w-[660px] h-[350px] sm:h-[450px] lg:h-[540px] flex items-center justify-center my-1">
+                  <div className="relative mx-auto w-full max-w-[660px] h-[350px] sm:h-[420px] lg:h-[490px] flex items-center justify-center my-1">
                     <motion.div
                       aria-hidden="true"
                       animate={{ scale: [1, 1.04, 1], rotate: [0, 1.25, 0] }}
@@ -573,13 +573,13 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       className="absolute inset-[3%] rounded-[40px] border border-white/50 bg-cover bg-center opacity-85 blur-[1px]"
                       style={{ backgroundImage: "linear-gradient(135deg, rgba(217,250,255,.18), rgba(124,84,207,.25)), url('/user_custom_bg.jpg')" }}
                     />
-                    <div className="absolute inset-[8%] rounded-[36px] border border-white/50 bg-[radial-gradient(circle_at_55%_46%,rgba(255,193,238,.32),transparent_44%),rgba(240,248,255,.18)] shadow-[0_28px_80px_-40px_rgba(74,38,143,.9),inset_0_1px_0_rgba(255,255,255,.8)] backdrop-blur-[3px]"></div>
+                    <div className="absolute inset-[8%] rounded-[36px] border border-white/50 bg-[radial-gradient(circle_at_55%_46%,rgba(255,193,238,.18),transparent_44%),rgba(240,248,255,.05)] shadow-[0_28px_80px_-40px_rgba(74,38,143,.75),inset_0_1px_0_rgba(255,255,255,.8)] backdrop-blur-[1px]"></div>
                     <div className="absolute w-[70%] h-[70%] rounded-full bg-[radial-gradient(circle,rgba(47,222,255,0.4)_0%,rgba(239,111,204,0.2)_48%,transparent_72%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
                     <div aria-hidden="true" className="absolute inset-[16%] rounded-full border border-cyan-100/80 animate-[spin_32s_linear_infinite]"></div>
                     <div aria-hidden="true" className="absolute inset-[23%] rounded-full border border-dashed border-fuchsia-200/80 animate-[spin_42s_linear_infinite_reverse]"></div>
 
-                    <div className="absolute inset-[-17%] z-10">
-                      <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto" style={{ background: 'transparent' }} title="Knowledge Globe" />
+                    <div className="absolute inset-[-15%] z-10">
+                      <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto mix-blend-screen opacity-95" style={{ background: 'transparent' }} title="Knowledge Globe" />
                     </div>
 
                     <div className="absolute z-20 bottom-[5%] left-1/2 -translate-x-1/2 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/75 bg-white/55 px-4 py-2 text-[10px] font-semibold tracking-[0.13em] text-indigo-800 shadow-[0_14px_28px_-18px_rgba(74,38,143,.95)] backdrop-blur-xl">
@@ -780,7 +780,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 <button
                   type="button"
                   onClick={() => scrollToSection(topologySectionRef)}
-                  className="relative z-30 mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-slate-950/45 px-4 py-2 text-[10px] font-semibold tracking-[0.16em] text-slate-300 backdrop-blur-md transition hover:border-cyan-300/35 hover:text-cyan-100"
+                  className="relative z-30 mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/40 px-4 py-2 text-[10px] font-semibold tracking-[0.16em] text-indigo-800 backdrop-blur-md transition hover:border-fuchsia-300 hover:text-fuchsia-700"
                 >
                   EXPLORE THE RESEARCH UNIVERSE <ChevronDown className="h-3.5 w-3.5 animate-bounce text-cyan-300" />
                 </button>
@@ -792,7 +792,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={topologySectionRef}
-                className="w-full py-24 px-4 sm:px-8 bg-[#04091a] relative z-20 border-t border-white/10"
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(180deg,#6358bd_0%,#343373_12%,#111a46_100%)] relative z-20 border-t border-white/25"
               >
                 <div className="max-w-7xl mx-auto">
                   
