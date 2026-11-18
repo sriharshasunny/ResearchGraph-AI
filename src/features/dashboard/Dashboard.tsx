@@ -92,7 +92,7 @@ export const Dashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
           aria-labelledby="dashboard-search-title"
-          className="relative isolate min-h-[382px] lg:min-h-[405px] overflow-hidden rounded-[26px] border border-blue-200/60 dark:border-indigo-500/30 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] dark:from-[#080E1A] dark:to-[#0B132B] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-4 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_16px_50px_-10px_rgba(2,6,23,0.85)] transition-all duration-300"
+          className="relative isolate min-h-[420px] lg:min-h-[446px] overflow-hidden rounded-[26px] border border-blue-200/60 dark:border-indigo-500/30 bg-gradient-to-r from-sky-100/30 via-slate-50/20 to-[#0b193d] dark:from-[#080E1A] dark:to-[#0B132B] px-5 py-4 sm:px-7 sm:py-5 lg:px-8 lg:py-5 shadow-[0_12px_45px_-12px_rgba(15,23,42,0.12)] dark:shadow-[0_16px_50px_-10px_rgba(2,6,23,0.85)] transition-all duration-300"
           style={{
             backgroundImage: theme === 'dark'
               ? `
@@ -108,8 +108,8 @@ export const Dashboard: React.FC = () => {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="grid min-h-[312px] lg:min-h-[330px] items-center gap-3 lg:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)] xl:gap-4">
-            <div className="relative z-10 max-w-[580px]">
+          <div className="grid min-h-[343px] lg:min-h-[363px] items-center gap-3 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)] xl:gap-5">
+            <div className="relative z-10 max-w-[610px] lg:-translate-y-1">
               {/* Badge */}
               <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 dark:border-indigo-400/40 bg-white/90 dark:bg-slate-900/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] dark:text-indigo-300 shadow-[0_2px_10px_rgba(37,99,235,0.12)] dark:shadow-[0_2px_14px_rgba(99,102,241,0.25)] backdrop-blur-md transition-colors duration-200">
                 <Sparkles className="h-3 w-3 text-[#4F46E5] dark:text-indigo-300" />
@@ -117,13 +117,13 @@ export const Dashboard: React.FC = () => {
               </div>
 
               {/* Title */}
-              <h1 id="dashboard-search-title" className="text-[26px] font-black leading-[1.1] tracking-[-0.035em] text-[#0F172A] dark:text-white sm:text-[29px] lg:text-[32px] xl:text-[34px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] transition-colors duration-200">
+              <h1 id="dashboard-search-title" className="text-[27px] font-black leading-[1.1] tracking-[-0.035em] text-[#0F172A] dark:text-white sm:text-[30px] lg:text-[34px] xl:text-[36px] drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] dark:drop-shadow-[0_2px_12px_rgba(0,0,0,0.8)] transition-colors duration-200">
                 Discover. Connect. Advance<br />
                 <span className="bg-gradient-to-r from-[#2563EB] to-[#7C3AED] dark:from-blue-400 dark:to-indigo-300 bg-clip-text text-transparent">Research</span> with AI.
               </h1>
 
               {/* Subtitle */}
-              <p className="mt-2 max-w-[480px] text-[12.5px] leading-relaxed text-[#1E293B] dark:text-slate-300 sm:text-[13px] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] dark:drop-shadow-none transition-colors duration-200">
+              <p className="mt-2.5 max-w-[505px] text-[13px] leading-relaxed text-[#1E293B] dark:text-slate-300 sm:text-[13.5px] font-semibold drop-shadow-[0_1px_1px_rgba(255,255,255,0.9)] dark:drop-shadow-none transition-colors duration-200">
                 Search papers, explore knowledge graphs, get AI insights and find new research directions.
               </p>
 
@@ -134,7 +134,7 @@ export const Dashboard: React.FC = () => {
                   event.preventDefault();
                   openSearch();
                 }}
-                className="mt-3.5 flex h-[48px] max-w-[540px] items-center gap-2 rounded-full border border-blue-200/70 dark:border-slate-700/80 bg-white/95 dark:bg-[#0B132B]/90 p-1 pl-4 shadow-[0_6px_25px_rgba(30,60,120,0.1)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl focus-within:border-blue-500 dark:focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-blue-500/20 dark:focus-within:ring-indigo-500/30 transition-all duration-200"
+                className="mt-4 flex h-[50px] max-w-[570px] items-center gap-2 rounded-full border border-blue-200/70 dark:border-slate-700/80 bg-white/95 dark:bg-[#0B132B]/90 p-1 pl-4 shadow-[0_6px_25px_rgba(30,60,120,0.1)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl focus-within:border-blue-500 dark:focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-blue-500/20 dark:focus-within:ring-indigo-500/30 transition-all duration-200"
               >
                 <Search aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500" />
                 <input
@@ -153,7 +153,7 @@ export const Dashboard: React.FC = () => {
               </form>
 
               {/* Try Queries */}
-              <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10.5px] sm:text-[11px]">
+              <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[10.5px] sm:text-[11px]">
                 <span className="font-semibold text-slate-600 dark:text-slate-400 mr-0.5">Try:</span>
                 {suggestedQueries.map(term => (
                   <button
@@ -170,7 +170,7 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* Right Side: Exact ResearchGraph Model & Interactive Stage */}
-            <div className="relative mx-auto flex w-full max-w-[650px] items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
+            <div className="relative mx-auto flex w-full max-w-[715px] items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
               <ResearchKnowledgeCore />
             </div>
           </div>
