@@ -464,8 +464,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (SEARCH BAR REMOVED)              */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div className="relative w-full min-h-[780px] flex flex-col justify-start overflow-hidden bg-[radial-gradient(circle_at_82%_29%,rgba(37,215,238,.58),transparent_22%),radial-gradient(circle_at_64%_86%,rgba(255,164,105,.35),transparent_25%),radial-gradient(circle_at_13%_76%,rgba(255,125,205,.36),transparent_29%),linear-gradient(118deg,#f1fbff_0%,#c7edff_30%,#8ca6e8_59%,#7a62bd_100%)]">
-                <div aria-hidden="true" className="absolute inset-0 opacity-50 bg-cover bg-center mix-blend-screen" style={{ backgroundImage: "url('/user_custom_bg.jpg')" }} />
-                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(108deg,rgba(249,253,255,.78)_0%,rgba(223,249,255,.3)_39%,rgba(104,92,194,.05)_100%)]" />
+                <div aria-hidden="true" className="absolute inset-0 bg-cover bg-center opacity-90" style={{ backgroundImage: "url('https://www.si.edu/sites/default/files/newsdesk/press_releases/hidden-universe-art-crop.jpg')" }} />
+                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(100deg,rgba(248,253,255,.92)_0%,rgba(235,249,255,.66)_33%,rgba(184,223,255,.22)_51%,rgba(55,44,127,.12)_100%)]" />
                 <div aria-hidden="true" className="absolute right-[16%] top-[19%] h-64 w-64 rounded-full bg-teal-200/45 blur-[90px] animate-pulse-slow" />
                 <div aria-hidden="true" className="absolute right-[3%] bottom-[8%] h-56 w-56 rounded-full bg-orange-200/35 blur-[100px] animate-pulse-slow" />
                 
