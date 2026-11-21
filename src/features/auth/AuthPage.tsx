@@ -464,8 +464,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (SEARCH BAR REMOVED)              */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div className="relative w-full min-h-[780px] flex flex-col justify-start overflow-hidden bg-[radial-gradient(circle_at_82%_29%,rgba(37,215,238,.58),transparent_22%),radial-gradient(circle_at_64%_86%,rgba(255,164,105,.35),transparent_25%),radial-gradient(circle_at_13%_76%,rgba(255,125,205,.36),transparent_29%),linear-gradient(118deg,#f1fbff_0%,#c7edff_30%,#8ca6e8_59%,#7a62bd_100%)]">
-                <div aria-hidden="true" className="absolute inset-0 bg-cover bg-center opacity-90" style={{ backgroundImage: "url('https://www.si.edu/sites/default/files/newsdesk/press_releases/hidden-universe-art-crop.jpg')" }} />
-                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(100deg,rgba(248,253,255,.92)_0%,rgba(235,249,255,.66)_33%,rgba(184,223,255,.22)_51%,rgba(55,44,127,.12)_100%)]" />
+                <div aria-hidden="true" className="absolute inset-0 bg-cover bg-center opacity-100" style={{ backgroundImage: "url('/research-universe-library.svg')" }} />
+                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,11,32,.87)_0%,rgba(5,14,42,.72)_32%,rgba(7,20,61,.20)_57%,rgba(12,8,48,.10)_100%)]" />
                 <div aria-hidden="true" className="absolute right-[16%] top-[19%] h-64 w-64 rounded-full bg-teal-200/45 blur-[90px] animate-pulse-slow" />
                 <div aria-hidden="true" className="absolute right-[3%] bottom-[8%] h-56 w-56 rounded-full bg-orange-200/35 blur-[100px] animate-pulse-slow" />
                 
@@ -511,21 +511,21 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     className="flex-1 flex flex-col items-start text-left max-w-xl z-30"
                   >
                     {/* Brand Pill */}
-                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/60 border border-white/80 text-indigo-700 text-[10px] font-bold tracking-[0.2em] uppercase mb-5 backdrop-blur-xl shadow-[0_12px_30px_-18px_rgba(89,85,194,.7)]">
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/20 border border-violet-200/45 text-violet-100 text-[10px] font-bold tracking-[0.2em] uppercase mb-5 backdrop-blur-xl shadow-[0_12px_30px_-18px_rgba(116,79,255,.85)]">
                       <span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></span>
                       RESEARCH INTELLIGENCE, REIMAGINED
                     </div>
 
                     {/* Massive Punchy Headline */}
-                    <h1 className="text-[46px] sm:text-[56px] lg:text-[64px] font-black tracking-[-0.06em] leading-[.96] mb-6 text-slate-950 drop-shadow-[0_5px_18px_rgba(255,255,255,.38)]">
+                    <h1 className="text-[46px] sm:text-[56px] lg:text-[64px] font-black tracking-[-0.06em] leading-[.96] mb-6 text-white drop-shadow-[0_5px_22px_rgba(0,0,0,.6)]">
                       Research,<br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-500">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-400">
                         connected.
                       </span>
                     </h1>
 
                     {/* Subtitle Description */}
-                    <p className="text-slate-700 text-[15px] sm:text-[17px] font-medium leading-relaxed mb-7 max-w-[520px]">
+                    <p className="text-slate-100/90 text-[15px] sm:text-[17px] font-medium leading-relaxed mb-7 max-w-[520px]">
                       Discover papers, people, and ideas — then see how they connect across a living research universe.
                     </p>
 
@@ -551,17 +551,17 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     {/* 4 Stats Grid with Glowing Accents */}
                     <div className="flex flex-wrap gap-2.5 w-full pt-1">
-                      <div className="bg-white/55 border border-white/90 hover:border-cyan-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(54,60,136,.7)] transition-all group">
-                        <span className="text-xs font-bold text-cyan-700 block tracking-tight">Discover</span>
-                        <span className="text-slate-600 text-[10px] leading-tight block">Find relevant work</span>
+                      <div className="bg-slate-950/35 border border-cyan-200/30 hover:border-cyan-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.9)] transition-all group">
+                        <span className="text-xs font-bold text-cyan-200 block tracking-tight">Discover</span>
+                        <span className="text-slate-300 text-[10px] leading-tight block">Find relevant work</span>
                       </div>
-                      <div className="bg-white/55 border border-white/90 hover:border-violet-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(54,60,136,.7)] transition-all group">
-                        <span className="text-xs font-bold text-violet-700 block tracking-tight">Connect</span>
-                        <span className="text-slate-600 text-[10px] leading-tight block">Follow context</span>
+                      <div className="bg-slate-950/35 border border-violet-200/30 hover:border-violet-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.9)] transition-all group">
+                        <span className="text-xs font-bold text-violet-200 block tracking-tight">Connect</span>
+                        <span className="text-slate-300 text-[10px] leading-tight block">Follow context</span>
                       </div>
-                      <div className="bg-white/55 border border-white/90 hover:border-rose-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(54,60,136,.7)] transition-all group">
-                        <span className="text-xs font-bold text-rose-600 block tracking-tight">Understand</span>
-                        <span className="text-slate-600 text-[10px] leading-tight block">Keep evidence close</span>
+                      <div className="bg-slate-950/35 border border-fuchsia-200/30 hover:border-fuchsia-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.9)] transition-all group">
+                        <span className="text-xs font-bold text-fuchsia-200 block tracking-tight">Understand</span>
+                        <span className="text-slate-300 text-[10px] leading-tight block">Keep evidence close</span>
                       </div>
                     </div>
                   </motion.div>
