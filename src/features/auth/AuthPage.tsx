@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 import { 
-  Network, Mail, Lock, User, ArrowRight, Search, BrainCircuit, Sparkles, ArrowLeft, 
+  Network, Mail, Lock, User, ArrowRight, BrainCircuit, Sparkles, ArrowLeft, 
   Zap, Database, Layers, Info, X, Compass, Award, KeyRound, CheckCircle2,
-  Play, ChevronDown, Activity, Share2, FileText,
-  Microscope, Binary, Eye, EyeOff, Loader2
+  Play, ChevronDown, Activity, Cpu, Share2, Radio, FileText,
+  Microscope, Binary, Eye, EyeOff, Loader2, Clock3
 } from 'lucide-react';
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
 import { supabase } from '../../lib/supabase';
+import LandingExperience from './LandingExperience';
 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
@@ -36,7 +37,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
   const [activeModal, setActiveModal] = useState<InfoModalType>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedDomain, setSelectedDomain] = useState<'ai' | 'bio' | 'quantum' | 'materials' | 'neuro'>('ai');
   const [activeDemoQuery, setActiveDemoQuery] = useState(0);
 
@@ -50,8 +50,29 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const topologySectionRef = useRef<HTMLDivElement>(null);
+  const videoSectionRef = useRef<HTMLDivElement>(null);
   const sourcesSectionRef = useRef<HTMLDivElement>(null);
   const pipelineSectionRef = useRef<HTMLDivElement>(null);
+  const sandboxSectionRef = useRef<HTMLDivElement>(null);
+
+  const [selectedVideoIdx, setSelectedVideoIdx] = useState(0);
+  const [activeSimChapter, setActiveSimChapter] = useState(0);
+  const [isSimPlaying, setIsSimPlaying] = useState(true);
+
+  // Scroll Progress Bar
+  const { scrollYProgress } = useScroll({ container: scrollContainerRef });
+  const scaleX = useSpring(scrollYProgress, { stiffness: 120, damping: 30, restDelta: 0.001 });
+
+  // Escape key closes modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActiveModal(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   React.useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
@@ -79,7 +100,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           }
         });
         if (error) throw error;
-        // Proceed to platform if successful
         onAuthComplete();
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -87,7 +107,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           password
         });
         if (error) throw error;
-        // Proceed to platform if successful
         onAuthComplete();
       }
     } catch (err: any) {
@@ -95,11 +114,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     } finally {
       setIsAuthenticating(false);
     }
-  };
-
-  const handleHeroSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    triggerTraversal('AUTH', 'LOGIN');
   };
 
   const triggerTraversal = (destination: PageState, mode?: AuthMode) => {
@@ -113,26 +127,6 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     ref.current?.scrollIntoView({ behavior: 'smooth' });
     setActiveModal(null);
   };
-
-  // ═══════ SCROLL-REVEAL INTERSECTION OBSERVER ═══════
-  useEffect(() => {
-    const revealElements = document.querySelectorAll('.landing-reveal, .landing-reveal-left, .landing-reveal-right, .landing-reveal-scale');
-    if (revealElements.length === 0) return;
-    
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
-    );
-
-    revealElements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [pageState]);
 
   // Demo queries for the interactive sandbox
   const demoQueries = [
@@ -190,9 +184,130 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     }
   ];
 
+  const landingVideos = [
+    {
+      id: 'tour',
+      youtubeId: null,
+      title: 'Autonomous ResearchGraph Tour & 3D Synthesis',
+      publisher: 'ResearchGraph Core Team',
+      duration: '3:24',
+      badge: 'Interactive Walkthrough',
+      tagColor: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10',
+      description: 'See live 3D graph vectorization, 45+ repository ingestion, and multi-LLM consensus synthesis operating in real-time.',
+      highlights: ['Sub-15ms Latency', 'Multi-Hop Graph Walks', '1536-Dim GNN Embeddings', 'Verifiable Citations']
+    },
+    {
+      id: 'neo4j',
+      youtubeId: 'YVLwu3jE09c',
+      title: 'What is a Knowledge Graph?',
+      publisher: 'Neo4j Graph Database',
+      duration: '2:36',
+      badge: 'Graph Foundations',
+      tagColor: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10',
+      description: 'An authoritative introduction to nodes, edges, relationships, and how connected data transforms scientific discovery.',
+      highlights: ['Semantic Property Graphs', 'Entities & Relationships', 'Relational vs Graph', 'Multi-Hop Traversal']
+    },
+    {
+      id: 'ibm',
+      youtubeId: 'y7sXDpffzQQ',
+      title: 'Knowledge Graphs, Clearly Explained',
+      publisher: 'IBM Technology',
+      duration: '6:12',
+      badge: 'AI & Context',
+      tagColor: 'text-purple-400 border-purple-500/40 bg-purple-500/10',
+      description: 'IBM Technology explains how connected information and ontological structures anchor LLMs to ground truth with zero hallucination.',
+      highlights: ['Contextual Grounding', 'Entity Disambiguation', 'Ontology Engineering', 'LLM Integration']
+    },
+    {
+      id: 'stanford',
+      youtubeId: 'JtDgmmQ60x8',
+      title: 'Graph Neural Networks & Machine Learning on Graphs',
+      publisher: 'Stanford Online • CS224W',
+      duration: '4:50',
+      badge: 'Deep Learning',
+      tagColor: 'text-amber-400 border-amber-500/40 bg-amber-500/10',
+      description: 'Stanford CS224W lecture on Graph Neural Networks (GNNs), message passing algorithms, and topological embeddings for scientific discovery.',
+      highlights: ['Message Passing (MPNN)', 'Permutation Invariance', 'Graph Convolutional Networks', 'Biomedical Discovery']
+    },
+    {
+      id: 'earth-orbit',
+      youtubeId: 'yQNEKTOL_oA',
+      title: 'Earth from Space in 4K',
+      publisher: 'NASA Johnson',
+      duration: '4K Space View',
+      badge: 'Orbital Perspective',
+      tagColor: 'text-fuchsia-300 border-fuchsia-400/40 bg-fuchsia-500/10',
+      description: 'A cinematic orbital view of Earth that brings the scale, color, and wonder of scientific exploration into the ResearchGraph universe.',
+      highlights: ['Earth Observation', 'Orbital Perspective', 'Scientific Curiosity', 'NASA Footage']
+    }
+  ];
+
+  const simulationChapters = [
+    {
+      title: '01 • Multimodal Document Ingestion',
+      metric: '45+ Sources Active',
+      detail: 'Continuous stream parsing LaTeX equations, tables, figures, and author networks across arXiv, PubMed, and IEEE.',
+      badge: 'Ingestion Phase',
+      color: 'from-blue-500 to-cyan-400'
+    },
+    {
+      title: '02 • 3D Topology & GNN Clustering',
+      metric: '204.8M Nodes Mapped',
+      detail: 'Spatial projection into 1536-dimensional manifold where conceptual similarity translates to geometric Euclidean distance.',
+      badge: 'Graph Engine',
+      color: 'from-cyan-400 to-emerald-400'
+    },
+    {
+      title: '03 • Hybrid Dense & Graph Retrieval',
+      metric: '14ms Traversal',
+      detail: 'Traversing multi-hop citation paths across interdisciplinary bridge papers to uncover hidden cross-domain solutions.',
+      badge: 'Retrieval Phase',
+      color: 'from-purple-400 to-pink-400'
+    },
+    {
+      title: '04 • Multi-LLM Consensus Synthesis',
+      metric: '100% Citation Grounding',
+      detail: 'Ensemble consensus of GPT-4o, Claude 3.5, and Gemini generating verifiable literature reviews with direct DOI links.',
+      badge: 'Synthesis Phase',
+      color: 'from-emerald-400 to-teal-300'
+    }
+  ];
+
+  useEffect(() => {
+    if (!isSimPlaying || landingVideos[selectedVideoIdx].id !== 'tour') return;
+    const timer = setInterval(() => {
+      setActiveSimChapter(prev => (prev + 1) % 4);
+    }, 4200);
+    return () => clearInterval(timer);
+  }, [isSimPlaying, selectedVideoIdx]);
+
+  // The public experience is intentionally isolated from the authenticated shell.
+  // Authentication itself remains the same component and uses the existing Supabase flow below.
+  const shouldRenderPublicLanding = () => pageState === 'LANDING';
+  if (shouldRenderPublicLanding()) {
+    return (
+      <LandingExperience
+        onLogin={() => triggerTraversal('AUTH', 'LOGIN')}
+        onRegister={() => triggerTraversal('AUTH', 'REGISTER')}
+        onSearch={(query) => {
+          window.sessionStorage.setItem('researchgraph-pending-query', query);
+          triggerTraversal('AUTH', 'REGISTER');
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-[#101642] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
       
+      {/* --- SMOOTH SCROLL PROGRESS BAR --- */}
+      {pageState === 'LANDING' && (
+        <motion.div
+          style={{ scaleX }}
+          className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-cyan-400 via-sky-400 to-purple-500 origin-left z-[100] shadow-[0_0_12px_rgba(6,182,212,0.8)]"
+        />
+      )}
+
       {/* --- INTERACTIVE 3D SPACE BACKGROUND --- */}
       <InteractiveSpaceBackground pageState={pageState} authMode={authMode} />
 
@@ -215,9 +330,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="w-full flex flex-col relative"
             >
-              {/* ═══════════════ TOP NAVBAR ═══════════════ */}
-              <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#040816]/85 backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50 shadow-2xl shadow-black/80">
-                {/* Brand Logo */}
+              {/* ═══════════════ PRO TOP NAVBAR WITH VIBRANT COLORED ICONS ═══════════════ */}
+              <nav className="w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[1520px] mx-auto mt-3 px-4 sm:px-7 py-2.5 flex items-center justify-between rounded-2xl bg-[linear-gradient(105deg,rgba(11,20,55,.82),rgba(24,39,91,.72),rgba(94,48,139,.68))] backdrop-blur-2xl border border-cyan-200/35 sticky top-3 z-50 shadow-[0_18px_42px_-25px_rgba(35,17,91,.9),inset_0_1px_0_rgba(255,255,255,.13)]">
+                {/* Brand Logo with Glowing Aura */}
                 <div 
                   className="flex items-center gap-3 cursor-pointer group" 
                   onClick={() => {
@@ -225,470 +340,479 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     setActiveModal(null);
                   }}
                 >
-                  <div className="w-10 h-10 rounded-xl border border-cyan-500/40 flex items-center justify-center bg-gradient-to-br from-cyan-500/20 via-blue-600/20 to-purple-600/20 shadow-lg shadow-cyan-500/25 group-hover:scale-105 transition-all">
-                    <Network className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
+                  <div className="relative">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 rounded-xl blur-sm opacity-60 group-hover:opacity-100 transition duration-500"></div>
+                    <div className="relative w-10 h-10 rounded-xl border border-cyan-400/50 flex items-center justify-center bg-gradient-to-br from-[#06122c] to-[#040816] shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-all">
+                      <Network className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform duration-300" />
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
+                    <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white group-hover:text-cyan-100 transition-colors">
                       ResearchGraph <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-400">AI</span>
                     </span>
-                    <span className="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 font-mono font-bold tracking-wider">
-                      v2.0
+                    <span className="hidden sm:inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 font-mono font-bold tracking-wider shadow-sm">
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                      v2.4
                     </span>
                   </div>
                 </div>
                 
-                {/* Center Navigation Links */}
-                <div className="hidden lg:flex items-center gap-1.5 bg-white dark:bg-[#111D35]/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-xl">
+                {/* Center Navigation Links with Vivid Colored Icons */}
+                <div className="hidden lg:flex items-center gap-1.5 bg-slate-950/35 border border-cyan-100/20 rounded-full p-1.5 backdrop-blur-2xl shadow-[0_4px_20px_rgba(34,27,99,.45)]">
                   <button 
                     onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white dark:bg-[#111D35]/10 transition-all"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all flex items-center gap-2 group"
                   >
-                    Cockpit View
+                    <Compass className="w-3.5 h-3.5 text-cyan-400 group-hover:rotate-45 transition-transform duration-300" />
+                    <span>Cockpit View</span>
                   </button>
 
                   <button 
                     onClick={() => scrollToSection(topologySectionRef)}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-cyan-300 rounded-full hover:bg-cyan-500/10 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-cyan-200 rounded-full hover:bg-cyan-500/15 transition-all flex items-center gap-2 group"
                   >
-                    <Network className="w-3 h-3 text-cyan-400" />
-                    3D Topology
+                    <Network className="w-3.5 h-3.5 text-indigo-400 group-hover:scale-110 transition-transform" />
+                    <span>3D Topology</span>
+                  </button>
+
+                  <button 
+                    onClick={() => scrollToSection(videoSectionRef)}
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-cyan-200 rounded-full hover:bg-cyan-500/15 transition-all flex items-center gap-2 group"
+                  >
+                    <Play className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400 group-hover:scale-110 transition-transform" />
+                    <span>Watch Tour</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-cyan-500/25 text-cyan-300 border border-cyan-500/40 font-mono font-bold">4 Videos</span>
                   </button>
 
                   <button 
                     onClick={() => scrollToSection(pipelineSectionRef)}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-purple-300 rounded-full hover:bg-purple-500/10 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-purple-200 rounded-full hover:bg-purple-500/15 transition-all flex items-center gap-2 group"
                   >
-                    <Zap className="w-3 h-3 text-purple-400" />
-                    RAG Pipeline
+                    <Zap className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
+                    <span>RAG Pipeline</span>
                   </button>
 
                   <button 
                     onClick={() => scrollToSection(sourcesSectionRef)}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-emerald-300 rounded-full hover:bg-emerald-500/10 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-emerald-200 rounded-full hover:bg-emerald-500/15 transition-all flex items-center gap-2 group"
                   >
-                    <Database className="w-3 h-3 text-emerald-400" />
-                    Data Sources
-                    <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">45+</span>
+                    <Database className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    <span>Data Sources</span>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 border border-emerald-500/40 font-mono font-bold">45+</span>
                   </button>
 
                   <button 
                     onClick={() => setActiveModal('ABOUT')}
-                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-sky-300 rounded-full hover:bg-sky-500/10 transition-all flex items-center gap-1.5"
+                    className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-sky-200 rounded-full hover:bg-sky-500/15 transition-all flex items-center gap-2 group"
                   >
-                    <Info className="w-3 h-3 text-sky-400" />
-                    About Us
+                    <Sparkles className="w-3.5 h-3.5 text-sky-400 group-hover:rotate-12 transition-transform" />
+                    <span>About Us</span>
                   </button>
                 </div>
 
-                {/* Right Action Buttons: Log In & Sign Up */}
+                {/* Right Action Buttons */}
                 <div className="flex items-center gap-2.5 sm:gap-3">
                   <button 
                     onClick={() => triggerTraversal('AUTH', 'LOGIN')} 
-                    className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all px-3.5 sm:px-4 py-2 rounded-xl hover:bg-white dark:bg-[#111D35]/10 border border-transparent hover:border-white/10"
+                    className="text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-all px-3.5 sm:px-4 py-2 rounded-xl hover:bg-white/10 border border-white/10 hover:border-cyan-400/40"
                   >
                     Log In
                   </button>
                   <button 
                     onClick={() => triggerTraversal('AUTH', 'REGISTER')} 
-                    className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-cyan-500/25 border border-cyan-400/30 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2"
+                    className="relative group px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-white font-bold text-xs sm:text-sm transition-all overflow-hidden"
                   >
-                    <span>Sign Up Free</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 group-hover:from-cyan-400 group-hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-500/30"></div>
+                    <div className="relative flex items-center gap-2">
+                      <span>Launch Cockpit</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </button>
                   
                   {/* Mobile Menu Trigger */}
                   <button 
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    className="lg:hidden p-2 rounded-lg bg-white dark:bg-[#111D35]/5 border border-white/10 text-gray-300 hover:text-white"
+                    className="lg:hidden p-2 rounded-lg bg-white/5 border border-white/10 text-gray-300 hover:text-white"
                   >
                     <Layers className="w-4 h-4" />
                   </button>
                 </div>
               </nav>
 
-              {/* Mobile Dropdown Menu */}
+              {/* Mobile Dropdown Menu with Colored Icons */}
               <AnimatePresence>
                 {mobileMenuOpen && (
                   <motion.div 
                     initial={{ opacity: 0, y: -10 }} 
                     animate={{ opacity: 1, y: 0 }} 
                     exit={{ opacity: 0, y: -10 }}
-                    className="lg:hidden w-full bg-[#070b18]/95 border-b border-white/10 px-6 py-4 flex flex-col gap-2 relative z-40 backdrop-blur-2xl"
+                    className="lg:hidden w-full bg-[#070b18]/98 border-b border-white/15 px-6 py-4 flex flex-col gap-2 relative z-40 backdrop-blur-2xl"
                   >
                     <button 
                       onClick={() => { scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' }); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-gray-300 hover:bg-white dark:bg-[#111D35]/5 rounded-lg"
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-gray-300 hover:bg-white/10 rounded-xl flex items-center gap-2.5"
                     >
-                      Cockpit View
+                      <Compass className="w-4 h-4 text-cyan-400" /> Cockpit View
                     </button>
                     <button 
                       onClick={() => { scrollToSection(topologySectionRef); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-cyan-300 hover:bg-cyan-500/10 rounded-lg flex items-center gap-2"
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-500/15 rounded-xl flex items-center gap-2.5"
                     >
-                      <Network className="w-4 h-4 text-cyan-400" /> 3D Topology
+                      <Network className="w-4 h-4 text-indigo-400" /> 3D Topology
+                    </button>
+                    <button 
+                      onClick={() => { scrollToSection(videoSectionRef); setMobileMenuOpen(false); }}
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-cyan-300 hover:bg-cyan-500/15 rounded-xl flex items-center gap-2.5"
+                    >
+                      <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" /> Watch Videos & Tour
                     </button>
                     <button 
                       onClick={() => { scrollToSection(pipelineSectionRef); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-purple-300 hover:bg-purple-500/10 rounded-lg flex items-center gap-2"
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-purple-300 hover:bg-purple-500/15 rounded-xl flex items-center gap-2.5"
                     >
-                      <Zap className="w-4 h-4 text-purple-400" /> RAG Pipeline
+                      <Zap className="w-4 h-4 text-amber-400" /> RAG Pipeline
                     </button>
                     <button 
                       onClick={() => { scrollToSection(sourcesSectionRef); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-emerald-300 hover:bg-emerald-500/10 rounded-lg flex items-center gap-2"
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-emerald-300 hover:bg-emerald-500/15 rounded-xl flex items-center gap-2.5"
                     >
                       <Database className="w-4 h-4 text-emerald-400" /> Data Sources (45+ Repos)
                     </button>
                     <button 
                       onClick={() => { setActiveModal('ABOUT'); setMobileMenuOpen(false); }}
-                      className="text-left py-2 px-3 text-sm font-medium text-sky-300 hover:bg-sky-500/10 rounded-lg flex items-center gap-2"
+                      className="text-left py-2.5 px-3 text-sm font-semibold text-sky-300 hover:bg-sky-500/15 rounded-xl flex items-center gap-2.5"
                     >
-                      <Info className="w-4 h-4 text-sky-400" /> About ResearchGraph AI
+                      <Sparkles className="w-4 h-4 text-sky-400" /> About ResearchGraph AI
                     </button>
                   </motion.div>
                 )}
               </AnimatePresence>
 
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              {/*        EPIC IMMERSIVE HERO — BACKGROUND IMAGE + 3D NEURAL CORE MODEL                   */}
+              {/*        AUTHENTIC STARSHIP COCKPIT BRIDGE HERO VIEW (SEARCH BAR REMOVED)              */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div className="relative w-full min-h-[calc(100vh-65px)] flex flex-col justify-between overflow-hidden bg-transparent">
+              <div className="relative w-full min-h-[780px] flex flex-col justify-start overflow-hidden bg-[radial-gradient(circle_at_82%_29%,rgba(37,215,238,.58),transparent_22%),radial-gradient(circle_at_64%_86%,rgba(255,164,105,.35),transparent_25%),radial-gradient(circle_at_13%_76%,rgba(255,125,205,.36),transparent_29%),linear-gradient(118deg,#f1fbff_0%,#c7edff_30%,#8ca6e8_59%,#7a62bd_100%)]">
+                <div aria-hidden="true" className="absolute inset-0 bg-cover bg-center opacity-100" style={{ backgroundImage: "url('/research-universe-library.svg')" }} />
+                <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(90deg,rgba(3,11,32,.87)_0%,rgba(5,14,42,.72)_32%,rgba(7,20,61,.20)_57%,rgba(12,8,48,.10)_100%)]" />
+                <div aria-hidden="true" className="absolute right-[16%] top-[19%] h-64 w-64 rounded-full bg-teal-200/45 blur-[90px] animate-pulse-slow" />
+                <div aria-hidden="true" className="absolute right-[3%] bottom-[8%] h-56 w-56 rounded-full bg-orange-200/35 blur-[100px] animate-pulse-slow" />
                 
-                {/* ─── AMBIENT ATMOSPHERIC EFFECTS ─── */}
-                {/* Top status bar */}
-                <div className="absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
+                {/* Top Canopy Arch Beam */}
+                <div className="hidden absolute top-0 left-0 right-0 h-9 pointer-events-none z-20 bg-gradient-to-b from-[#040816]/90 via-[#060c20]/60 to-transparent flex items-center justify-between px-6 sm:px-12 border-b border-cyan-500/20">
                   <div className="flex items-center gap-2.5 text-[9px] font-mono text-cyan-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span className="tracking-wider">RESEARCH INTELLIGENCE · REIMAGINED</span>
+                    <span className="tracking-wider">COCKPIT BRIDGE // 3D HUD ONLINE</span>
                   </div>
-                  <div className="hidden sm:flex items-center gap-4 text-[9px] font-mono text-gray-400 dark:text-gray-500">
-                    <span className="text-purple-400">✦ AI-POWERED</span>
-                    <span className="text-cyan-400">KNOWLEDGE GRAPH: ACTIVE</span>
-                    <span className="text-emerald-400">● 45+ SOURCES LIVE</span>
+                  <div className="hidden sm:flex items-center gap-4 text-[9px] font-mono text-gray-400">
+                    <span className="text-emerald-400 font-semibold">● 45 SOURCES SYNCHRONIZED</span>
+                    <span className="text-cyan-400 font-semibold">GRAPH TOPOLOGY: ACTIVE</span>
+                    <span>CANOPY PRESSURIZED</span>
                   </div>
                 </div>
 
-                {/* Floating orbital decorative rings */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-cyan-500/[0.07] animate-orbit-spin pointer-events-none z-0"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-purple-500/[0.06] pointer-events-none z-0" style={{ animation: 'orbit-spin 35s linear infinite reverse' }}></div>
+                {/* Left & Right Canopy Structural Pillar Struts */}
+                <div className="hidden absolute top-0 left-0 bottom-28 w-10 sm:w-14 pointer-events-none z-20">
+                  <div className="w-full h-full bg-gradient-to-r from-[#030612]/95 via-[#050b1a]/40 to-transparent border-r border-cyan-500/15 relative">
+                    <div className="absolute top-1/4 left-1.5 w-1 h-14 bg-cyan-500/40 rounded-full"></div>
+                    <div className="absolute top-1/2 left-1.5 w-1 h-20 bg-purple-500/40 rounded-full"></div>
+                  </div>
+                </div>
 
-                {/* Ambient nebula glow */}
-                <div className="absolute top-[30%] left-[55%] -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-cyan-500/[0.08] via-purple-500/[0.05] to-transparent blur-[150px] pointer-events-none z-0"></div>
-                <div className="absolute bottom-[10%] left-[20%] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-purple-600/[0.06] to-fuchsia-500/[0.04] blur-[120px] pointer-events-none z-0"></div>
+                <div className="hidden absolute top-0 right-0 bottom-28 w-10 sm:w-14 pointer-events-none z-20">
+                  <div className="w-full h-full bg-gradient-to-l from-[#030612]/95 via-[#050b1a]/40 to-transparent border-l border-cyan-500/15 relative">
+                    <div className="absolute top-1/3 right-1.5 w-1 h-16 bg-cyan-500/40 rounded-full"></div>
+                    <div className="absolute bottom-1/3 right-1.5 w-1 h-24 bg-purple-500/40 rounded-full"></div>
+                  </div>
+                </div>
 
-                {/* ─── HERO STAGE: LEFT COPY + RIGHT 3D NEURAL CORE ─── */}
-                <div className="relative z-20 w-full max-w-[1400px] mx-auto px-4 sm:px-8 lg:px-12 pt-10 sm:pt-16 lg:pt-20 pb-4 flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-14">
+                {/* Ambient Radial Nebula Glow */}
+                <div className="absolute top-[44%] left-[64%] -translate-x-1/2 -translate-y-1/2 w-[720px] h-[720px] rounded-full bg-gradient-to-br from-cyan-300/35 via-fuchsia-300/20 to-amber-200/20 blur-[120px] pointer-events-none z-0"></div>
+
+                {/* ─── HERO STAGE: LEFT HERO COPY + CENTER 3D KNOWLEDGE SPHERE ─── */}
+                <div className="relative z-20 w-full max-w-[1370px] mx-auto px-5 sm:px-8 lg:px-10 pt-10 sm:pt-12 lg:pt-14 pb-3 grid grid-cols-1 lg:grid-cols-[.9fr_1.1fr] items-center gap-6 lg:gap-6">
                   
                   {/* LEFT: HERO COPY & CALL TO ACTIONS */}
                   <motion.div 
-                    initial={{ opacity: 0, x: -40 }}
+                    initial={{ opacity: 0, x: -25 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ delay: 0.2, duration: 0.6 }}
                     className="flex-1 flex flex-col items-start text-left max-w-xl z-30"
                   >
                     {/* Brand Pill */}
-                    <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-gradient-to-r from-cyan-500/15 via-purple-500/10 to-cyan-500/15 border border-cyan-500/40 text-cyan-400 text-xs font-mono font-bold tracking-widest uppercase mb-4 shadow-lg backdrop-blur-md animate-neon-border">
-                      <span className="relative flex h-2.5 w-2.5">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
-                      </span>
-                      RESEARCH INTELLIGENCE · REIMAGINED
+                    <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/20 border border-violet-200/45 text-violet-100 text-[10px] font-bold tracking-[0.2em] uppercase mb-5 backdrop-blur-xl shadow-[0_12px_30px_-18px_rgba(116,79,255,.85)]">
+                      <span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse"></span>
+                      RESEARCH INTELLIGENCE, REIMAGINED
                     </div>
 
-                    {/* Massive Headline */}
-                    <h1 className="text-4xl sm:text-5xl lg:text-[3.6rem] font-black tracking-tight leading-[1.06] mb-5 text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.95)]">
+                    {/* Massive Punchy Headline */}
+                    <h1 className="text-[46px] sm:text-[56px] lg:text-[64px] font-black tracking-[-0.06em] leading-[.96] mb-6 text-white drop-shadow-[0_5px_22px_rgba(0,0,0,.6)]">
                       Research,<br />
-                      <span className="gradient-text-animated">
-                        Connected.
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-400">
+                        connected.
                       </span>
                     </h1>
 
-                    {/* Subtitle */}
-                    <p className="text-gray-300 text-sm sm:text-[15px] leading-relaxed mb-6 max-w-md drop-shadow-lg">
-                      Discover, explore, and connect research papers, authors, and ideas through an intelligent knowledge graph powered by AI.
+                    {/* Subtitle Description */}
+                    <p className="text-slate-100/90 text-[15px] sm:text-[17px] font-medium leading-relaxed mb-7 max-w-[520px]">
+                      Discover papers, people, and ideas — then see how they connect across a living research universe.
                     </p>
 
                     {/* Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-3 mb-6">
+                    <div className="flex flex-wrap items-center gap-3 mb-5">
                       <button 
                         onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                        className="group px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:via-sky-400 hover:to-blue-500 text-white font-extrabold text-sm transition-all shadow-xl shadow-cyan-500/30 flex items-center gap-2.5 border border-cyan-400/40 hover:scale-[1.04] active:scale-[0.97]"
+                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-500 hover:from-blue-500 hover:to-fuchsia-400 text-white font-extrabold text-xs sm:text-sm transition-all shadow-xl shadow-violet-500/35 flex items-center gap-2 border border-white/45 hover:scale-[1.03] active:scale-[0.98]"
                       >
-                        Explore Research Graph
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Compass className="w-4 h-4 text-white" />
+                        <span>Explore research graph</span>
+                        <ArrowRight className="w-4 h-4" />
                       </button>
 
                       <button 
                         onClick={() => setActiveModal('DEMO')}
-                        className="group px-5 py-3 rounded-2xl glass-card hover:border-cyan-400/50 text-gray-200 hover:text-white font-bold text-sm transition-all flex items-center gap-2.5 hover:bg-white/[0.06] shadow-lg"
+                        className="px-5 py-3 rounded-xl bg-white/65 border border-white/90 hover:border-violet-300 text-slate-800 hover:text-violet-700 font-bold text-xs sm:text-sm transition-all flex items-center gap-2 backdrop-blur-xl hover:bg-white shadow-lg"
                       >
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-r from-cyan-500/30 to-purple-500/30 flex items-center justify-center">
-                          <Play className="w-3 h-3 text-cyan-300 fill-cyan-300" />
-                        </div>
-                        Watch Overview
+                        <Play className="w-3.5 h-3.5 text-violet-600 fill-violet-600" />
+                        <span>Watch overview</span>
                       </button>
                     </div>
 
-                    {/* Quick Natural Language Search Bar */}
-                    <form 
-                      onSubmit={handleHeroSearch}
-                      className="w-full max-w-lg mb-5 group relative"
-                    >
-                      <div className="relative flex items-center bg-black/40 border border-cyan-500/30 rounded-2xl px-4 py-2 backdrop-blur-xl focus-within:border-cyan-400 focus-within:shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all">
-                        <Search className="w-4 h-4 text-cyan-400 mr-2.5 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                        <input 
-                          type="text"
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          placeholder="Search 200M+ papers or ask a question..."
-                          className="w-full bg-transparent text-white placeholder-gray-400 text-xs sm:text-sm font-sans focus:outline-none"
-                        />
-                        <button 
-                          type="submit"
-                          className="ml-2 px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md shadow-cyan-500/30"
-                        >
-                          <span>Ask AI</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
+                    {/* 4 Stats Grid with Glowing Accents */}
+                    <div className="flex flex-wrap gap-2.5 w-full pt-1">
+                      <div className="bg-slate-950/35 border border-cyan-200/30 hover:border-cyan-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.9)] transition-all group">
+                        <span className="text-xs font-bold text-cyan-200 block tracking-tight">Discover</span>
+                        <span className="text-slate-300 text-[10px] leading-tight block">Find relevant work</span>
                       </div>
-                    </form>
-
-                    {/* Feature Pills Row */}
-                    <div className="flex flex-wrap items-center gap-2.5 mb-6">
-                      {[
-                        { icon: Search, label: 'Discover', desc: 'Find relevant work', color: 'text-cyan-400' },
-                        { icon: Share2, label: 'Connect', desc: 'Follow context', color: 'text-purple-400' },
-                        { icon: Sparkles, label: 'Understand', desc: 'Get deeper insights', color: 'text-emerald-400' },
-                      ].map((pill, idx) => {
-                        const Icon = pill.icon;
-                        return (
-                          <div key={idx} className="flex items-center gap-2 px-3 py-1.5 rounded-xl glass-card hover:bg-white/[0.06] transition-all cursor-default group">
-                            <Icon className={`w-3.5 h-3.5 ${pill.color} group-hover:scale-110 transition-transform`} />
-                            <div>
-                              <span className="text-[11px] font-bold text-white block leading-tight">{pill.label}</span>
-                              <span className="text-[9px] text-gray-400 block leading-tight">{pill.desc}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Stats Row */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full pt-4 border-t border-white/15">
-                      {[
-                        { value: '200M+', label: 'Research Papers', color: 'text-cyan-400', icon: FileText },
-                        { value: '12.4M+', label: 'Authors', color: 'text-purple-400', icon: User },
-                        { value: '1.8M+', label: 'Research Concepts', color: 'text-emerald-400', icon: Sparkles },
-                        { value: '250M+', label: 'Citations', color: 'text-sky-400', icon: Share2 },
-                      ].map((stat, idx) => {
-                        const Icon = stat.icon;
-                        return (
-                          <div key={idx} className="glass-card-vibrant rounded-xl p-2.5 stat-card-glow transition-all duration-300 cursor-default group">
-                            <div className="flex items-center gap-1.5 mb-0.5">
-                              <Icon className={`w-3 h-3 ${stat.color} group-hover:scale-110 transition-transform`} />
-                              <span className={`text-base sm:text-lg font-black ${stat.color} block tracking-tight`}>{stat.value}</span>
-                            </div>
-                            <span className="text-gray-400 text-[10px] leading-tight block">{stat.label}</span>
-                          </div>
-                        );
-                      })}
+                      <div className="bg-slate-950/35 border border-violet-200/30 hover:border-violet-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.9)] transition-all group">
+                        <span className="text-xs font-bold text-violet-200 block tracking-tight">Connect</span>
+                        <span className="text-slate-300 text-[10px] leading-tight block">Follow context</span>
+                      </div>
+                      <div className="bg-slate-950/35 border border-fuchsia-200/30 hover:border-fuchsia-300 rounded-2xl px-3.5 py-2.5 backdrop-blur-xl shadow-[0_12px_26px_-22px_rgba(0,0,0,.9)] transition-all group">
+                        <span className="text-xs font-bold text-fuchsia-200 block tracking-tight">Understand</span>
+                        <span className="text-slate-300 text-[10px] leading-tight block">Keep evidence close</span>
+                      </div>
                     </div>
                   </motion.div>
 
-                  {/* ─── RIGHT: 3D NEURAL CORE MODEL ─── */}
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3, duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[540px] lg:h-[540px] flex items-center justify-center flex-shrink-0 my-1"
-                  >
-                    {/* Radiant Halo */}
-                    <div className="absolute w-[90%] h-[90%] rounded-full bg-[radial-gradient(circle,rgba(6,182,212,0.25)_0%,rgba(99,102,241,0.15)_40%,transparent_70%)] blur-2xl pointer-events-none animate-pulse"></div>
-                    
-                    {/* Outer decorative ring */}
-                    <div className="absolute w-[105%] h-[105%] rounded-full border border-dashed border-cyan-500/15 animate-orbit-spin pointer-events-none"></div>
-                    
-                    {/* The 3D Neural Core Model */}
-                    <div className="absolute inset-[5%] z-10">
-                      <ThreeNeuralCore className="w-full h-full" interactive={true} theme="cyan" />
+                  {/* ─── CENTER: 3D KNOWLEDGE SPHERE ─── */}
+                  <div className="relative mx-auto w-full max-w-[660px] h-[350px] sm:h-[420px] lg:h-[490px] flex items-center justify-center my-1">
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ scale: [1, 1.04, 1], rotate: [0, 1.25, 0] }}
+                      transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
+                      className="hidden absolute inset-[3%] rounded-[40px] border border-white/50 bg-cover bg-center opacity-85 blur-[1px]"
+                      style={{ backgroundImage: "linear-gradient(135deg, rgba(217,250,255,.18), rgba(124,84,207,.25)), url('/user_custom_bg.jpg')" }}
+                    />
+                    <div className="absolute w-[74%] h-[74%] rounded-full bg-[radial-gradient(circle,rgba(47,222,255,0.52)_0%,rgba(117,111,255,0.2)_45%,rgba(255,168,102,0.12)_62%,transparent_74%)] blur-2xl pointer-events-none animate-pulse-slow"></div>
+                    <div aria-hidden="true" className="absolute inset-[15%] rounded-full border border-cyan-100/75 animate-[spin_32s_linear_infinite]"></div>
+                    <div aria-hidden="true" className="absolute inset-[23%] rounded-full border border-dashed border-fuchsia-100/70 animate-[spin_42s_linear_infinite_reverse]"></div>
+
+                    <div className="absolute inset-[-15%] z-10">
+                      <iframe allowTransparency={true} src="/knowledge_globe.html" className="w-full h-full border-none pointer-events-auto opacity-100" style={{ background: 'transparent' }} title="Knowledge Globe" />
                     </div>
 
-                    {/* Floating info badges around the model */}
-                    <motion.div 
-                      animate={{ y: [-5, 5, -5] }}
-                      transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                      className="absolute -top-2 right-[5%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-cyan-500/20"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-cyan-500/30 to-blue-500/30 flex items-center justify-center">
-                          <BrainCircuit className="w-3 h-3 text-cyan-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-cyan-300 font-bold block">Knowledge Graph</span>
-                          <span className="text-[8px] text-gray-400">AI-Powered</span>
-                        </div>
-                      </div>
-                    </motion.div>
+                    <div className="absolute z-20 bottom-[5%] left-1/2 -translate-x-1/2 inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/75 bg-white/55 px-4 py-2 text-[10px] font-semibold tracking-[0.13em] text-indigo-800 shadow-[0_14px_28px_-18px_rgba(74,38,143,.95)] backdrop-blur-xl">
+                      <Network className="h-3.5 w-3.5 text-fuchsia-600" /> INTERACTIVE KNOWLEDGE NETWORK
+                    </div>
 
-                    <motion.div 
-                      animate={{ y: [4, -4, 4] }}
-                      transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                      className="absolute top-[20%] -left-[8%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-purple-500/20"
+                    {/* The cards are deliberately small and decorative: the live globe remains the interaction surface. */}
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ duration: 6.2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="hidden absolute z-20 -left-5 top-16 items-center gap-2.5 rounded-2xl border border-cyan-300/30 bg-[#06152f]/80 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
                     >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 flex items-center justify-center">
-                          <Sparkles className="w-3 h-3 text-purple-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-purple-300 font-bold block">AI Insights</span>
-                          <span className="text-[8px] text-gray-400">Summarize · Compare</span>
-                        </div>
-                      </div>
+                      <span className="grid h-8 w-8 place-items-center rounded-xl border border-cyan-400/35 bg-cyan-400/10"><FileText className="w-4 h-4 text-cyan-300" /></span>
+                      <span className="grid"><b className="text-[10px] tracking-wide text-white">Evidence trail</b><small className="text-[9px] text-cyan-100/60">papers in context</small></span>
                     </motion.div>
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ y: [0, 7, 0] }}
+                      transition={{ duration: 7.1, repeat: Infinity, ease: 'easeInOut', delay: .8 }}
+                      className="hidden absolute z-20 -right-6 top-24 items-center gap-2.5 rounded-2xl border border-violet-300/30 bg-[#10113a]/78 px-3 py-2.5 shadow-[0_14px_32px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                    >
+                      <span className="grid h-8 w-8 place-items-center rounded-xl border border-violet-400/35 bg-violet-400/10"><Network className="w-4 h-4 text-violet-300" /></span>
+                      <span className="grid"><b className="text-[10px] tracking-wide text-white">Knowledge map</b><small className="text-[9px] text-violet-100/60">linked relationships</small></span>
+                    </motion.div>
+                    <motion.div
+                      aria-hidden="true"
+                      animate={{ y: [0, -6, 0] }}
+                      transition={{ duration: 6.6, repeat: Infinity, ease: 'easeInOut', delay: 1.7 }}
+                      className="hidden absolute z-20 right-2 bottom-14 items-center gap-2 rounded-full border border-emerald-300/25 bg-[#061d25]/80 px-3 py-2 shadow-[0_12px_28px_-20px_rgba(0,0,0,0.95)] backdrop-blur-xl"
+                    >
+                      <span className="h-2 w-2 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,.95)]" />
+                      <span className="text-[9px] font-bold tracking-wider text-emerald-100">LIVE RESEARCH SIGNALS</span>
+                    </motion.div>
+                  </div>
 
-                    <motion.div 
-                      animate={{ y: [-3, 6, -3] }}
-                      transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                      className="absolute bottom-[15%] -right-[5%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-emerald-500/20"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-emerald-500/30 to-teal-500/30 flex items-center justify-center">
-                          <Database className="w-3 h-3 text-emerald-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-emerald-300 font-bold block">Datasets</span>
-                          <span className="text-[8px] text-gray-400">85K+</span>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div 
-                      animate={{ y: [3, -5, 3] }}
-                      transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-                      className="absolute top-[55%] -left-[12%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-sky-500/20"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-sky-500/30 to-blue-500/30 flex items-center justify-center">
-                          <Activity className="w-3 h-3 text-sky-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-sky-300 font-bold block">Concepts</span>
-                          <span className="text-[8px] text-gray-400">1.8M+</span>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div 
-                      animate={{ y: [-4, 3, -4] }}
-                      transition={{ duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                      className="absolute -top-1 left-[10%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-rose-500/20"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-rose-500/30 to-pink-500/30 flex items-center justify-center">
-                          <FileText className="w-3 h-3 text-rose-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-rose-300 font-bold block">Papers</span>
-                          <span className="text-[8px] text-gray-400">200M+</span>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div 
-                      animate={{ y: [5, -3, 5] }}
-                      transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-                      className="absolute bottom-[5%] left-[15%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-amber-500/20"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-amber-500/30 to-orange-500/30 flex items-center justify-center">
-                          <User className="w-3 h-3 text-amber-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-amber-300 font-bold block">Authors</span>
-                          <span className="text-[8px] text-gray-400">12.4M+</span>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    <motion.div 
-                      animate={{ y: [-2, 7, -2] }}
-                      transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}
-                      className="absolute top-[35%] -right-[10%] z-20 glass-card px-3 py-1.5 rounded-xl shadow-lg shadow-cyan-500/20"
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-cyan-500/30 to-teal-500/30 flex items-center justify-center">
-                          <Network className="w-3 h-3 text-cyan-300" />
-                        </div>
-                        <div>
-                          <span className="text-[9px] text-cyan-300 font-bold block">Citations</span>
-                          <span className="text-[8px] text-gray-400">250M+</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </motion.div>
                 </div>
 
-                {/* ─── BOTTOM STATS TICKER BAR ─── */}
+                {/* ─── BOTTOM COCKPIT COMMAND DECK (PRO DESIGNER TELEMETRY HUB - SEARCH BAR REPLACED) ─── */}
                 <motion.div 
                   initial={{ opacity: 0, y: 25 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.6 }}
-                  className="relative z-30 w-full"
+                  transition={{ delay: 0.45, duration: 0.6 }}
+                  className="hidden"
                 >
-                  {/* Glowing curved separator */}
+                  {/* Glowing 3D Curved Arc Tracer Line */}
                   <div className="relative w-full h-8 sm:h-10 flex justify-center items-end overflow-hidden pointer-events-none">
                     <svg className="w-full h-12 text-cyan-400/80" viewBox="0 0 1200 65" preserveAspectRatio="none">
-                      <path d="M 0 65 Q 600 -8 1200 65" fill="none" stroke="url(#heroArc)" strokeWidth="3" filter="drop-shadow(0 0 10px #06b6d4)" />
-                      <path d="M 100 65 Q 600 10 1100 65" fill="none" stroke="#818cf8" strokeWidth="1" strokeDasharray="8 6" opacity="0.5" />
+                      <path 
+                        d="M 0 65 Q 600 -8 1200 65" 
+                        fill="none" 
+                        stroke="url(#cockpitCurveGlow)" 
+                        strokeWidth="3.5" 
+                        filter="drop-shadow(0 0 10px #06b6d4)" 
+                      />
+                      <path 
+                        d="M 100 65 Q 600 10 1100 65" 
+                        fill="none" 
+                        stroke="#38bdf8" 
+                        strokeWidth="1.5" 
+                        strokeDasharray="9 7" 
+                        opacity="0.8" 
+                      />
+                      <path 
+                        d="M 585 6 Q 600 0 615 6" 
+                        fill="none" 
+                        stroke="#67e8f9" 
+                        strokeWidth="2.5" 
+                      />
                       <defs>
-                        <linearGradient id="heroArc" x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#a855f7" stopOpacity="0.3" />
-                          <stop offset="30%" stopColor="#22d3ee" stopOpacity="0.9" />
+                        <linearGradient id="cockpitCurveGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#818cf8" stopOpacity="0.2" />
+                          <stop offset="25%" stopColor="#22d3ee" stopOpacity="0.95" />
                           <stop offset="50%" stopColor="#38bdf8" stopOpacity="1" />
-                          <stop offset="70%" stopColor="#22d3ee" stopOpacity="0.9" />
-                          <stop offset="100%" stopColor="#a855f7" stopOpacity="0.3" />
+                          <stop offset="75%" stopColor="#22d3ee" stopOpacity="0.95" />
+                          <stop offset="100%" stopColor="#818cf8" stopOpacity="0.2" />
                         </linearGradient>
                       </defs>
                     </svg>
                   </div>
 
-                  {/* Ticker Bar */}
-                  <div className="w-full bg-gradient-to-b from-[#060c20]/98 via-[#040816] to-[#030712] backdrop-blur-3xl border-t-2 border-cyan-400/50 px-4 sm:px-8 py-3 shadow-[0_-20px_50px_rgba(0,0,0,0.9)]">
-                    <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-center gap-6 sm:gap-10">
-                      {[
-                        { icon: FileText, value: '200M+', label: 'Research Papers', color: 'text-cyan-400' },
-                        { icon: User, value: '12.4M+', label: 'Authors', color: 'text-purple-400' },
-                        { icon: Sparkles, value: '1.8M+', label: 'Research Concepts', color: 'text-emerald-400' },
-                        { icon: Share2, value: '250M+', label: 'Citations', color: 'text-sky-400' },
-                      ].map((item, idx) => {
-                        const Icon = item.icon;
-                        return (
-                          <div key={idx} className="flex items-center gap-2.5 group">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-white/5 to-white/[0.02] border border-white/10 flex items-center justify-center group-hover:border-cyan-400/40 transition-all">
-                              <Icon className={`w-3.5 h-3.5 ${item.color}`} />
-                            </div>
-                            <div>
-                              <span className={`text-sm sm:text-base font-black ${item.color} block tracking-tight`}>{item.value}</span>
-                              <span className="text-gray-400 text-[10px] block">{item.label}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
+                  {/* Central Pedestal Badge */}
+                  <div className="flex justify-center -mb-[2px] relative z-30">
+                    <div className="px-6 py-1.5 rounded-t-2xl bg-[#060c22]/98 border-2 border-cyan-400/70 border-b-0 backdrop-blur-3xl text-center shadow-[0_-12px_25px_rgba(6,182,212,0.35)] flex flex-col items-center">
+                      <span className="text-[10px] font-black text-cyan-300 uppercase tracking-[0.25em] block drop-shadow-[0_0_10px_rgba(6,182,212,0.6)]">
+                        RESEARCHGRAPH AI
+                      </span>
+                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-[0.2em] block">
+                        COCKPIT BRIDGE // TELEMETRY COMMAND
+                      </span>
                     </div>
                   </div>
 
-                  {/* Scroll prompt */}
+                  {/* Panoramic Curved Cockpit Bridge Console Deck */}
+                  <div 
+                    style={{ perspective: 1200, transformStyle: 'preserve-3d' }}
+                    className="w-full bg-gradient-to-b from-[#060c20]/98 via-[#040816] to-[#02050e] backdrop-blur-3xl border-t-2 border-cyan-400/60 px-4 sm:px-8 py-3 shadow-[0_-20px_50px_rgba(0,0,0,0.95)]"
+                  >
+                    <div className="max-w-[1550px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
+                      
+                      {/* Left Deck: Multi-Source Repository Stream */}
+                      <div 
+                        onClick={() => scrollToSection(sourcesSectionRef)}
+                        style={{ perspective: 800, transform: 'rotateY(6deg)' }}
+                        className="hidden sm:flex items-center gap-3 flex-shrink-0 cursor-pointer group p-2.5 rounded-2xl bg-[#081026]/90 border border-cyan-500/40 hover:border-cyan-400 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.7)] hover:shadow-[0_0_20px_rgba(6,182,212,0.3)]"
+                      >
+                        <div className="relative w-11 h-11 rounded-full border-2 border-cyan-400/60 bg-[#030612] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                          <div className="absolute inset-0 rounded-full border border-cyan-400/20"></div>
+                          <div className="absolute w-full h-[1px] bg-cyan-500/40 top-1/2 -translate-y-1/2"></div>
+                          <div className="absolute h-full w-[1px] bg-cyan-500/40 left-1/2 -translate-x-1/2"></div>
+                          <div className="absolute inset-0 rounded-full border-t-2 border-cyan-300 animate-spin"></div>
+                          <Radio className="w-4 h-4 text-cyan-300 z-10" />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider block group-hover:text-white transition-colors">
+                            Multi-Source Stream
+                          </span>
+                          <span className="text-[9px] text-gray-400 font-mono block">
+                            45+ Academic Repositories Connected
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Center Console: Interactive Scientific Domain Command Deck (SEARCH BAR REPLACED) */}
+                      <div className="flex-1 w-full max-w-2xl bg-[#081026]/95 border-2 border-cyan-400/60 rounded-2xl p-2.5 shadow-[0_0_30px_rgba(6,182,212,0.25)] flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 px-2">
+                          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></div>
+                          <span className="text-[11px] font-mono font-bold text-cyan-300 uppercase tracking-wider">
+                            ACTIVE DOMAIN CLUSTERS:
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                          {[
+                            { name: 'AI & Neural', icon: BrainCircuit, color: 'text-cyan-400 border-cyan-500/40 hover:bg-cyan-500/10' },
+                            { name: 'Genomics', icon: Microscope, color: 'text-emerald-400 border-emerald-500/40 hover:bg-emerald-500/10' },
+                            { name: 'Quantum', icon: Binary, color: 'text-purple-400 border-purple-500/40 hover:bg-purple-500/10' },
+                            { name: 'Materials', icon: Sparkles, color: 'text-amber-400 border-amber-500/40 hover:bg-amber-500/10' },
+                          ].map((item, idx) => {
+                            const Icon = item.icon;
+                            return (
+                              <button
+                                key={idx}
+                                onClick={() => scrollToSection(topologySectionRef)}
+                                className={`px-2.5 py-1 rounded-lg border bg-[#050b1a] text-[11px] font-bold font-mono transition-all flex items-center gap-1.5 ${item.color}`}
+                              >
+                                <Icon className="w-3 h-3" />
+                                <span>{item.name}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <button
+                          onClick={() => triggerTraversal('AUTH', 'REGISTER')}
+                          className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-cyan-500/30 flex-shrink-0"
+                        >
+                          <span>Explore</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Right Console: AI-Powered Insights */}
+                      <div 
+                        onClick={() => scrollToSection(pipelineSectionRef)}
+                        style={{ perspective: 800, transform: 'rotateY(-6deg)' }}
+                        className="hidden sm:flex items-center gap-3 flex-shrink-0 text-left cursor-pointer group p-2.5 rounded-2xl bg-[#081026]/90 border border-purple-500/40 hover:border-purple-400 transition-all shadow-[0_8px_20px_rgba(0,0,0,0.7)] hover:shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+                      >
+                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/30 to-purple-600/30 border-2 border-cyan-400/60 flex items-center justify-center flex-shrink-0 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                          <Cpu className="w-5 h-5 text-cyan-300 group-hover:rotate-12 transition-transform" />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-extrabold text-cyan-300 uppercase tracking-wider block group-hover:text-white transition-colors">
+                            AI Synthesis Engine
+                          </span>
+                          <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[9px] text-gray-300">
+                            <span>• Direct Citations</span>
+                            <span>• Methodologies</span>
+                            <span>• Hypotheses</span>
+                            <span>• Benchmarks</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* Downward Scroll Prompt */}
                   <div 
                     onClick={() => scrollToSection(topologySectionRef)}
-                    className="w-full py-2.5 bg-[#02050e]/95 border-t border-white/[0.06] flex items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-cyan-400 transition-colors group"
+                    className="w-full py-2 bg-[#02050e]/95 border-t border-white/10 flex items-center justify-center gap-2 cursor-pointer text-gray-400 hover:text-cyan-400 transition-colors group"
                   >
                     <span className="text-[10px] font-bold tracking-widest uppercase font-mono group-hover:tracking-wider transition-all">
-                      Scroll to explore platform architecture
+                      Scroll to explore platform architecture & 3D topology
                     </span>
                     <ChevronDown className="w-3.5 h-3.5 animate-bounce text-cyan-400" />
                   </div>
                 </motion.div>
+
+                <button
+                  type="button"
+                  onClick={() => scrollToSection(topologySectionRef)}
+                  className="relative z-30 mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/40 px-4 py-2 text-[10px] font-semibold tracking-[0.16em] text-indigo-800 backdrop-blur-md transition hover:border-fuchsia-300 hover:text-fuchsia-700"
+                >
+                  EXPLORE THE RESEARCH UNIVERSE <ChevronDown className="h-3.5 w-3.5 animate-bounce text-cyan-300" />
+                </button>
 
               </div>
 
@@ -697,24 +821,18 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={topologySectionRef}
-                className="w-full py-20 px-4 sm:px-8 relative z-20 overflow-hidden"
-                style={{ background: 'linear-gradient(180deg, #04091a 0%, #071028 50%, #04091a 100%)' }}
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(180deg,#6857b4_0%,#315a91_42%,#1a346d_100%)] relative z-20 border-t border-cyan-100/35"
               >
-                {/* Section gradient divider */}
-                <div className="absolute top-0 left-0 right-0 section-divider"></div>
-                {/* Decorative background glow */}
-                <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-br from-cyan-500/[0.06] to-purple-500/[0.04] blur-[150px] pointer-events-none"></div>
-                <div className="absolute bottom-[10%] left-[-5%] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-purple-600/[0.05] to-blue-500/[0.03] blur-[120px] pointer-events-none"></div>
                 <div className="max-w-7xl mx-auto">
                   
                   {/* Section Header */}
-                  <div className="text-center max-w-3xl mx-auto mb-14 landing-reveal">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase mb-3 animate-neon-border">
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
                       <Network className="w-3.5 h-3.5" /> High-Dimensional Knowledge Topologies
                     </div>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
                       Every Paper, Author & Concept<br />
-                      <span className="gradient-text-animated">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400">
                         Mapped in 3D Vector Space
                       </span>
                     </h2>
@@ -724,13 +842,13 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
 
                   {/* Domain Filter Tabs */}
-                  <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+                  <div className="flex flex-wrap items-center justify-center gap-2.5 mb-12">
                     {[
-                      { id: 'ai', label: 'Artificial Intelligence', icon: BrainCircuit, color: 'border-cyan-500 text-cyan-400 bg-cyan-500/10' },
-                      { id: 'bio', label: 'Genomics & Biomedicine', icon: Microscope, color: 'border-emerald-500 text-emerald-400 bg-emerald-500/10' },
-                      { id: 'quantum', label: 'Quantum Computing', icon: Binary, color: 'border-purple-500 text-purple-400 bg-purple-500/10' },
-                      { id: 'materials', label: 'Materials Discovery', icon: Sparkles, color: 'border-amber-500 text-amber-400 bg-amber-500/10' },
-                      { id: 'neuro', label: 'Neurobiology', icon: Network, color: 'border-rose-500 text-rose-400 bg-rose-500/10' },
+                      { id: 'ai', label: 'Artificial Intelligence', icon: BrainCircuit, color: 'border-cyan-500 text-cyan-400 bg-cyan-500/15 shadow-[0_0_15px_rgba(6,182,212,0.3)]' },
+                      { id: 'bio', label: 'Genomics & Biomedicine', icon: Microscope, color: 'border-emerald-500 text-emerald-400 bg-emerald-500/15 shadow-[0_0_15px_rgba(16,185,129,0.3)]' },
+                      { id: 'quantum', label: 'Quantum Computing', icon: Binary, color: 'border-purple-500 text-purple-400 bg-purple-500/15 shadow-[0_0_15px_rgba(168,85,247,0.3)]' },
+                      { id: 'materials', label: 'Materials Discovery', icon: Sparkles, color: 'border-amber-500 text-amber-400 bg-amber-500/15 shadow-[0_0_15px_rgba(245,158,11,0.3)]' },
+                      { id: 'neuro', label: 'Neurobiology', icon: Network, color: 'border-rose-500 text-rose-400 bg-rose-500/15 shadow-[0_0_15px_rgba(244,63,94,0.3)]' },
                     ].map((tab) => {
                       const Icon = tab.icon;
                       const isActive = selectedDomain === tab.id;
@@ -740,8 +858,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           onClick={() => setSelectedDomain(tab.id as any)}
                           className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
                             isActive 
-                              ? `${tab.color} shadow-lg shadow-cyan-950/50` 
-                              : 'border-white/10 text-gray-400 dark:text-gray-500 hover:text-white hover:bg-white dark:bg-[#111D35]/5'
+                              ? `${tab.color}` 
+                              : 'border-white/10 text-gray-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
                           <Icon className="w-3.5 h-3.5" />
@@ -751,27 +869,76 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     })}
                   </div>
 
-                  {/* 6 Dimensions Grid Cards */}
+                  {/* 6 Dimensions Grid Cards - REDESIGNED PRO DESIGNER QUALITY */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {[
-                      { title: "Authors & PIs", count: "38.4M Entities", desc: "Maps co-authorship networks, institutional affiliations, and h-index citation trajectories across global labs.", color: "border-amber-500/30 text-amber-400 bg-amber-500/5", icon: User },
-                      { title: "Research Papers", count: "204.8M Nodes", desc: "Full-text embeddings including methodologies, mathematical theorems, experimental datasets, and abstract vectors.", color: "border-blue-500/30 text-blue-400 bg-blue-500/5", icon: FileText },
-                      { title: "Extracted Concepts", count: "45,200 Clusters", desc: "Autonomous ontology extraction identifying emerging paradigm shifts, theoretical frameworks, and taxonomies.", color: "border-purple-500/30 text-purple-400 bg-purple-500/5", icon: Sparkles },
-                      { title: "Empirical Datasets", count: "1.4M Repositories", desc: "Direct associations between published claims, benchmark performance tables, Hugging Face repos, and PDB structures.", color: "border-emerald-500/30 text-emerald-400 bg-emerald-500/5", icon: Database },
-                      { title: "Citation Networks", count: "1.24B Verified Edges", desc: "Directional citation graphs distinguishing between background mentions, conflicting results, and fundamental extensions.", color: "border-rose-500/30 text-rose-400 bg-rose-500/5", icon: Share2 },
-                      { title: "Research Trends", count: "Live Velocity Index", desc: "Real-time tracking of preprint momentum, rapid citation velocity, and interdisciplinary convergence spikes.", color: "border-fuchsia-500/30 text-fuchsia-400 bg-fuchsia-500/5", icon: Activity },
+                      { 
+                        title: "Authors & Principal Investigators", 
+                        count: "38.4M Entities", 
+                        desc: "Maps global co-authorship networks, lab affiliations, citation trajectories, and multi-disciplinary mentorship lineage across leading universities.", 
+                        color: "border-amber-500/30 text-amber-400 bg-gradient-to-br from-amber-500/10 via-[#0a1128] to-[#040816]", 
+                        badge: "Graph Clustering",
+                        icon: User 
+                      },
+                      { 
+                        title: "Full-Text Research Literature", 
+                        count: "204.8M Nodes", 
+                        desc: "Vectorized full-text documents including mathematical derivations, empirical datasets, figure captions, and cross-domain methodology embeddings.", 
+                        color: "border-cyan-500/30 text-cyan-400 bg-gradient-to-br from-cyan-500/10 via-[#0a1128] to-[#040816]", 
+                        badge: "1536-Dim HNSW",
+                        icon: FileText 
+                      },
+                      { 
+                        title: "Autonomous Ontology & Concepts", 
+                        count: "45,200 Taxonomies", 
+                        desc: "Continuous neural clustering identifying emergent conceptual paradigms, resolving synonym clashes, and bridging disparate scientific vocabularies.", 
+                        color: "border-purple-500/30 text-purple-400 bg-gradient-to-br from-purple-500/10 via-[#0a1128] to-[#040816]", 
+                        badge: "LLM Extraction",
+                        icon: Sparkles 
+                      },
+                      { 
+                        title: "Empirical & Benchmark Datasets", 
+                        count: "1.4M Repositories", 
+                        desc: "Direct cryptographic links between published claims, benchmark performance tables, Hugging Face checkpoints, PDB structures, and code repos.", 
+                        color: "border-emerald-500/30 text-emerald-400 bg-gradient-to-br from-emerald-500/10 via-[#0a1128] to-[#040816]", 
+                        badge: "Verifiable Data",
+                        icon: Database 
+                      },
+                      { 
+                        title: "Directional Citation Networks", 
+                        count: "1.24B Verified Edges", 
+                        desc: "High-order citation topologies categorizing references into foundational pillars, conflicting empirical results, and incremental extensions.", 
+                        color: "border-rose-500/30 text-rose-400 bg-gradient-to-br from-rose-500/10 via-[#0a1128] to-[#040816]", 
+                        badge: "Semantic Edges",
+                        icon: Share2 
+                      },
+                      { 
+                        title: "Frontier Velocity Index", 
+                        count: "Live Real-Time Index", 
+                        desc: "Continuous algorithmic telemetry calculating acceleration spikes in preprints, patent filings, and cross-field convergence momentum.", 
+                        color: "border-fuchsia-500/30 text-fuchsia-400 bg-gradient-to-br from-fuchsia-500/10 via-[#0a1128] to-[#040816]", 
+                        badge: "Real-Time Feed",
+                        icon: Activity 
+                      },
                     ].map((card, idx) => {
                       const Icon = card.icon;
                       return (
-                        <div key={idx} className={`landing-reveal p-6 rounded-2xl border ${card.color} glass-card-vibrant relative overflow-hidden group hover:scale-[1.03] hover:shadow-lg transition-all duration-300`} style={{ transitionDelay: `${idx * 80}ms` }}>
-                          <div className="absolute inset-0 bg-gradient-to-br from-white/[0.02] to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2.5">
-                              <Icon className="w-5 h-5" />
-                              <h3 className="font-extrabold text-white text-base">{card.title}</h3>
+                        <div 
+                          key={idx} 
+                          className={`p-6 sm:p-7 rounded-3xl border ${card.color} backdrop-blur-2xl relative overflow-hidden group hover:scale-[1.02] hover:border-cyan-400/60 transition-all duration-300 shadow-xl shadow-black/50`}
+                        >
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Icon className="w-5 h-5" />
+                              </div>
+                              <h3 className="font-extrabold text-white text-base leading-snug">{card.title}</h3>
                             </div>
-                            <span className="text-xs font-mono font-bold text-gray-400 dark:text-gray-500">{card.count}</span>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 font-mono font-bold text-gray-300 border border-white/10">
+                              {card.badge}
+                            </span>
                           </div>
+                          <span className="text-xs font-mono font-bold text-cyan-300 block mb-2">{card.count}</span>
                           <p className="text-xs text-gray-300 leading-relaxed">{card.desc}</p>
                         </div>
                       );
@@ -782,25 +949,238 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               </div>
 
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              {/*      SCROLLABLE SECTION: INTERACTIVE VIDEO SHOWCASE & SCIENTIFIC WALKTHROUGH          */}
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
+              <div 
+                ref={videoSectionRef}
+                className="w-full py-24 px-4 sm:px-8 relative z-20 border-t border-cyan-100/30 overflow-hidden"
+                style={{ backgroundImage: "linear-gradient(118deg,rgba(17,20,73,.92),rgba(19,80,125,.77),rgba(91,37,122,.82)), url('/research-universe-library.svg')", backgroundSize: 'cover', backgroundPosition: 'center' }}
+              >
+                {/* Floating ambient glow orbs */}
+                <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none"></div>
+                <div className="absolute bottom-1/4 -right-32 w-96 h-96 rounded-full bg-purple-500/10 blur-[130px] pointer-events-none"></div>
+
+                <div className="max-w-7xl mx-auto relative z-10">
+                  
+                  {/* Section Eyebrow & Header */}
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold tracking-wider uppercase mb-3 shadow-lg backdrop-blur-md">
+                      <Play className="w-3.5 h-3.5 fill-cyan-400" /> Watch &amp; Explore
+                    </div>
+                    <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-4">
+                      See Connected Knowledge<br />
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400">
+                        In Action
+                      </span>
+                    </h2>
+                    <p className="text-gray-300 text-sm sm:text-base leading-relaxed">
+                      Watch authoritative technical walkthroughs and explore how ResearchGraph AI unifies high-dimensional vector graphs, multi-hop citation traversals, and multi-LLM consensus synthesis.
+                    </p>
+                  </div>
+
+                  {/* Video Selector Tabs */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mb-8">
+                    {landingVideos.map((video, idx) => {
+                      const isSelected = selectedVideoIdx === idx;
+                      return (
+                        <button
+                          key={video.id}
+                          onClick={() => setSelectedVideoIdx(idx)}
+                          className={`p-4 rounded-2xl text-left transition-all duration-300 border flex flex-col justify-between relative overflow-hidden group ${
+                            isSelected
+                              ? 'bg-[#081533] border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.35)] scale-[1.02]'
+                              : 'bg-[#060c20]/80 border-white/10 hover:border-cyan-500/40 hover:bg-[#08122a] text-gray-300'
+                          }`}
+                        >
+                          {isSelected && (
+                            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-sky-400 to-indigo-500"></div>
+                          )}
+
+                          <div>
+                            <div className="flex items-center justify-between mb-2">
+                              <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono font-bold border ${video.tagColor}`}>
+                                {video.badge}
+                              </span>
+                              <span className="text-[11px] font-mono text-cyan-400 font-semibold flex items-center gap-1">
+                                <Clock3 className="w-3 h-3" /> {video.duration}
+                              </span>
+                            </div>
+
+                            <h4 className={`text-sm font-bold line-clamp-2 mb-1.5 transition-colors ${isSelected ? 'text-white' : 'text-gray-200 group-hover:text-white'}`}>
+                              {video.title}
+                            </h4>
+
+                            <span className="text-[11px] font-mono text-gray-400 block mb-2">
+                              {video.publisher}
+                            </span>
+                          </div>
+
+                          <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-semibold">
+                            <span className={isSelected ? 'text-cyan-300 flex items-center gap-1.5' : 'text-gray-400 group-hover:text-gray-200'}>
+                              {isSelected ? (
+                                <>
+                                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                                  Now Playing
+                                </>
+                              ) : (
+                                'Click to Watch'
+                              )}
+                            </span>
+                            <Play className={`w-3.5 h-3.5 transition-transform ${isSelected ? 'text-cyan-400 fill-cyan-400' : 'text-gray-500 group-hover:text-cyan-300 group-hover:scale-110'}`} />
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* High-Tech Main Theater Display Deck */}
+                  <div className="relative rounded-3xl border-2 border-cyan-400/50 bg-[#050b1d]/95 backdrop-blur-2xl shadow-[0_0_60px_rgba(6,182,212,0.25)] overflow-hidden p-4 sm:p-7">
+                    
+                    {/* Top Cockpit Telemetry Bar */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pb-4 mb-5 border-b border-white/10 text-xs font-mono">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                          THEATER // {landingVideos[selectedVideoIdx].badge.toUpperCase()}
+                        </div>
+                        <span className="text-gray-400 hidden sm:inline">•</span>
+                        <span className="text-white font-bold hidden sm:inline">{landingVideos[selectedVideoIdx].title}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <span className="text-gray-400">Duration: <strong className="text-cyan-400">{landingVideos[selectedVideoIdx].duration}</strong></span>
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold">1080p HD</span>
+                      </div>
+                    </div>
+
+                    {/* VIDEO CONTAINER */}
+                    <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/90 border border-white/10 shadow-2xl flex items-center justify-center">
+                      {landingVideos[selectedVideoIdx].youtubeId ? (
+                        <iframe
+                          src={`https://www.youtube-nocookie.com/embed/${landingVideos[selectedVideoIdx].youtubeId}?autoplay=1&rel=0&modestbranding=1`}
+                          title={landingVideos[selectedVideoIdx].title}
+                          className="w-full h-full border-none"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        /* LIVE INTERACTIVE SIMULATED NEURAL WALKTHROUGH */
+                        <div className="relative w-full h-full bg-gradient-to-br from-[#030718] via-[#06122e] to-[#020510] flex flex-col justify-between p-6 sm:p-10 select-none overflow-hidden">
+                          {/* Animated Background Vector Lines */}
+                          <div className="absolute inset-0 pointer-events-none opacity-30">
+                            <svg className="w-full h-full" viewBox="0 0 800 450">
+                              <circle cx="200" cy="180" r="140" fill="none" stroke="#06b6d4" strokeWidth="0.8" strokeDasharray="4 4" className="animate-spin" style={{ animationDuration: '40s' }} />
+                              <circle cx="600" cy="220" r="160" fill="none" stroke="#8b5cf6" strokeWidth="0.8" strokeDasharray="6 6" className="animate-spin" style={{ animationDuration: '50s', animationDirection: 'reverse' }} />
+                              <line x1="200" y1="180" x2="600" y2="220" stroke="#38bdf8" strokeWidth="1.5" strokeDasharray="6 4" />
+                              <circle cx="360" cy="195" r="4" fill="#38bdf8">
+                                <animate attributeName="cx" values="200;600;200" dur="4s" repeatCount="indefinite" />
+                                <animate attributeName="cy" values="180;220;180" dur="4s" repeatCount="indefinite" />
+                              </circle>
+                            </svg>
+                          </div>
+
+                          {/* Top Simulation HUD */}
+                          <div className="relative z-10 flex items-center justify-between text-xs font-mono">
+                            <div className="flex items-center gap-2">
+                              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+                              <span className="text-cyan-300 font-bold uppercase tracking-widest">REAL-TIME TRAVERSAL ENGINE</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setIsSimPlaying(!isSimPlaying)}
+                                className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-gray-200 text-[11px] font-mono flex items-center gap-1.5 transition-colors"
+                              >
+                                {isSimPlaying ? 'Pause Walkthrough' : 'Play Walkthrough'}
+                              </button>
+                              <div className="flex items-center gap-2 bg-black/50 px-3 py-1 rounded-full border border-white/10">
+                                <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                                <span className="text-emerald-400 font-bold">14ms GRAPH LATENCY</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Center Active Chapter Visualizer */}
+                          <div className="relative z-10 my-auto text-center max-w-2xl mx-auto">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-cyan-300 text-xs font-mono font-bold mb-3 backdrop-blur-md">
+                              <span>CHAPTER {activeSimChapter + 1} OF 4</span> • <span>{simulationChapters[activeSimChapter].badge}</span>
+                            </div>
+                            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-3">
+                              {simulationChapters[activeSimChapter].title}
+                            </h3>
+                            <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-6">
+                              {simulationChapters[activeSimChapter].detail}
+                            </p>
+                            
+                            <div className="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-cyan-500/20 border border-cyan-400/50 text-cyan-200 font-mono text-xs sm:text-sm shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                              <Sparkles className="w-4 h-4 text-cyan-300" />
+                              <span>Live Metric: <strong>{simulationChapters[activeSimChapter].metric}</strong></span>
+                            </div>
+                          </div>
+
+                          {/* Bottom Chapter Steps Progress Track */}
+                          <div className="relative z-10 grid grid-cols-4 gap-2 pt-4 border-t border-white/10">
+                            {simulationChapters.map((chap, cIdx) => (
+                              <button
+                                key={cIdx}
+                                onClick={() => setActiveSimChapter(cIdx)}
+                                className={`text-left p-2 rounded-xl transition-all ${
+                                  activeSimChapter === cIdx
+                                    ? 'bg-white/15 border border-cyan-400/70 text-white'
+                                    : 'bg-black/30 border border-white/5 text-gray-400 hover:text-gray-200'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[10px] font-mono font-bold">0{cIdx + 1}</span>
+                                  {activeSimChapter === cIdx && <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>}
+                                </div>
+                                <span className="text-[11px] font-bold block truncate">{chap.badge}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Metadata & Highlights Row */}
+                    <div className="mt-6 pt-5 border-t border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="text-base font-bold text-white mb-1">{landingVideos[selectedVideoIdx].title}</h4>
+                        <p className="text-xs text-gray-300 max-w-2xl">{landingVideos[selectedVideoIdx].description}</p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        {landingVideos[selectedVideoIdx].highlights.map((item, hIdx) => (
+                          <span key={hIdx} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono font-semibold text-gray-300 flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3 h-3 text-cyan-400" />
+                            {item}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              </div>
+
+              {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*      SCROLLABLE SECTION 2: 45+ CONNECTED SCHOLARLY REPOSITORIES                      */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={sourcesSectionRef}
-                className="w-full py-20 px-4 sm:px-8 relative z-20 overflow-hidden"
-                style={{ background: 'linear-gradient(180deg, #030612 0%, #0a0e28 50%, #030612 100%)' }}
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(130deg,#5a2d70_0%,#245b83_48%,#162e68_100%)] relative z-20 border-t border-cyan-100/25"
               >
-                <div className="absolute top-0 left-0 right-0 section-divider"></div>
-                <div className="absolute top-[30%] left-[-5%] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-purple-600/[0.06] to-fuchsia-500/[0.04] blur-[180px] pointer-events-none"></div>
                 <div className="max-w-7xl mx-auto">
                   
                   {/* Section Header */}
-                  <div className="text-center max-w-3xl mx-auto mb-14 landing-reveal">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold tracking-wider uppercase mb-3 animate-neon-border">
-                      <Database className="w-3.5 h-3.5" /> 45+ Global Academic Databases
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
+                      <Database className="w-3.5 h-3.5" /> 45+ Global Academic Repositories
                     </div>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
                       Continuous Ingestion Across<br />
-                      <span className="gradient-text-animated">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-cyan-400">
                         The World's Scientific Repositories
                       </span>
                     </h2>
@@ -809,7 +1189,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </p>
                   </div>
 
-                  {/* Sources Cards Grid */}
+                  {/* Sources Cards Grid - REDESIGNED PRO DESIGNER QUALITY */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
                     {[
                       { name: 'arXiv', papers: '13.4M Preprints', domain: 'Physics, Math, CS & AI', tag: 'Open Access', status: 'Continuous Sync', color: 'border-red-500/40 text-red-400' },
@@ -823,8 +1203,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     ].map((source, idx) => (
                       <div 
                         key={idx} 
-                        className="landing-reveal-scale p-5 rounded-2xl glass-card border border-white/10 hover:border-cyan-400/50 hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1.5"
-                        style={{ transitionDelay: `${idx * 60}ms` }}
+                        className="p-5 rounded-3xl bg-[#070e24]/80 border border-white/10 hover:border-cyan-400/60 transition-all duration-300 flex flex-col justify-between group hover:scale-[1.02] shadow-lg shadow-black/40"
                       >
                         <div>
                           <div className="flex items-center justify-between mb-2.5">
@@ -833,35 +1212,32 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               {source.tag}
                             </span>
                           </div>
-                          <span className="text-cyan-400 font-extrabold text-base block mb-1 group-hover:scale-105 transition-transform origin-left">{source.papers}</span>
-                          <p className="text-[11px] text-gray-400 mb-3">{source.domain}</p>
+                          <span className="text-cyan-400 font-extrabold text-sm block mb-1">{source.papers}</span>
+                          <p className="text-[11px] text-gray-400 mb-4">{source.domain}</p>
                         </div>
-                        <div className="pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-gray-400">
+                        <div className="pt-3 border-t border-white/10 flex items-center justify-between text-[10px] font-mono text-gray-400">
                           <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                             {source.status}
                           </span>
-                          <span className="group-hover:text-cyan-400 transition-colors flex items-center gap-1 font-bold">Details &rarr;</span>
+                          <span className="group-hover:text-cyan-400 group-hover:translate-x-1 transition-all">Explore →</span>
                         </div>
                       </div>
                     ))}
                   </div>
 
                   {/* Connect Sources Banner */}
-                  <div className="landing-reveal p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950/60 via-purple-950/60 to-cyan-950/60 border border-cyan-500/40 shadow-[0_0_35px_rgba(6,182,212,0.15)] flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                    <div className="relative z-10">
-                      <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-mono font-bold tracking-wider uppercase mb-2">
-                        ✦ ENTERPRISE RESEARCH CONNECTIONS
-                      </div>
-                      <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-1.5">Need custom private repository integration?</h3>
-                      <p className="text-xs sm:text-sm text-gray-300 max-w-xl">Connect institutional repositories, lab databases, internal patents, and private PDFs with enterprise end-to-end encryption.</p>
+                  <div className="p-7 sm:p-9 rounded-3xl bg-gradient-to-r from-blue-950/40 via-purple-950/40 to-cyan-950/40 border border-cyan-500/30 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left shadow-2xl">
+                    <div>
+                      <h3 className="text-xl font-extrabold text-white mb-1.5">Need custom institutional repository integration?</h3>
+                      <p className="text-xs text-gray-300 max-w-xl">Connect proprietary lab data, institutional repositories, internal patent databases, and research PDFs with enterprise-grade AES-256 encryption.</p>
                     </div>
                     <button 
                       onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                      className="relative z-10 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-xs sm:text-sm transition-all shadow-xl shadow-cyan-500/30 flex items-center gap-2 flex-shrink-0 hover:scale-105 active:scale-95 border border-cyan-400/40"
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-cyan-500/25 flex items-center gap-2 flex-shrink-0"
                     >
-                      Connect Enterprise Sources <ArrowRight className="w-4 h-4" />
+                      <span>Connect Enterprise Sources</span>
+                      <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
 
@@ -873,21 +1249,18 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={pipelineSectionRef}
-                className="w-full py-20 px-4 sm:px-8 relative z-20 overflow-hidden"
-                style={{ background: 'linear-gradient(180deg, #030612 0%, #061126 50%, #030712 100%)' }}
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(135deg,#18396f_0%,#425aaf_48%,#7a397c_100%)] relative z-20 border-t border-cyan-100/25"
               >
-                <div className="absolute top-0 left-0 right-0 section-divider"></div>
-                <div className="absolute top-[20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-gradient-to-bl from-emerald-500/[0.06] to-cyan-500/[0.04] blur-[160px] pointer-events-none"></div>
                 <div className="max-w-7xl mx-auto">
                   
                   {/* Section Header */}
-                  <div className="text-center max-w-3xl mx-auto mb-14 landing-reveal">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase mb-3 animate-neon-border">
+                  <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
                       <Zap className="w-3.5 h-3.5" /> End-to-End Autonomous Pipeline
                     </div>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
                       How RAG & Multi-LLM Synthesis<br />
-                      <span className="gradient-text-animated">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-blue-400">
                         Delivers Hallucination-Free Answers
                       </span>
                     </h2>
@@ -896,7 +1269,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </p>
                   </div>
 
-                  {/* 4-Stage Pipeline Cards */}
+                  {/* 4-Stage Pipeline Cards - REDESIGNED PRO DESIGNER QUALITY */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
                       {
@@ -905,8 +1278,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         subtitle: "PDF Structural Parsing",
                         desc: "High-throughput document processors parse LaTeX equations, figure captions, experimental tables, and citation markers into semantic chunks.",
                         tag: "Multimodal OCR",
-                        color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30 text-blue-400",
-                        accent: "bg-blue-400"
+                        color: "from-blue-500/20 to-cyan-500/20 border-blue-500/30 text-blue-400"
                       },
                       {
                         step: "02",
@@ -914,8 +1286,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         subtitle: "GNN + Dense Vectors",
                         desc: "Dual embeddings combine dense language semantics with Graph Neural Network message passing to preserve topological citation context.",
                         tag: "1536-Dim Vectors",
-                        color: "from-cyan-500/20 to-teal-500/20 border-cyan-500/30 text-cyan-400",
-                        accent: "bg-cyan-400"
+                        color: "from-cyan-500/20 to-teal-500/20 border-cyan-500/30 text-cyan-400"
                       },
                       {
                         step: "03",
@@ -923,8 +1294,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         subtitle: "Dense + Graph Traversal",
                         desc: "Combines cosine vector similarity with multi-hop graph walks to unearth non-obvious interdisciplinary bridge papers across domains.",
                         tag: "Sub-15ms Latency",
-                        color: "from-purple-500/20 to-fuchsia-500/20 border-purple-500/30 text-purple-400",
-                        accent: "bg-purple-400"
+                        color: "from-purple-500/20 to-fuchsia-500/20 border-purple-500/30 text-purple-400"
                       },
                       {
                         step: "04",
@@ -932,30 +1302,28 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         subtitle: "Ensemble Consensus",
                         desc: "Ensembles of GPT-4o, Claude 3.5, and Gemini synthesize literature reviews, validate mathematical claims, and cross-reference citations.",
                         tag: "Zero Hallucination",
-                        color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30 text-emerald-400",
-                        accent: "bg-emerald-400"
+                        color: "from-emerald-500/20 to-green-500/20 border-emerald-500/30 text-emerald-400"
                       },
                     ].map((stage, idx) => (
                       <div 
                         key={idx} 
-                        className="landing-reveal-scale p-6 rounded-3xl glass-card border border-white/10 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] transition-all duration-300 flex flex-col justify-between relative group hover:-translate-y-2"
-                        style={{ transitionDelay: `${idx * 80}ms` }}
+                        className="p-6 sm:p-7 rounded-3xl bg-[#070e24]/80 border border-white/10 hover:border-cyan-400/60 flex flex-col justify-between relative group hover:scale-[1.02] transition-all duration-300 shadow-xl"
                       >
                         <div className="flex items-center justify-between mb-4">
-                          <span className={`text-2xl font-black bg-gradient-to-r ${stage.color} bg-clip-text text-transparent group-hover:scale-110 transition-transform origin-left`}>
+                          <span className={`text-2xl font-black bg-gradient-to-r ${stage.color} bg-clip-text text-transparent`}>
                             {stage.step}
                           </span>
-                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-mono text-gray-300">
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 font-mono text-gray-300 font-bold">
                             {stage.tag}
                           </span>
                         </div>
                         <div>
-                          <h3 className="font-extrabold text-white text-lg mb-0.5 group-hover:text-cyan-300 transition-colors">{stage.title}</h3>
-                          <span className="text-xs font-semibold text-cyan-400 block mb-3">{stage.subtitle}</span>
+                          <h3 className="font-extrabold text-white text-lg mb-1">{stage.title}</h3>
+                          <span className="text-xs font-semibold text-cyan-400 block mb-3 font-mono">{stage.subtitle}</span>
                           <p className="text-xs text-gray-300 leading-relaxed mb-4">{stage.desc}</p>
                         </div>
-                        <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                          <div className={`h-full bg-gradient-to-r ${stage.color} group-hover:animate-pulse`} style={{ width: `${(idx + 1) * 25}%` }}></div>
+                        <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                          <div className={`h-full bg-gradient-to-r ${stage.color}`} style={{ width: `${(idx + 1) * 25}%` }}></div>
                         </div>
                       </div>
                     ))}
@@ -968,21 +1336,19 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/*      SCROLLABLE SECTION 4: INTERACTIVE RESEARCH QUESTION SANDBOX                     */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
-                className="w-full py-20 px-4 sm:px-8 relative z-20 overflow-hidden"
-                style={{ background: 'linear-gradient(180deg, #030712 0%, #080f24 50%, #02050e 100%)' }}
+                ref={sandboxSectionRef}
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(125deg,#66366b_0%,#205d7d_50%,#213a78_100%)] relative z-20 border-t border-cyan-100/25"
               >
-                <div className="absolute top-0 left-0 right-0 section-divider"></div>
-                <div className="absolute top-[30%] left-[5%] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-sky-500/[0.06] to-purple-500/[0.04] blur-[160px] pointer-events-none"></div>
                 <div className="max-w-6xl mx-auto">
                   
                   {/* Section Header */}
-                  <div className="text-center max-w-3xl mx-auto mb-12 landing-reveal">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold tracking-wider uppercase mb-3 animate-neon-border">
+                  <div className="text-center max-w-3xl mx-auto mb-12">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-mono font-bold tracking-wider uppercase mb-3">
                       <Sparkles className="w-3.5 h-3.5" /> Interactive Research Sandbox
                     </div>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-4">
                       Test the Autonomous Engine<br />
-                      <span className="gradient-text-animated">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-300 to-blue-500">
                         In Real-Time
                       </span>
                     </h2>
@@ -992,17 +1358,16 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
 
                   {/* Sample Query Pills */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-8">
                     {demoQueries.map((item, idx) => (
                       <button
                         key={idx}
                         onClick={() => setActiveDemoQuery(idx)}
-                        className={`landing-reveal-scale p-4 rounded-2xl text-left transition-all border flex items-center justify-between gap-3 ${
+                        className={`p-4 rounded-2xl text-left transition-all border flex items-center justify-between gap-3 ${
                           activeDemoQuery === idx
-                            ? 'bg-[#0c183a] border-cyan-400 shadow-[0_0_25px_rgba(6,182,212,0.3)] text-white scale-[1.01]'
-                            : 'glass-card border-white/10 text-gray-300 hover:text-white hover:border-cyan-500/30 hover:bg-white/[0.06]'
+                            ? 'bg-[#09132e] border-cyan-400 shadow-lg shadow-cyan-950/40 text-white'
+                            : 'bg-white/5 border-white/10 text-gray-300 hover:text-white hover:bg-white/10'
                         }`}
-                        style={{ transitionDelay: `${idx * 60}ms` }}
                       >
                         <div>
                           <span className="text-[10px] font-mono font-bold text-cyan-400 block mb-1 uppercase tracking-wider">
@@ -1016,50 +1381,49 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   </div>
 
                   {/* Sandbox Simulated Output Display */}
-                  <div className="landing-reveal p-6 sm:p-8 rounded-3xl bg-[#060c1f]/90 border border-cyan-500/40 shadow-[0_0_50px_rgba(6,182,212,0.15)] relative overflow-hidden backdrop-blur-2xl">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-cyan-500/[0.05] rounded-full blur-3xl pointer-events-none"></div>
-                    <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10 mb-6 relative z-10">
+                  <div className="p-6 sm:p-8 rounded-3xl bg-[#060c1f] border border-cyan-500/40 shadow-2xl relative overflow-hidden">
+                    <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10 mb-6">
                       <div>
-                        <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-widest block font-bold">Query Target</span>
-                        <h4 className="text-base sm:text-lg font-bold text-white mt-0.5">{demoQueries[activeDemoQuery].query}</h4>
+                        <span className="text-[10px] font-mono text-gray-400 uppercase tracking-widest block">Query Target</span>
+                        <h4 className="text-base sm:text-lg font-bold text-white">{demoQueries[activeDemoQuery].query}</h4>
                       </div>
                       <div className="flex items-center gap-3 text-xs font-mono">
-                        <span className="px-3 py-1 rounded-lg bg-cyan-500/15 border border-cyan-500/40 text-cyan-300 font-bold shadow-sm">
+                        <span className="px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 font-bold">
                           {demoQueries[activeDemoQuery].nodesFound} Nodes
                         </span>
-                        <span className="px-3 py-1 rounded-lg bg-purple-500/15 border border-purple-500/40 text-purple-300 font-bold shadow-sm">
+                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 font-bold">
                           {demoQueries[activeDemoQuery].papersFound} Papers
                         </span>
-                        <span className="px-3 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 font-bold shadow-sm">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 font-bold">
                           {demoQueries[activeDemoQuery].confidence} Confidence
                         </span>
                       </div>
                     </div>
 
                     {/* Synthesized Summary */}
-                    <div className="mb-6 relative z-10">
+                    <div className="mb-6">
                       <span className="text-[11px] font-mono text-cyan-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
                         <BrainCircuit className="w-3.5 h-3.5" /> Synthesized Multi-Paper Consensus
                       </span>
-                      <p className="text-sm text-gray-200 leading-relaxed p-4 rounded-xl bg-black/50 border border-white/10 min-h-[100px] shadow-inner">
+                      <p className="text-sm text-gray-200 leading-relaxed p-4 rounded-xl bg-black/40 border border-white/5 min-h-[100px]">
                         <TypingEffect text={demoQueries[activeDemoQuery].summary} trigger={activeDemoQuery} />
                         <span className="inline-block w-1.5 h-4 ml-1 bg-cyan-400 animate-pulse"></span>
                       </p>
                     </div>
 
                     {/* Cited Papers */}
-                    <div className="mb-6 relative z-10">
+                    <div className="mb-6">
                       <span className="text-[11px] font-mono text-purple-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
                         <FileText className="w-3.5 h-3.5" /> Primary Anchor Literature
                       </span>
                       <div className="space-y-2">
                         {demoQueries[activeDemoQuery].papers.map((p, pIdx) => (
-                          <div key={pIdx} className="p-3.5 rounded-xl glass-card border border-white/10 hover:border-cyan-400/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div key={pIdx} className="p-3 rounded-xl bg-white/5 border border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                             <div>
                               <span className="text-xs font-bold text-white block">{p.title}</span>
                               <span className="text-[11px] text-gray-400">{p.authors} • {p.journal} • {p.citations} citations</span>
                             </div>
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 self-start sm:self-auto font-semibold">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 self-start sm:self-auto">
                               DOI: {p.doi}
                             </span>
                           </div>
@@ -1068,25 +1432,25 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
 
                     {/* Discovered Conceptual Bridges */}
-                    <div className="relative z-10">
+                    <div>
                       <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider block mb-2 font-bold flex items-center gap-1.5">
                         <Share2 className="w-3.5 h-3.5" /> Discovered Concept Bridges
                       </span>
                       <div className="flex flex-wrap gap-2">
                         {demoQueries[activeDemoQuery].connections.map((conn, cIdx) => (
-                          <span key={cIdx} className="px-3 py-1.5 rounded-full glass-card border border-white/15 text-xs text-gray-200 font-semibold flex items-center gap-2 hover:border-emerald-400/50 transition-colors">
-                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]"></span>
+                          <span key={cIdx} className="px-3 py-1 rounded-full bg-white/5 border border-white/15 text-xs text-gray-300 font-semibold flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
                             {conn}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="mt-8 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10">
+                    <div className="mt-8 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
                       <span className="text-xs text-gray-400">Want to run custom full-text synthesis queries?</span>
                       <button 
                         onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 hover:scale-105 active:scale-95"
+                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
                       >
                         Launch Interactive Explorer <ArrowRight className="w-3.5 h-3.5" />
                       </button>
@@ -1100,21 +1464,16 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*      SCROLLABLE SECTION 5: FINAL LAUNCHPAD CALL TO ACTION                            */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div 
-                className="w-full py-28 px-4 sm:px-8 relative z-20 overflow-hidden text-center"
-                style={{ background: 'linear-gradient(180deg, #02050e 0%, #060c24 50%, #030712 100%)' }}
-              >
-                <div className="absolute top-0 left-0 right-0 section-divider"></div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-gradient-to-br from-cyan-500/[0.08] via-purple-500/[0.08] to-transparent blur-[160px] pointer-events-none"></div>
-                <div className="max-w-4xl mx-auto text-center relative z-10 landing-reveal">
+              <div className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(135deg,#253e88_0%,#6e458e_55%,#182d64_100%)] relative z-20 border-t border-cyan-100/25">
+                <div className="max-w-4xl mx-auto text-center">
                   
-                  <div className="w-18 h-18 w-[72px] h-[72px] rounded-3xl border border-cyan-400/50 bg-gradient-to-br from-cyan-500/20 via-purple-600/20 to-blue-600/20 flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(6,182,212,0.35)] animate-glow-pulse">
-                    <Network className="w-9 h-9 text-cyan-300" />
+                  <div className="w-16 h-16 rounded-2xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-cyan-500/30">
+                    <Network className="w-8 h-8 text-cyan-300" />
                   </div>
 
-                  <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight mb-5 leading-tight">
+                  <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4 leading-tight">
                     Ready to Enter the Universe of<br />
-                    <span className="gradient-text-animated">
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400">
                       Connected Scientific Knowledge?
                     </span>
                   </h2>
@@ -1126,14 +1485,14 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   <div className="flex flex-wrap items-center justify-center gap-4">
                     <button 
                       onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                      className="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-sm sm:text-base transition-all shadow-xl shadow-cyan-500/40 border border-cyan-400/40 hover:scale-105 active:scale-95 flex items-center gap-3"
+                      className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-extrabold text-sm sm:text-base transition-all shadow-xl shadow-cyan-500/35 border border-cyan-400/40 hover:scale-[1.03] active:scale-[0.98] flex items-center gap-2.5"
                     >
-                      Launch 3D Explorer Free <ArrowRight className="w-5 h-5" />
+                      Launch 3D Explorer Free <ArrowRight className="w-4 h-4" />
                     </button>
 
                     <button 
                       onClick={() => triggerTraversal('AUTH', 'LOGIN')}
-                      className="px-8 py-4 rounded-2xl glass-card hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm sm:text-base transition-all backdrop-blur-md hover:bg-white/10 hover:scale-105 active:scale-95"
+                      className="px-8 py-3.5 rounded-xl bg-white/5 border border-white/20 hover:border-cyan-400/40 text-gray-200 hover:text-white font-bold text-sm sm:text-base transition-all backdrop-blur-md hover:bg-white/10"
                     >
                       Sign In to Account
                     </button>
@@ -1145,7 +1504,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*                                HIGH-TECH FOOTER                                    */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <footer className="w-full bg-[#02040b] border-t border-white/10 px-4 sm:px-8 py-10 relative z-20 text-xs text-gray-400 dark:text-gray-500">
+              <footer className="w-full bg-[linear-gradient(120deg,#172455,#32296b,#5c2f76)] border-t border-cyan-100/25 px-4 sm:px-8 py-10 relative z-20 text-xs text-slate-200">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                   
                   {/* Brand & Mission */}
@@ -1155,7 +1514,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </div>
                     <div>
                       <span className="font-bold text-white text-sm block">ResearchGraph AI</span>
-                      <span className="text-[10px] text-gray-400 dark:text-gray-500">Autonomous 3D Scientific Knowledge Navigation</span>
+                      <span className="text-[10px] text-gray-400">Autonomous 3D Scientific Knowledge Navigation</span>
                     </div>
                   </div>
 
@@ -1176,28 +1535,63 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
               </footer>
 
-              {/* ═══════════════ INTERACTIVE INFORMATION MODALS ═══════════════ */}
+              {/* ═══════════════ PRO SPRING-ANIMATED MODALS WITH INTERACTIVE TABS & ESC LISTENER ═══════════════ */}
               <AnimatePresence>
                 {activeModal && (
                   <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-xl"
+                    onClick={() => setActiveModal(null)}
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-2xl"
                   >
                     <motion.div 
-                      initial={{ scale: 0.95, y: 15 }}
-                      animate={{ scale: 1, y: 0 }}
-                      exit={{ scale: 0.95, y: 15 }}
-                      className="bg-[#0a0f1c] border border-white/15 rounded-3xl w-full max-w-3xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative shadow-2xl shadow-cyan-500/10 text-left"
+                      initial={{ scale: 0.92, y: 25, opacity: 0 }}
+                      animate={{ scale: 1, y: 0, opacity: 1, transition: { type: "spring", damping: 25, stiffness: 320 } }}
+                      exit={{ scale: 0.94, y: 20, opacity: 0 }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="bg-[#070c1d]/98 border border-cyan-500/35 rounded-3xl w-full max-w-3xl max-h-[85vh] overflow-y-auto p-6 sm:p-9 relative shadow-[0_0_80px_rgba(6,182,212,0.2)] text-left"
                     >
-                      {/* Close button */}
-                      <button 
-                        onClick={() => setActiveModal(null)}
-                        className="absolute top-5 right-5 w-8 h-8 rounded-full bg-white dark:bg-[#111D35]/5 border border-white/10 flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-white hover:bg-white dark:bg-[#111D35]/10 transition-all"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      {/* Top Specular Glow Line */}
+                      <div className="absolute top-0 left-12 right-12 h-[2px] bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+
+                      {/* Close button with ESC tip */}
+                      <div className="absolute top-5 right-5 flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-gray-500 hidden sm:inline">ESC to close</span>
+                        <button 
+                          onClick={() => setActiveModal(null)}
+                          className="w-8 h-8 rounded-full bg-white/10 border border-white/15 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Modal Internal Navigation Switcher */}
+                      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-black/40 border border-white/10 rounded-2xl mb-7 max-w-fit">
+                        {[
+                          { id: 'HOW_IT_WORKS', label: 'Pipeline Docs', icon: Zap },
+                          { id: 'SOURCES', label: '45+ Sources', icon: Database },
+                          { id: 'ABOUT', label: 'About Platform', icon: Sparkles },
+                          { id: 'DEMO', label: 'Live Demo', icon: Play },
+                        ].map((tab) => {
+                          const Icon = tab.icon;
+                          const isCurrent = activeModal === tab.id;
+                          return (
+                            <button
+                              key={tab.id}
+                              onClick={() => setActiveModal(tab.id as InfoModalType)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                                isCurrent 
+                                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-sm' 
+                                  : 'text-gray-400 hover:text-white'
+                              }`}
+                            >
+                              <Icon className="w-3.5 h-3.5" />
+                              <span>{tab.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
 
                       {/* --- MODAL 1: HOW IT WORKS --- */}
                       {activeModal === 'HOW_IT_WORKS' && (
@@ -1211,7 +1605,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </p>
 
                           <div className="space-y-4 mb-8">
-                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex gap-4 items-start">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4 items-start">
                               <div className="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-500/30 flex items-center justify-center flex-shrink-0 text-blue-400 font-bold">1</div>
                               <div>
                                 <h3 className="font-bold text-base text-white mb-1">Continuous Multi-Source Ingestion</h3>
@@ -1221,7 +1615,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </div>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex gap-4 items-start">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4 items-start">
                               <div className="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 text-cyan-400 font-bold">2</div>
                               <div>
                                 <h3 className="font-bold text-base text-white mb-1">Graph Neural Embedding & 3D Topology</h3>
@@ -1231,7 +1625,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </div>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 flex gap-4 items-start">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex gap-4 items-start">
                               <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center flex-shrink-0 text-purple-400 font-bold">3</div>
                               <div>
                                 <h3 className="font-bold text-base text-white mb-1">Multi-LLM Synthesis & Hypothesis Generation</h3>
@@ -1243,7 +1637,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </div>
 
                           <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">Ready to accelerate your research?</span>
+                            <span className="text-xs text-gray-400">Ready to accelerate your research?</span>
                             <button 
                               onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30"
@@ -1274,19 +1668,19 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               { name: 'CrossRef', count: '140M DOIs', desc: 'Universal scientific citation networks, publisher metadata, and DOIs', tag: 'Citations', color: 'border-green-500/30 text-green-400' },
                               { name: 'OpenAlex', count: '250M Entities', desc: 'Global scholarly ontology mapping authors, institutions, and concepts', tag: 'Ontology', color: 'border-purple-500/30 text-purple-400' },
                             ].map((source, idx) => (
-                              <div key={idx} className="p-3.5 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10 hover:border-white/20 transition-all">
+                              <div key={idx} className="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all">
                                 <div className="flex items-center justify-between mb-1.5">
                                   <span className="font-bold text-white text-sm">{source.name}</span>
-                                  <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white dark:bg-[#111D35]/5 font-mono ${source.color}`}>{source.tag}</span>
+                                  <span className={`text-[10px] px-2 py-0.5 rounded-full border bg-white/5 font-mono ${source.color}`}>{source.tag}</span>
                                 </div>
                                 <span className="text-cyan-400 font-extrabold text-xs block mb-1">{source.count}</span>
-                                <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-tight">{source.desc}</p>
+                                <p className="text-[11px] text-gray-400 leading-tight">{source.desc}</p>
                               </div>
                             ))}
                           </div>
 
                           <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">Want to connect custom institutional databases?</span>
+                            <span className="text-xs text-gray-400">Want to connect custom institutional databases?</span>
                             <button 
                               onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold text-xs sm:text-sm hover:from-purple-400 hover:to-indigo-500 transition-all shadow-lg shadow-purple-500/30"
@@ -1301,7 +1695,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       {activeModal === 'ABOUT' && (
                         <div>
                           <div className="flex items-center gap-2.5 text-emerald-400 font-bold text-xs uppercase tracking-widest mb-2">
-                            <Info className="w-4 h-4" /> About ResearchGraph AI
+                            <Sparkles className="w-4 h-4" /> About ResearchGraph AI
                           </div>
                           <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Pioneering Cognitive Research</h2>
                           <p className="text-gray-300 text-sm leading-relaxed mb-6">
@@ -1309,7 +1703,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </p>
 
                           <div className="space-y-3.5 mb-8">
-                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
                               <h3 className="font-bold text-sm text-cyan-300 mb-1 flex items-center gap-2">
                                 <Compass className="w-4 h-4 text-cyan-400" />
                                 Breaking Academic Silos
@@ -1319,7 +1713,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </p>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
                               <h3 className="font-bold text-sm text-purple-300 mb-1 flex items-center gap-2">
                                 <Award className="w-4 h-4 text-purple-400" />
                                 Built for Academics, Labs & Innovators
@@ -1329,7 +1723,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                               </p>
                             </div>
 
-                            <div className="p-4 rounded-2xl bg-white dark:bg-[#111D35]/5 border border-white/10">
+                            <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
                               <h3 className="font-bold text-sm text-emerald-300 mb-1 flex items-center gap-2">
                                 <Sparkles className="w-4 h-4 text-emerald-400" />
                                 Verifiable Citations, Zero Hallucinations
@@ -1341,7 +1735,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           </div>
 
                           <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">Join the scientific revolution today.</span>
+                            <span className="text-xs text-gray-400">Join the scientific revolution today.</span>
                             <button 
                               onClick={() => triggerTraversal('AUTH', 'REGISTER')}
                               className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-xs sm:text-sm hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/30"
@@ -1352,44 +1746,75 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       )}
 
-                      {/* --- MODAL 4: INTERACTIVE DEMO WALKTHROUGH --- */}
+                      {/* --- MODAL 4: INTERACTIVE DEMO & VIDEO WALKTHROUGH --- */}
                       {activeModal === 'DEMO' && (
                         <div>
                           <div className="flex items-center gap-2.5 text-cyan-400 font-bold text-xs uppercase tracking-widest mb-2">
                             <Play className="w-4 h-4 text-cyan-400 fill-cyan-400" /> Interactive Platform Demonstration
                           </div>
-                          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Cockpit Research Traversal</h2>
+                          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Cockpit Research Traversal & Video Tour</h2>
                           <p className="text-gray-300 text-sm leading-relaxed mb-6">
                             Experience how ResearchGraph AI automates months of literature discovery into seconds of deep graph traversal.
                           </p>
 
+                          {/* Embedded Video / Interactive Player */}
+                          <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-black/90 border border-cyan-500/40 mb-6 shadow-2xl">
+                            <iframe
+                              src="https://www.youtube-nocookie.com/embed/YVLwu3jE09c?autoplay=1&rel=0&modestbranding=1"
+                              title="What is a Knowledge Graph?"
+                              className="w-full h-full border-none"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          </div>
+
                           <div className="p-4 rounded-2xl bg-black/60 border border-cyan-500/30 mb-6">
-                            <div className="flex items-center justify-between mb-3 text-xs font-mono text-gray-400 dark:text-gray-500">
+                            <div className="flex items-center justify-between mb-3 text-xs font-mono text-gray-400">
                               <span className="text-cyan-400 font-bold">SIMULATION: GNN DRUG DISCOVERY</span>
-                              <span className="text-emerald-400 font-bold">● ACTIVE SYNTHESIS</span>
+                              <span className="text-emerald-400 font-bold flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                ACTIVE SYNTHESIS
+                              </span>
                             </div>
 
-                            <div className="space-y-3 text-xs">
-                              <div className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10">
-                                <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-mono block">Step 1 • Parallel Query Dispatch</span>
-                                <span className="text-white font-semibold">Broadcasting to arXiv, PubMed, IEEE, CrossRef (1,420 matched candidates)</span>
+                            <div className="space-y-2.5 text-xs">
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+                                <span className="px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 font-mono text-[10px] font-bold">01</span>
+                                <div>
+                                  <span className="text-white font-semibold block">Parallel Ingestion Stream</span>
+                                  <span className="text-gray-400 text-[11px]">Broadcasting query to arXiv, PubMed, IEEE, CrossRef (1,420 matched candidates)</span>
+                                </div>
                               </div>
-                              <div className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10">
-                                <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-mono block">Step 2 • 3D Topology Clustering</span>
-                                <span className="text-cyan-300 font-semibold">Extracting ADMET prediction cluster & E(3)-equivariant graph neural networks</span>
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+                                <span className="px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[10px] font-bold">02</span>
+                                <div>
+                                  <span className="text-cyan-300 font-semibold block">3D Topology & GNN Message Passing</span>
+                                  <span className="text-gray-400 text-[11px]">Extracting ADMET prediction cluster & E(3)-equivariant graph neural networks</span>
+                                </div>
                               </div>
-                              <div className="p-3 rounded-xl bg-white dark:bg-[#111D35]/5 border border-white/10">
-                                <span className="text-[10px] text-gray-400 dark:text-gray-500 uppercase font-mono block">Step 3 • Multi-LLM Consensus Synthesis</span>
-                                <span className="text-emerald-300 font-semibold">Ensemble generated 4 key hypotheses with 100% verified citation anchors</span>
+                              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-3">
+                                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-bold">03</span>
+                                <div>
+                                  <span className="text-emerald-300 font-semibold block">Multi-LLM Consensus Synthesis</span>
+                                  <span className="text-gray-400 text-[11px]">Ensemble generated 4 key hypotheses with 100% verified citation anchors</span>
+                                </div>
                               </div>
                             </div>
                           </div>
 
-                          <div className="flex items-center justify-between pt-4 border-t border-white/10">
-                            <span className="text-xs text-gray-400 dark:text-gray-500">Ready to explore with your own research queries?</span>
+                          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-white/10">
+                            <button
+                              onClick={() => {
+                                setActiveModal(null);
+                                scrollToSection(videoSectionRef);
+                              }}
+                              className="text-xs font-semibold text-cyan-400 hover:text-cyan-300 flex items-center gap-1.5"
+                            >
+                              <Play className="w-3.5 h-3.5" /> Watch all 4 videos in full theater
+                            </button>
                             <button 
                               onClick={() => triggerTraversal('AUTH', 'REGISTER')}
-                              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2"
+                              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs sm:text-sm hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/30 flex items-center gap-2 w-full sm:w-auto justify-center"
                             >
                               Launch Explorer Now <ArrowRight className="w-3.5 h-3.5" />
                             </button>
@@ -1420,7 +1845,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* BACK TO BASE BUTTON */}
               <button 
                 onClick={() => triggerTraversal('LANDING')} 
-                className="absolute top-6 left-6 z-[110] px-4 py-2 rounded-full bg-[#0a0f1c]/90 border border-white/15 flex items-center gap-2 hover:bg-white dark:bg-[#111D35]/10 hover:border-cyan-500/40 transition-all backdrop-blur-md shadow-xl"
+                className="absolute top-6 left-6 z-[110] px-4 py-2 rounded-full bg-[#0a0f1c]/90 border border-white/15 flex items-center gap-2 hover:bg-white/10 hover:border-cyan-500/40 transition-all backdrop-blur-md shadow-xl"
               >
                 <ArrowLeft className="w-4 h-4 text-cyan-400" />
                 <span className="font-semibold text-xs sm:text-sm text-gray-200">Return to Base</span>
@@ -1454,26 +1879,26 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <span className={`w-1.5 h-1.5 rounded-full animate-ping ${authMode === 'LOGIN' ? 'bg-cyan-400' : 'bg-purple-400'}`}></span>
                         <span>3D NEURAL UPLINK ACTIVE</span>
                       </div>
-                      <span className="text-[10px] text-gray-300 font-mono bg-white dark:bg-[#111D35]/10 px-2.5 py-1 rounded-full border border-white/15">
+                      <span className="text-[10px] text-gray-300 font-mono bg-white/10 px-2.5 py-1 rounded-full border border-white/15">
                         ✦ DRAG TO ROTATE
                       </span>
                     </div>
                     <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
                       {authMode === 'LOGIN' ? 'Quantum Knowledge Grid' : 'Neural Node Genesis'}
                     </h3>
-                    <p className="text-gray-400 dark:text-gray-500 text-xs sm:text-sm leading-relaxed mb-4">
+                    <p className="text-gray-400 text-xs sm:text-sm leading-relaxed mb-4">
                       {authMode === 'LOGIN' 
                         ? 'Connected to the decentralized scientific graph. Authenticate to sync your papers and explore 3D citation maps.' 
                         : 'Generate your cryptographic researcher identity to contribute hypotheses and synthesize discoveries.'}
                     </p>
-                    <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-gray-400 dark:text-gray-500 border-t border-white/10 pt-3">
-                      <div className="bg-white dark:bg-[#111D35]/5 rounded-lg py-1.5 px-2 border border-white/5">
+                    <div className="grid grid-cols-3 gap-2 text-[11px] font-mono text-gray-400 border-t border-white/10 pt-3">
+                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
                         <span className="text-cyan-400 font-bold block">204.8M</span> Papers
                       </div>
-                      <div className="bg-white dark:bg-[#111D35]/5 rounded-lg py-1.5 px-2 border border-white/5">
+                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
                         <span className="text-purple-400 font-bold block">14ms</span> Latency
                       </div>
-                      <div className="bg-white dark:bg-[#111D35]/5 rounded-lg py-1.5 px-2 border border-white/5">
+                      <div className="bg-white/5 rounded-lg py-1.5 px-2 border border-white/5">
                         <span className="text-emerald-400 font-bold block">TLS 1.3</span> Encrypted
                       </div>
                     </div>
@@ -1500,7 +1925,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
                         authMode === 'LOGIN' 
                           ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]' 
-                          : 'text-gray-400 dark:text-gray-500 hover:text-white'
+                          : 'text-gray-400 hover:text-white'
                       }`}
                     >
                       <KeyRound className="w-3.5 h-3.5" /> Sign In
@@ -1511,7 +1936,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                       className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${
                         authMode === 'REGISTER' 
                           ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.2)]' 
-                          : 'text-gray-400 dark:text-gray-500 hover:text-white'
+                          : 'text-gray-400 hover:text-white'
                       }`}
                     >
                       <Sparkles className="w-3.5 h-3.5" /> Create Account
@@ -1521,7 +1946,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-white mb-2 tracking-tight">
                     {authMode === 'LOGIN' ? 'Supabase Secure Login' : 'Create Researcher ID'}
                   </h2>
-                  <p className="text-gray-400 dark:text-gray-500 text-xs sm:text-sm text-center mb-6">
+                  <p className="text-gray-400 text-xs sm:text-sm text-center mb-6">
                     {authMode === 'LOGIN' ? 'Access your research universe and knowledge maps.' : 'Join 140K+ researchers mapping scientific literature.'}
                   </p>
 
@@ -1588,7 +2013,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <button 
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-white transition-colors"
+                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                         >
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -1597,7 +2022,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                     {/* Features checklist for register mode */}
                     {authMode === 'REGISTER' && (
-                      <div className="text-[11px] text-gray-400 dark:text-gray-500 space-y-1 py-1">
+                      <div className="text-[11px] text-gray-400 space-y-1 py-1">
                         <div className="flex items-center gap-1.5 text-gray-300">
                           <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
                           <span>Unlimited 3D Knowledge Graph querying</span>
@@ -1649,7 +2074,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
                   </form>
 
-                  <div className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 border-t border-white/10 pt-5">
+                  <div className="mt-6 text-center text-xs text-gray-400 border-t border-white/10 pt-5">
                     {authMode === 'LOGIN' ? "Don't have an account? " : "Already registered? "}
                     <button 
                       onClick={() => setAuthMode(authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
@@ -1670,3 +2095,4 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
     </div>
   );
 };
+
