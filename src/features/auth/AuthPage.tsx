@@ -270,7 +270,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   }, [isSimPlaying, selectedVideoIdx]);
 
   return (
-    <div className="min-h-screen w-full bg-[#030712] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
+    <div className="min-h-screen w-full bg-[#101642] text-white font-sans overflow-x-hidden selection:bg-cyan-500/30 fixed inset-0">
       
       {/* --- SMOOTH SCROLL PROGRESS BAR --- */}
       {pageState === 'LANDING' && (
@@ -303,7 +303,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               className="w-full flex flex-col relative"
             >
               {/* ═══════════════ PRO TOP NAVBAR WITH VIBRANT COLORED ICONS ═══════════════ */}
-              <nav className="w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[1520px] mx-auto mt-3 px-4 sm:px-7 py-2.5 flex items-center justify-between rounded-2xl bg-[#050b1c]/75 backdrop-blur-2xl border border-cyan-200/15 sticky top-3 z-50 shadow-[0_18px_42px_-25px_rgba(0,0,0,0.95)]">
+              <nav className="w-[calc(100%-1.5rem)] sm:w-[calc(100%-3rem)] max-w-[1520px] mx-auto mt-3 px-4 sm:px-7 py-2.5 flex items-center justify-between rounded-2xl bg-[linear-gradient(105deg,rgba(11,20,55,.82),rgba(24,39,91,.72),rgba(94,48,139,.68))] backdrop-blur-2xl border border-cyan-200/35 sticky top-3 z-50 shadow-[0_18px_42px_-25px_rgba(35,17,91,.9),inset_0_1px_0_rgba(255,255,255,.13)]">
                 {/* Brand Logo with Glowing Aura */}
                 <div 
                   className="flex items-center gap-3 cursor-pointer group" 
@@ -330,7 +330,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                 </div>
                 
                 {/* Center Navigation Links with Vivid Colored Icons */}
-                <div className="hidden lg:flex items-center gap-1.5 bg-[#091124]/90 border border-white/15 rounded-full p-1.5 backdrop-blur-2xl shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                <div className="hidden lg:flex items-center gap-1.5 bg-slate-950/35 border border-cyan-100/20 rounded-full p-1.5 backdrop-blur-2xl shadow-[0_4px_20px_rgba(34,27,99,.45)]">
                   <button 
                     onClick={() => scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all flex items-center gap-2 group"
@@ -793,7 +793,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={topologySectionRef}
-                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(180deg,#6358bd_0%,#343373_12%,#111a46_100%)] relative z-20 border-t border-white/25"
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(180deg,#6857b4_0%,#315a91_42%,#1a346d_100%)] relative z-20 border-t border-cyan-100/35"
               >
                 <div className="max-w-7xl mx-auto">
                   
@@ -925,7 +925,8 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={videoSectionRef}
-                className="w-full py-24 px-4 sm:px-8 bg-gradient-to-b from-[#04091a] via-[#050e26] to-[#030612] relative z-20 border-t border-cyan-500/25 overflow-hidden"
+                className="w-full py-24 px-4 sm:px-8 relative z-20 border-t border-cyan-100/30 overflow-hidden"
+                style={{ backgroundImage: "linear-gradient(118deg,rgba(17,20,73,.92),rgba(19,80,125,.77),rgba(91,37,122,.82)), url('/research-universe-library.svg')", backgroundSize: 'cover', backgroundPosition: 'center' }}
               >
                 {/* Floating ambient glow orbs */}
                 <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-cyan-500/10 blur-[130px] pointer-events-none"></div>
@@ -1140,7 +1141,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={sourcesSectionRef}
-                className="w-full py-24 px-4 sm:px-8 bg-[#030612] relative z-20 border-t border-white/10"
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(130deg,#5a2d70_0%,#245b83_48%,#162e68_100%)] relative z-20 border-t border-cyan-100/25"
               >
                 <div className="max-w-7xl mx-auto">
                   
@@ -1220,7 +1221,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={pipelineSectionRef}
-                className="w-full py-24 px-4 sm:px-8 bg-[#04091a] relative z-20 border-t border-white/10"
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(135deg,#18396f_0%,#425aaf_48%,#7a397c_100%)] relative z-20 border-t border-cyan-100/25"
               >
                 <div className="max-w-7xl mx-auto">
                   
@@ -1308,7 +1309,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               <div 
                 ref={sandboxSectionRef}
-                className="w-full py-24 px-4 sm:px-8 bg-[#02050e] relative z-20 border-t border-white/10"
+                className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(125deg,#66366b_0%,#205d7d_50%,#213a78_100%)] relative z-20 border-t border-cyan-100/25"
               >
                 <div className="max-w-6xl mx-auto">
                   
@@ -1435,7 +1436,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*      SCROLLABLE SECTION 5: FINAL LAUNCHPAD CALL TO ACTION                            */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <div className="w-full py-24 px-4 sm:px-8 bg-gradient-to-b from-[#02050e] to-[#04091a] relative z-20 border-t border-white/10">
+              <div className="w-full py-24 px-4 sm:px-8 bg-[linear-gradient(135deg,#253e88_0%,#6e458e_55%,#182d64_100%)] relative z-20 border-t border-cyan-100/25">
                 <div className="max-w-4xl mx-auto text-center">
                   
                   <div className="w-16 h-16 rounded-2xl border border-cyan-500/40 bg-gradient-to-br from-cyan-500/20 to-purple-600/20 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-cyan-500/30">
@@ -1475,7 +1476,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
               {/*                                HIGH-TECH FOOTER                                    */}
               {/* ════════════════════════════════════════════════════════════════════════════════════ */}
-              <footer className="w-full bg-[#02040b] border-t border-white/10 px-4 sm:px-8 py-10 relative z-20 text-xs text-gray-400">
+              <footer className="w-full bg-[linear-gradient(120deg,#172455,#32296b,#5c2f76)] border-t border-cyan-100/25 px-4 sm:px-8 py-10 relative z-20 text-xs text-slate-200">
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                   
                   {/* Brand & Mission */}
