@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Network, Search, ArrowRight, Sparkles, Play, CheckCircle2,
   Database, Layers, Binary, FileText, Users, Share2,
-  BrainCircuit, Microscope, ChevronDown, Activity, X, Menu
+  BrainCircuit, Microscope, ChevronDown, X, Menu,
+  ArrowUpRight
 } from 'lucide-react';
 import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
@@ -13,13 +14,26 @@ interface LandingViewProps {
 }
 
 // ══════════════════════════════════════════════════════════════════
-//  UFO / RESEARCH EXPLORER SPACECRAFT (TRAVELS ON SCROLL)
+//  UFO / AUTONOMOUS RESEARCH SPACECRAFT (HERO PATROL + SCROLL TRAVEL)
 // ══════════════════════════════════════════════════════════════════
 const ResearchSpacecraftUFO: React.FC<{
   scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }> = ({ scrollContainerRef }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [ambientTime, setAmbientTime] = useState(0);
 
+  // Ambient patrol timer for hero hovering
+  useEffect(() => {
+    let animId: number;
+    const animate = () => {
+      setAmbientTime((t) => t + 0.035);
+      animId = requestAnimationFrame(animate);
+    };
+    animId = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  // Track scroll progress along the page container
   useEffect(() => {
     const container = scrollContainerRef?.current;
     if (!container) return;
@@ -37,19 +51,18 @@ const ResearchSpacecraftUFO: React.FC<{
     return () => container.removeEventListener('scroll', handleScroll);
   }, [scrollContainerRef]);
 
-  // S-Curve Flight Path Waypoints across 7 sections
+  // S-Curve Flight Waypoints across 7 sections
   // [progress, xPercent, yPercent, tiltAngle, scale]
   const waypoints = [
-    { p: 0.00, x: 88, y: 15, tilt: -8, scale: 0.95 },   // Hero right survey
-    { p: 0.16, x: 8,  y: 28, tilt: 14, scale: 1.00 },   // Workflow left
-    { p: 0.32, x: 91, y: 42, tilt: -12, scale: 1.05 },  // Universe right
-    { p: 0.50, x: 7,  y: 56, tilt: 10, scale: 1.00 },   // Knowledge Graph left
-    { p: 0.66, x: 90, y: 69, tilt: -12, scale: 1.05 },  // AI Assistant right
-    { p: 0.82, x: 8,  y: 81, tilt: 8,  scale: 1.00 },   // RAG Pipeline left
-    { p: 1.00, x: 50, y: 94, tilt: 0,  scale: 1.15 }    // Final CTA bottom center
+    { p: 0.00, x: 84, y: 16, tilt: -6,  scale: 0.95 },  // Hero upper right survey
+    { p: 0.16, x: 10, y: 28, tilt: 14,  scale: 1.00 },  // Discovery Pipeline left
+    { p: 0.34, x: 91, y: 44, tilt: -12, scale: 1.05 },  // 6 Dimensions right
+    { p: 0.52, x: 8,  y: 58, tilt: 12,  scale: 1.00 },  // Knowledge Graph left
+    { p: 0.68, x: 91, y: 72, tilt: -10, scale: 1.05 },  // AI Assistant right
+    { p: 0.84, x: 9,  y: 84, tilt: 8,   scale: 1.00 },  // RAG Pipeline left
+    { p: 1.00, x: 50, y: 94, tilt: 0,   scale: 1.15 }   // Final CTA bottom center
   ];
 
-  // Interpolate position along waypoints
   const p = scrollProgress;
   let currentWp = waypoints[0];
   let nextWp = waypoints[waypoints.length - 1];
@@ -64,61 +77,81 @@ const ResearchSpacecraftUFO: React.FC<{
 
   const range = (nextWp.p - currentWp.p) || 0.001;
   const t = (p - currentWp.p) / range;
-  // Smooth cubic ease-in-out interpolation
+  // Smooth cubic ease-in-out
   const easeT = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-  const currentX = currentWp.x + (nextWp.x - currentWp.x) * easeT;
-  const currentY = currentWp.y + (nextWp.y - currentWp.y) * easeT;
-  const currentTilt = currentWp.tilt + (nextWp.tilt - currentWp.tilt) * easeT;
-  const currentScale = currentWp.scale + (nextWp.scale - currentWp.scale) * easeT;
+  // Base waypoint position
+  let targetX = currentWp.x + (nextWp.x - currentWp.x) * easeT;
+  let targetY = currentWp.y + (nextWp.y - currentWp.y) * easeT;
+  let targetTilt = currentWp.tilt + (nextWp.tilt - currentWp.tilt) * easeT;
+  const targetScale = currentWp.scale + (nextWp.scale - currentWp.scale) * easeT;
+
+  // When at Hero (p < 0.05), add gentle sinusoidal atmospheric patrol hovering
+  const isHero = p < 0.06;
+  if (isHero) {
+    targetX += Math.sin(ambientTime * 0.45) * 4.5 + Math.cos(ambientTime * 0.2) * 2;
+    targetY += Math.cos(ambientTime * 0.4) * 3.2;
+    targetTilt += Math.sin(ambientTime * 0.45) * 5;
+  } else {
+    // Subtle float while browsing any section
+    targetY += Math.sin(ambientTime * 0.8) * 1.5;
+  }
+
+  // Periodic subtle scanning tractor beam (pulses every ~8s for 2.5s)
+  const beamCycle = (ambientTime * 0.5) % 8;
+  const beamActive = beamCycle > 5.5;
 
   return (
     <div
       className="fixed pointer-events-none z-40 transition-transform duration-200 ease-out hidden lg:block"
       style={{
-        left: `${currentX}%`,
-        top: `${currentY}%`,
-        transform: `translate(-50%, -50%) rotate(${currentTilt}deg) scale(${currentScale})`,
+        left: `${targetX}%`,
+        top: `${targetY}%`,
+        transform: `translate(-50%, -50%) rotate(${targetTilt}deg) scale(${targetScale})`,
       }}
     >
       {/* Downward Conical Scanning Tractor Beam */}
-      <div className="absolute top-[82%] left-1/2 -translate-x-1/2 w-32 h-52 pointer-events-none overflow-hidden opacity-75">
+      <div 
+        className={`absolute top-[80%] left-1/2 -translate-x-1/2 w-36 h-56 pointer-events-none overflow-hidden transition-opacity duration-700 ${
+          beamActive || p > 0.08 ? 'opacity-85' : 'opacity-20'
+        }`}
+      >
         <div
           className="w-full h-full"
           style={{
-            background: 'conic-gradient(from 180deg at 50% 0%, rgba(6,182,212,0.28) 0deg, rgba(99,102,241,0.2) 25deg, transparent 40deg, transparent 320deg, rgba(99,102,241,0.2) 335deg, rgba(6,182,212,0.28) 360deg)',
-            filter: 'blur(1.5px)',
+            background: 'conic-gradient(from 180deg at 50% 0%, rgba(6,182,212,0.35) 0deg, rgba(99,102,241,0.22) 22deg, transparent 38deg, transparent 322deg, rgba(99,102,241,0.22) 338deg, rgba(6,182,212,0.35) 360deg)',
+            filter: 'blur(2px)',
             maskImage: 'linear-gradient(to bottom, black 15%, transparent 95%)'
           }}
         />
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-20 h-5 rounded-full border border-cyan-400/40 bg-cyan-400/10 animate-ping opacity-35" />
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-24 h-6 rounded-full border border-cyan-400/40 bg-cyan-400/15 animate-ping opacity-35" />
       </div>
 
       {/* Atmospheric Hover Glow Behind UFO */}
       <div className="absolute -inset-4 rounded-full bg-cyan-400/25 blur-xl pointer-events-none animate-pulse" />
 
-      {/* Futuristic Saucer Craft Body (SVG) */}
+      {/* Sleek Saucer Craft Body (SVG) */}
       <svg
-        width="92"
-        height="56"
+        width="96"
+        height="58"
         viewBox="0 0 92 56"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        className="relative z-10 drop-shadow-[0_8px_20px_rgba(6,182,212,0.45)]"
+        className="relative z-10 drop-shadow-[0_10px_22px_rgba(6,182,212,0.45)]"
       >
         <defs>
-          <linearGradient id="ufoHull" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#0F172A" />
-            <stop offset="45%" stopColor="#334155" />
-            <stop offset="75%" stopColor="#0EA5E9" />
+          <linearGradient id="ufoHullGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0B132B" />
+            <stop offset="40%" stopColor="#1E293B" />
+            <stop offset="75%" stopColor="#0284C7" />
+            <stop offset="100%" stopColor="#38BDF8" />
+          </linearGradient>
+          <linearGradient id="ufoDomeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#CFFAFE" />
+            <stop offset="50%" stopColor="#06B6D4" />
             <stop offset="100%" stopColor="#0284C7" />
           </linearGradient>
-          <linearGradient id="ufoDome" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#A5F3FC" />
-            <stop offset="60%" stopColor="#06B6D4" />
-            <stop offset="100%" stopColor="#0284C7" />
-          </linearGradient>
-          <radialGradient id="ufoThruster" cx="50%" cy="50%" r="50%">
+          <radialGradient id="ufoThrusterGrad" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor="#38BDF8" />
             <stop offset="70%" stopColor="#6366F1" />
             <stop offset="100%" stopColor="transparent" />
@@ -126,17 +159,17 @@ const ResearchSpacecraftUFO: React.FC<{
         </defs>
 
         {/* Cockpit Canopy Dome */}
-        <ellipse cx="46" cy="18" rx="18" ry="11" fill="url(#ufoDome)" opacity="0.9" />
-        <ellipse cx="44" cy="16" rx="10" ry="5" fill="#FFFFFF" opacity="0.6" />
+        <ellipse cx="46" cy="18" rx="18" ry="11" fill="url(#ufoDomeGrad)" opacity="0.92" />
+        <ellipse cx="44" cy="16" rx="10" ry="5" fill="#FFFFFF" opacity="0.65" />
 
-        {/* Autonomous AI Navigation Node */}
+        {/* Autonomous AI Navigation Core */}
         <circle cx="46" cy="18" r="3.2" fill="#FFFFFF" />
-        <circle cx="46" cy="18" r="5" stroke="#38BDF8" strokeWidth="1" className="animate-ping" opacity="0.75" />
+        <circle cx="46" cy="18" r="5" stroke="#38BDF8" strokeWidth="1" className="animate-ping" opacity="0.8" />
 
-        {/* Outer Ring Hull */}
+        {/* Saucer Outer Ring Hull */}
         <path
           d="M6 31 C6 24, 86 24, 86 31 C86 42, 6 42, 6 31 Z"
-          fill="url(#ufoHull)"
+          fill="url(#ufoHullGrad)"
           stroke="#38BDF8"
           strokeWidth="1.2"
         />
@@ -151,7 +184,7 @@ const ResearchSpacecraftUFO: React.FC<{
         <circle cx="74" cy="32" r="1.8" fill="#38BDF8" />
 
         {/* Bottom Reactor Core */}
-        <ellipse cx="46" cy="36" rx="14" ry="4.5" fill="url(#ufoThruster)" opacity="0.9" />
+        <ellipse cx="46" cy="36" rx="14" ry="4.5" fill="url(#ufoThrusterGrad)" opacity="0.9" />
         <ellipse cx="46" cy="37" rx="7" ry="2.2" fill="#FFFFFF" />
       </svg>
 
@@ -162,10 +195,10 @@ const ResearchSpacecraftUFO: React.FC<{
         <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
       </div>
 
-      {/* High-Tech Autonomous Status Pill */}
-      <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-[#030712]/80 border border-cyan-400/40 text-[9px] font-mono text-cyan-300 tracking-wider shadow-sm flex items-center gap-1">
+      {/* Autonomous Status HUD */}
+      <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2.5 py-0.5 rounded-full bg-[#030712]/85 border border-cyan-400/40 text-[9px] font-mono text-cyan-300 tracking-wider shadow-sm flex items-center gap-1.5 backdrop-blur-md">
         <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-        <span>UFO SURVEYOR • {(p * 100).toFixed(0)}%</span>
+        <span>RECON SURVEYOR • {(p * 100).toFixed(0)}%</span>
       </div>
     </div>
   );
@@ -194,7 +227,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
     setMobileMenuOpen(false);
   };
 
-  // Example Topic Chips for Hero
+  // Compact Trending Topic Chips
   const exampleChips = [
     'Vision Transformers',
     'Graph Neural Networks',
@@ -203,7 +236,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
     'Multimodal Oncology AI'
   ];
 
-  // 5-Step Workflow Data
+  // 5-Step Scientific Discovery Pipeline
   const workflowSteps = [
     {
       num: '01',
@@ -213,7 +246,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       color: 'from-blue-500 to-cyan-500',
       badgeColor: 'bg-blue-50 border-blue-200 text-blue-700',
       desc: 'Enter any hypothesis, research challenge, or DOI into the unified knowledge bar. Natural language processing translates your prompt into high-dimensional semantic vectors.',
-      metric: '200M+ Works Scanned',
+      metric: '204M+ Works Scanned',
       detail: 'Supports Boolean operators, complex mathematical expressions, and direct DOI ingestion.'
     },
     {
@@ -268,48 +301,36 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       title: 'Research Papers',
       count: '204.8M Nodes',
       icon: FileText,
-      accent: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
-      iconBg: 'bg-blue-600 text-white',
       desc: 'Full-text embeddings including methodologies, mathematical formulas, experimental results, and abstract vectors across 45+ academic disciplines.'
     },
     {
       title: 'Authors & PIs',
       count: '12.4M Profiles',
       icon: Users,
-      accent: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-400',
-      iconBg: 'bg-indigo-600 text-white',
       desc: 'Institutional affiliations, co-authorship networks, citation trajectories, and lab collaboration clusters mapped continuously across the globe.'
     },
     {
       title: 'Concepts & Ontologies',
       count: '1.8M Taxonomies',
       icon: BrainCircuit,
-      accent: 'border-purple-500/30 bg-purple-500/10 text-purple-400',
-      iconBg: 'bg-purple-600 text-white',
       desc: 'Dynamic scientific concept extraction tracking the evolution of emerging paradigms, theoretical frameworks, and interdisciplinary terminology.'
     },
     {
       title: 'Methods & Techniques',
       count: '340K+ Formulations',
       icon: Microscope,
-      accent: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400',
-      iconBg: 'bg-cyan-600 text-white',
       desc: 'Algorithmic architectures, clinical assay protocols, synthesis steps, and reproducible computational workflows isolated from method sections.'
     },
     {
       title: 'Empirical Datasets',
       count: '85K+ Repositories',
       icon: Database,
-      accent: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
-      iconBg: 'bg-emerald-600 text-white',
       desc: 'Published benchmark performance tables, Protein Data Bank (PDB) structures, Hugging Face checkpoints, and open research repositories.'
     },
     {
       title: 'Citation Networks',
       count: '1.24B Directional Edges',
       icon: Share2,
-      accent: 'border-rose-500/30 bg-rose-500/10 text-rose-400',
-      iconBg: 'bg-rose-600 text-white',
       desc: 'Directional citation graphs distinguishing between background mentions, foundational methodology extensions, and conflicting empirical claims.'
     }
   ];
@@ -382,10 +403,6 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       confidence: '99.2%',
       citationsCount: 6,
       answer: 'Graph Neural Networks (GNNs) represent molecules as topological graphs where atoms are nodes and covalent bonds are edges with directional features. Unlike fixed-length Morgan or ECFP fingerprints, message-passing neural networks (MPNNs) iteratively aggregate local chemical environments, preserving spatial conformations and stereochemical invariants.',
-      citations: [
-        { id: 1, title: 'Pushing the Boundaries of Molecular Property Prediction with GNNs', author: 'Yang et al., 2024', doi: '10.1021/acscentsci.9b00476' },
-        { id: 2, title: 'Geometric Deep Learning Grids for Structure-Based Drug Discovery', author: 'Bronstein et al., 2023', doi: '10.1038/s41587-021-00984-3' }
-      ],
       metrics: [
         { label: 'ADMET RMSE Reduction', value: '-34.8%' },
         { label: 'Synthesis Lead Time', value: '-68%' },
@@ -399,10 +416,6 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       confidence: '98.9%',
       citationsCount: 5,
       answer: 'While MAE optimizes an autoencoding reconstruction objective by predicting raw pixel values of heavily masked patches (75% mask ratio), DINOv2 uses a discriminative self-distillation framework with student-teacher networks, Sinkhorn-Knopp centering, and KoLeo regularization. Consequently, DINOv2 produces ready-to-use frozen visual representations with state-of-the-art k-NN classification accuracy without fine-tuning.',
-      citations: [
-        { id: 1, title: 'DINOv2: Learning Robust Visual Features without Supervision', author: 'Oquab et al., 2023', doi: '10.48550/arXiv.2304.07193' },
-        { id: 2, title: 'Masked Autoencoders Are Scalable Vision Learners', author: 'He et al., 2022', doi: '10.1109/CVPR52688.2022.01553' }
-      ],
       metrics: [
         { label: 'Linear Probe Accuracy', value: '+8.4%' },
         { label: 'Dense Matching Precision', value: '94.2%' },
@@ -416,10 +429,6 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       confidence: '97.6%',
       citationsCount: 8,
       answer: 'Analysis across 980 recent surface code preprints reveals three dominant research gaps: (1) Real-time sub-microsecond MWPM decoding latency bottlenecks on classical FPGA controllers as physical qubit count exceeds 1,000; (2) Leakage errors from computational qubit states into non-computational states that bypass stabilizer syndrome measurements; and (3) Physical qubit overhead for magic state distillation in non-Clifford gates.',
-      citations: [
-        { id: 1, title: 'Suppressing quantum errors by scaling a quantum error-correcting code', author: 'Google Quantum AI, 2023', doi: '10.1038/s41586-022-05434-1' },
-        { id: 2, title: 'High-rate quantum low-density parity-check codes', author: 'Panteleev & Kalachev, 2023', doi: '10.1109/TIT.2023.3283254' }
-      ],
       metrics: [
         { label: 'Identified Whitespace Gaps', value: '3 Critical' },
         { label: 'Decoded Preprints', value: '980 Works' },
@@ -488,7 +497,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       {/* ════════════════════════════════════════════════════════════ */}
       {/*                       0. TOP NAVBAR                         */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#060B19]/85 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-md transition-all">
+      <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#060B19]/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-md transition-all">
         {/* Brand Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
@@ -508,13 +517,19 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
           </div>
         </div>
 
-        {/* Center Navigation Links (Matching User Mockup) */}
+        {/* Center Navigation Links */}
         <div className="hidden lg:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-md">
           <button
             onClick={() => scrollTo(heroRef)}
             className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
           >
             Cockpit
+          </button>
+          <button
+            onClick={() => scrollTo(workflowRef)}
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
+          >
+            Pipeline
           </button>
           <button
             onClick={() => scrollTo(universeRef)}
@@ -527,12 +542,6 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
           >
             Knowledge Graph
-          </button>
-          <button
-            onClick={() => scrollTo(pipelineRef)}
-            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
-          >
-            RAG Pipeline
           </button>
           <button
             onClick={() => scrollTo(sourcesRef)}
@@ -587,14 +596,14 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             <button onClick={() => scrollTo(heroRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               Cockpit
             </button>
+            <button onClick={() => scrollTo(workflowRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
+              Pipeline
+            </button>
             <button onClick={() => scrollTo(universeRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               3D Topology
             </button>
             <button onClick={() => scrollTo(graphRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               Knowledge Graph
-            </button>
-            <button onClick={() => scrollTo(pipelineRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
-              RAG Pipeline
             </button>
             <button onClick={() => scrollTo(sourcesRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               Data Sources (OpenAlex & arXiv)
@@ -607,13 +616,13 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       </AnimatePresence>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*   1. FUTURISTIC RESEARCH UNIVERSE HERO (MATCHING IMAGE 1)    */}
+      {/*    1. CINEMATIC SPACE HERO: ROTATING GLOBE & ORBITAL NODES   */}
       {/* ════════════════════════════════════════════════════════════ */}
       <section
         ref={heroRef}
         className="relative w-full min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#060B19]"
       >
-        {/* Layer 1: Scenic Cosmic Artwork Background (Clean, No Text Overlays) */}
+        {/* Layer 1: Scenic Cosmic Horizon Background (Clean, No Text Overlays) */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
           style={{
@@ -622,12 +631,12 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
         />
 
         {/* Layer 2: Deep Space Contrast Gradient Vignettes */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#060B19]/95 via-[#060B19]/80 to-transparent pointer-events-none lg:w-[65%]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#060B19]/95 via-[#060B19]/80 to-transparent pointer-events-none lg:w-[62%]" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#060B19] via-transparent to-transparent pointer-events-none h-44 bottom-0 top-auto" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#060B19]/80 via-transparent to-transparent pointer-events-none h-24 top-0" />
 
         {/* Ambient Cosmic Radial Glows */}
-        <div className="absolute top-[20%] right-[18%] w-[500px] h-[500px] rounded-full bg-cyan-500/15 blur-[120px] pointer-events-none" />
+        <div className="absolute top-[22%] right-[20%] w-[520px] h-[520px] rounded-full bg-cyan-500/15 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[20%] left-[8%] w-[420px] h-[420px] rounded-full bg-purple-600/20 blur-[130px] pointer-events-none" />
 
         {/* Main Hero Container */}
@@ -636,22 +645,22 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
 
             {/* ─── LEFT COLUMN: REFINED HERO CONTENT & SEARCH ─── */}
             <div className="lg:col-span-5 flex flex-col justify-center space-y-5 text-left">
-              {/* Badge */}
+              {/* Small Badge (Exact Prompt Wording) */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-950/70 border border-purple-500/40 text-purple-200 text-xs font-semibold tracking-wider uppercase shadow-[0_0_15px_rgba(168,85,247,0.3)] w-fit backdrop-blur-md">
                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                <span>Research Intelligence, Reimagined</span>
+                <span>RESEARCH INTELLIGENCE · REIMAGINED</span>
               </div>
 
-              {/* Main Headline with Cyan Blinking Cursor */}
+              {/* Main Headline (Exact Prompt Structure) */}
               <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.12]">
                 Research,<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">Connected.</span>
-                <span className="inline-block w-1.5 h-[0.88em] bg-cyan-400 ml-1.5 align-baseline animate-pulse shadow-[0_0_10px_#22d3ee]" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">Connected.</span><br />
+                <span className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-gray-300 block mt-1">Discover what matters.</span>
               </h1>
 
-              {/* Compelling Description */}
+              {/* Compelling Description (Exact Prompt Text) */}
               <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl font-normal drop-shadow-sm">
-                Discover, explore, and connect research papers, authors, and ideas through an intelligent knowledge graph powered by AI.
+                Discover research papers, authors, methods, and ideas — and explore how they connect through an intelligent research knowledge graph.
               </p>
 
               {/* Dual Action CTAs */}
@@ -673,62 +682,28 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                 </button>
               </div>
 
-              {/* 3 Quick Action Chips (Matching User Mockup) */}
-              <div className="grid grid-cols-3 gap-2 pt-2 max-w-lg">
-                <div
-                  onClick={() => onNavigateAuth('LOGIN')}
-                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/40 hover:bg-cyan-500/10 cursor-pointer transition-all backdrop-blur-md group"
-                >
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-300 mb-0.5">
-                    <Search className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
-                    <span>Discover</span>
-                  </div>
-                  <span className="text-[10px] text-gray-400 block leading-tight">Find relevant work</span>
-                </div>
-                <div
-                  onClick={() => onNavigateAuth('LOGIN')}
-                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-purple-400/40 hover:bg-purple-500/10 cursor-pointer transition-all backdrop-blur-md group"
-                >
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-purple-300 mb-0.5">
-                    <Share2 className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
-                    <span>Connect</span>
-                  </div>
-                  <span className="text-[10px] text-gray-400 block leading-tight">Follow context</span>
-                </div>
-                <div
-                  onClick={() => onNavigateAuth('LOGIN')}
-                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-blue-400/40 hover:bg-blue-500/10 cursor-pointer transition-all backdrop-blur-md group"
-                >
-                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-300 mb-0.5">
-                    <Layers className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
-                    <span>Understand</span>
-                  </div>
-                  <span className="text-[10px] text-gray-400 block leading-tight">Get deeper insights</span>
-                </div>
-              </div>
-
-              {/* Deep Glass Search Input (Matching Mockup) */}
-              <form onSubmit={handleHeroSearchSubmit} className="relative w-full max-w-lg mt-1">
+              {/* Deep Glass Research Search Bar Beneath Buttons */}
+              <form onSubmit={handleHeroSearchSubmit} className="relative w-full max-w-lg mt-2">
                 <div className="relative flex items-center bg-[#070D1E]/90 border border-cyan-500/30 rounded-2xl p-1.5 backdrop-blur-xl shadow-[0_4px_25px_rgba(0,0,0,0.5)] focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all">
                   <Search className="ml-3 w-4 h-4 text-cyan-400 pointer-events-none" />
                   <input
                     type="text"
                     value={heroSearchQuery}
                     onChange={(e) => setHeroSearchQuery(e.target.value)}
-                    placeholder="Ask anything about 200M+ academic papers..."
+                    placeholder="Search 204M+ papers, authors, or concepts..."
                     className="w-full bg-transparent py-2.5 pl-3 pr-24 text-sm text-white placeholder-gray-400 focus:outline-none"
                   />
                   <button
                     type="submit"
                     className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:from-cyan-400 hover:to-blue-500 transition-all shadow-sm flex items-center gap-1.5 shrink-0"
                   >
-                    <span>Ask AI</span>
+                    <span>Search</span>
                     <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
               </form>
 
-              {/* Trending Topic Chips */}
+              {/* Compact Trending Topic Chips */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-gray-400">
                 <span className="font-semibold text-gray-300 mr-1">Trending:</span>
                 {exampleChips.map((chip, idx) => (
@@ -744,110 +719,13 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               </div>
             </div>
 
-            {/* ─── RIGHT COLUMN: AUTHENTIC 3D GLOBE & FLOATING PILLS ─── */}
-            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[460px] sm:min-h-[540px]">
+            {/* ─── RIGHT COLUMN: ROTATING GLOBE & CLEAN ORBITAL LABELS (NO CARDS) ─── */}
+            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[480px] sm:min-h-[560px]">
+              {/* Atmospheric Backglow */}
+              <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-purple-500/15 blur-[90px] pointer-events-none" />
 
-              {/* Floating Holographic Knowledge Pods (Matching Mockup Colors & Positions) */}
-              {/* 1. Knowledge Graph (Emerald/Cyan) - Top Left */}
-              <div
-                onClick={() => scrollTo(graphRef)}
-                className="absolute top-[8%] left-[4%] sm:left-[8%] z-20 px-3.5 py-2 rounded-2xl bg-[#071E26]/85 border border-emerald-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5 animate-pulse"
-              >
-                <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
-                  <Network className="w-4 h-4 text-emerald-300" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-white block leading-tight">Knowledge Graph</span>
-                  <span className="text-[9px] text-emerald-300 font-mono">AI-Powered</span>
-                </div>
-              </div>
-
-              {/* 2. AI Insights (Blue/Cyan) - Mid Left */}
-              <div
-                onClick={() => scrollTo(assistantRef)}
-                className="absolute top-[40%] left-[0%] sm:left-[3%] z-20 px-3.5 py-2 rounded-2xl bg-[#091536]/85 border border-cyan-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
-              >
-                <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center">
-                  <BrainCircuit className="w-4 h-4 text-cyan-300" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-white block leading-tight">AI Insights</span>
-                  <span className="text-[9px] text-cyan-300 font-mono">Summarize • Compare</span>
-                </div>
-              </div>
-
-              {/* 3. Concepts (Purple) - Bottom Left */}
-              <div
-                onClick={() => scrollTo(universeRef)}
-                className="absolute bottom-[10%] left-[8%] sm:left-[14%] z-20 px-3.5 py-2 rounded-2xl bg-[#170C33]/85 border border-purple-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(168,85,247,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
-              >
-                <div className="w-7 h-7 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center">
-                  <Activity className="w-4 h-4 text-purple-300" />
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-white block leading-tight">Concepts</span>
-                  <span className="text-[10px] text-purple-300 font-bold font-mono">1.8M+</span>
-                </div>
-              </div>
-
-              {/* 4. Papers (Purple/Violet) - Top Right */}
-              <div
-                onClick={() => onNavigateAuth('LOGIN')}
-                className="absolute top-[5%] right-[10%] sm:right-[15%] z-20 px-4 py-2.5 rounded-2xl bg-[#1A0C38]/85 border border-purple-400/60 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.4)] cursor-pointer hover:scale-105 transition-all flex items-center gap-3"
-              >
-                <div className="w-8 h-8 rounded-xl bg-purple-500/25 border border-purple-400/50 flex items-center justify-center">
-                  <FileText className="w-4 h-4 text-purple-200" />
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-purple-300 block leading-tight">Papers</span>
-                  <span className="text-sm font-extrabold text-white font-mono">200M+</span>
-                </div>
-              </div>
-
-              {/* 5. Authors (Cyan) - Upper Right */}
-              <div
-                onClick={() => onNavigateAuth('LOGIN')}
-                className="absolute top-[26%] right-[0%] sm:right-[4%] z-20 px-3.5 py-2 rounded-2xl bg-[#082036]/85 border border-cyan-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
-              >
-                <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center">
-                  <Users className="w-4 h-4 text-cyan-300" />
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-cyan-300 block leading-tight">Authors</span>
-                  <span className="text-xs font-bold text-white font-mono">12.4M+</span>
-                </div>
-              </div>
-
-              {/* 6. Datasets (Amber/Gold) - Mid Right */}
-              <div
-                onClick={() => scrollTo(sourcesRef)}
-                className="absolute top-[50%] right-[2%] sm:right-[6%] z-20 px-3.5 py-2 rounded-2xl bg-[#291704]/85 border border-amber-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
-              >
-                <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center">
-                  <Database className="w-4 h-4 text-amber-300" />
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-amber-300 block leading-tight">Datasets</span>
-                  <span className="text-xs font-bold text-white font-mono">85K+</span>
-                </div>
-              </div>
-
-              {/* 7. Citations (Magenta/Purple) - Bottom Right */}
-              <div
-                onClick={() => scrollTo(universeRef)}
-                className="absolute bottom-[14%] right-[6%] sm:right-[12%] z-20 px-3.5 py-2 rounded-2xl bg-[#29082C]/85 border border-pink-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(244,114,182,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
-              >
-                <div className="w-7 h-7 rounded-xl bg-pink-500/20 border border-pink-400/40 flex items-center justify-center">
-                  <Share2 className="w-4 h-4 text-pink-300" />
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase font-mono text-pink-300 block leading-tight">Citations</span>
-                  <span className="text-xs font-bold text-white font-mono">250M+</span>
-                </div>
-              </div>
-
-              {/* Center Globe Visualization - Authentic ResearchKnowledgeCore */}
-              <div className="relative w-full max-w-[660px] mx-auto overflow-visible select-none pointer-events-auto">
+              {/* The Authentic Rotating Globe Centerpiece with 7 Orbital Labels */}
+              <div className="relative w-full max-w-[700px] mx-auto overflow-visible select-none pointer-events-auto">
                 <ResearchKnowledgeCore onNavigate={() => onNavigateAuth('LOGIN')} />
               </div>
             </div>
@@ -855,14 +733,14 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
           </div>
         </div>
 
-        {/* ─── BOTTOM HERO TELEMETRY STRIP (MATCHING IMAGE 1) ─── */}
+        {/* ─── BOTTOM HERO TELEMETRY STRIP ─── */}
         <div className="relative z-20 w-full max-w-5xl mx-auto px-4 pb-4">
           <div className="p-3 sm:p-4 rounded-2xl bg-[#091129]/80 border border-cyan-500/30 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.6)] flex items-center justify-between">
             <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className="flex items-center justify-center gap-2.5">
                 <FileText className="w-5 h-5 text-purple-400 shrink-0" />
                 <div className="text-left">
-                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">200M+</span>
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">204M+</span>
                   <span className="text-[11px] text-gray-400">Research Papers</span>
                 </div>
               </div>
@@ -883,7 +761,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               <div className="flex items-center justify-center gap-2.5">
                 <Share2 className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div className="text-left">
-                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">250M+</span>
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">1.24B</span>
                   <span className="text-[11px] text-gray-400">Citations</span>
                 </div>
               </div>
@@ -902,13 +780,13 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
       </section>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*        2. 5-STAGE SCIENTIFIC WORKFLOW (LIGHT DECK)           */}
+      {/*   2. REDESIGNED RESEARCH DISCOVERY PIPELINE (FROSTED DECK)   */}
       {/* ════════════════════════════════════════════════════════════ */}
       <section ref={workflowRef} className="py-20 lg:py-24 bg-[#F8FAFC] text-slate-900 relative border-t border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold font-mono tracking-wider uppercase mb-3">
-              Autonomous Ingestion Architecture
+              Research Discovery Pipeline
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               From Raw PDF to High-Dimensional Knowledge Graph
@@ -918,7 +796,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             </p>
           </div>
 
-          {/* Interactive Stage Selector Bar */}
+          {/* Interactive Modern Visual Timeline */}
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 mb-10">
             {workflowSteps.map((step, idx) => {
               const IconComp = step.icon;
@@ -947,8 +825,9 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             })}
           </div>
 
-          {/* Detailed Active Step Deep-Dive Card */}
+          {/* Combined Light Scientific UI Surface & Dark Technical Console */}
           <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left: Light Scientific Surface */}
             <div className="lg:col-span-7 space-y-4">
               <div className="flex items-center gap-3">
                 <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700">
@@ -979,20 +858,20 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               </div>
             </div>
 
-            {/* Stage Technical Simulation HUD */}
+            {/* Right: Dark Technical Telemetry Console */}
             <div className="lg:col-span-5 bg-slate-900 rounded-2xl p-5 text-white font-mono text-xs border border-slate-800 space-y-3 shadow-inner">
               <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px] text-slate-400">
                 <span>PIPELINE_EXECUTOR::V2.4</span>
                 <span className="text-emerald-400 font-bold">● ONLINE</span>
               </div>
               <div className="space-y-1.5 text-slate-300">
-                <div className="text-blue-400">&gt; INPUT: Multimodal Research Stream</div>
+                <div className="text-blue-400">&gt; INPUT: Multimodal Academic Corpus Stream</div>
                 <div className="text-cyan-300">&gt; LATENCY: 12.4ms per vector cluster</div>
                 <div className="text-purple-300">&gt; TOPOLOGY: Directional citation mesh</div>
-                <div className="text-emerald-300">&gt; INTEGRITY: 100% verified anchors</div>
+                <div className="text-emerald-300">&gt; INTEGRITY: 100% verified DOI anchors</div>
               </div>
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed">
-                Autonomous validation engine guarantees that every retrieved citation maps directly to a peer-reviewed DOI.
+                Autonomous validation engine guarantees that every claim maps directly to a peer-reviewed PDF paragraph.
               </div>
             </div>
           </div>
@@ -1109,8 +988,9 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                     <span className="text-blue-600 font-bold">{paper.journal} • {paper.year}</span>
                     <span>{paper.citations} citations</span>
                   </div>
-                  <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
-                    {paper.title}
+                  <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5 flex items-center justify-between">
+                    <span>{paper.title}</span>
+                    <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-600 transition-colors shrink-0" />
                   </h4>
                   <div className="text-xs text-slate-500">
                     {paper.authors}
@@ -1301,7 +1181,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             Accelerate Your Research with Connected Intelligence
           </h2>
           <p className="text-gray-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Join thousands of scientists, machine learning engineers, and researchers exploring over 200M+ publications through ResearchGraph AI.
+            Join thousands of scientists, machine learning engineers, and researchers exploring over 204M+ publications through ResearchGraph AI.
           </p>
           <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
             <button
@@ -1380,7 +1260,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                     </div>
                   </div>
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    ResearchGraph AI was developed to overcome the acute fragmentation of modern scientific research. With over 200M+ papers scattered across proprietary silos and isolated preprint archives, critical cross-disciplinary intersections frequently go undetected for years.
+                    ResearchGraph AI was developed to overcome the acute fragmentation of modern scientific research. With over 204M+ papers scattered across proprietary silos and isolated preprint archives, critical cross-disciplinary intersections frequently go undetected for years.
                   </p>
                   <p className="text-sm text-gray-300 leading-relaxed">
                     By combining hybrid vector-graph indexing with multi-LLM consensus verification (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5 Pro), ResearchGraph AI anchors every synthetic insight directly to peer-reviewed evidence with zero hallucination.
