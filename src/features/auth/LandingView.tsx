@@ -529,7 +529,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             onClick={() => scrollTo(workflowRef)}
             className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
           >
-            Pipeline
+            RAG Pipeline
           </button>
           <button
             onClick={() => scrollTo(universeRef)}
@@ -745,12 +745,12 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             </div>
 
             {/* ─── RIGHT COLUMN: ROTATING GLOBE & CLEAN ORBITAL LABELS (NO CARDS) ─── */}
-            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[480px] sm:min-h-[560px]">
-              {/* Atmospheric Backglow */}
-              <div className="absolute inset-8 rounded-full bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-purple-500/15 blur-[90px] pointer-events-none" />
+            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[480px] sm:min-h-[560px] lg:translate-x-[50px] lg:-translate-y-12">
+              {/* Atmospheric Backglow Centered on Citadel Platform */}
+              <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-cyan-500/20 via-blue-500/15 to-purple-500/15 blur-[95px] pointer-events-none" />
 
               {/* The Authentic Rotating Globe Centerpiece with 7 Orbital Labels */}
-              <div className="relative w-full max-w-[700px] mx-auto overflow-visible select-none pointer-events-auto">
+              <div className="relative w-full max-w-[720px] mx-auto overflow-visible select-none pointer-events-auto">
                 <ResearchKnowledgeCore onNavigate={() => onNavigateAuth('LOGIN')} />
               </div>
             </div>

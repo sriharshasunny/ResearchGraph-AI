@@ -209,6 +209,12 @@ function initResearchGraphGlobe(
           bb = 54 * lt + dot * 80 + gl * 150;
         }
 
+        // Upward holographic bounce from platform emitter beam
+        const bottomBounce = Math.max(0, -NY[p]) * 0.42;
+        rr += bottomBounce * 35;
+        gg += bottomBounce * 120;
+        bb += bottomBounce * 190;
+
         rr += fr * 100;
         gg += fr * 190;
         bb += fr * 255;
@@ -708,14 +714,16 @@ function initResearchGraphGlobe(
         .rg-stage canvas {
           position: absolute;
           left: 50%;
-          top: 48%;
-          width: 52%;
+          top: 42%;
+          width: 50%;
           aspect-ratio: 1;
           transform: translate(-50%, -50%);
           cursor: grab;
           touch-action: pan-y;
           outline: none;
           -webkit-tap-highlight-color: transparent;
+          z-index: 10;
+          animation: rg-globe-float 6.5s ease-in-out infinite;
         }
         .rg-stage canvas:focus-visible {
           outline: 2px solid #35c6ff;
@@ -723,57 +731,131 @@ function initResearchGraphGlobe(
           border-radius: 50%;
         }
 
-        /* ── CITADEL PROJECTION EMITTER PLATFORM (ANCHORS GLOBE VISUALLY) ── */
+        @keyframes rg-globe-float {
+          0%, 100% {
+            transform: translate(-50%, -50%) translateY(0px);
+          }
+          50% {
+            transform: translate(-50%, -50%) translateY(-7px);
+          }
+        }
+
+        /* ── CITADEL PROJECTION LEVITATION BEAM SYSTEM ── */
         .rg-projector-pedestal {
           position: absolute;
           left: 50%;
-          top: 74%;
+          top: 75%;
           transform: translate(-50%, -50%);
-          width: 38cqw;
-          height: 14cqw;
+          width: 44cqw;
+          height: 18cqw;
           pointer-events: none;
           display: flex;
           align-items: center;
           justify-content: center;
           z-index: 5;
         }
+        /* 1. Volumetric Conical Energy Beam */
         .rg-projector-beam {
           position: absolute;
-          bottom: 35%;
+          bottom: 24%;
           left: 50%;
           transform: translateX(-50%);
-          width: 32cqw;
-          height: 24cqw;
-          background: linear-gradient(to top, rgba(6,182,212,0.4) 0%, rgba(99,102,241,0.2) 48%, transparent 95%);
-          clip-path: polygon(25% 100%, 75% 100%, 95% 0%, 5% 0%);
+          width: 38cqw;
+          height: 29cqw;
+          background: linear-gradient(to top, rgba(6,182,212,0.48) 0%, rgba(56,189,248,0.28) 45%, rgba(129,140,248,0.12) 80%, transparent 100%);
+          clip-path: polygon(14% 100%, 86% 100%, 96% 0%, 4% 0%);
           filter: blur(4px);
-          opacity: 0.85;
-          animation: rg-beam-pulse 4s ease-in-out infinite;
+          opacity: 0.9;
+          animation: rg-beam-pulse 4.5s ease-in-out infinite;
+        }
+        /* Inner Scanline Filament */
+        .rg-projector-filament {
+          position: absolute;
+          bottom: 26%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 24cqw;
+          height: 27cqw;
+          background: linear-gradient(to top, rgba(165,243,252,0.65) 0%, rgba(56,189,248,0.3) 50%, transparent 100%);
+          clip-path: polygon(25% 100%, 75% 100%, 85% 0%, 15% 0%);
+          filter: blur(2px);
+          opacity: 0.75;
+          animation: rg-beam-pulse 3s ease-in-out infinite alternate;
+        }
+        /* 2. Platform Reflective Disc & Concentric Emitter Rings */
+        .rg-emitter-disc {
+          position: absolute;
+          width: 42cqw;
+          height: 12cqw;
+          border-radius: 50%;
+          background: radial-gradient(ellipse at center, rgba(6,182,212,0.45) 0%, rgba(56,189,248,0.25) 45%, rgba(99,102,241,0.08) 65%, transparent 80%);
+          filter: blur(3px);
+          animation: rg-ring-pulse 4s ease-in-out infinite;
         }
         .rg-projector-ring {
           position: absolute;
           border-radius: 50%;
-          border: 1.5px solid rgba(6, 182, 212, 0.65);
-          box-shadow: 0 0 16px rgba(6, 182, 212, 0.45), inset 0 0 12px rgba(99, 102, 241, 0.3);
+          border: 1.5px solid rgba(6, 182, 212, 0.75);
+          box-shadow: 0 0 16px rgba(6, 182, 212, 0.5), inset 0 0 12px rgba(99, 102, 241, 0.35);
         }
         .rg-projector-ring.r1 {
-          width: 34cqw;
-          height: 8.5cqw;
-          background: radial-gradient(ellipse at center, rgba(6,182,212,0.22) 0%, transparent 70%);
+          width: 36cqw;
+          height: 9.5cqw;
+          border-color: rgba(6, 182, 212, 0.6);
+          animation: rg-ring-pulse 4.5s ease-in-out infinite;
         }
         .rg-projector-ring.r2 {
           width: 26cqw;
-          height: 6.5cqw;
-          border-color: rgba(56, 189, 248, 0.85);
-          animation: rg-ring-pulse 3s ease-in-out infinite;
+          height: 7cqw;
+          border-color: rgba(56, 189, 248, 0.9);
+          box-shadow: 0 0 18px rgba(56, 189, 248, 0.65);
+          animation: rg-ring-pulse 3s ease-in-out infinite reverse;
         }
+        .rg-projector-ring.r3 {
+          width: 16cqw;
+          height: 4.5cqw;
+          border-color: rgba(207, 250, 254, 0.95);
+          box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+        }
+
+        /* 3. Soft Levitation Halo right beneath globe */
+        .rg-levitation-halo {
+          position: absolute;
+          left: 50%;
+          top: 65%;
+          transform: translate(-50%, -50%);
+          width: 34cqw;
+          height: 9cqw;
+          border-radius: 50%;
+          background: radial-gradient(ellipse at center, rgba(56,189,248,0.55) 0%, rgba(99,102,241,0.25) 50%, transparent 75%);
+          filter: blur(8px);
+          pointer-events: none;
+          z-index: 6;
+          animation: rg-beam-pulse 4.5s ease-in-out infinite;
+        }
+
+        /* 4. Subtle Planetary Equatorial Orbital Ring */
+        .rg-orbital-ring {
+          position: absolute;
+          left: 50%;
+          top: 42%;
+          width: 58cqw;
+          height: 16cqw;
+          transform: translate(-50%, -50%) rotate(-14deg);
+          border-radius: 50%;
+          border: 1px solid rgba(56, 189, 248, 0.32);
+          box-shadow: 0 0 12px rgba(56, 189, 248, 0.18), inset 0 0 10px rgba(129, 140, 248, 0.15);
+          pointer-events: none;
+          z-index: 9;
+        }
+
         @keyframes rg-beam-pulse {
-          0%, 100% { opacity: 0.75; transform: translateX(-50%) scaleY(1); }
-          50% { opacity: 0.95; transform: translateX(-50%) scaleY(1.08); }
+          0%, 100% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
+          50% { opacity: 1; transform: translateX(-50%) scaleY(1.06); }
         }
         @keyframes rg-ring-pulse {
-          0%, 100% { transform: scale(0.98); opacity: 0.7; }
-          50% { transform: scale(1.04); opacity: 1; }
+          0%, 100% { transform: scale(0.97); opacity: 0.75; }
+          50% { transform: scale(1.03); opacity: 1; }
         }
         .rg-tip {
           position: absolute;
@@ -796,18 +878,18 @@ function initResearchGraphGlobe(
         .rg-tip.on { opacity: 1; }
         .rg-hint {
           position: absolute;
-          left: 48.7%;
-          top: 73%;
+          left: 50%;
+          top: 95%;
           transform: translateX(-50%);
           display: flex;
           gap: .8cqw;
           align-items: center;
-          padding: .7cqw 1.5cqw;
+          padding: .5cqw 1.3cqw;
           border-radius: 2cqw;
-          font-size: 1.3cqw;
+          font-size: 1.2cqw;
           color: #9fb6e6;
-          background: rgba(6,16,42,.72);
-          border: 1px solid rgba(120,150,220,.22);
+          background: rgba(6,16,42,.85);
+          border: 1px solid rgba(120,150,220,.25);
           pointer-events: none;
           transition: opacity .6s;
           z-index: 30;
@@ -914,60 +996,69 @@ function initResearchGraphGlobe(
 
         {/* Citadel Platform Holographic Projector Pedestal Base */}
         <div className="rg-projector-pedestal" aria-hidden="true">
+          <div className="rg-emitter-disc" />
           <div className="rg-projector-beam" />
+          <div className="rg-projector-filament" />
           <div className="rg-projector-ring r1" />
           <div className="rg-projector-ring r2" />
+          <div className="rg-projector-ring r3" />
         </div>
+
+        {/* Soft Levitation Halo beneath the globe */}
+        <div className="rg-levitation-halo" aria-hidden="true" />
+
+        {/* Subtle Equatorial Orbital Ring */}
+        <div className="rg-orbital-ring" aria-hidden="true" />
 
         {/* Fine Animated Orbital Connection Vectors */}
         <svg className="rg-links-svg" viewBox="0 0 1000 585" aria-hidden="true">
           {/* 1. Knowledge Graph Link (Upper Left) */}
           <g style={{ color: '#10b981' }} className="g">
-            <line x1="280" y1="90" x2="430" y2="210" stroke="#10b981" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="280" cy="90" r="3" fill="#10b981" />
-            <circle cx="430" cy="210" r="2.5" fill="#fff" />
+            <line x1="220" y1="95" x2="410" y2="190" stroke="#10b981" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="220" cy="95" r="3" fill="#10b981" />
+            <circle cx="410" cy="190" r="2.5" fill="#fff" />
           </g>
 
           {/* 2. Research Papers Link (Upper Right) */}
           <g style={{ color: '#38bdf8' }} className="g">
-            <line x1="720" y1="90" x2="570" y2="210" stroke="#38bdf8" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="720" cy="90" r="3" fill="#38bdf8" />
-            <circle cx="570" cy="210" r="2.5" fill="#fff" />
+            <line x1="760" y1="95" x2="590" y2="190" stroke="#38bdf8" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="760" cy="95" r="3" fill="#38bdf8" />
+            <circle cx="590" cy="190" r="2.5" fill="#fff" />
           </g>
 
           {/* 3. AI Insights Link (Mid Left) */}
           <g style={{ color: '#6366f1' }} className="g">
-            <line x1="150" y1="245" x2="380" y2="290" stroke="#6366f1" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="150" cy="245" r="3" fill="#6366f1" />
-            <circle cx="380" cy="290" r="2.5" fill="#fff" />
+            <line x1="130" y1="240" x2="380" y2="260" stroke="#6366f1" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="130" cy="240" r="3" fill="#6366f1" />
+            <circle cx="380" cy="260" r="2.5" fill="#fff" />
           </g>
 
           {/* 4. Authors Link (Mid Right) */}
           <g style={{ color: '#06b6d4' }} className="g">
-            <line x1="850" y1="245" x2="620" y2="290" stroke="#06b6d4" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="850" cy="245" r="3" fill="#06b6d4" />
-            <circle cx="620" cy="290" r="2.5" fill="#fff" />
+            <line x1="870" y1="240" x2="620" y2="260" stroke="#06b6d4" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="870" cy="240" r="3" fill="#06b6d4" />
+            <circle cx="620" cy="260" r="2.5" fill="#fff" />
           </g>
 
           {/* 5. Concepts Link (Lower Left) */}
           <g style={{ color: '#a855f7' }} className="g">
-            <line x1="200" y1="430" x2="410" y2="380" stroke="#a855f7" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="200" cy="430" r="3" fill="#a855f7" />
-            <circle cx="410" cy="380" r="2.5" fill="#fff" />
+            <line x1="160" y1="395" x2="390" y2="340" stroke="#a855f7" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="160" cy="395" r="3" fill="#a855f7" />
+            <circle cx="390" cy="340" r="2.5" fill="#fff" />
           </g>
 
           {/* 6. Datasets Link (Lower Right) */}
           <g style={{ color: '#f59e0b' }} className="g">
-            <line x1="800" y1="430" x2="590" y2="380" stroke="#f59e0b" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="800" cy="430" r="3" fill="#f59e0b" />
-            <circle cx="590" cy="380" r="2.5" fill="#fff" />
+            <line x1="830" y1="395" x2="610" y2="340" stroke="#f59e0b" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="830" cy="395" r="3" fill="#f59e0b" />
+            <circle cx="610" cy="340" r="2.5" fill="#fff" />
           </g>
 
-          {/* 7. Citations Link (Bottom Center) */}
+          {/* 7. Citations Link (Lower Flank) */}
           <g style={{ color: '#ec4899' }} className="g">
-            <line x1="500" y1="510" x2="500" y2="425" stroke="#ec4899" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="500" cy="510" r="3" fill="#ec4899" />
-            <circle cx="500" cy="425" r="2.5" fill="#fff" />
+            <line x1="700" y1="495" x2="570" y2="385" stroke="#ec4899" strokeDasharray="3 3" opacity="0.55" />
+            <circle cx="700" cy="495" r="3" fill="#ec4899" />
+            <circle cx="570" cy="385" r="2.5" fill="#fff" />
           </g>
         </svg>
 
@@ -978,8 +1069,8 @@ function initResearchGraphGlobe(
           onClick={() => handleAction('graph')}
           className="rg-orbit-pill"
           style={{
-            left: '28%',
-            top: '15%',
+            left: '20%',
+            top: '16%',
             '--c': '#10b981',
             '--glow': 'rgba(16, 185, 129, 0.4)'
           } as React.CSSProperties}
@@ -996,8 +1087,8 @@ function initResearchGraphGlobe(
           onClick={() => handleAction('search')}
           className="rg-orbit-pill"
           style={{
-            left: '72%',
-            top: '15%',
+            left: '78%',
+            top: '16%',
             '--c': '#38bdf8',
             '--glow': 'rgba(56, 189, 248, 0.4)'
           } as React.CSSProperties}
@@ -1014,8 +1105,8 @@ function initResearchGraphGlobe(
           onClick={() => handleAction('search')}
           className="rg-orbit-pill"
           style={{
-            left: '14%',
-            top: '42%',
+            left: '10%',
+            top: '41%',
             '--c': '#818cf8',
             '--glow': 'rgba(129, 140, 248, 0.4)'
           } as React.CSSProperties}
@@ -1032,8 +1123,8 @@ function initResearchGraphGlobe(
           onClick={() => handleSearch('Research authors')}
           className="rg-orbit-pill"
           style={{
-            left: '86%',
-            top: '42%',
+            left: '88%',
+            top: '41%',
             '--c': '#06b6d4',
             '--glow': 'rgba(6, 182, 212, 0.4)'
           } as React.CSSProperties}
@@ -1050,8 +1141,8 @@ function initResearchGraphGlobe(
           onClick={() => handleSearch('Ontological concepts')}
           className="rg-orbit-pill"
           style={{
-            left: '20%',
-            top: '73%',
+            left: '15%',
+            top: '67%',
             '--c': '#a855f7',
             '--glow': 'rgba(168, 85, 247, 0.4)'
           } as React.CSSProperties}
@@ -1068,8 +1159,8 @@ function initResearchGraphGlobe(
           onClick={() => handleSearch('Empirical datasets')}
           className="rg-orbit-pill"
           style={{
-            left: '80%',
-            top: '73%',
+            left: '84%',
+            top: '67%',
             '--c': '#f59e0b',
             '--glow': 'rgba(245, 158, 11, 0.4)'
           } as React.CSSProperties}
@@ -1086,8 +1177,8 @@ function initResearchGraphGlobe(
           onClick={() => handleSearch('Citation networks')}
           className="rg-orbit-pill"
           style={{
-            left: '50%',
-            top: '87%',
+            left: '70%',
+            top: '84%',
             '--c': '#ec4899',
             '--glow': 'rgba(236, 72, 153, 0.4)'
           } as React.CSSProperties}
