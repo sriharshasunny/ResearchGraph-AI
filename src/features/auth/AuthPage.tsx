@@ -227,6 +227,17 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
       tagColor: 'text-amber-400 border-amber-500/40 bg-amber-500/10',
       description: 'Stanford CS224W lecture on Graph Neural Networks (GNNs), message passing algorithms, and topological embeddings for scientific discovery.',
       highlights: ['Message Passing (MPNN)', 'Permutation Invariance', 'Graph Convolutional Networks', 'Biomedical Discovery']
+    },
+    {
+      id: 'earth-orbit',
+      youtubeId: 'yQNEKTOL_oA',
+      title: 'Earth from Space in 4K',
+      publisher: 'NASA Johnson',
+      duration: '4K Space View',
+      badge: 'Orbital Perspective',
+      tagColor: 'text-fuchsia-300 border-fuchsia-400/40 bg-fuchsia-500/10',
+      description: 'A cinematic orbital view of Earth that brings the scale, color, and wonder of scientific exploration into the ResearchGraph universe.',
+      highlights: ['Earth Observation', 'Orbital Perspective', 'Scientific Curiosity', 'NASA Footage']
     }
   ];
 
