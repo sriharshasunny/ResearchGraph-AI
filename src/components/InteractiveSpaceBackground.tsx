@@ -38,8 +38,8 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // Layer 1: Distant Multi-Depth Star Field (Deep Cosmic Canvas)
-    const starCount = 120;
+    // ─── LAYER 1: MULTI-DEPTH REALISTIC STAR FIELD ───
+    const starCount = 140;
     const stars: Array<{
       x: number;
       y: number;
@@ -51,25 +51,25 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       speed: number;
     }> = [];
 
-    const starColors = ['#FFFFFF', '#E0F2FE', '#CFFAFE', '#EDE9FE', '#DDD6FE', '#38BDF8'];
+    const starColors = ['#FFFFFF', '#F0F9FF', '#E0F2FE', '#EDE9FE', '#DDD6FE', '#38BDF8'];
 
     for (let i = 0; i < starCount; i++) {
-      const depth = Math.random(); // 0 (far) to 1 (near)
+      const depth = Math.random(); // 0 (far distant) to 1 (near)
       stars.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        radius: depth * 1.5 + 0.4,
-        baseAlpha: Math.random() * 0.6 + 0.25,
-        twinkleSpeed: Math.random() * 0.04 + 0.015,
+        radius: depth > 0.85 ? Math.random() * 1.4 + 0.8 : Math.random() * 0.7 + 0.35,
+        baseAlpha: Math.random() * 0.55 + 0.25,
+        twinkleSpeed: Math.random() * 0.03 + 0.01,
         phase: Math.random() * Math.PI * 2,
         color: starColors[Math.floor(Math.random() * starColors.length)],
-        speed: depth * 0.15 + 0.05
+        speed: depth * 0.12 + 0.03
       });
     }
 
-    // Layer 2: Floating Scientific Network Nodes with Topological Links
-    const nodeCount = 36;
-    const nodes: Array<{
+    // ─── LAYER 2: SLOW DRIFTING COSMIC DUST PARTICLES ───
+    const dustCount = 38;
+    const dustParticles: Array<{
       x: number;
       y: number;
       vx: number;
@@ -79,21 +79,21 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       alpha: number;
     }> = [];
 
-    const nodeColors = ['#0EA5E9', '#38BDF8', '#6366F1', '#A855F7', '#06B6D4'];
+    const dustColors = ['#38BDF8', '#818CF8', '#A855F7', '#06B6D4', '#22D3EE'];
 
-    for (let i = 0; i < nodeCount; i++) {
-      nodes.push({
+    for (let i = 0; i < dustCount; i++) {
+      dustParticles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        radius: Math.random() * 1.8 + 1.2,
-        color: nodeColors[Math.floor(Math.random() * nodeColors.length)],
-        alpha: Math.random() * 0.35 + 0.2,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        radius: Math.random() * 1.6 + 0.8,
+        color: dustColors[Math.floor(Math.random() * dustColors.length)],
+        alpha: Math.random() * 0.3 + 0.15,
       });
     }
 
-    // Layer 3: Occasional Cosmic Shooting Stars
+    // ─── LAYER 3: OCCASIONAL HIGH-SPEED RESEARCH METEOR STREAKS ───
     let shootingStar: {
       x: number;
       y: number;
@@ -104,7 +104,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
       active: boolean;
     } | null = null;
 
-    let nextShootingStarTime = Date.now() + 3000;
+    let nextShootingStarTime = Date.now() + 3500;
 
     let animationId: number;
     let isRunning = true;
@@ -113,83 +113,90 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     const render = () => {
       if (!isRunning) return;
       animationId = requestAnimationFrame(render);
-      time += 0.02;
+      time += 0.016;
 
-      mouseX += (targetMouseX - mouseX) * 0.05;
-      mouseY += (targetMouseY - mouseY) * 0.05;
+      mouseX += (targetMouseX - mouseX) * 0.04;
+      mouseY += (targetMouseY - mouseY) * 0.04;
 
       ctx.clearRect(0, 0, width, height);
 
-      // Render for Landing Page
       if (pageState === 'LANDING') {
-        // 1. Draw Multi-Layered Twinkling Starfield
+        // 1. Draw Multi-Layered Stars with Organic Twinkle
         for (let i = 0; i < stars.length; i++) {
           const s = stars[i];
           const px = s.x + mouseX * s.speed;
           const py = s.y + mouseY * s.speed;
 
-          // Twinkle pulse calculation
-          const alpha = s.baseAlpha + Math.sin(time * s.twinkleSpeed * 60 + s.phase) * 0.35;
+          const alpha = s.baseAlpha + Math.sin(time * s.twinkleSpeed * 60 + s.phase) * 0.3;
           ctx.fillStyle = s.color;
-          ctx.globalAlpha = Math.max(0.1, Math.min(1, alpha));
+          ctx.globalAlpha = Math.max(0.12, Math.min(0.95, alpha));
           ctx.beginPath();
           ctx.arc(px, py, s.radius, 0, Math.PI * 2);
           ctx.fill();
+
+          // Subtle corona for brighter foreground stars
+          if (s.radius > 1.2) {
+            ctx.fillStyle = s.color;
+            ctx.globalAlpha = alpha * 0.25;
+            ctx.beginPath();
+            ctx.arc(px, py, s.radius * 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
 
-        // 2. Draw Scientific Constellation Nodes & Directional Data Links
-        for (let i = 0; i < nodes.length; i++) {
-          const n = nodes[i];
-          n.x += n.vx;
-          n.y += n.vy;
+        // 2. Draw Gentle Drifting Cosmic Dust & Research Vector Links
+        for (let i = 0; i < dustParticles.length; i++) {
+          const p = dustParticles[i];
+          p.x += p.vx;
+          p.y += p.vy;
 
-          if (n.x < 0) n.x = width;
-          if (n.x > width) n.x = 0;
-          if (n.y < 0) n.y = height;
-          if (n.y > height) n.y = 0;
+          if (p.x < 0) p.x = width;
+          if (p.x > width) p.x = 0;
+          if (p.y < 0) p.y = height;
+          if (p.y > height) p.y = 0;
 
-          const px = n.x + mouseX * 0.2;
-          const py = n.y + mouseY * 0.2;
+          const px = p.x + mouseX * 0.18;
+          const py = p.y + mouseY * 0.18;
 
-          ctx.fillStyle = n.color;
-          ctx.globalAlpha = n.alpha;
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = p.alpha;
           ctx.beginPath();
-          ctx.arc(px, py, n.radius, 0, Math.PI * 2);
+          ctx.arc(px, py, p.radius, 0, Math.PI * 2);
           ctx.fill();
 
-          // Connect adjacent nodes within connection radius
-          for (let j = i + 1; j < nodes.length; j++) {
-            const n2 = nodes[j];
-            const dx = n.x - n2.x;
-            const dy = n.y - n2.y;
+          // Subtle connection arcs between proximate dust particles
+          for (let j = i + 1; j < dustParticles.length; j++) {
+            const p2 = dustParticles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < 140) {
-              const lineAlpha = (1 - dist / 140) * 0.12;
+            if (dist < 135) {
+              const lineAlpha = (1 - dist / 135) * 0.08;
               ctx.strokeStyle = '#38BDF8';
               ctx.globalAlpha = lineAlpha;
-              ctx.lineWidth = 0.85;
+              ctx.lineWidth = 0.75;
               ctx.beginPath();
               ctx.moveTo(px, py);
-              ctx.lineTo(n2.x + mouseX * 0.2, n2.y + mouseY * 0.2);
+              ctx.lineTo(p2.x + mouseX * 0.18, p2.y + mouseY * 0.18);
               ctx.stroke();
             }
           }
         }
 
-        // 3. Cosmic Shooting Star / Fast Research Data Pulse
+        // 3. Cosmic Shooting Star / High-Velocity Data Streak
         const now = Date.now();
         if (!shootingStar && now > nextShootingStarTime) {
           shootingStar = {
-            x: Math.random() * width * 0.8,
+            x: Math.random() * width * 0.85,
             y: Math.random() * height * 0.35,
-            length: Math.random() * 80 + 70,
-            speed: Math.random() * 12 + 16,
-            angle: Math.PI / 4 + (Math.random() - 0.5) * 0.3,
+            length: Math.random() * 80 + 75,
+            speed: Math.random() * 12 + 15,
+            angle: Math.PI / 4 + (Math.random() - 0.5) * 0.25,
             opacity: 1,
             active: true
           };
-          nextShootingStarTime = now + Math.random() * 7000 + 5000;
+          nextShootingStarTime = now + Math.random() * 8000 + 6000;
         }
 
         if (shootingStar && shootingStar.active) {
@@ -199,11 +206,11 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
           const grad = ctx.createLinearGradient(tailX, tailY, shootingStar.x, shootingStar.y);
           grad.addColorStop(0, 'rgba(6, 182, 212, 0)');
-          grad.addColorStop(0.7, 'rgba(56, 189, 248, 0.4)');
+          grad.addColorStop(0.65, 'rgba(56, 189, 248, 0.45)');
           grad.addColorStop(1, 'rgba(255, 255, 255, 0.95)');
 
           ctx.strokeStyle = grad;
-          ctx.lineWidth = 1.8;
+          ctx.lineWidth = 1.75;
           ctx.globalAlpha = shootingStar.opacity;
           ctx.beginPath();
           ctx.moveTo(tailX, tailY);
@@ -213,7 +220,7 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
           shootingStar.x += Math.cos(shootingStar.angle) * shootingStar.speed;
           shootingStar.y += Math.sin(shootingStar.angle) * shootingStar.speed;
-          shootingStar.opacity -= 0.025;
+          shootingStar.opacity -= 0.024;
 
           if (shootingStar.opacity <= 0 || shootingStar.x > width || shootingStar.y > height) {
             shootingStar = null;
@@ -244,41 +251,42 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none transition-colors duration-700">
       
-      {/* ─── LANDING MODE: DEEP SPACE RESEARCH COSMOS WITH PARALLAX NEBULAE ─── */}
+      {/* ─── LANDING MODE: DEEP SPACE RESEARCH COSMOS WITH HARMONIC ATMOSPHERIC WAVES ─── */}
       {pageState === 'LANDING' && (
         <div className="absolute inset-0 bg-[#060B19]">
-          {/* Ambient Cosmic Nebula Glow 1: Top Right (Electric Blue & Indigo) */}
+          {/* Cosmic Nebula Wave 1: Top Right (Electric Blue & Indigo) */}
           <div 
-            className="absolute -top-[15%] right-[5%] w-[700px] h-[700px] rounded-full pointer-events-none blur-[120px] opacity-35"
+            className="absolute -top-[18%] right-[4%] w-[750px] h-[750px] rounded-full pointer-events-none blur-[130px] opacity-35 animate-pulse"
             style={{
               background: 'radial-gradient(circle, rgba(14, 165, 233, 0.45) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 75%)',
-              transform: `translate3d(${parallax.x * 0.4}px, ${parallax.y * 0.4}px, 0)`
+              transform: `translate3d(${parallax.x * 0.35}px, ${parallax.y * 0.35}px, 0)`,
+              animationDuration: '14s'
             }}
           />
 
-          {/* Ambient Cosmic Nebula Glow 2: Center Left (Deep Violet & Magenta) */}
+          {/* Cosmic Nebula Wave 2: Center Left (Deep Violet & Magenta Galaxy Dust) */}
           <div 
-            className="absolute top-[32%] -left-[12%] w-[650px] h-[650px] rounded-full pointer-events-none blur-[130px] opacity-35"
+            className="absolute top-[30%] -left-[14%] w-[700px] h-[700px] rounded-full pointer-events-none blur-[140px] opacity-30"
             style={{
               background: 'radial-gradient(circle, rgba(168, 85, 247, 0.4) 0%, rgba(59, 130, 246, 0.2) 50%, transparent 80%)',
-              transform: `translate3d(${parallax.x * -0.3}px, ${parallax.y * -0.3}px, 0)`
+              transform: `translate3d(${parallax.x * -0.28}px, ${parallax.y * -0.28}px, 0)`
             }}
           />
 
-          {/* Ambient Cosmic Nebula Glow 3: Bottom Right (Cyan Atmospheric Halo) */}
+          {/* Cosmic Nebula Wave 3: Bottom Right (Cyan Atmospheric Halo) */}
           <div 
-            className="absolute -bottom-[15%] right-[15%] w-[600px] h-[600px] rounded-full pointer-events-none blur-[110px] opacity-25"
+            className="absolute -bottom-[16%] right-[14%] w-[650px] h-[650px] rounded-full pointer-events-none blur-[120px] opacity-25"
             style={{
-              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(37, 99, 235, 0.2) 60%, transparent 80%)',
+              background: 'radial-gradient(circle, rgba(6, 182, 212, 0.35) 0%, rgba(37, 99, 235, 0.18) 60%, transparent 80%)',
               transform: `translate3d(${parallax.x * 0.2}px, ${parallax.y * 0.2}px, 0)`
             }}
           />
 
           {/* Micro-dot constellation grid texture */}
           <div 
-            className="absolute inset-0 opacity-[0.16]"
+            className="absolute inset-0 opacity-[0.14]"
             style={{
-              backgroundImage: 'radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px)',
+              backgroundImage: 'radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px)',
               backgroundSize: '32px 32px'
             }}
           />

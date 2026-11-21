@@ -700,7 +700,7 @@ function initResearchGraphGlobe(
         .rg-stage {
           position: relative;
           container-type: inline-size;
-          aspect-ratio: 1000/585;
+          aspect-ratio: 1000/600;
           width: 100%;
           max-width: 960px;
           margin: 0 auto;
@@ -708,8 +708,8 @@ function initResearchGraphGlobe(
         .rg-stage canvas {
           position: absolute;
           left: 50%;
-          top: 55%;
-          width: 50%;
+          top: 48%;
+          width: 52%;
           aspect-ratio: 1;
           transform: translate(-50%, -50%);
           cursor: grab;
@@ -721,6 +721,59 @@ function initResearchGraphGlobe(
           outline: 2px solid #35c6ff;
           outline-offset: -4px;
           border-radius: 50%;
+        }
+
+        /* ── CITADEL PROJECTION EMITTER PLATFORM (ANCHORS GLOBE VISUALLY) ── */
+        .rg-projector-pedestal {
+          position: absolute;
+          left: 50%;
+          top: 74%;
+          transform: translate(-50%, -50%);
+          width: 38cqw;
+          height: 14cqw;
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 5;
+        }
+        .rg-projector-beam {
+          position: absolute;
+          bottom: 35%;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 32cqw;
+          height: 24cqw;
+          background: linear-gradient(to top, rgba(6,182,212,0.4) 0%, rgba(99,102,241,0.2) 48%, transparent 95%);
+          clip-path: polygon(25% 100%, 75% 100%, 95% 0%, 5% 0%);
+          filter: blur(4px);
+          opacity: 0.85;
+          animation: rg-beam-pulse 4s ease-in-out infinite;
+        }
+        .rg-projector-ring {
+          position: absolute;
+          border-radius: 50%;
+          border: 1.5px solid rgba(6, 182, 212, 0.65);
+          box-shadow: 0 0 16px rgba(6, 182, 212, 0.45), inset 0 0 12px rgba(99, 102, 241, 0.3);
+        }
+        .rg-projector-ring.r1 {
+          width: 34cqw;
+          height: 8.5cqw;
+          background: radial-gradient(ellipse at center, rgba(6,182,212,0.22) 0%, transparent 70%);
+        }
+        .rg-projector-ring.r2 {
+          width: 26cqw;
+          height: 6.5cqw;
+          border-color: rgba(56, 189, 248, 0.85);
+          animation: rg-ring-pulse 3s ease-in-out infinite;
+        }
+        @keyframes rg-beam-pulse {
+          0%, 100% { opacity: 0.75; transform: translateX(-50%) scaleY(1); }
+          50% { opacity: 0.95; transform: translateX(-50%) scaleY(1.08); }
+        }
+        @keyframes rg-ring-pulse {
+          0%, 100% { transform: scale(0.98); opacity: 0.7; }
+          50% { transform: scale(1.04); opacity: 1; }
         }
         .rg-tip {
           position: absolute;
@@ -858,6 +911,13 @@ function initResearchGraphGlobe(
           tabIndex={0}
           aria-label="Interactive knowledge graph globe. Drag to rotate, hover a node for details, click a node to fly to it."
         />
+
+        {/* Citadel Platform Holographic Projector Pedestal Base */}
+        <div className="rg-projector-pedestal" aria-hidden="true">
+          <div className="rg-projector-beam" />
+          <div className="rg-projector-ring r1" />
+          <div className="rg-projector-ring r2" />
+        </div>
 
         {/* Fine Animated Orbital Connection Vectors */}
         <svg className="rg-links-svg" viewBox="0 0 1000 585" aria-hidden="true">

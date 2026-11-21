@@ -651,16 +651,16 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                 <span>RESEARCH INTELLIGENCE · REIMAGINED</span>
               </div>
 
-              {/* Main Headline (Exact Prompt Structure) */}
-              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.12]">
+              {/* Main Headline (Exact Prompt Structure & Mockup) */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[52px] font-extrabold text-white tracking-tight leading-[1.12]">
                 Research,<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">Connected.</span><br />
-                <span className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-gray-300 block mt-1">Discover what matters.</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">Connected.</span>
+                <span className="inline-block w-1 h-8 sm:h-11 bg-cyan-400 ml-1.5 align-middle animate-pulse" />
               </h1>
 
-              {/* Compelling Description (Exact Prompt Text) */}
+              {/* Compelling Description (Exact Reference Mockup Text) */}
               <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl font-normal drop-shadow-sm">
-                Discover research papers, authors, methods, and ideas — and explore how they connect through an intelligent research knowledge graph.
+                Discover, explore, and connect research papers, authors, and ideas through an intelligent knowledge graph powered by AI.
               </p>
 
               {/* Dual Action CTAs */}
@@ -682,22 +682,47 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                 </button>
               </div>
 
+              {/* 3 Action Feature Pills from Reference Mockup */}
+              <div className="grid grid-cols-3 gap-2 pt-1 max-w-lg">
+                <div className="p-2.5 rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-md flex items-center gap-2">
+                  <Search className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <div>
+                    <span className="block text-xs font-bold text-white leading-tight">Discover</span>
+                    <span className="text-[10px] text-gray-400 leading-tight">Find relevant work</span>
+                  </div>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-md flex items-center gap-2">
+                  <Network className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <div>
+                    <span className="block text-xs font-bold text-white leading-tight">Connect</span>
+                    <span className="text-[10px] text-gray-400 leading-tight">Follow context</span>
+                  </div>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white/[0.06] border border-white/10 backdrop-blur-md flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <div>
+                    <span className="block text-xs font-bold text-white leading-tight">Understand</span>
+                    <span className="text-[10px] text-gray-400 leading-tight">Get deeper insights</span>
+                  </div>
+                </div>
+              </div>
+
               {/* Deep Glass Research Search Bar Beneath Buttons */}
-              <form onSubmit={handleHeroSearchSubmit} className="relative w-full max-w-lg mt-2">
+              <form onSubmit={handleHeroSearchSubmit} className="relative w-full max-w-lg mt-1">
                 <div className="relative flex items-center bg-[#070D1E]/90 border border-cyan-500/30 rounded-2xl p-1.5 backdrop-blur-xl shadow-[0_4px_25px_rgba(0,0,0,0.5)] focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all">
                   <Search className="ml-3 w-4 h-4 text-cyan-400 pointer-events-none" />
                   <input
                     type="text"
                     value={heroSearchQuery}
                     onChange={(e) => setHeroSearchQuery(e.target.value)}
-                    placeholder="Search 204M+ papers, authors, or concepts..."
+                    placeholder="Ask anything about 200M+ academic papers..."
                     className="w-full bg-transparent py-2.5 pl-3 pr-24 text-sm text-white placeholder-gray-400 focus:outline-none"
                   />
                   <button
                     type="submit"
                     className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:from-cyan-400 hover:to-blue-500 transition-all shadow-sm flex items-center gap-1.5 shrink-0"
                   >
-                    <span>Search</span>
+                    <span>Ask AI</span>
                     <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>
@@ -740,7 +765,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               <div className="flex items-center justify-center gap-2.5">
                 <FileText className="w-5 h-5 text-purple-400 shrink-0" />
                 <div className="text-left">
-                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">204M+</span>
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">200M+</span>
                   <span className="text-[11px] text-gray-400">Research Papers</span>
                 </div>
               </div>
@@ -752,16 +777,16 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                 </div>
               </div>
               <div className="flex items-center justify-center gap-2.5">
-                <BrainCircuit className="w-5 h-5 text-indigo-400 shrink-0" />
+                <Network className="w-5 h-5 text-indigo-400 shrink-0" />
                 <div className="text-left">
                   <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">1.8M+</span>
                   <span className="text-[11px] text-gray-400">Research Concepts</span>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-2.5">
-                <Share2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <Database className="w-5 h-5 text-emerald-400 shrink-0" />
                 <div className="text-left">
-                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">1.24B</span>
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">250M+</span>
                   <span className="text-[11px] text-gray-400">Citations</span>
                 </div>
               </div>
