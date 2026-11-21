@@ -1,18 +1,177 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Network, Search, ArrowRight, Sparkles, Play, CheckCircle2,
   Database, Layers, Binary, FileText, Users, Share2,
-  BrainCircuit, Microscope, ChevronRight,
-  ShieldCheck, Activity, Info, X, Cpu, Check, Menu
+  BrainCircuit, Microscope, ChevronDown, Activity, X, Menu
 } from 'lucide-react';
 import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
 
 interface LandingViewProps {
   onNavigateAuth: (mode: 'LOGIN' | 'REGISTER') => void;
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
 }
 
-export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
+// ══════════════════════════════════════════════════════════════════
+//  UFO / RESEARCH EXPLORER SPACECRAFT (TRAVELS ON SCROLL)
+// ══════════════════════════════════════════════════════════════════
+const ResearchSpacecraftUFO: React.FC<{
+  scrollContainerRef?: React.RefObject<HTMLDivElement | null>;
+}> = ({ scrollContainerRef }) => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const container = scrollContainerRef?.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = container;
+      const totalScrollable = scrollHeight - clientHeight;
+      if (totalScrollable > 0) {
+        setScrollProgress(Math.min(1, Math.max(0, scrollTop / totalScrollable)));
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [scrollContainerRef]);
+
+  // S-Curve Flight Path Waypoints across 7 sections
+  // [progress, xPercent, yPercent, tiltAngle, scale]
+  const waypoints = [
+    { p: 0.00, x: 88, y: 15, tilt: -8, scale: 0.95 },   // Hero right survey
+    { p: 0.16, x: 8,  y: 28, tilt: 14, scale: 1.00 },   // Workflow left
+    { p: 0.32, x: 91, y: 42, tilt: -12, scale: 1.05 },  // Universe right
+    { p: 0.50, x: 7,  y: 56, tilt: 10, scale: 1.00 },   // Knowledge Graph left
+    { p: 0.66, x: 90, y: 69, tilt: -12, scale: 1.05 },  // AI Assistant right
+    { p: 0.82, x: 8,  y: 81, tilt: 8,  scale: 1.00 },   // RAG Pipeline left
+    { p: 1.00, x: 50, y: 94, tilt: 0,  scale: 1.15 }    // Final CTA bottom center
+  ];
+
+  // Interpolate position along waypoints
+  const p = scrollProgress;
+  let currentWp = waypoints[0];
+  let nextWp = waypoints[waypoints.length - 1];
+
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    if (p >= waypoints[i].p && p <= waypoints[i + 1].p) {
+      currentWp = waypoints[i];
+      nextWp = waypoints[i + 1];
+      break;
+    }
+  }
+
+  const range = (nextWp.p - currentWp.p) || 0.001;
+  const t = (p - currentWp.p) / range;
+  // Smooth cubic ease-in-out interpolation
+  const easeT = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+  const currentX = currentWp.x + (nextWp.x - currentWp.x) * easeT;
+  const currentY = currentWp.y + (nextWp.y - currentWp.y) * easeT;
+  const currentTilt = currentWp.tilt + (nextWp.tilt - currentWp.tilt) * easeT;
+  const currentScale = currentWp.scale + (nextWp.scale - currentWp.scale) * easeT;
+
+  return (
+    <div
+      className="fixed pointer-events-none z-40 transition-transform duration-200 ease-out hidden lg:block"
+      style={{
+        left: `${currentX}%`,
+        top: `${currentY}%`,
+        transform: `translate(-50%, -50%) rotate(${currentTilt}deg) scale(${currentScale})`,
+      }}
+    >
+      {/* Downward Conical Scanning Tractor Beam */}
+      <div className="absolute top-[82%] left-1/2 -translate-x-1/2 w-32 h-52 pointer-events-none overflow-hidden opacity-75">
+        <div
+          className="w-full h-full"
+          style={{
+            background: 'conic-gradient(from 180deg at 50% 0%, rgba(6,182,212,0.28) 0deg, rgba(99,102,241,0.2) 25deg, transparent 40deg, transparent 320deg, rgba(99,102,241,0.2) 335deg, rgba(6,182,212,0.28) 360deg)',
+            filter: 'blur(1.5px)',
+            maskImage: 'linear-gradient(to bottom, black 15%, transparent 95%)'
+          }}
+        />
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-20 h-5 rounded-full border border-cyan-400/40 bg-cyan-400/10 animate-ping opacity-35" />
+      </div>
+
+      {/* Atmospheric Hover Glow Behind UFO */}
+      <div className="absolute -inset-4 rounded-full bg-cyan-400/25 blur-xl pointer-events-none animate-pulse" />
+
+      {/* Futuristic Saucer Craft Body (SVG) */}
+      <svg
+        width="92"
+        height="56"
+        viewBox="0 0 92 56"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="relative z-10 drop-shadow-[0_8px_20px_rgba(6,182,212,0.45)]"
+      >
+        <defs>
+          <linearGradient id="ufoHull" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#0F172A" />
+            <stop offset="45%" stopColor="#334155" />
+            <stop offset="75%" stopColor="#0EA5E9" />
+            <stop offset="100%" stopColor="#0284C7" />
+          </linearGradient>
+          <linearGradient id="ufoDome" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#A5F3FC" />
+            <stop offset="60%" stopColor="#06B6D4" />
+            <stop offset="100%" stopColor="#0284C7" />
+          </linearGradient>
+          <radialGradient id="ufoThruster" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="70%" stopColor="#6366F1" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+        </defs>
+
+        {/* Cockpit Canopy Dome */}
+        <ellipse cx="46" cy="18" rx="18" ry="11" fill="url(#ufoDome)" opacity="0.9" />
+        <ellipse cx="44" cy="16" rx="10" ry="5" fill="#FFFFFF" opacity="0.6" />
+
+        {/* Autonomous AI Navigation Node */}
+        <circle cx="46" cy="18" r="3.2" fill="#FFFFFF" />
+        <circle cx="46" cy="18" r="5" stroke="#38BDF8" strokeWidth="1" className="animate-ping" opacity="0.75" />
+
+        {/* Outer Ring Hull */}
+        <path
+          d="M6 31 C6 24, 86 24, 86 31 C86 42, 6 42, 6 31 Z"
+          fill="url(#ufoHull)"
+          stroke="#38BDF8"
+          strokeWidth="1.2"
+        />
+
+        {/* Sensor Ring Beads */}
+        <circle cx="18" cy="32" r="1.8" fill="#38BDF8" />
+        <circle cx="28" cy="34" r="1.8" fill="#67E8F9" />
+        <circle cx="39" cy="35" r="2.0" fill="#A5F3FC" />
+        <circle cx="46" cy="35.5" r="2.2" fill="#FFFFFF" />
+        <circle cx="53" cy="35" r="2.0" fill="#A5F3FC" />
+        <circle cx="64" cy="34" r="1.8" fill="#67E8F9" />
+        <circle cx="74" cy="32" r="1.8" fill="#38BDF8" />
+
+        {/* Bottom Reactor Core */}
+        <ellipse cx="46" cy="36" rx="14" ry="4.5" fill="url(#ufoThruster)" opacity="0.9" />
+        <ellipse cx="46" cy="37" rx="7" ry="2.2" fill="#FFFFFF" />
+      </svg>
+
+      {/* Ion Propulsion Light Trail */}
+      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 opacity-80">
+        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+        <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-ping" />
+      </div>
+
+      {/* High-Tech Autonomous Status Pill */}
+      <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full bg-[#030712]/80 border border-cyan-400/40 text-[9px] font-mono text-cyan-300 tracking-wider shadow-sm flex items-center gap-1">
+        <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+        <span>UFO SURVEYOR • {(p * 100).toFixed(0)}%</span>
+      </div>
+    </div>
+  );
+};
+
+export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scrollContainerRef }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [heroSearchQuery, setHeroSearchQuery] = useState('');
   const [activeWorkflowStep, setActiveWorkflowStep] = useState(0);
@@ -109,7 +268,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       title: 'Research Papers',
       count: '204.8M Nodes',
       icon: FileText,
-      accent: 'border-blue-200 bg-blue-50/50 text-blue-700',
+      accent: 'border-blue-500/30 bg-blue-500/10 text-blue-400',
       iconBg: 'bg-blue-600 text-white',
       desc: 'Full-text embeddings including methodologies, mathematical formulas, experimental results, and abstract vectors across 45+ academic disciplines.'
     },
@@ -117,7 +276,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       title: 'Authors & PIs',
       count: '12.4M Profiles',
       icon: Users,
-      accent: 'border-indigo-200 bg-indigo-50/50 text-indigo-700',
+      accent: 'border-indigo-500/30 bg-indigo-500/10 text-indigo-400',
       iconBg: 'bg-indigo-600 text-white',
       desc: 'Institutional affiliations, co-authorship networks, citation trajectories, and lab collaboration clusters mapped continuously across the globe.'
     },
@@ -125,7 +284,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       title: 'Concepts & Ontologies',
       count: '1.8M Taxonomies',
       icon: BrainCircuit,
-      accent: 'border-purple-200 bg-purple-50/50 text-purple-700',
+      accent: 'border-purple-500/30 bg-purple-500/10 text-purple-400',
       iconBg: 'bg-purple-600 text-white',
       desc: 'Dynamic scientific concept extraction tracking the evolution of emerging paradigms, theoretical frameworks, and interdisciplinary terminology.'
     },
@@ -133,7 +292,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       title: 'Methods & Techniques',
       count: '340K+ Formulations',
       icon: Microscope,
-      accent: 'border-cyan-200 bg-cyan-50/50 text-cyan-700',
+      accent: 'border-cyan-500/30 bg-cyan-500/10 text-cyan-400',
       iconBg: 'bg-cyan-600 text-white',
       desc: 'Algorithmic architectures, clinical assay protocols, synthesis steps, and reproducible computational workflows isolated from method sections.'
     },
@@ -141,7 +300,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       title: 'Empirical Datasets',
       count: '85K+ Repositories',
       icon: Database,
-      accent: 'border-emerald-200 bg-emerald-50/50 text-emerald-700',
+      accent: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400',
       iconBg: 'bg-emerald-600 text-white',
       desc: 'Published benchmark performance tables, Protein Data Bank (PDB) structures, Hugging Face checkpoints, and open research repositories.'
     },
@@ -149,7 +308,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       title: 'Citation Networks',
       count: '1.24B Directional Edges',
       icon: Share2,
-      accent: 'border-rose-200 bg-rose-50/50 text-rose-700',
+      accent: 'border-rose-500/30 bg-rose-500/10 text-rose-400',
       iconBg: 'bg-rose-600 text-white',
       desc: 'Directional citation graphs distinguishing between background mentions, foundational methodology extensions, and conflicting empirical claims.'
     }
@@ -319,61 +478,72 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
   };
 
   return (
-    <div className="w-full flex flex-col relative text-slate-900 font-sans selection:bg-blue-500/20">
+    <div className="w-full flex flex-col relative text-slate-100 font-sans selection:bg-cyan-500/30 overflow-x-hidden">
+
+      {/* ════════════════════════════════════════════════════════════ */}
+      {/*              AUTONOMOUS RESEARCH SPACECRAFT (UFO)           */}
+      {/* ════════════════════════════════════════════════════════════ */}
+      <ResearchSpacecraftUFO scrollContainerRef={scrollContainerRef} />
 
       {/* ════════════════════════════════════════════════════════════ */}
       {/*                       0. TOP NAVBAR                         */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-white/85 backdrop-blur-xl border-b border-slate-200/80 sticky top-0 z-50 shadow-xs transition-all">
+      <nav className="w-full px-4 sm:px-8 py-3.5 flex items-center justify-between bg-[#060B19]/85 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 shadow-md transition-all">
         {/* Brand Logo */}
         <div
           className="flex items-center gap-3 cursor-pointer group"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          onClick={() => scrollTo(heroRef)}
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-all">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-400 flex items-center justify-center shadow-md shadow-cyan-500/20 group-hover:scale-105 transition-all">
             <Network className="w-5 h-5 text-white" />
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900">
-              ResearchGraph <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">AI</span>
+            <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white">
+              ResearchGraph <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">AI</span>
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-blue-50 border border-blue-200/70 text-blue-700 font-mono font-bold tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full bg-cyan-950/70 border border-cyan-400/30 text-cyan-300 font-mono font-bold tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
               v2.4
             </span>
           </div>
         </div>
 
-        {/* Center Navigation Links */}
-        <div className="hidden lg:flex items-center gap-1 bg-slate-100/80 border border-slate-200/80 rounded-full px-3 py-1.5 backdrop-blur-md">
+        {/* Center Navigation Links (Matching User Mockup) */}
+        <div className="hidden lg:flex items-center gap-1 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-md">
           <button
             onClick={() => scrollTo(heroRef)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 rounded-full hover:bg-white transition-all"
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
           >
-            Home
+            Cockpit
           </button>
           <button
-            onClick={() => scrollTo(graphRef)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 rounded-full hover:bg-white transition-all flex items-center gap-1"
+            onClick={() => scrollTo(universeRef)}
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all flex items-center gap-1"
           >
             <span>3D Topology</span>
           </button>
           <button
+            onClick={() => scrollTo(graphRef)}
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
+          >
+            Knowledge Graph
+          </button>
+          <button
             onClick={() => scrollTo(pipelineRef)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 rounded-full hover:bg-white transition-all"
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
           >
             RAG Pipeline
           </button>
           <button
             onClick={() => scrollTo(sourcesRef)}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 rounded-full hover:bg-white transition-all flex items-center gap-1.5"
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all flex items-center gap-1.5"
           >
             <span>Data Sources</span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-700 font-mono font-bold">OpenAlex + arXiv</span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-cyan-500/20 text-cyan-300 font-mono font-bold">45+</span>
           </button>
           <button
             onClick={() => setActiveModal('ABOUT')}
-            className="px-3 py-1.5 text-xs font-semibold text-slate-700 hover:text-blue-600 rounded-full hover:bg-white transition-all"
+            className="px-3.5 py-1.5 text-xs font-semibold text-gray-300 hover:text-white rounded-full hover:bg-white/10 transition-all"
           >
             About Us
           </button>
@@ -383,13 +553,13 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
         <div className="flex items-center gap-3">
           <button
             onClick={() => onNavigateAuth('LOGIN')}
-            className="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"
+            className="px-4 py-2 text-xs sm:text-sm font-semibold text-gray-300 hover:text-white transition-colors"
           >
             Log In
           </button>
           <button
             onClick={() => onNavigateAuth('LOGIN')}
-            className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2"
+            className="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-cyan-500/25 hover:shadow-lg hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2"
           >
             <span>Launch Cockpit</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -397,7 +567,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+            className="lg:hidden p-2 rounded-xl text-gray-300 hover:bg-white/10 transition-colors"
             aria-label="Toggle Navigation Menu"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -412,21 +582,24 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="lg:hidden w-full bg-white border-b border-slate-200 px-6 py-4 flex flex-col gap-2 relative z-40 shadow-xl"
+            className="lg:hidden w-full bg-[#060B19] border-b border-white/10 px-6 py-4 flex flex-col gap-2 relative z-40 shadow-xl"
           >
-            <button onClick={() => scrollTo(heroRef)} className="text-left py-2 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">
-              Home
+            <button onClick={() => scrollTo(heroRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
+              Cockpit
             </button>
-            <button onClick={() => scrollTo(graphRef)} className="text-left py-2 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">
+            <button onClick={() => scrollTo(universeRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               3D Topology
             </button>
-            <button onClick={() => scrollTo(pipelineRef)} className="text-left py-2 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">
+            <button onClick={() => scrollTo(graphRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
+              Knowledge Graph
+            </button>
+            <button onClick={() => scrollTo(pipelineRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               RAG Pipeline
             </button>
-            <button onClick={() => scrollTo(sourcesRef)} className="text-left py-2 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">
+            <button onClick={() => scrollTo(sourcesRef)} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               Data Sources (OpenAlex & arXiv)
             </button>
-            <button onClick={() => { setActiveModal('ABOUT'); setMobileMenuOpen(false); }} className="text-left py-2 px-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-xl">
+            <button onClick={() => { setActiveModal('ABOUT'); setMobileMenuOpen(false); }} className="text-left py-2 px-3 text-sm font-semibold text-gray-200 hover:bg-white/5 rounded-xl">
               About Us
             </button>
           </motion.div>
@@ -434,782 +607,743 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       </AnimatePresence>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*              1. COMPLETELY REBUILT HERO SECTION             */}
+      {/*   1. FUTURISTIC RESEARCH UNIVERSE HERO (MATCHING IMAGE 1)    */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-14 lg:pt-12 lg:pb-18 overflow-visible">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+      <section
+        ref={heroRef}
+        className="relative w-full min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#060B19]"
+      >
+        {/* Layer 1: Scenic Cosmic Artwork Background (Clean, No Text Overlays) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
+          style={{
+            backgroundImage: "url('/landing_hero_universe.jpg')",
+          }}
+        />
 
-          {/* Left Column: Clean, Compact, Properly Spaced Hero Content */}
-          <div className="lg:col-span-5 flex flex-col justify-center space-y-5 text-left">
-            {/* Small Elegant Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold tracking-wider uppercase shadow-xs w-fit">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-              <span>Research Intelligence, Reimagined</span>
+        {/* Layer 2: Deep Space Contrast Gradient Vignettes */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#060B19]/95 via-[#060B19]/80 to-transparent pointer-events-none lg:w-[65%]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#060B19] via-transparent to-transparent pointer-events-none h-44 bottom-0 top-auto" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#060B19]/80 via-transparent to-transparent pointer-events-none h-24 top-0" />
+
+        {/* Ambient Cosmic Radial Glows */}
+        <div className="absolute top-[20%] right-[18%] w-[500px] h-[500px] rounded-full bg-cyan-500/15 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-[20%] left-[8%] w-[420px] h-[420px] rounded-full bg-purple-600/20 blur-[130px] pointer-events-none" />
+
+        {/* Main Hero Container */}
+        <div className="relative z-10 w-full max-w-[1480px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-10 lg:pt-12 lg:pb-8 flex-1 flex flex-col justify-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+
+            {/* ─── LEFT COLUMN: REFINED HERO CONTENT & SEARCH ─── */}
+            <div className="lg:col-span-5 flex flex-col justify-center space-y-5 text-left">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-950/70 border border-purple-500/40 text-purple-200 text-xs font-semibold tracking-wider uppercase shadow-[0_0_15px_rgba(168,85,247,0.3)] w-fit backdrop-blur-md">
+                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                <span>Research Intelligence, Reimagined</span>
+              </div>
+
+              {/* Main Headline with Cyan Blinking Cursor */}
+              <h1 className="text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-white tracking-tight leading-[1.12]">
+                Research,<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-300">Connected.</span>
+                <span className="inline-block w-1.5 h-[0.88em] bg-cyan-400 ml-1.5 align-baseline animate-pulse shadow-[0_0_10px_#22d3ee]" />
+              </h1>
+
+              {/* Compelling Description */}
+              <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-xl font-normal drop-shadow-sm">
+                Discover, explore, and connect research papers, authors, and ideas through an intelligent knowledge graph powered by AI.
+              </p>
+
+              {/* Dual Action CTAs */}
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <button
+                  onClick={() => onNavigateAuth('LOGIN')}
+                  className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 text-white font-bold text-sm shadow-[0_0_25px_rgba(99,102,241,0.4)] hover:shadow-[0_0_35px_rgba(6,182,212,0.6)] hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 group"
+                >
+                  <Network className="w-4 h-4 text-cyan-200" />
+                  <span>Explore Research Graph</span>
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button
+                  onClick={() => setActiveModal('DEMO')}
+                  className="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-semibold text-sm backdrop-blur-md shadow-sm hover:border-white/30 transition-all flex items-center gap-2 group"
+                >
+                  <Play className="w-4 h-4 text-cyan-300 fill-cyan-300 group-hover:scale-110 transition-transform" />
+                  <span>Watch Overview</span>
+                </button>
+              </div>
+
+              {/* 3 Quick Action Chips (Matching User Mockup) */}
+              <div className="grid grid-cols-3 gap-2 pt-2 max-w-lg">
+                <div
+                  onClick={() => onNavigateAuth('LOGIN')}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-cyan-400/40 hover:bg-cyan-500/10 cursor-pointer transition-all backdrop-blur-md group"
+                >
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-cyan-300 mb-0.5">
+                    <Search className="w-3.5 h-3.5 text-cyan-400 group-hover:scale-110 transition-transform" />
+                    <span>Discover</span>
+                  </div>
+                  <span className="text-[10px] text-gray-400 block leading-tight">Find relevant work</span>
+                </div>
+                <div
+                  onClick={() => onNavigateAuth('LOGIN')}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-purple-400/40 hover:bg-purple-500/10 cursor-pointer transition-all backdrop-blur-md group"
+                >
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-purple-300 mb-0.5">
+                    <Share2 className="w-3.5 h-3.5 text-purple-400 group-hover:scale-110 transition-transform" />
+                    <span>Connect</span>
+                  </div>
+                  <span className="text-[10px] text-gray-400 block leading-tight">Follow context</span>
+                </div>
+                <div
+                  onClick={() => onNavigateAuth('LOGIN')}
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-blue-400/40 hover:bg-blue-500/10 cursor-pointer transition-all backdrop-blur-md group"
+                >
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-blue-300 mb-0.5">
+                    <Layers className="w-3.5 h-3.5 text-blue-400 group-hover:scale-110 transition-transform" />
+                    <span>Understand</span>
+                  </div>
+                  <span className="text-[10px] text-gray-400 block leading-tight">Get deeper insights</span>
+                </div>
+              </div>
+
+              {/* Deep Glass Search Input (Matching Mockup) */}
+              <form onSubmit={handleHeroSearchSubmit} className="relative w-full max-w-lg mt-1">
+                <div className="relative flex items-center bg-[#070D1E]/90 border border-cyan-500/30 rounded-2xl p-1.5 backdrop-blur-xl shadow-[0_4px_25px_rgba(0,0,0,0.5)] focus-within:border-cyan-400 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all">
+                  <Search className="ml-3 w-4 h-4 text-cyan-400 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={heroSearchQuery}
+                    onChange={(e) => setHeroSearchQuery(e.target.value)}
+                    placeholder="Ask anything about 200M+ academic papers..."
+                    className="w-full bg-transparent py-2.5 pl-3 pr-24 text-sm text-white placeholder-gray-400 focus:outline-none"
+                  />
+                  <button
+                    type="submit"
+                    className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-xs hover:from-cyan-400 hover:to-blue-500 transition-all shadow-sm flex items-center gap-1.5 shrink-0"
+                  >
+                    <span>Ask AI</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </form>
+
+              {/* Trending Topic Chips */}
+              <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-gray-400">
+                <span className="font-semibold text-gray-300 mr-1">Trending:</span>
+                {exampleChips.map((chip, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => handleChipClick(chip)}
+                    className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-gray-300 text-[11px] font-medium hover:border-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-all backdrop-blur-xs"
+                  >
+                    {chip}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-4xl sm:text-5xl lg:text-[50px] font-extrabold text-slate-900 tracking-tight leading-[1.14]">
-              Research, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">connected.</span><br />
-              Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-600">what matters.</span>
-            </h1>
+            {/* ─── RIGHT COLUMN: AUTHENTIC 3D GLOBE & FLOATING PILLS ─── */}
+            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[460px] sm:min-h-[540px]">
 
-            {/* Compelling Description */}
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-xl">
-              Explore, analyze, and synthesize over 200M+ research papers, authors, and concepts through an autonomous knowledge graph powered by multi-LLM consensus.
-            </p>
+              {/* Floating Holographic Knowledge Pods (Matching Mockup Colors & Positions) */}
+              {/* 1. Knowledge Graph (Emerald/Cyan) - Top Left */}
+              <div
+                onClick={() => scrollTo(graphRef)}
+                className="absolute top-[8%] left-[4%] sm:left-[8%] z-20 px-3.5 py-2 rounded-2xl bg-[#071E26]/85 border border-emerald-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(16,185,129,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5 animate-pulse"
+              >
+                <div className="w-7 h-7 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
+                  <Network className="w-4 h-4 text-emerald-300" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-white block leading-tight">Knowledge Graph</span>
+                  <span className="text-[9px] text-emerald-300 font-mono">AI-Powered</span>
+                </div>
+              </div>
 
-            {/* Prominent CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <button
+              {/* 2. AI Insights (Blue/Cyan) - Mid Left */}
+              <div
+                onClick={() => scrollTo(assistantRef)}
+                className="absolute top-[40%] left-[0%] sm:left-[3%] z-20 px-3.5 py-2 rounded-2xl bg-[#091536]/85 border border-cyan-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
+              >
+                <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center">
+                  <BrainCircuit className="w-4 h-4 text-cyan-300" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-white block leading-tight">AI Insights</span>
+                  <span className="text-[9px] text-cyan-300 font-mono">Summarize • Compare</span>
+                </div>
+              </div>
+
+              {/* 3. Concepts (Purple) - Bottom Left */}
+              <div
+                onClick={() => scrollTo(universeRef)}
+                className="absolute bottom-[10%] left-[8%] sm:left-[14%] z-20 px-3.5 py-2 rounded-2xl bg-[#170C33]/85 border border-purple-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(168,85,247,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
+              >
+                <div className="w-7 h-7 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center">
+                  <Activity className="w-4 h-4 text-purple-300" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-white block leading-tight">Concepts</span>
+                  <span className="text-[10px] text-purple-300 font-bold font-mono">1.8M+</span>
+                </div>
+              </div>
+
+              {/* 4. Papers (Purple/Violet) - Top Right */}
+              <div
                 onClick={() => onNavigateAuth('LOGIN')}
-                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white font-bold text-sm shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-2 group"
+                className="absolute top-[5%] right-[10%] sm:right-[15%] z-20 px-4 py-2.5 rounded-2xl bg-[#1A0C38]/85 border border-purple-400/60 backdrop-blur-md shadow-[0_0_25px_rgba(168,85,247,0.4)] cursor-pointer hover:scale-105 transition-all flex items-center gap-3"
               >
-                <span>Explore Research Graph</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={() => setActiveModal('DEMO')}
-                className="px-5 py-3.5 rounded-xl bg-white border border-slate-200/90 text-slate-700 font-semibold text-sm shadow-xs hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 group"
+                <div className="w-8 h-8 rounded-xl bg-purple-500/25 border border-purple-400/50 flex items-center justify-center">
+                  <FileText className="w-4 h-4 text-purple-200" />
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-purple-300 block leading-tight">Papers</span>
+                  <span className="text-sm font-extrabold text-white font-mono">200M+</span>
+                </div>
+              </div>
+
+              {/* 5. Authors (Cyan) - Upper Right */}
+              <div
+                onClick={() => onNavigateAuth('LOGIN')}
+                className="absolute top-[26%] right-[0%] sm:right-[4%] z-20 px-3.5 py-2 rounded-2xl bg-[#082036]/85 border border-cyan-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(6,182,212,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
               >
-                <Play className="w-4 h-4 text-blue-600 fill-blue-600 group-hover:scale-110 transition-transform" />
-                <span>Watch Demo</span>
-              </button>
+                <div className="w-7 h-7 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-cyan-300" />
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-cyan-300 block leading-tight">Authors</span>
+                  <span className="text-xs font-bold text-white font-mono">12.4M+</span>
+                </div>
+              </div>
+
+              {/* 6. Datasets (Amber/Gold) - Mid Right */}
+              <div
+                onClick={() => scrollTo(sourcesRef)}
+                className="absolute top-[50%] right-[2%] sm:right-[6%] z-20 px-3.5 py-2 rounded-2xl bg-[#291704]/85 border border-amber-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
+              >
+                <div className="w-7 h-7 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center">
+                  <Database className="w-4 h-4 text-amber-300" />
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-amber-300 block leading-tight">Datasets</span>
+                  <span className="text-xs font-bold text-white font-mono">85K+</span>
+                </div>
+              </div>
+
+              {/* 7. Citations (Magenta/Purple) - Bottom Right */}
+              <div
+                onClick={() => scrollTo(universeRef)}
+                className="absolute bottom-[14%] right-[6%] sm:right-[12%] z-20 px-3.5 py-2 rounded-2xl bg-[#29082C]/85 border border-pink-400/50 backdrop-blur-md shadow-[0_0_20px_rgba(244,114,182,0.35)] cursor-pointer hover:scale-105 transition-all flex items-center gap-2.5"
+              >
+                <div className="w-7 h-7 rounded-xl bg-pink-500/20 border border-pink-400/40 flex items-center justify-center">
+                  <Share2 className="w-4 h-4 text-pink-300" />
+                </div>
+                <div>
+                  <span className="text-[10px] uppercase font-mono text-pink-300 block leading-tight">Citations</span>
+                  <span className="text-xs font-bold text-white font-mono">250M+</span>
+                </div>
+              </div>
+
+              {/* Center Globe Visualization - Authentic ResearchKnowledgeCore */}
+              <div className="relative w-full max-w-[660px] mx-auto overflow-visible select-none pointer-events-auto">
+                <ResearchKnowledgeCore onNavigate={() => onNavigateAuth('LOGIN')} />
+              </div>
             </div>
 
-            {/* Hero Search Bar */}
-            <form onSubmit={handleHeroSearchSubmit} className="relative w-full max-w-lg mt-2">
-              <div className="relative flex items-center">
-                <Search className="absolute left-4 w-4 h-4 text-slate-400 pointer-events-none" />
-                <input
-                  type="text"
-                  value={heroSearchQuery}
-                  onChange={(e) => setHeroSearchQuery(e.target.value)}
-                  placeholder="Search 200M+ papers, authors, or concepts..."
-                  className="w-full bg-white border border-slate-200/90 rounded-2xl py-3.5 pl-11 pr-24 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 shadow-xs transition-all"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 px-4 py-2 rounded-xl bg-blue-600 text-white font-semibold text-xs hover:bg-blue-700 transition-colors shadow-xs"
-                >
-                  Search
-                </button>
-              </div>
-            </form>
-
-            {/* Neatly Designed Example Topic Chips */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs text-slate-500">
-              <span className="font-semibold text-slate-700 mr-1">Trending:</span>
-              {exampleChips.map((chip, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => handleChipClick(chip)}
-                  className="px-2.5 py-1 rounded-full bg-white border border-slate-200/80 text-slate-600 text-[11px] font-medium hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50/50 transition-all shadow-2xs"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-
-            {/* Quick Metrics Bar */}
-            <div className="pt-4 border-t border-slate-200/80 grid grid-cols-4 gap-2 text-center max-w-lg">
-              <div>
-                <span className="block font-black text-slate-900 text-base sm:text-lg">204M+</span>
-                <span className="block text-[10px] text-slate-500 font-medium">Papers</span>
-              </div>
-              <div>
-                <span className="block font-black text-slate-900 text-base sm:text-lg">12.4M</span>
-                <span className="block text-[10px] text-slate-500 font-medium">Authors</span>
-              </div>
-              <div>
-                <span className="block font-black text-slate-900 text-base sm:text-lg">1.8M</span>
-                <span className="block text-[10px] text-slate-500 font-medium">Concepts</span>
-              </div>
-              <div>
-                <span className="block font-black text-slate-900 text-base sm:text-lg">1.24B</span>
-                <span className="block text-[10px] text-slate-500 font-medium">Citations</span>
-              </div>
-            </div>
           </div>
+        </div>
 
-          {/* Right Column: Global Knowledge Model (Existing Centerpiece, Non-Overlapping Layout) */}
-          <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible">
-            {/* Ambient Background Aura */}
-            <div className="absolute inset-4 -z-10 rounded-full bg-gradient-to-tr from-blue-300/25 via-indigo-200/20 to-cyan-300/25 blur-3xl pointer-events-none" />
-
-            {/* The Authentic ResearchGraph Knowledge Globe Model with container queries */}
-            <div className="relative w-full max-w-[760px] mx-auto rounded-3xl bg-gradient-to-b from-white/75 to-slate-50/60 border border-slate-200/80 p-2 sm:p-4 shadow-[0_20px_60px_-15px_rgba(15,23,42,0.08)] backdrop-blur-md overflow-visible">
-              <ResearchKnowledgeCore onNavigate={() => onNavigateAuth('LOGIN')} />
+        {/* ─── BOTTOM HERO TELEMETRY STRIP (MATCHING IMAGE 1) ─── */}
+        <div className="relative z-20 w-full max-w-5xl mx-auto px-4 pb-4">
+          <div className="p-3 sm:p-4 rounded-2xl bg-[#091129]/80 border border-cyan-500/30 backdrop-blur-xl shadow-[0_10px_35px_rgba(0,0,0,0.6)] flex items-center justify-between">
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div className="flex items-center justify-center gap-2.5">
+                <FileText className="w-5 h-5 text-purple-400 shrink-0" />
+                <div className="text-left">
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">200M+</span>
+                  <span className="text-[11px] text-gray-400">Research Papers</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-2.5">
+                <Users className="w-5 h-5 text-cyan-400 shrink-0" />
+                <div className="text-left">
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">12.4M+</span>
+                  <span className="text-[11px] text-gray-400">Authors</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-2.5">
+                <BrainCircuit className="w-5 h-5 text-indigo-400 shrink-0" />
+                <div className="text-left">
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">1.8M+</span>
+                  <span className="text-[11px] text-gray-400">Research Concepts</span>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-2.5">
+                <Share2 className="w-5 h-5 text-emerald-400 shrink-0" />
+                <div className="text-left">
+                  <span className="block font-black text-white text-base sm:text-lg font-mono leading-none">250M+</span>
+                  <span className="text-[11px] text-gray-400">Citations</span>
+                </div>
+              </div>
             </div>
-          </div>
 
+            {/* Scroll Down Trigger Chevron */}
+            <button
+              onClick={() => scrollTo(workflowRef)}
+              className="ml-3 p-2 rounded-xl bg-white/5 border border-white/10 text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400/50 transition-all shrink-0 animate-bounce"
+              aria-label="Scroll to exploration sections"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*               2. HOW RESEARCHGRAPH WORKS                    */}
+      {/*        2. 5-STAGE SCIENTIFIC WORKFLOW (LIGHT DECK)           */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={workflowRef} className="w-full bg-white border-y border-slate-200/80 py-16 lg:py-24">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold uppercase tracking-wider mb-3">
-              <Activity className="w-3.5 h-3.5 text-blue-600" />
-              <span>Scientific Ingestion & Processing</span>
+      <section ref={workflowRef} className="py-20 lg:py-24 bg-[#F8FAFC] text-slate-900 relative border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 border border-blue-200 text-blue-700 text-xs font-bold font-mono tracking-wider uppercase mb-3">
+              Autonomous Ingestion Architecture
             </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-              How ResearchGraph Works
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              From Raw PDF to High-Dimensional Knowledge Graph
             </h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              A five-stage autonomous pipeline transforming fragmented scholarly literature into interconnected, actionable discovery.
+            <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+              Experience the 5 continuous pipelines that normalize unstructured preprints into verified semantic structures with zero hallucination.
             </p>
           </div>
 
-          {/* 5-Step Horizontal Workflow (Desktop) / Vertical Stack (Mobile) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 lg:gap-5 relative">
+          {/* Interactive Stage Selector Bar */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3 mb-10">
             {workflowSteps.map((step, idx) => {
-              const Icon = step.icon;
+              const IconComp = step.icon;
               const isActive = activeWorkflowStep === idx;
               return (
-                <div
-                  key={idx}
+                <button
+                  key={step.num}
                   onClick={() => setActiveWorkflowStep(idx)}
-                  className={`p-5 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col justify-between relative group ${
+                  className={`p-3.5 sm:p-4 rounded-2xl text-left transition-all border ${
                     isActive
-                      ? 'bg-blue-50/40 border-blue-400 shadow-md ring-2 ring-blue-400/20'
-                      : 'bg-white border-slate-200/80 hover:border-slate-300 hover:shadow-xs'
+                      ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-500/20'
+                      : 'bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-white'
                   }`}
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-xs font-mono font-bold text-slate-400 group-hover:text-blue-600 transition-colors">
-                        {step.num}
-                      </span>
-                      <div className={`w-9 h-9 rounded-xl bg-gradient-to-tr ${step.color} flex items-center justify-center text-white shadow-xs`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                    </div>
-
-                    <h3 className="font-bold text-base text-slate-900 mb-1">
-                      {step.title}
-                    </h3>
-                    <span className="text-[11px] font-semibold text-blue-600 block mb-2.5">
-                      {step.tagline}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-xs font-mono font-bold ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>
+                      {step.num}
                     </span>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {step.desc}
-                    </p>
+                    <IconComp className={`w-4 h-4 ${isActive ? 'text-blue-600' : 'text-slate-400'}`} />
                   </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                    <span className="font-mono font-bold text-slate-800">{step.metric}</span>
-                    <ChevronRight className={`w-3.5 h-3.5 transition-transform ${isActive ? 'text-blue-600 translate-x-1' : 'text-slate-400'}`} />
+                  <div className="text-xs sm:text-sm font-bold text-slate-900 leading-tight">
+                    {step.title}
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>
 
-          {/* Deep Insight Callout for the Selected Workflow Step */}
-          <div className="mt-8 p-5 sm:p-6 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0">
-                <Check className="w-5 h-5" />
+          {/* Detailed Active Step Deep-Dive Card */}
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div className="lg:col-span-7 space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700">
+                  STAGE {workflowSteps[activeWorkflowStep].num} • {workflowSteps[activeWorkflowStep].tagline}
+                </span>
+                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full">
+                  {workflowSteps[activeWorkflowStep].metric}
+                </span>
               </div>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-700 block">
-                  Stage {workflowSteps[activeWorkflowStep].num} Technical Specification
-                </span>
-                <span className="text-sm font-medium text-slate-800">
-                  {workflowSteps[activeWorkflowStep].detail}
-                </span>
+              <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                {workflowSteps[activeWorkflowStep].title}
+              </h3>
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
+                {workflowSteps[activeWorkflowStep].desc}
+              </p>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-700 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                <span>{workflowSteps[activeWorkflowStep].detail}</span>
+              </div>
+              <div className="pt-2">
+                <button
+                  onClick={() => onNavigateAuth('LOGIN')}
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm transition-all shadow-md flex items-center gap-2"
+                >
+                  <span>Test {workflowSteps[activeWorkflowStep].title} Live</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
-            <button
-              onClick={() => onNavigateAuth('LOGIN')}
-              className="px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-blue-600 transition-colors shrink-0"
-            >
-              Test with Your Query
-            </button>
-          </div>
 
+            {/* Stage Technical Simulation HUD */}
+            <div className="lg:col-span-5 bg-slate-900 rounded-2xl p-5 text-white font-mono text-xs border border-slate-800 space-y-3 shadow-inner">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px] text-slate-400">
+                <span>PIPELINE_EXECUTOR::V2.4</span>
+                <span className="text-emerald-400 font-bold">● ONLINE</span>
+              </div>
+              <div className="space-y-1.5 text-slate-300">
+                <div className="text-blue-400">&gt; INPUT: Multimodal Research Stream</div>
+                <div className="text-cyan-300">&gt; LATENCY: 12.4ms per vector cluster</div>
+                <div className="text-purple-300">&gt; TOPOLOGY: Directional citation mesh</div>
+                <div className="text-emerald-300">&gt; INTEGRITY: 100% verified anchors</div>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800/80 text-[11px] text-slate-400 leading-relaxed">
+                Autonomous validation engine guarantees that every retrieved citation maps directly to a peer-reviewed DOI.
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*             3. EXPLORE THE RESEARCH UNIVERSE                */}
+      {/*   3. THE 6 DIMENSIONS OF THE RESEARCH UNIVERSE (COSMIC)      */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={universeRef} className="w-full py-16 lg:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-700 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Database className="w-3.5 h-3.5 text-purple-600" />
-            <span>Universal Knowledge Taxonomy</span>
+      <section ref={universeRef} className="py-20 lg:py-24 bg-[#060B19] text-white relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-mono tracking-wider uppercase mb-3">
+              Ontological Taxonomy
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              The 6 Dimensions of the Research Universe
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base mt-3 leading-relaxed">
+              Every academic artifact is indexed across multi-relational layers, transforming isolated PDF documents into a living, queryable knowledge network.
+            </p>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            Explore the Research Universe
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Science is more than isolated PDFs. Traverse six connected dimensions of discovery across millions of entities.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {universeDimensions.map((dim, idx) => {
-            const Icon = dim.icon;
-            return (
-              <div
-                key={idx}
-                className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {universeDimensions.map((dim, idx) => {
+              const IconComp = dim.icon;
+              return (
+                <div
+                  key={idx}
+                  className="p-6 rounded-3xl bg-[#091129]/80 border border-white/10 hover:border-cyan-400/40 hover:bg-[#0D183B] transition-all backdrop-blur-md group shadow-md"
+                >
                   <div className="flex items-center justify-between mb-4">
-                    <div className={`w-11 h-11 rounded-xl ${dim.iconBg} flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform`}>
-                      <Icon className="w-5 h-5" />
+                    <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-400/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <IconComp className="w-6 h-6 text-cyan-300" />
                     </div>
-                    <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-white/5 border border-white/10 text-cyan-300">
                       {dim.count}
                     </span>
                   </div>
-                  <h3 className="font-extrabold text-lg text-slate-900 mb-2">
+                  <h3 className="text-lg font-bold text-white mb-2 group-hover:text-cyan-300 transition-colors">
                     {dim.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                     {dim.desc}
                   </p>
-                </div>
-
-                <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:text-blue-700">
-                  <span>Explore this dimension</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════ */}
-      {/*           4. KNOWLEDGE GRAPH VISUALIZATION SECTION          */}
-      {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={graphRef} className="w-full bg-white border-y border-slate-200/80 py-16 lg:py-24">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-semibold uppercase tracking-wider mb-3">
-              <Network className="w-3.5 h-3.5 text-indigo-600" />
-              <span>Multi-Hop Graph Topology</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-              See How Research Connects
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Traditional search engines return isolated links. ResearchGraph maps papers to authors, concepts, methods, and citations into an interactive topological network.
-            </p>
-          </div>
-
-          {/* Domain Filter Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-            {[
-              { id: 'bio', label: 'Biomedical AI & Drug Discovery' },
-              { id: 'quantum', label: 'Quantum Error Correction' },
-              { id: 'oncology', label: 'Multimodal Oncology' },
-              { id: 'crispr', label: 'CRISPR Specificity' },
-              { id: 'materials', label: 'Autonomous Materials' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveDomain(tab.id as any)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-                  activeDomain === tab.id
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Interactive Graph Showcase Board */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-slate-50 border border-slate-200/90 shadow-sm">
-            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-6 border-b border-slate-200">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-blue-600 block mb-1">
-                  Active Topology Node
-                </span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
-                  {domainData[activeDomain].title}
-                </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-semibold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 shadow-2xs">
-                  Center: {domainData[activeDomain].centerNode}
-                </span>
-                <button
-                  onClick={() => onNavigateAuth('LOGIN')}
-                  className="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-colors shadow-xs"
-                >
-                  Open in 3D Cockpit
-                </button>
-              </div>
-            </div>
-
-            {/* Connected Papers and Interdisciplinary Bridges */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
-              
-              {/* Left Column: 4 Connected Research Papers */}
-              <div className="lg:col-span-8 space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">
-                  Connected Literature Nodes (4 of {domainData[activeDomain].connectedPapers.length} shown)
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  {domainData[activeDomain].connectedPapers.map((paper, pIdx) => (
-                    <div
-                      key={pIdx}
-                      className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:border-blue-400 hover:shadow-xs transition-all"
-                    >
-                      <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 mb-2">
-                        <span className="font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded">{paper.journal}</span>
-                        <span>{paper.year}</span>
-                      </div>
-                      <h4 className="font-bold text-xs sm:text-sm text-slate-900 line-clamp-2 mb-2">
-                        {paper.title}
-                      </h4>
-                      <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
-                        <span>{paper.authors}</span>
-                        <span className="font-mono font-bold text-slate-700">★ {paper.citations}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Right Column: Interdisciplinary Bridge Concepts */}
-              <div className="lg:col-span-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-3">
-                  Cross-Domain Bridge Concepts
-                </span>
-                <div className="space-y-2.5">
-                  {domainData[activeDomain].bridges.map((bridge, bIdx) => (
-                    <div
-                      key={bIdx}
-                      className="p-3 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-blue-500" />
-                        <span className="font-semibold text-slate-800">{bridge}</span>
-                      </div>
-                      <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                        Active Bridge
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-500 leading-relaxed">
-                  These bridges connect this domain to external fields, allowing researchers to uncover cross-pollinating breakthroughs.
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════ */}
-      {/*               5. AI RESEARCH ASSISTANT                      */}
-      {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={assistantRef} className="w-full py-16 lg:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-xs font-semibold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-teal-600" />
-            <span>Autonomous Intelligence</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            Your Autonomous AI Research Assistant
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Ask complex scientific questions across millions of papers. Every answer is grounded in verifiable peer-reviewed citations.
-          </p>
-        </div>
-
-        {/* Realistic Chat Assistant Interface */}
-        <div className="max-w-5xl mx-auto rounded-3xl bg-white border border-slate-200/90 shadow-lg overflow-hidden">
-          
-          {/* Header Bar */}
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-bold text-xs sm:text-sm text-slate-800">
-                ResearchGraph Consensus Engine
-              </span>
-              <span className="text-[11px] font-mono text-slate-500">
-                (Claude 3.5 Sonnet + GPT-4o + Gemini 1.5 Pro)
-              </span>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-              <span className="bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-200">
-                Citation Grounding: 99.4%
-              </span>
-            </div>
-          </div>
-
-          {/* Query Switcher Pills */}
-          <div className="px-6 pt-4 pb-2 bg-slate-50/50 border-b border-slate-200/60 flex items-center gap-2 overflow-x-auto">
-            {assistantScenarios.map((sc, scIdx) => (
-              <button
-                key={scIdx}
-                onClick={() => setActiveChatTab(scIdx)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                  activeChatTab === scIdx
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                {sc.domain}
-              </button>
-            ))}
-          </div>
-
-          {/* Interactive Chat Window */}
-          <div className="p-6 sm:p-8 space-y-6">
-            
-            {/* User Prompt */}
-            <div className="flex items-start gap-3.5 max-w-3xl">
-              <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                Dr
-              </div>
-              <div className="bg-slate-100 p-4 rounded-2xl rounded-tl-sm text-xs sm:text-sm text-slate-900 font-medium leading-relaxed">
-                {assistantScenarios[activeChatTab].query}
-              </div>
-            </div>
-
-            {/* AI Synthesized Response */}
-            <div className="flex items-start gap-3.5 max-w-4xl ml-auto">
-              <div className="bg-blue-50/70 border border-blue-200/70 p-5 sm:p-6 rounded-2xl rounded-tr-sm text-xs sm:text-sm text-slate-800 leading-relaxed space-y-4">
-                <div className="flex items-center justify-between text-xs font-mono text-blue-700 border-b border-blue-200/60 pb-2">
-                  <span>● MULTI-LLM CONSENSUS SYNTHESIS</span>
-                  <span>Confidence: {assistantScenarios[activeChatTab].confidence}</span>
-                </div>
-
-                <p>{assistantScenarios[activeChatTab].answer}</p>
-
-                {/* Citation Anchors */}
-                <div className="space-y-2 pt-2">
-                  <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block">
-                    Verified Citation Anchors:
-                  </span>
-                  {assistantScenarios[activeChatTab].citations.map((cite) => (
-                    <div
-                      key={cite.id}
-                      className="p-2.5 rounded-xl bg-white border border-blue-200/80 flex items-center justify-between text-xs"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] flex items-center justify-center font-bold">
-                          {cite.id}
-                        </span>
-                        <span className="font-semibold text-slate-900 line-clamp-1">{cite.title}</span>
-                        <span className="text-slate-500 text-[11px] shrink-0">({cite.author})</span>
-                      </div>
-                      <span className="font-mono text-[10px] text-blue-600 font-bold shrink-0">DOI: {cite.doi}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Key Metrics */}
-                <div className="grid grid-cols-3 gap-2 pt-2">
-                  {assistantScenarios[activeChatTab].metrics.map((m, mIdx) => (
-                    <div key={mIdx} className="bg-white p-2.5 rounded-xl border border-blue-100 text-center">
-                      <span className="block font-black text-slate-900 text-xs sm:text-sm">{m.value}</span>
-                      <span className="block text-[10px] text-slate-500">{m.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-md">
-                <Sparkles className="w-4 h-4" />
-              </div>
-            </div>
-
-          </div>
-
-          {/* Capabilities Footer Banner */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-[11px] font-semibold text-slate-700">
-            <span>✓ Ask Questions</span>
-            <span>✓ Find Related Papers</span>
-            <span>✓ Understand Concepts</span>
-            <span>✓ Compare Methods</span>
-            <span>✓ Explore Relations</span>
-            <span>✓ Discover Gaps</span>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════ */}
-      {/*                   6. RAG PIPELINE SECTION                   */}
-      {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={pipelineRef} className="w-full bg-white border-y border-slate-200/80 py-16 lg:py-24">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold uppercase tracking-wider mb-3">
-              <Cpu className="w-3.5 h-3.5 text-blue-600" />
-              <span>Deterministic Retrieval Pipeline</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-              The Grounded RAG Pipeline
-            </h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-              Research Papers → Text Extraction → Chunking → Embeddings → Retrieval → AI Response
-            </p>
-          </div>
-
-          {/* 6-Stage Stepped Pipeline Graphic */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
-            {[
-              { step: '01', title: 'Research Papers', icon: FileText, desc: 'Continuous automated ingestion from OpenAlex, arXiv, and CrossRef APIs.' },
-              { step: '02', title: 'Text Extraction', icon: Layers, desc: 'High-precision PDF parsing isolating math, formulas, and tabular metrics.' },
-              { step: '03', title: 'Chunking', icon: Binary, desc: 'Semantic boundary splitting preserving section context and citations.' },
-              { step: '04', title: 'Embeddings', icon: Network, desc: '1536-dimensional scientific embeddings aligned with domain ontologies.' },
-              { step: '05', title: 'Retrieval', icon: Search, desc: 'Hybrid retrieval blending graph walks, vector distance, and BM25 keywords.' },
-              { step: '06', title: 'AI Response', icon: Sparkles, desc: 'Synthesized answers with 100% verified DOI anchors and zero hallucination.' }
-            ].map((p, pIdx) => {
-              const Icon = p.icon;
-              return (
-                <div
-                  key={pIdx}
-                  className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:bg-white hover:border-blue-400 hover:shadow-md transition-all duration-300 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-mono text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                        {p.step}
-                      </span>
-                      <Icon className="w-4 h-4 text-slate-400" />
-                    </div>
-                    <h3 className="font-extrabold text-sm text-slate-900 mb-1.5">
-                      {p.title}
-                    </h3>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      {p.desc}
-                    </p>
-                  </div>
-                  <div className="mt-4 pt-2 border-t border-slate-200/50 flex items-center gap-1 text-[10px] font-mono font-bold text-slate-400">
-                    <span>STAGE COMPLETED</span>
-                    <CheckCircle2 className="w-3 h-3 text-emerald-500 ml-auto" />
-                  </div>
                 </div>
               );
             })}
           </div>
-
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*                   7. DATA SOURCES SECTION                   */}
+      {/*    4. INTERACTIVE KNOWLEDGE GRAPH EXPLORER (LIGHT DECK)      */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <section ref={sourcesRef} className="w-full py-16 lg:py-24 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold uppercase tracking-wider mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Authoritative Academic Provenance</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-3">
-            Supported Data Sources
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base leading-relaxed">
-            Directly synchronized with the world's most trusted open academic indexes. No fabricated datasets or unverified claims.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          
-          {/* OpenAlex Card */}
-          <div className="p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xl border border-emerald-200">
-                OA
-              </div>
-              <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                200M+ Works
-              </span>
+      <section ref={graphRef} className="py-20 lg:py-24 bg-white text-slate-900 relative border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 border border-purple-200 text-purple-700 text-xs font-bold font-mono tracking-wider uppercase mb-3">
+              Interactive Topology Explorer
             </div>
-            <h3 className="font-extrabold text-xl text-slate-900 mb-2">
-              OpenAlex Scholarly Catalog
-            </h3>
-            <p className="text-sm text-slate-600 leading-relaxed mb-6">
-              A fully open catalog of the global research system, mapping 200M+ publications, 12M+ authors, 100K+ institutions, and 65K+ venues.
-            </p>
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 text-xs font-semibold text-slate-700">
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Open Metadata</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Author Disambiguation</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Concept Taxonomies</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-emerald-600" /> Institution Lineages</span>
-            </div>
-          </div>
-
-          {/* arXiv Card */}
-          <div className="p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-black text-xl border border-rose-200">
-                ar<i>X</i>iv
-              </div>
-              <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                2.4M+ Preprints
-              </span>
-            </div>
-            <h3 className="font-extrabold text-xl text-slate-900 mb-2">
-              arXiv Open-Access Archive
-            </h3>
-            <p className="text-sm text-slate-600 leading-relaxed mb-6">
-              The premier open-access repository for scholarly articles in physics, mathematics, computer science, quantitative biology, and statistics.
-            </p>
-            <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 text-xs font-semibold text-slate-700">
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-rose-600" /> Daily Preprints</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-rose-600" /> Computer Science</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-rose-600" /> Quantitative Biology</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4 text-rose-600" /> Theoretical Physics</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════════════════════════ */}
-      {/*                   8. FINAL CTA SECTION                      */}
-      {/* ════════════════════════════════════════════════════════════ */}
-      <section className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="relative rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 p-8 sm:p-14 lg:p-16 text-center text-white overflow-hidden shadow-2xl shadow-blue-500/20">
-          
-          {/* Subtle Ambient Decorative Circles */}
-          <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-
-          <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/20 text-white text-xs font-semibold uppercase tracking-wider backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-              <span>Start Exploring Today</span>
-            </div>
-
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
-              Discover connections hidden in research.
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Cross-Disciplinary Graph Traversal
             </h2>
-
-            <p className="text-blue-100 text-sm sm:text-base leading-relaxed">
-              Explore papers, connect knowledge, and uncover new research directions with the world's most advanced scientific intelligence graph.
+            <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+              Select any frontier domain below to inspect connected seminal papers, citation bridges, and emergent methodology hubs.
             </p>
-
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <button
-                onClick={() => onNavigateAuth('LOGIN')}
-                className="px-8 py-4 rounded-xl bg-white text-blue-700 font-extrabold text-sm sm:text-base hover:bg-blue-50 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-black/10 flex items-center gap-2 group"
-              >
-                <span>Launch ResearchGraph</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={() => onNavigateAuth('LOGIN')}
-                className="px-6 py-4 rounded-xl bg-white/10 border border-white/20 text-white font-semibold text-sm sm:text-base hover:bg-white/20 transition-all backdrop-blur-md"
-              >
-                Sign In to Cockpit
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-4 text-xs text-blue-100/80 font-medium">
-              <span>✦ Free to explore</span>
-              <span>✦ No credit card required</span>
-              <span>✦ Sub-15ms graph traversal</span>
-            </div>
           </div>
 
+          {/* Domain Tabs */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+            {(['bio', 'quantum', 'oncology', 'crispr', 'materials'] as const).map((key) => (
+              <button
+                key={key}
+                onClick={() => setActiveDomain(key)}
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
+                  activeDomain === key
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {domainData[key].title}
+              </button>
+            ))}
+          </div>
+
+          {/* Graph Hub & Connected Papers Display */}
+          <div className="bg-slate-50 rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-lg">
+            <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-200 gap-4">
+              <div>
+                <span className="text-xs font-mono font-bold text-blue-600 uppercase">Focal Hub Node</span>
+                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                  {domainData[activeDomain].centerNode}
+                </h3>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {domainData[activeDomain].bridges.map((bridge, i) => (
+                  <span key={i} className="text-xs font-medium px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 shadow-2xs">
+                    ✦ {bridge}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Connected Papers Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {domainData[activeDomain].connectedPapers.map((paper, i) => (
+                <div
+                  key={i}
+                  onClick={() => onNavigateAuth('LOGIN')}
+                  className="p-4 rounded-2xl bg-white border border-slate-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between text-xs text-slate-500 mb-2 font-mono">
+                    <span className="text-blue-600 font-bold">{paper.journal} • {paper.year}</span>
+                    <span>{paper.citations} citations</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
+                    {paper.title}
+                  </h4>
+                  <div className="text-xs text-slate-500">
+                    {paper.authors}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*                      9. GLOBAL FOOTER                       */}
+      {/*      5. AI ASSISTANT: MULTI-LLM CONSENSUS (COSMIC)          */}
       {/* ════════════════════════════════════════════════════════════ */}
-      <footer className="w-full bg-white border-t border-slate-200/80 pt-12 pb-8">
-        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-200/80">
-            
-            {/* Col 1: Brand */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white">
-                  <Network className="w-4 h-4" />
-                </div>
-                <span className="font-extrabold text-base text-slate-900">
-                  ResearchGraph <span className="text-blue-600">AI</span>
+      <section ref={assistantRef} className="py-20 lg:py-24 bg-[#070D1E] text-white relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-400/30 text-emerald-300 text-xs font-bold font-mono tracking-wider uppercase mb-3">
+              Multi-LLM Consensus Engine
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Ensemble Reasoning Grounded in Verified Literature
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base mt-3 leading-relaxed">
+              Claude 3.5 Sonnet, GPT-4o, and Gemini 1.5 Pro cross-verify hypotheses simultaneously, citing direct DOI anchors to eliminate hallucinations.
+            </p>
+          </div>
+
+          {/* Scenario Tabs */}
+          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-thin">
+            {assistantScenarios.map((scen, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveChatTab(idx)}
+                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border ${
+                  activeChatTab === idx
+                    ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md'
+                    : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+                }`}
+              >
+                {scen.domain}
+              </button>
+            ))}
+          </div>
+
+          {/* Active Chat Scenario Card */}
+          <div className="rounded-3xl bg-[#091129] border border-cyan-500/30 p-6 sm:p-10 shadow-2xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-white/10 gap-3">
+              <div>
+                <span className="text-xs font-mono text-cyan-400 font-bold block mb-1">
+                  QUERY: {assistantScenarios[activeChatTab].domain}
+                </span>
+                <h3 className="text-lg sm:text-xl font-bold text-white">
+                  "{assistantScenarios[activeChatTab].query}"
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold">
+                  {assistantScenarios[activeChatTab].confidence} Confidence
                 </span>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Empowering researchers, laboratories, and universities worldwide with an interconnected, autonomous knowledge graph.
+            </div>
+
+            <div className="p-5 rounded-2xl bg-white/5 border border-white/10 mb-6">
+              <span className="text-xs font-mono text-gray-400 block mb-2">
+                {assistantScenarios[activeChatTab].models}
+              </span>
+              <p className="text-sm sm:text-base text-gray-200 leading-relaxed font-normal">
+                {assistantScenarios[activeChatTab].answer}
               </p>
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-mono font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                Systems Operational • 99.98%
+            </div>
+
+            {/* Metrics and Citations Bar */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {assistantScenarios[activeChatTab].metrics.map((met, i) => (
+                <div key={i} className="p-4 rounded-xl bg-[#060B19] border border-white/10">
+                  <span className="text-[11px] text-gray-400 uppercase font-mono block mb-1">{met.label}</span>
+                  <span className="text-lg font-bold text-cyan-300 font-mono">{met.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════ */}
+      {/*        6. 6-STAGE RAG PIPELINE (FROSTED LIGHT DECK)          */}
+      {/* ════════════════════════════════════════════════════════════ */}
+      <section ref={pipelineRef} className="py-20 lg:py-24 bg-[#F1F5F9] text-slate-900 relative border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-100 border border-cyan-200 text-cyan-800 text-xs font-bold font-mono tracking-wider uppercase mb-3">
+              Stepped RAG Architecture
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Deterministic Retrieval-Augmented Generation
+            </h2>
+            <p className="text-slate-600 text-sm sm:text-base mt-3 leading-relaxed">
+              How ResearchGraph AI ensures absolute scientific fidelity from user prompt to final cited output.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { step: '01', title: 'Intent Parsing & Vectorization', desc: 'Queries are decomposed into mathematical formulas, scientific entities, and dense 1536-dimensional embeddings.' },
+              { step: '02', title: 'Hybrid Dense + Sparse Search', desc: 'Simultaneous BM25 lexical matching and vector similarity retrieve top-k authoritative source candidate papers.' },
+              { step: '03', title: 'Knowledge Graph Re-Ranking', desc: 'Directional citation graphs weight papers based on citation velocity, methodology extensions, and peer validation.' },
+              { step: '04', title: 'Context Window Synthesis', desc: 'Key paragraphs, empirical benchmark tables, and LaTeX equations are injected into the multi-model context window.' },
+              { step: '05', title: 'Cross-LLM Consensus Check', desc: 'Independent foundation models compare claims; divergent statements are re-checked against original PDF paragraphs.' },
+              { step: '06', title: 'Verified Output & DOI Anchors', desc: 'Synthesized response is returned with clickable DOI badges that highlight the exact source paragraphs.' }
+            ].map((p, i) => (
+              <div key={i} className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md transition-all">
+                <span className="text-xs font-mono font-bold text-blue-600 block mb-2">STEP {p.step}</span>
+                <h3 className="text-base font-bold text-slate-900 mb-2">{p.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════ */}
+      {/*        7. ENTERPRISE DATA SOURCES (COSMIC TELEMETRY)         */}
+      {/* ════════════════════════════════════════════════════════════ */}
+      <section ref={sourcesRef} className="py-20 lg:py-24 bg-[#060B19] text-white relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/70 border border-blue-400/30 text-blue-300 text-xs font-bold font-mono tracking-wider uppercase mb-3">
+              Federated Repository Sync
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Continuously Synchronized with OpenAlex & arXiv
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base mt-3 leading-relaxed">
+              Real-time ingestion workers poll global preprint archives and bibliographic ontologies every 60 seconds.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            {/* OpenAlex Card */}
+            <div className="p-8 rounded-3xl bg-[#091129] border border-emerald-500/30 shadow-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/20 px-3 py-1 rounded-full border border-emerald-400/30">
+                  OPENALEX GLOBAL ONTOLOGY
+                </span>
+                <span className="text-xs text-gray-400 font-mono">SYNC: ACTIVE</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white">250M+ Works & 12.4M Authors</h3>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Complete coverage of CrossRef, PubMed, DOAJ, and institutional repositories with full author disambiguation and institution mappings.
+              </p>
+              <div className="pt-2 text-xs font-mono text-emerald-300 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Synchronized across 45+ academic disciplines</span>
               </div>
             </div>
 
-            {/* Col 2: Navigation */}
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 block mb-3">
-                Platform
-              </span>
-              <ul className="space-y-2 text-xs text-slate-600">
-                <li><button onClick={() => scrollTo(heroRef)} className="hover:text-blue-600">Research Cockpit</button></li>
-                <li><button onClick={() => scrollTo(graphRef)} className="hover:text-blue-600">3D Topology</button></li>
-                <li><button onClick={() => scrollTo(pipelineRef)} className="hover:text-blue-600">RAG Pipeline</button></li>
-                <li><button onClick={() => scrollTo(sourcesRef)} className="hover:text-blue-600">Data Sources</button></li>
-              </ul>
-            </div>
-
-            {/* Col 3: Academic */}
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 block mb-3">
-                Academic Sources
-              </span>
-              <ul className="space-y-2 text-xs text-slate-600">
-                <li><span className="hover:text-blue-600 cursor-pointer">OpenAlex Integration</span></li>
-                <li><span className="hover:text-blue-600 cursor-pointer">arXiv Preprint Sync</span></li>
-                <li><span className="hover:text-blue-600 cursor-pointer">Citation Methodology</span></li>
-                <li><span className="hover:text-blue-600 cursor-pointer">API Documentation</span></li>
-              </ul>
-            </div>
-
-            {/* Col 4: Trust */}
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-900 block mb-3">
-                Trust & Standards
-              </span>
-              <ul className="space-y-2 text-xs text-slate-600">
-                <li><span className="hover:text-blue-600 cursor-pointer">Zero Hallucination Policy</span></li>
-                <li><span className="hover:text-blue-600 cursor-pointer">Privacy & Data Governance</span></li>
-                <li><span className="hover:text-blue-600 cursor-pointer">Open Access Commitment</span></li>
-                <li><span className="hover:text-blue-600 cursor-pointer">Institutional Licensing</span></li>
-              </ul>
-            </div>
-
-          </div>
-
-          <div className="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-            <span>© 2026 ResearchGraph AI. Built for researchers and academic institutions worldwide.</span>
-            <div className="flex items-center gap-4">
-              <span className="hover:text-blue-600 cursor-pointer">Privacy Policy</span>
-              <span className="hover:text-blue-600 cursor-pointer">Terms of Service</span>
-              <span className="hover:text-blue-600 cursor-pointer">Security</span>
+            {/* arXiv Card */}
+            <div className="p-8 rounded-3xl bg-[#091129] border border-cyan-500/30 shadow-xl space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-cyan-400 bg-cyan-500/20 px-3 py-1 rounded-full border border-cyan-400/30">
+                  ARXIV PREPRINT PIPELINE
+                </span>
+                <span className="text-xs text-gray-400 font-mono">SYNC: HOURLY</span>
+              </div>
+              <h3 className="text-2xl font-bold text-white">2.4M+ Preprints & LaTeX Sources</h3>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                Instant indexing of frontier CS, Physics, Quantitative Biology, and Mathematics preprints within 60 minutes of release.
+              </p>
+              <div className="pt-2 text-xs font-mono text-cyan-300 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Full LaTeX equations & benchmark table extraction</span>
+              </div>
             </div>
           </div>
-
         </div>
-      </footer>
+      </section>
 
       {/* ════════════════════════════════════════════════════════════ */}
-      {/*                     10. IN-APP MODALS                       */}
+      {/*          8. FINAL HIGH-CONVERSION CTA & FOOTER              */}
+      {/* ════════════════════════════════════════════════════════════ */}
+      <section className="py-20 lg:py-28 bg-gradient-to-b from-[#060B19] via-[#091129] to-[#030712] text-white relative text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-mono tracking-wider uppercase">
+            Start Exploring Today
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            Accelerate Your Research with Connected Intelligence
+          </h2>
+          <p className="text-gray-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            Join thousands of scientists, machine learning engineers, and researchers exploring over 200M+ publications through ResearchGraph AI.
+          </p>
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+            <button
+              onClick={() => onNavigateAuth('REGISTER')}
+              className="px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 text-white font-extrabold text-sm sm:text-base shadow-[0_0_30px_rgba(6,182,212,0.4)] hover:shadow-[0_0_45px_rgba(6,182,212,0.6)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+            >
+              <span>Launch ResearchGraph AI Cockpit</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setActiveModal('DEMO')}
+              className="px-6 py-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-sm sm:text-base backdrop-blur-md transition-all flex items-center gap-2"
+            >
+              <Play className="w-4 h-4 text-cyan-300 fill-cyan-300" />
+              <span>Watch Video Tour</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Global Footer */}
+        <footer className="mt-24 pt-12 border-t border-white/10 text-xs text-gray-400 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Network className="w-4 h-4 text-cyan-400" />
+            <span className="font-bold text-white">ResearchGraph AI</span>
+            <span>&copy; {new Date().getFullYear()} • Semantic Academic Knowledge Platform</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <button onClick={() => setActiveModal('ABOUT')} className="hover:text-white transition-colors">
+              Methodology Paper
+            </button>
+            <button onClick={() => setActiveModal('ABOUT')} className="hover:text-white transition-colors">
+              Open Governance
+            </button>
+            <button onClick={() => onNavigateAuth('LOGIN')} className="hover:text-white transition-colors">
+              Platform Sign In
+            </button>
+          </div>
+        </footer>
+      </section>
+
+      {/* ════════════════════════════════════════════════════════════ */}
+      {/*               MODALS: ABOUT US & VIDEO DEMO                  */}
       {/* ════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {activeModal && (
@@ -1217,128 +1351,91 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md"
+            className="fixed inset-0 z-[120] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
             onClick={() => setActiveModal(null)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-3xl bg-[#091129] border border-cyan-500/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto"
             >
-              {/* Close Button */}
               <button
                 onClick={() => setActiveModal(null)}
-                className="absolute top-5 right-5 p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                className="absolute top-5 right-5 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              {/* ABOUT MODAL */}
               {activeModal === 'ABOUT' && (
-                <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider">
-                    <Info className="w-3.5 h-3.5" /> About ResearchGraph AI
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center">
+                      <Network className="w-5 h-5 text-cyan-300" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-white">About ResearchGraph AI</h2>
+                      <span className="text-xs font-mono text-cyan-400">Autonomous Scientific Discovery Platform</span>
+                    </div>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900">
-                    Pioneering Cognitive Research Intelligence
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    ResearchGraph AI was created to solve academic fragmentation. Every year, over 5 million new research papers are published across thousands of siloed journals and repositories. Researchers spend months manually reading disconnected PDFs and missing critical breakthroughs.
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    ResearchGraph AI was developed to overcome the acute fragmentation of modern scientific research. With over 200M+ papers scattered across proprietary silos and isolated preprint archives, critical cross-disciplinary intersections frequently go undetected for years.
                   </p>
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-                    <h4 className="font-bold text-sm text-slate-800">Our Mission</h4>
-                    <p className="text-xs text-slate-600 leading-relaxed">
-                      To organize the world's academic literature into an interconnected, multi-dimensional cognitive universe where any hypothesis can be validated across disciplines in milliseconds.
-                    </p>
-                  </div>
-                  <div className="pt-2 flex justify-end">
-                    <button
-                      onClick={() => { setActiveModal(null); onNavigateAuth('LOGIN'); }}
-                      className="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition-colors"
-                    >
-                      Join the Platform
-                    </button>
+                  <p className="text-sm text-gray-300 leading-relaxed">
+                    By combining hybrid vector-graph indexing with multi-LLM consensus verification (Claude 3.5 Sonnet, GPT-4o, Gemini 1.5 Pro), ResearchGraph AI anchors every synthetic insight directly to peer-reviewed evidence with zero hallucination.
+                  </p>
+                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-xs font-mono text-gray-300">
+                    <div>CORE SPECIFICATION:</div>
+                    <div className="mt-1 text-cyan-300">• 204.8M Works Scanned across 45+ Scientific Fields</div>
+                    <div className="text-cyan-300">• 1.24B Directional Citation Arcs Computed</div>
+                    <div className="text-cyan-300">• Sub-14ms Multi-Hop Graph Traversal Latency</div>
                   </div>
                 </div>
               )}
 
-              {/* DEMO MODAL */}
               {activeModal === 'DEMO' && (
                 <div className="space-y-4">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider">
-                    <Play className="w-3.5 h-3.5 text-blue-600 fill-blue-600" /> Interactive Platform Demonstration
-                  </div>
-
-                  {/* Video Selector Tabs */}
-                  <div className="flex gap-2 overflow-x-auto pb-1">
-                    {videoTourData.map((item, idx) => (
+                  <div className="flex items-center gap-2 mb-2">
+                    {videoTourData.map((v, i) => (
                       <button
-                        key={item.id}
-                        onClick={() => setActiveVideoIdx(idx)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                          activeVideoIdx === idx
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        key={v.id}
+                        onClick={() => setActiveVideoIdx(i)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                          activeVideoIdx === i
+                            ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40'
+                            : 'bg-white/5 text-gray-400 hover:text-white'
                         }`}
                       >
-                        {item.title}
+                        {v.title}
                       </button>
                     ))}
                   </div>
 
-                  <h3 className="text-xl font-bold text-slate-900">
-                    {videoTourData[activeVideoIdx].title}
-                  </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {videoTourData[activeVideoIdx].description}
-                  </p>
+                  <h3 className="text-lg font-bold text-white">{videoTourData[activeVideoIdx].title}</h3>
+                  <p className="text-xs text-gray-300 mb-4">{videoTourData[activeVideoIdx].description}</p>
 
-                  {/* Embedded Player or Interactive Simulation */}
                   {videoTourData[activeVideoIdx].youtubeId ? (
-                    <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-slate-200 shadow-md bg-black">
+                    <div className="relative w-full aspect-video rounded-2xl overflow-hidden border border-cyan-500/30 bg-black">
                       <iframe
                         src={`https://www.youtube-nocookie.com/embed/${videoTourData[activeVideoIdx].youtubeId}?autoplay=1&rel=0`}
                         title={videoTourData[activeVideoIdx].title}
                         className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       />
                     </div>
                   ) : (
-                    <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-3 font-mono text-xs">
-                      <div className="flex items-center justify-between text-blue-400 font-bold">
-                        <span>SIMULATION: GNN DRUG DISCOVERY</span>
-                        <span className="text-emerald-400">● ACTIVE SYNTHESIS</span>
-                      </div>
-                      <div className="space-y-2 text-slate-300 text-[11px]">
-                        <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
-                          Step 1 • Parallel query dispatch to arXiv & OpenAlex (1,420 matched candidates)
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
-                          Step 2 • 3D Topology clustering extracting ADMET & E(3)-equivariant networks
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
-                          Step 3 • Multi-LLM consensus synthesis generated 4 verifiable hypotheses
-                        </div>
-                      </div>
+                    <div className="p-6 rounded-2xl bg-black/60 border border-cyan-500/30 text-xs space-y-3 font-mono">
+                      <div className="text-cyan-400 font-bold">LIVE PLATFORM DEMONSTRATION SIMULATION</div>
+                      <div className="text-gray-300">1. Broadcasting query across arXiv, PubMed, and OpenAlex</div>
+                      <div className="text-gray-300">2. Vector clustering: 1,420 matched papers embedded into 3D topology</div>
+                      <div className="text-gray-300">3. Multi-LLM consensus: 4 validated hypotheses synthesized</div>
+                      <div className="text-emerald-400">✓ Ground truth confirmed with 100% verified citation badges</div>
                     </div>
                   )}
-
-                  <div className="pt-2 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">Ready to explore with your research queries?</span>
-                    <button
-                      onClick={() => { setActiveModal(null); onNavigateAuth('LOGIN'); }}
-                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-xs hover:from-blue-700 hover:to-indigo-700 transition-all flex items-center gap-1.5"
-                    >
-                      <span>Launch Cockpit</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
                 </div>
               )}
-
             </motion.div>
           </motion.div>
         )}

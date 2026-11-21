@@ -15,6 +15,7 @@ type AuthMode = 'LOGIN' | 'REGISTER';
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
+  const scrollContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Authentication State
   const [fullName, setFullName] = useState('');
@@ -71,14 +72,17 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
   return (
     <div className={`min-h-screen w-full font-sans overflow-x-hidden selection:bg-blue-500/30 fixed inset-0 transition-colors duration-300 ${
-      pageState === 'LANDING' ? 'bg-[#F8FAFC] text-slate-900' : 'bg-[#030712] text-white'
+      pageState === 'LANDING' ? 'bg-[#060B19] text-white' : 'bg-[#030712] text-white'
     }`}>
 
       {/* --- INTERACTIVE 3D SPACE BACKGROUND --- */}
       <InteractiveSpaceBackground pageState={pageState} authMode={authMode} />
 
       {/* --- PAGE CONTENT CONTAINER --- */}
-      <div className="relative z-20 w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth">
+      <div 
+        ref={scrollContainerRef}
+        className="relative z-20 w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+      >
         <AnimatePresence mode="wait">
 
           {/* ==================================================== */}
@@ -93,7 +97,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               transition={{ duration: 0.35, ease: "easeInOut" }}
               className="w-full flex flex-col relative"
             >
-              <LandingView onNavigateAuth={(mode) => triggerTraversal('AUTH', mode)} />
+              <LandingView 
+                onNavigateAuth={(mode) => triggerTraversal('AUTH', mode)} 
+                scrollContainerRef={scrollContainerRef}
+              />
             </motion.div>
           )}
 

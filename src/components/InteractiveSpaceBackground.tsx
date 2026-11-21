@@ -141,41 +141,33 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none transition-colors duration-700">
       
-      {/* ─── LANDING MODE: BRIGHT, FUTURISTIC, LUMINOUS SCIENTIFIC SURFACE (60% Light White/Slate) ─── */}
+      {/* ─── LANDING MODE: DEEP COSMIC RESEARCH UNIVERSE ─── */}
       {pageState === 'LANDING' && (
-        <div className="absolute inset-0 bg-[#F8FAFC]">
-          {/* Soft ambient radial glow 1: Top Right (Lavender & Blue) */}
+        <div className="absolute inset-0 bg-[#060B19]">
+          {/* Ambient Cosmic Nebula Glow 1: Top Right */}
           <div 
-            className="absolute -top-[15%] right-[5%] w-[650px] h-[650px] rounded-full pointer-events-none blur-3xl opacity-60"
+            className="absolute -top-[15%] right-[5%] w-[650px] h-[650px] rounded-full pointer-events-none blur-3xl opacity-30"
             style={{
-              background: 'radial-gradient(circle, rgba(199, 210, 254, 0.45) 0%, rgba(224, 242, 254, 0.25) 50%, transparent 75%)',
+              background: 'radial-gradient(circle, rgba(14, 165, 233, 0.4) 0%, rgba(99, 102, 241, 0.25) 50%, transparent 75%)',
               transform: `translate3d(${parallax.x * 0.4}px, ${parallax.y * 0.4}px, 0)`
             }}
           />
 
-          {/* Soft ambient radial glow 2: Center Left (Sky Cyan & Indigo) */}
+          {/* Ambient Cosmic Nebula Glow 2: Center Left */}
           <div 
-            className="absolute top-[28%] -left-[10%] w-[600px] h-[600px] rounded-full pointer-events-none blur-3xl opacity-50"
+            className="absolute top-[28%] -left-[10%] w-[600px] h-[600px] rounded-full pointer-events-none blur-3xl opacity-35"
             style={{
-              background: 'radial-gradient(circle, rgba(224, 242, 254, 0.55) 0%, rgba(243, 232, 255, 0.35) 50%, transparent 80%)',
+              background: 'radial-gradient(circle, rgba(168, 85, 247, 0.35) 0%, rgba(59, 130, 246, 0.2) 50%, transparent 80%)',
               transform: `translate3d(${parallax.x * -0.3}px, ${parallax.y * -0.3}px, 0)`
             }}
           />
 
-          {/* Soft ambient radial glow 3: Bottom Center (Subtle Cyan accent) */}
+          {/* Micro-dot constellation grid texture */}
           <div 
-            className="absolute -bottom-[10%] left-[25%] w-[700px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-40"
+            className="absolute inset-0 opacity-[0.2]"
             style={{
-              background: 'radial-gradient(circle, rgba(219, 234, 254, 0.5) 0%, rgba(238, 242, 255, 0.3) 60%, transparent 80%)'
-            }}
-          />
-
-          {/* Micro-dot academic grid texture */}
-          <div 
-            className="absolute inset-0 opacity-[0.4]"
-            style={{
-              backgroundImage: 'radial-gradient(rgba(100, 116, 139, 0.16) 1px, transparent 1px)',
-              backgroundSize: '28px 28px'
+              backgroundImage: 'radial-gradient(rgba(148, 163, 184, 0.2) 1px, transparent 1px)',
+              backgroundSize: '32px 32px'
             }}
           />
         </div>
