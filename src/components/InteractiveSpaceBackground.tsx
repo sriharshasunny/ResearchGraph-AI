@@ -28,76 +28,41 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
     let targetMouseY = 0;
 
     const handleMouseMove = (e: MouseEvent) => {
-      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 35;
-      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 35;
-      // Also update subtle background parallax state smoothly
+      targetMouseX = (e.clientX / window.innerWidth - 0.5) * 30;
+      targetMouseY = (e.clientY / window.innerHeight - 0.5) * 30;
       setParallax({
-        x: (e.clientX / window.innerWidth - 0.5) * -18,
-        y: (e.clientY / window.innerHeight - 0.5) * -18,
+        x: (e.clientX / window.innerWidth - 0.5) * -15,
+        y: (e.clientY / window.innerHeight - 0.5) * -15,
       });
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
 
-    // Dynamic Starfield with 3D Depth
-    const starCount = 120;
-    const stars: Array<{
+    // Floating Network Nodes for Scientific Intelligence Visualization
+    const nodeCount = 45;
+    const nodes: Array<{
       x: number;
       y: number;
-      size: number;
-      baseAlpha: number;
+      vx: number;
+      vy: number;
+      radius: number;
+      color: string;
       alpha: number;
-      depth: number;
-      twinkleSpeed: number;
-      twinklePhase: number;
     }> = [];
 
-    for (let i = 0; i < starCount; i++) {
-      const depth = Math.random() * 0.8 + 0.2;
-      stars.push({
+    const colors = ['#2563EB', '#3B82F6', '#6366F1', '#8B5CF6', '#06B6D4'];
+
+    for (let i = 0; i < nodeCount; i++) {
+      nodes.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        size: Math.random() * 1.5 + 0.5,
-        baseAlpha: Math.random() * 0.45 + 0.25,
-        alpha: 0.5,
-        depth,
-        twinkleSpeed: Math.random() * 0.025 + 0.01,
-        twinklePhase: Math.random() * Math.PI * 2,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
+        radius: Math.random() * 2 + 1.2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: Math.random() * 0.3 + 0.15,
       });
     }
-
-    // Occasional shooting stars
-    interface ShootingStar {
-      x: number;
-      y: number;
-      length: number;
-      speed: number;
-      angle: number;
-      opacity: number;
-      active: boolean;
-    }
-
-    const shootingStar: ShootingStar = {
-      x: 0,
-      y: 0,
-      length: 80,
-      speed: 14,
-      angle: Math.PI / 4,
-      opacity: 0,
-      active: false,
-    };
-
-    let nextShootingStarTime = Date.now() + 3000;
-
-    const spawnShootingStar = () => {
-      shootingStar.x = Math.random() * width * 0.8;
-      shootingStar.y = Math.random() * height * 0.4;
-      shootingStar.length = Math.random() * 70 + 60;
-      shootingStar.speed = Math.random() * 8 + 12;
-      shootingStar.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.2;
-      shootingStar.opacity = 1;
-      shootingStar.active = true;
-    };
 
     let animationId: number;
     let isRunning = true;
@@ -111,45 +76,48 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
       ctx.clearRect(0, 0, width, height);
 
-      // Render stars with 3D depth parallax
-      for (const star of stars) {
-        star.twinklePhase += star.twinkleSpeed;
-        star.alpha = star.baseAlpha + Math.sin(star.twinklePhase) * 0.2;
+      // Only draw subtle node connections on landing mode
+      if (pageState === 'LANDING') {
+        // Update and draw nodes
+        for (let i = 0; i < nodes.length; i++) {
+          const n = nodes[i];
+          n.x += n.vx;
+          n.y += n.vy;
 
-        const px = star.x + mouseX * star.depth;
-        const py = star.y + mouseY * star.depth;
+          if (n.x < 0) n.x = width;
+          if (n.x > width) n.x = 0;
+          if (n.y < 0) n.y = height;
+          if (n.y > height) n.y = 0;
 
-        ctx.fillStyle = `rgba(186, 230, 253, ${Math.max(0.1, star.alpha)})`;
-        ctx.beginPath();
-        ctx.arc(px, py, star.size * star.depth, 0, Math.PI * 2);
-        ctx.fill();
-      }
+          const px = n.x + mouseX * 0.15;
+          const py = n.y + mouseY * 0.15;
 
-      // Check shooting star
-      if (Date.now() > nextShootingStarTime && !shootingStar.active) {
-        spawnShootingStar();
-        nextShootingStarTime = Date.now() + Math.random() * 8000 + 4000;
-      }
+          ctx.fillStyle = n.color;
+          ctx.globalAlpha = n.alpha;
+          ctx.beginPath();
+          ctx.arc(px, py, n.radius, 0, Math.PI * 2);
+          ctx.fill();
 
-      if (shootingStar.active) {
-        ctx.save();
-        ctx.strokeStyle = `rgba(125, 211, 252, ${shootingStar.opacity})`;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(shootingStar.x, shootingStar.y);
-        const tailX = shootingStar.x - Math.cos(shootingStar.angle) * shootingStar.length;
-        const tailY = shootingStar.y - Math.sin(shootingStar.angle) * shootingStar.length;
-        ctx.lineTo(tailX, tailY);
-        ctx.stroke();
-        ctx.restore();
+          // Connect adjacent nodes with faint lines
+          for (let j = i + 1; j < nodes.length; j++) {
+            const n2 = nodes[j];
+            const dx = n.x - n2.x;
+            const dy = n.y - n2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
 
-        shootingStar.x += Math.cos(shootingStar.angle) * shootingStar.speed;
-        shootingStar.y += Math.sin(shootingStar.angle) * shootingStar.speed;
-        shootingStar.opacity -= 0.016;
-
-        if (shootingStar.opacity <= 0 || shootingStar.x > width || shootingStar.y > height) {
-          shootingStar.active = false;
+            if (dist < 130) {
+              const lineAlpha = (1 - dist / 130) * 0.09;
+              ctx.strokeStyle = '#3B82F6';
+              ctx.globalAlpha = lineAlpha;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(px, py);
+              ctx.lineTo(n2.x + mouseX * 0.15, n2.y + mouseY * 0.15);
+              ctx.stroke();
+            }
+          }
         }
+        ctx.globalAlpha = 1.0;
       }
     };
 
@@ -162,121 +130,107 @@ export const InteractiveSpaceBackground: React.FC<InteractiveSpaceBackgroundProp
 
     window.addEventListener('resize', handleResize);
 
-    const handleVisibility = () => {
-      if (document.hidden) {
-        isRunning = false;
-        cancelAnimationFrame(animationId);
-      } else {
-        isRunning = true;
-        render();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibility);
-
     return () => {
       isRunning = false;
       cancelAnimationFrame(animationId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);
-      document.removeEventListener('visibilitychange', handleVisibility);
     };
-  }, []);
+  }, [pageState]);
 
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-[#030712] pointer-events-none select-none">
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none transition-colors duration-700">
       
-      {/* Layer 1: Epic Landing Page Background (uploaded hero image) */}
-      <motion.div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: "url('/landing_hero_bg.jpg')",
-          transform: `translate3d(${parallax.x * 0.5}px, ${parallax.y * 0.5}px, 0)`,
-          filter: 'brightness(0.45) saturate(1.4) contrast(1.1)'
-        }}
-        initial={false}
-        animate={{ 
-          opacity: pageState === 'LANDING' ? 1.0 : 0,
-          scale: pageState === 'LANDING' ? [1.0, 1.04, 1.0] : 1.0
-        }}
-        transition={{ 
-          opacity: { duration: 1.0, ease: "easeInOut" },
-          scale: { duration: 30, repeat: Infinity, ease: "easeInOut" }
-        }}
-      />
-      {/* Layer 1b: Colour overlay for vibrance */}
-      <motion.div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(135deg, rgba(6,182,212,0.08) 0%, rgba(99,102,241,0.06) 40%, rgba(168,85,247,0.08) 70%, rgba(6,182,212,0.05) 100%)',
-          mixBlendMode: 'screen',
-        }}
-        initial={false}
-        animate={{ opacity: pageState === 'LANDING' ? 1 : 0 }}
-        transition={{ duration: 0.8 }}
-      />
+      {/* ─── LANDING MODE: BRIGHT, FUTURISTIC, LUMINOUS SCIENTIFIC SURFACE (60% Light White/Slate) ─── */}
+      {pageState === 'LANDING' && (
+        <div className="absolute inset-0 bg-[#F8FAFC]">
+          {/* Soft ambient radial glow 1: Top Right (Lavender & Blue) */}
+          <div 
+            className="absolute -top-[15%] right-[5%] w-[650px] h-[650px] rounded-full pointer-events-none blur-3xl opacity-60"
+            style={{
+              background: 'radial-gradient(circle, rgba(199, 210, 254, 0.45) 0%, rgba(224, 242, 254, 0.25) 50%, transparent 75%)',
+              transform: `translate3d(${parallax.x * 0.4}px, ${parallax.y * 0.4}px, 0)`
+            }}
+          />
 
-      {/* Layer 2: Login Background (Photorealistic Planetary Arc & Cosmos Vista) */}
-      <motion.div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: "url('/login_bg.jpg')",
-          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
-        }}
-        initial={false}
-        animate={{ 
-          opacity: (pageState === 'AUTH' && authMode === 'LOGIN') ? 0.88 : 0,
-          scale: (pageState === 'AUTH' && authMode === 'LOGIN') ? [1.02, 1.05, 1.02] : 1.0
-        }}
-        transition={{ 
-          opacity: { duration: 0.8, ease: "easeInOut" },
-          scale: { duration: 35, repeat: Infinity, ease: "easeInOut" }
-        }}
-      />
+          {/* Soft ambient radial glow 2: Center Left (Sky Cyan & Indigo) */}
+          <div 
+            className="absolute top-[28%] -left-[10%] w-[600px] h-[600px] rounded-full pointer-events-none blur-3xl opacity-50"
+            style={{
+              background: 'radial-gradient(circle, rgba(224, 242, 254, 0.55) 0%, rgba(243, 232, 255, 0.35) 50%, transparent 80%)',
+              transform: `translate3d(${parallax.x * -0.3}px, ${parallax.y * -0.3}px, 0)`
+            }}
+          />
 
-      {/* Layer 3: Register Background (Photorealistic Interstellar Nebula Star Cluster) */}
-      <motion.div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ 
-          backgroundImage: "url('/register_bg.jpg')",
-          transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
-        }}
-        initial={false}
-        animate={{ 
-          opacity: (pageState === 'AUTH' && authMode === 'REGISTER') ? 0.88 : 0,
-          scale: (pageState === 'AUTH' && authMode === 'REGISTER') ? [1.02, 1.05, 1.02] : 1.0
-        }}
-        transition={{ 
-          opacity: { duration: 0.8, ease: "easeInOut" },
-          scale: { duration: 35, repeat: Infinity, ease: "easeInOut" }
-        }}
-      />
+          {/* Soft ambient radial glow 3: Bottom Center (Subtle Cyan accent) */}
+          <div 
+            className="absolute -bottom-[10%] left-[25%] w-[700px] h-[500px] rounded-full pointer-events-none blur-3xl opacity-40"
+            style={{
+              background: 'radial-gradient(circle, rgba(219, 234, 254, 0.5) 0%, rgba(238, 242, 255, 0.3) 60%, transparent 80%)'
+            }}
+          />
 
-      {/* Interactive 3D Depth Starfield & Cosmic Dust Canvas */}
+          {/* Micro-dot academic grid texture */}
+          <div 
+            className="absolute inset-0 opacity-[0.4]"
+            style={{
+              backgroundImage: 'radial-gradient(rgba(100, 116, 139, 0.16) 1px, transparent 1px)',
+              backgroundSize: '28px 28px'
+            }}
+          />
+        </div>
+      )}
+
+      {/* ─── AUTH MODE: DARK INTERSTELLAR COSMOS ─── */}
+      {pageState === 'AUTH' && (
+        <div className="absolute inset-0 bg-[#030712]">
+          {/* Layer 2: Login Background */}
+          <motion.div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: "url('/login_bg.jpg')",
+              transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
+            }}
+            initial={false}
+            animate={{ 
+              opacity: authMode === 'LOGIN' ? 0.85 : 0,
+              scale: authMode === 'LOGIN' ? [1.02, 1.05, 1.02] : 1.0
+            }}
+            transition={{ 
+              opacity: { duration: 0.8, ease: "easeInOut" },
+              scale: { duration: 35, repeat: Infinity, ease: "easeInOut" }
+            }}
+          />
+
+          {/* Layer 3: Register Background */}
+          <motion.div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: "url('/register_bg.jpg')",
+              transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`
+            }}
+            initial={false}
+            animate={{ 
+              opacity: authMode === 'REGISTER' ? 0.85 : 0,
+              scale: authMode === 'REGISTER' ? [1.02, 1.05, 1.02] : 1.0
+            }}
+            transition={{ 
+              opacity: { duration: 0.8, ease: "easeInOut" },
+              scale: { duration: 35, repeat: Infinity, ease: "easeInOut" }
+            }}
+          />
+
+          {/* Dark Vignettes */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,#030712_85%)] opacity-80" />
+        </div>
+      )}
+
+      {/* Interactive Canvas (Nodes / Constellation lines) */}
       <canvas 
         ref={canvasRef} 
         className="absolute inset-0 z-10 pointer-events-none"
       />
-
-      {/* Atmospheric Gradients: Soft vignettes that preserve cockpit space visibility while maintaining UI clarity */}
-      <div className={`absolute inset-0 transition-colors duration-700 ease-in-out z-10 ${
-        pageState === 'LANDING' 
-          ? 'bg-black/5' 
-          : 'bg-black/25'
-      }`}></div>
-
-      <div className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-700 ease-in-out z-10 ${
-        pageState === 'LANDING' 
-          ? 'from-black/30 via-transparent to-black/35 opacity-40' 
-          : 'from-[#030712]/80 via-transparent to-[#030712]/80 opacity-90'
-      }`}></div>
-
-      {/* Radial Focus Vignette */}
-      <div className={`absolute inset-0 pointer-events-none transition-opacity duration-700 z-10 ${
-        pageState === 'AUTH' 
-          ? 'opacity-80 bg-[radial-gradient(ellipse_at_center,transparent_20%,#030712_85%)]' 
-          : 'opacity-40 bg-[radial-gradient(ellipse_at_center,transparent_40%,#01020a_95%)]'
-      }`}></div>
     </div>
   );
 };

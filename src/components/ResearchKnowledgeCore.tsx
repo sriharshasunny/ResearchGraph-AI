@@ -2,7 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { GLOBE_RAW_BASE64 } from './researchGraphGlobeRaw';
 
-export const ResearchKnowledgeCore: React.FC = () => {
+interface ResearchKnowledgeCoreProps {
+  onNavigate?: (target: string) => void;
+}
+
+export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ onNavigate }) => {
   const { setActivePage, setSearchQuery } = useApp();
   const stageRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -10,8 +14,20 @@ export const ResearchKnowledgeCore: React.FC = () => {
   const hintRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (term: string) => {
-    setSearchQuery(term);
-    setActivePage('search');
+    if (onNavigate) {
+      onNavigate(term);
+    } else {
+      setSearchQuery(term);
+      setActivePage('search');
+    }
+  };
+
+  const handleAction = (page: any) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else {
+      setActivePage(page);
+    }
   };
 
 function initResearchGraphGlobe(
@@ -1214,7 +1230,7 @@ function initResearchGraphGlobe(
         {/* 4 Interactive Feature Badges Floating Around Globe */}
         <button
           type="button"
-          onClick={() => setActivePage('graph')}
+          onClick={() => handleAction('graph')}
           className="rg-pill-badge rg-pill-purple"
           style={{ left: '54%', top: '14%' }}
         >
@@ -1229,7 +1245,7 @@ function initResearchGraphGlobe(
 
         <button
           type="button"
-          onClick={() => setActivePage('search')}
+          onClick={() => handleAction('search')}
           className="rg-pill-badge rg-pill-blue"
           style={{ left: '44%', top: '42%' }}
         >
