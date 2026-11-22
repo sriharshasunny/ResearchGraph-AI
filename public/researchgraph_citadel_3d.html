@@ -3,244 +3,941 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ResearchGraph AI – Research, Connected.</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"><style>
-:root{color-scheme:dark;--bg:#030616}
-html,body{margin:0;height:100%;background:var(--bg);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-canvas{display:block;position:fixed;inset:0;z-index:0;pointer-events:auto;}
-#lines{z-index:1;position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-svg:not(#lines){position:static;display:inline-block}
-.pill{position:fixed;left:0;top:0;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 12px;border-radius:999px;background:rgba(5,10,35,.85);border:1.5px solid;color:#fff;font-weight:600;z-index:15;font-size:13px;white-space:nowrap;pointer-events:auto;cursor:pointer;box-shadow:0 0 18px var(--c);border-color:var(--c);backdrop-filter:blur(6px);transition:transform .2s cubic-bezier(0.16,1,0.3,1),box-shadow .2s;}
-   .pill:hover{transform:scale(1.08)!important;box-shadow:0 0 28px var(--c),0 6px 20px rgba(0,0,0,0.6)!important;}
-.pill i{font-style:normal;font-size:18px;color:var(--c)}
-.pill b{font-weight:500;font-size:12px;background:rgba(255,255,255,.1);padding:3px 9px;border-radius:999px;color:#dfe8ff}
-.ufo{font-size:12px;padding:5px 12px;letter-spacing:.04em;color:#5ff3ff}
-.hint{position:fixed;bottom:12px;left:0;right:0;text-align:center;color:#7f8bd0;font-size:12px;pointer-events:none;padding-bottom:env(safe-area-inset-bottom,0px)}
-:root{--cy:#3ad8ff;--vi:#8a5cff;--bl:#3b82ff;--mu:#9fb0e6;--bd:rgba(120,150,255,.16)}
-html{scroll-behavior:smooth}body{color:#e8ecff;overflow-x:hidden;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-h1,h2,h3,.logo,.stats b,.big b{font-family:"Space Grotesk",Inter,sans-serif}
-a{color:inherit;text-decoration:none}
-body::after{content:"";position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(1400px 800px at 10% 25%,rgba(76,29,149,.15),transparent 65%),radial-gradient(1000px 700px at 85% 85%,rgba(30,58,138,.12),transparent 60%);mix-blend-mode:screen}
-.pill{background:linear-gradient(135deg,rgba(16,24,64,.88),rgba(6,10,32,.88));border-width:1px;box-shadow:0 8px 30px rgba(0,0,0,.45),0 0 22px color-mix(in srgb,var(--c) 38%,transparent);font-family:Inter,sans-serif}
-header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:calc(14px + env(safe-area-inset-top,0px)) 36px 14px;transition:.3s}
-header.sc{background:rgba(4,7,26,.78);backdrop-filter:blur(16px) saturate(1.4);border-bottom:1px solid var(--bd)}
-.logo{display:flex;align-items:center;gap:12px;font-weight:700;font-size:22px;letter-spacing:-.02em}.logo em{font-style:normal;background:linear-gradient(90deg,#4aa3ff,#9a6bff);-webkit-background-clip:text;background-clip:text;color:transparent}
-.mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#7a5cff,#2f7bff);display:grid;place-items:center;font-size:20px;box-shadow:0 0 0 1px #ffffff30 inset,0 0 28px #4f6bffaa}
-.ver{font:600 11px ui-monospace,monospace;color:#5ff3ff;background:#0d1b3d;border:1px solid #1f4a7a;padding:4px 9px;border-radius:99px}
-nav{display:flex;gap:4px;padding:5px;border-radius:99px;background:rgba(10,16,44,.62);border:1px solid var(--bd);backdrop-filter:blur(14px)}
-nav a{padding:10px 17px;border-radius:99px;font-size:14px;font-weight:600;color:#cfd9ff;transition:.2s}nav a:hover{background:rgba(90,110,255,.22);color:#fff}
-nav b{font:700 10px ui-monospace,monospace;color:#04152a;background:var(--cy);padding:2px 7px;border-radius:99px;margin-left:6px}
-.right{display:flex;align-items:center;gap:22px;font-weight:600}
-.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;gap:10px;padding:13px 24px;border-radius:13px;font-weight:700;font-size:15px;border:1px solid var(--bd);background:rgba(16,24,60,.65);backdrop-filter:blur(8px);color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s}
-.btn:hover{transform:translateY(-2px)}
-.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.3) 50%,transparent 65%);transform:translateX(-120%);transition:.6s}.btn:hover::after{transform:translateX(120%)}
-.btn.p{background:linear-gradient(90deg,#8a4dff,#4d6bff);border-color:#9a7bff;box-shadow:0 8px 32px #6a4dff77}
-.btn.c{background:linear-gradient(90deg,#16b6ff,#2b6cff);border-color:#5ac4ff;box-shadow:0 8px 32px #1e8bff66}
-.hero{position:relative;z-index:5;min-height:100vh;min-height:100svh;padding:150px 36px 170px;pointer-events:none;display:flex;flex-direction:column;justify-content:center}
-.col{max-width:620px;margin-left:36px}.col>*{pointer-events:auto}
-.tag{display:inline-flex;align-items:center;gap:10px;padding:9px 16px;border-radius:99px;border:1px solid #5b3fc8;background:rgba(70,35,150,.35);backdrop-filter:blur(8px);color:#d4c6ff;font:700 12.5px ui-monospace,monospace;letter-spacing:.08em;margin-bottom:26px}
-.tag::before{content:"";width:8px;height:8px;border-radius:50%;background:#19e6c4;box-shadow:0 0 0 0 #19e6c488;animation:pu 2s infinite}@keyframes pu{70%{box-shadow:0 0 0 10px transparent}}
-h1{margin:0;font-size:clamp(48px,6.4vw,84px);line-height:.98;letter-spacing:-.035em;font-weight:700}
-h1 span{background:linear-gradient(90deg,#4aa3ff,#a46bff,#4aa3ff);background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 6s linear infinite}@keyframes sh{to{background-position:200%}}
-h1 u{display:inline-block;width:4px;height:.78em;background:var(--cy);margin-left:8px;vertical-align:-.04em;animation:bl 1s steps(2) infinite;box-shadow:0 0 14px var(--cy)}@keyframes bl{50%{opacity:0}}
-.lead{font-size:19px;line-height:1.65;color:#c3cdf2;margin:26px 0 30px;max-width:560px}
-.cta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:28px}
-.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:26px}
-.feat div{padding:16px;border-radius:16px;background:linear-gradient(160deg,rgba(24,34,86,.6),rgba(10,16,44,.6));border:1px solid var(--bd);backdrop-filter:blur(10px);transition:.25s}
-.feat div:hover{transform:translateY(-4px);border-color:#5a7aff88;box-shadow:0 12px 30px #3a5aff33}
-.feat b{display:block;font-size:15px;margin-bottom:6px}.feat small{color:var(--mu);font-size:12.5px}
-.ask{display:flex;align-items:center;gap:12px;padding:10px 10px 10px 20px;border-radius:18px;background:rgba(6,10,34,.82);border:1px solid #2c3d86;box-shadow:0 0 0 4px rgba(58,120,255,.06),0 18px 50px rgba(0,0,0,.4);transition:.25s}
-.ask:focus-within{border-color:var(--cy);box-shadow:0 0 0 4px rgba(58,216,255,.14),0 18px 50px rgba(0,0,0,.4)}
-.ask input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font-size:16px;font-family:inherit}.ask input::placeholder{color:#a9b4e6}
-.ask .btn{padding:11px 18px;border-radius:12px}
-.trend{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:22px;font-size:14px;font-weight:600}
-.trend a{padding:8px 14px;border-radius:99px;border:1px solid var(--bd);background:rgba(16,24,60,.55);font-size:13px;font-weight:500;transition:.2s}.trend a:hover{border-color:var(--cy);color:var(--cy)}
-.stats{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:min(1100px,calc(100% - 48px));display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:22px 34px;border-radius:20px;background:linear-gradient(180deg,rgba(14,22,60,.85),rgba(6,10,34,.9));border:1px solid #24508a;box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(40,140,255,.12) inset;pointer-events:auto;backdrop-filter:blur(14px)}
-.stats b{display:block;font-size:26px;font-weight:700}.stats small{color:var(--mu);font-size:13px}.stats i{font-style:normal;margin-right:14px;color:var(--cy);font-size:26px;float:left;filter:drop-shadow(0 0 8px var(--cy))}
+:root {
+  --bg: #02040e;
+  --cy: #38bdf8;
+  --vi: #a855f7;
+  --bl: #3b82f6;
+  --em: #10b981;
+  --am: #f59e0b;
+  --pk: #ec4899;
+  --text: #f1f5f9;
+  --mu: #94a3b8;
+  --bd: rgba(56, 189, 248, 0.20);
+  --bd-glow: rgba(56, 189, 248, 0.45);
+  --glass: rgba(7, 12, 34, 0.82);
+  --glass-card: linear-gradient(150deg, rgba(14, 22, 58, 0.78), rgba(6, 10, 32, 0.85));
+}
 
-/* Left-aligned sticky layout styling */
-.hero{position:relative;z-index:5;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:100px 32px 60px 48px;box-sizing:border-box;}
-.col{position:relative;z-index:10;max-width:560px;display:flex;flex-direction:column;gap:18px;pointer-events:auto;}
-.sec{position:relative;z-index:6;background:transparent!important;padding:80px 48px;box-sizing:border-box;}
-.sec-content{max-width:580px;background:linear-gradient(145deg,rgba(10,18,52,0.82),rgba(5,9,30,0.85));border:1px solid rgba(56,189,248,0.22);border-radius:28px;padding:36px;box-shadow:0 20px 60px rgba(0,0,0,0.6),0 0 40px rgba(14,165,233,0.08) inset;backdrop-filter:blur(18px);pointer-events:auto;}
-.sec h2{font-size:clamp(28px,3.6vw,44px);margin:0 0 14px;letter-spacing:-.03em;text-align:left;line-height:1.1;}
-.sec h2 span{background:linear-gradient(90deg,#4aa3ff,#a46bff);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.sec p.sec-lead{font-size:15px;color:#94a3b8;line-height:1.6;margin:0 0 24px;text-align:left;}
-.steps{display:flex;flex-direction:column;gap:16px;}
-.step{position:relative;padding:22px 24px;border-radius:20px;background:linear-gradient(160deg,rgba(20,32,84,0.65),rgba(10,16,48,0.7));border:1px solid rgba(56,189,248,0.2);transition:transform .3s,border-color .3s,box-shadow .3s;}
-.step:hover{transform:translateX(6px);border-color:rgba(56,189,248,0.5);box-shadow:0 8px 30px rgba(14,165,233,0.2);}
-.step em{font:800 12px ui-monospace,monospace;color:#38bdf8;background:rgba(14,165,233,0.18);border:1px solid rgba(56,189,248,0.3);padding:3px 9px;border-radius:99px;display:inline-block;margin-bottom:8px;}
-.step h3{margin:4px 0 6px;font-size:17px;color:#fff;font-weight:700;}
-.step p{margin:0;font-size:13.5px;color:#cbd5e1;line-height:1.5;}
-.bento{display:flex;flex-direction:column;gap:16px;}
-.card{padding:24px;border-radius:20px;background:linear-gradient(160deg,rgba(18,28,76,0.65),rgba(8,14,42,0.7));border:1px solid rgba(56,189,248,0.2);transition:.3s;}
-.card:hover{transform:translateY(-3px);border-color:rgba(56,189,248,0.45);box-shadow:0 12px 35px rgba(14,165,233,0.18);}
-.card h3{font-size:17px;color:#fff;margin:8px 0 6px;font-weight:700;}
-.card p{font-size:13.5px;color:#94a3b8;line-height:1.5;margin:0;}
-.big{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:22px;border-radius:22px;background:rgba(6,12,36,0.75);border:1px solid rgba(56,189,248,0.2);}
-.big div{text-align:center;padding:12px;}
-.big b{display:block;font-size:28px;font-weight:800;color:#fff;letter-spacing:-.02em;}
-.big small{font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;}
-.cta2{padding:32px;border-radius:24px;background:linear-gradient(145deg,rgba(22,34,92,0.85),rgba(10,16,48,0.9));border:1px solid rgba(168,85,247,0.35);box-shadow:0 15px 50px rgba(168,85,247,0.15);}
-.cta2 h2{font-size:32px;margin:0 0 10px;text-align:left;}
-.cta2 p{font-size:14.5px;color:#cbd5e1;margin:0 0 20px;text-align:left;}
-footer{position:relative;z-index:6;background:rgba(4,7,26,0.92);padding:40px 48px;border-top:1px solid rgba(56,189,248,0.15);backdrop-filter:blur(16px);}
-.fg{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;}
-.cp{text-align:center;margin-top:32px;font-size:12px;color:#64748b;}
-/* Subtle staggered scroll reveal */
-.rv{opacity:0.25;transform:translateY(18px);transition:opacity 0.6s ease-out,transform 0.6s ease-out;}.rv.in{opacity:1;transform:translateY(0);}
-.rv.in{opacity:1;transform:translateY(0);}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; color-scheme: dark; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
 
-@media(max-width:1000px){nav,.right a:first-child{display:none}header{padding-inline:18px}.pill,#lines{display:none}.hero{padding:120px 18px 270px;justify-content:flex-start;background:linear-gradient(#030616aa,#03061600 75%)}.col{margin:0}.feat,.steps{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr;padding:16px;bottom:12px}.sec{padding:64px 20px}.bento{grid-template-columns:1fr}.card,.card.w{grid-column:auto}.big{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr 1fr}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
-h1,h2{text-wrap:balance}p{text-wrap:pretty}
-.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(4,6,26,.8) 0,rgba(4,6,26,.45) 38%,transparent 64%);pointer-events:none;z-index:-1}
-h1{letter-spacing:-.045em;text-shadow:0 6px 50px rgba(0,0,0,.5)}
-.lead{font-size:clamp(17px,1.3vw,20px);line-height:1.7;color:#cbd5f8;text-shadow:0 2px 20px rgba(0,0,0,.7)}
-.tag{font-size:12px;letter-spacing:.14em}
+h1, h2, h3, h4, .logo, .stat-val, .badge, .code-font {
+  font-family: 'Space Grotesk', 'Inter', sans-serif;
+}
 
+a { color: inherit; text-decoration: none; }
 
+/* Fixed 3D Canvas & Interactive Floating HUD */
+canvas { display: block; position: fixed; inset: 0; z-index: 0; pointer-events: auto; }
+#lines { z-index: 1; position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+#stage { position: fixed; left: 0; top: 0; width: 400px; height: 400px; z-index: 7; pointer-events: none; }
+#globe { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: auto; cursor: grab; }
 
+/* 3D Floating Interactive HUD Pills */
+.pill {
+  position: fixed; left: 0; top: 0; display: flex; align-items: center; gap: 8px;
+  padding: 7px 14px 7px 11px; border-radius: 999px;
+  background: linear-gradient(135deg, rgba(14, 24, 64, 0.90), rgba(6, 10, 30, 0.92));
+  border: 1px solid var(--c, var(--cy));
+  color: #fff; font-weight: 600; z-index: 15; font-size: 12.5px;
+  white-space: nowrap; pointer-events: auto; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 16px color-mix(in srgb, var(--c) 40%, transparent);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, border-color 0.25s;
+}
+.pill:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 26px var(--c) !important;
+}
+.pill i { font-style: normal; font-size: 15px; color: var(--c); }
+.pill b {
+  font-weight: 600; font-size: 11px; font-family: ui-monospace, monospace;
+  background: rgba(255, 255, 255, 0.12); padding: 2px 7px; border-radius: 999px; color: #e2e8f0;
+}
+.ufo { font-size: 11.5px; padding: 5px 12px; letter-spacing: 0.05em; color: #38bdf8; }
 
+.tip {
+  position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0;
+  transition: opacity 0.15s; padding: 6px 14px; border-radius: 20px;
+  font-size: 12.5px; font-weight: 600; white-space: nowrap;
+  background: rgba(6, 16, 42, 0.95); border: 1px solid var(--c, #4aa0ff); color: #eaf2ff;
+  box-shadow: 0 0 16px -3px var(--c, #4aa0ff);
+}
+.tip.on { opacity: 1; }
 
+/* Subtle cosmic vignette */
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: 3; pointer-events: none;
+  background: radial-gradient(1400px 800px at 10% 25%, rgba(76, 29, 149, 0.12), transparent 65%),
+              radial-gradient(1000px 700px at 85% 85%, rgba(30, 58, 138, 0.10), transparent 60%);
+  mix-blend-mode: screen;
+}
 
+/* ─── NAVIGATION BAR ─── */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 30;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  padding: 16px 40px; transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+}
+header.sc {
+  background: rgba(3, 7, 24, 0.85);
+  backdrop-filter: blur(18px) saturate(1.4);
+  border-bottom: 1px solid var(--bd);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+.logo {
+  display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 20px; letter-spacing: -0.02em;
+}
+.mark {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  display: grid; place-items: center; font-size: 18px; color: #fff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.25) inset, 0 0 20px rgba(99, 102, 241, 0.5);
+}
+.logo em {
+  font-style: normal;
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.ver {
+  font: 700 10.5px ui-monospace, monospace; color: #38bdf8;
+  background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 3px 8px; border-radius: 99px;
+}
+nav {
+  display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-radius: 99px;
+  background: rgba(10, 18, 48, 0.65); border: 1px solid var(--bd); backdrop-filter: blur(14px);
+}
+nav a {
+  padding: 8px 15px; border-radius: 99px; font-size: 13.5px; font-weight: 600; color: #cbd5e1;
+  transition: all 0.2s;
+}
+nav a:hover { background: rgba(56, 189, 248, 0.15); color: #fff; }
+nav b {
+  font: 800 10px ui-monospace, monospace; color: #020617; background: var(--cy);
+  padding: 2px 6px; border-radius: 99px; margin-left: 5px;
+}
+.nav-actions { display: flex; align-items: center; gap: 16px; font-weight: 600; font-size: 14px; }
+.btn-login { color: #cbd5e1; transition: color 0.2s; cursor: pointer; padding: 6px 12px; }
+.btn-login:hover { color: #fff; }
 
+/* Modern Gradient Buttons */
+.btn {
+  position: relative; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 12px 22px; border-radius: 12px; font-weight: 700; font-size: 14.5px;
+  border: 1px solid transparent; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.25) 50%, transparent 65%);
+  transform: translateX(-120%); transition: 0.6s;
+}
+.btn:hover::after { transform: translateX(120%); }
+.btn.p {
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  border-color: rgba(192, 132, 252, 0.5);
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.4), 0 0 12px rgba(99, 102, 241, 0.3);
+  color: #fff;
+}
+.btn.c {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 6px 24px rgba(14, 165, 233, 0.4);
+  color: #fff;
+}
+.btn.glass {
+  background: rgba(14, 22, 54, 0.65);
+  border-color: var(--bd);
+  backdrop-filter: blur(10px);
+  color: #e2e8f0;
+}
+.btn.glass:hover { border-color: rgba(56, 189, 248, 0.45); color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
 
+/* ─── HERO SECTION ─── */
+.hero {
+  position: relative; z-index: 5; min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 120px 40px 70px;
+  pointer-events: none;
+}
+.hero-col {
+  position: relative; z-index: 10; max-width: 580px;
+  display: flex; flex-direction: column; gap: 20px;
+  pointer-events: auto;
+}
+.tag-badge {
+  display: inline-flex; align-items: center; gap: 9px; padding: 7px 15px; border-radius: 99px;
+  border: 1px solid rgba(168, 85, 247, 0.4); background: rgba(88, 28, 135, 0.22);
+  backdrop-filter: blur(10px); color: #d8b4fe; font: 700 11.5px ui-monospace, monospace;
+  letter-spacing: 0.12em; width: fit-content;
+}
+.tag-badge::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%; background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6); animation: pDot 2s infinite;
+}
+@keyframes pDot { 70% { box-shadow: 0 0 0 8px transparent; } }
 
-#stage{position:fixed;left:0;top:0;width:400px;height:400px;z-index:7;pointer-events:none}#globe{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:auto;cursor:grab;touch-action:pan-y;outline:none}.tip{position:absolute;left:0;top:0;pointer-events:none;opacity:0;transition:opacity .15s;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap;background:rgba(6,16,42,.95);border:1px solid var(--c,#4aa0ff);color:#eaf2ff;box-shadow:0 0 16px -3px var(--c,#4aa0ff)}.tip.on{opacity:1}</style>
-<style>
-#lines{z-index:1;position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
-svg:not(#lines){position:static!important;display:inline-block!important}
-.ask{display:flex!important;align-items:center!important;gap:12px!important;padding:8px 8px 8px 16px!important;border-radius:18px!important;background:rgba(6,10,34,.9)!important;border:1px solid rgba(56,189,248,.35)!important;box-shadow:0 4px 25px rgba(0,0,0,.6)!important;backdrop-filter:blur(16px)!important;width:100%!important;max-width:540px!important}
-.ask:focus-within{border-color:#38bdf8!important;box-shadow:0 0 0 3px rgba(56,189,248,.25),0 8px 30px rgba(0,0,0,.6)!important}
-.ask svg.ask-ic{width:18px!important;height:18px!important;flex-shrink:0!important;stroke:#38bdf8!important;display:block!important;position:static!important}
-.ask input{flex:1!important;min-width:0!important;background:none!important;border:0!important;outline:0!important;color:#fff!important;font-size:15px!important;font-family:inherit!important}
-.ask input::placeholder{color:#94a3b8!important}
-.ask button.btn{padding:9px 18px!important;border-radius:12px!important;background:linear-gradient(135deg,#06b6d4,#2563eb)!important;color:#fff!important;font-weight:700!important;border:none!important;cursor:pointer!important;box-shadow:0 0 12px rgba(6,182,212,.4)!important;display:flex!important;align-items:center!important;gap:4px!important}
-.btn svg{width:16px!important;height:16px!important;display:inline-block!important;vertical-align:-2px!important;margin-right:6px!important;position:static!important}
+h1.hero-title {
+  margin: 0; font-size: clamp(44px, 5.2vw, 76px); line-height: 0.98;
+  letter-spacing: -0.04em; font-weight: 800;
+}
+h1.hero-title span {
+  background: linear-gradient(90deg, #38bdf8, #c084fc, #38bdf8);
+  background-size: 200%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shineText 8s linear infinite;
+}
+@keyframes shineText { to { background-position: 200%; } }
+h1.hero-title u {
+  display: inline-block; width: 4px; height: 0.8em; background: var(--cy);
+  margin-left: 6px; vertical-align: -0.04em; animation: blinkCur 1s steps(2) infinite;
+  box-shadow: 0 0 12px var(--cy);
+}
+@keyframes blinkCur { 50% { opacity: 0; } }
+
+.hero-lead {
+  font-size: 17px; line-height: 1.65; color: #cbd5e1; margin: 0;
+  max-width: 530px; text-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+}
+
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.features-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 4px;
+}
+.feat-box {
+  padding: 14px 16px; border-radius: 14px;
+  background: linear-gradient(150deg, rgba(16, 26, 68, 0.6), rgba(8, 14, 40, 0.65));
+  border: 1px solid var(--bd); backdrop-filter: blur(10px);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.feat-box:hover {
+  transform: translateY(-3px); border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.16);
+}
+.feat-box b {
+  display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 3px;
+}
+.feat-box small { color: var(--mu); font-size: 12px; line-height: 1.4; display: block; }
+
+/* Interactive Live AI Search Bar */
+.ask-wrap {
+  display: flex; align-items: center; gap: 12px; padding: 7px 7px 7px 16px;
+  border-radius: 16px; background: rgba(5, 9, 30, 0.88);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(14, 165, 233, 0.1) inset;
+  backdrop-filter: blur(18px); width: 100%; max-width: 560px;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+.ask-wrap:focus-within {
+  border-color: #38bdf8;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25), 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+.ask-ic { width: 18px; height: 18px; flex-shrink: 0; stroke: #38bdf8; }
+.ask-input {
+  flex: 1; min-width: 0; background: none; border: 0; outline: 0;
+  color: #fff; font-size: 14.5px; font-family: inherit;
+}
+.ask-input::placeholder { color: #94a3b8; }
+.ask-btn {
+  padding: 10px 20px; border-radius: 11px;
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  border: 0; color: #fff; font-weight: 700; font-size: 13.5px; cursor: pointer;
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4); transition: transform 0.2s, box-shadow 0.2s;
+}
+.ask-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(2, 132, 199, 0.6); }
+
+/* Trending Chips */
+.trend-row {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  font-size: 13px; font-weight: 600; color: #94a3b8;
+}
+.trend-pill {
+  padding: 6px 13px; border-radius: 99px; border: 1px solid var(--bd);
+  background: rgba(14, 22, 54, 0.55); font-size: 12.5px; font-weight: 500; color: #e2e8f0;
+  cursor: pointer; transition: all 0.2s;
+}
+.trend-pill:hover { border-color: var(--cy); color: var(--cy); background: rgba(56, 189, 248, 0.12); }
+
+/* Real-Time Stats Bar */
+.stats-bar {
+  position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
+  width: min(1120px, calc(100% - 60px));
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  padding: 18px 30px; border-radius: 20px;
+  background: linear-gradient(180deg, rgba(12, 18, 52, 0.88), rgba(4, 8, 28, 0.94));
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(14, 165, 233, 0.08) inset;
+  backdrop-filter: blur(18px); pointer-events: auto;
+}
+.stat-item { display: flex; align-items: center; gap: 14px; }
+.stat-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.25);
+  display: grid; place-items: center; color: var(--cy); flex-shrink: 0;
+}
+.stat-val { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.1; }
+.stat-lbl { color: var(--mu); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+/* ─── SCHOLARLY SOURCES FEDERATION (INFINITE MARQUEE) ─── */
+.sources-section {
+  position: relative; z-index: 6; padding: 36px 0;
+  border-top: 1px solid rgba(56, 189, 248, 0.12);
+  border-bottom: 1px solid rgba(56, 189, 248, 0.12);
+  background: rgba(2, 5, 20, 0.75); backdrop-filter: blur(12px);
+}
+.sources-head {
+  text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 0.15em;
+  color: #38bdf8; text-transform: uppercase; margin-bottom: 18px;
+}
+.marquee-track {
+  display: flex; width: max-content; gap: 24px;
+  animation: scrollMarquee 38s linear infinite;
+}
+@keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.src-badge {
+  padding: 8px 18px; border-radius: 10px; font-size: 13.5px; font-weight: 600;
+  background: rgba(14, 22, 54, 0.6); border: 1px solid rgba(56, 189, 248, 0.18);
+  color: #cbd5e1; white-space: nowrap; transition: color 0.2s, border-color 0.2s;
+}
+.src-badge:hover { color: #fff; border-color: #38bdf8; }
+
+/* ─── STICKY SECTIONS (LEFT SCROLL, RIGHT 3D OBSERVATORY) ─── */
+.sec-wrap {
+  position: relative; z-index: 6; padding: 90px 48px;
+}
+.sec-container {
+  max-width: 600px; display: flex; flex-direction: column; gap: 28px;
+}
+.sec-card {
+  background: var(--glass-card);
+  border: 1px solid rgba(56, 189, 248, 0.22);
+  border-radius: 26px; padding: 38px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 35px rgba(14, 165, 233, 0.06) inset;
+  backdrop-filter: blur(18px); pointer-events: auto;
+}
+.sec-eyebrow {
+  display: inline-block; font: 800 11px ui-monospace, monospace;
+  letter-spacing: 0.15em; color: #38bdf8; text-transform: uppercase; margin-bottom: 10px;
+}
+.sec-title {
+  font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; margin: 0 0 14px;
+  letter-spacing: -0.03em; font-weight: 800;
+}
+.sec-title span {
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.sec-desc {
+  font-size: 15px; color: #94a3b8; line-height: 1.65; margin: 0 0 26px;
+}
+
+/* ─── 4-STAGE PIPELINE CARDS ─── */
+.pipeline-list { display: flex; flex-direction: column; gap: 14px; }
+.pipe-step {
+  padding: 20px 22px; border-radius: 18px;
+  background: linear-gradient(160deg, rgba(16, 26, 68, 0.65), rgba(8, 14, 40, 0.7));
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.pipe-step:hover {
+  transform: translateX(6px); border-color: rgba(56, 189, 248, 0.5);
+  box-shadow: 0 8px 30px rgba(14, 165, 233, 0.18);
+}
+.pipe-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.pipe-tag {
+  font: 800 11px ui-monospace, monospace; color: #38bdf8;
+  background: rgba(14, 165, 233, 0.16); border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 3px 9px; border-radius: 99px;
+}
+.pipe-metric { font: 700 11px ui-monospace, monospace; color: #a855f7; }
+.pipe-step h3 { margin: 4px 0 6px; font-size: 16.5px; color: #fff; font-weight: 700; }
+.pipe-step p { margin: 0; font-size: 13.5px; color: #cbd5e1; line-height: 1.5; }
+
+/* ─── 6-DIMENSION CAPABILITIES BENTO ─── */
+.bento-grid { display: flex; flex-direction: column; gap: 16px; }
+.bento-card {
+  padding: 24px; border-radius: 20px;
+  background: linear-gradient(160deg, rgba(16, 26, 68, 0.65), rgba(7, 12, 38, 0.7));
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.bento-card:hover {
+  transform: translateY(-3px); border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 12px 35px rgba(14, 165, 233, 0.18);
+}
+.bento-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bento-icon {
+  width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; font-size: 15px;
+}
+.bento-card h3 { margin: 0; font-size: 16.5px; color: #fff; font-weight: 700; }
+.bento-card p { margin: 0; font-size: 13.5px; color: #94a3b8; line-height: 1.5; }
+
+/* ─── LIVE INTERACTIVE RESEARCH QUERY SIMULATION WIDGET ─── */
+.sim-wrap {
+  border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 20px;
+  background: rgba(4, 8, 26, 0.9); overflow: hidden; margin-top: 10px;
+}
+.sim-tabs {
+  display: flex; border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+  background: rgba(10, 18, 48, 0.6);
+}
+.sim-tab {
+  flex: 1; padding: 12px 14px; font-size: 12.5px; font-weight: 700; color: #94a3b8;
+  text-align: center; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+}
+.sim-tab.active {
+  color: #38bdf8; border-bottom-color: #38bdf8; background: rgba(56, 189, 248, 0.08);
+}
+.sim-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.sim-query-box {
+  padding: 10px 14px; border-radius: 12px; background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(56, 189, 248, 0.2); font-size: 13px; color: #e2e8f0;
+}
+.sim-telemetry {
+  display: flex; gap: 12px; font: 700 11px ui-monospace, monospace; color: #38bdf8;
+}
+.sim-telemetry span {
+  background: rgba(56, 189, 248, 0.12); padding: 3px 8px; border-radius: 6px;
+}
+.sim-result {
+  font-size: 13.5px; line-height: 1.6; color: #cbd5e1;
+  border-left: 2px solid #38bdf8; padding-left: 12px;
+}
+.sim-citations { display: flex; flex-wrap: wrap; gap: 6px; }
+.sim-cit-pill {
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px;
+  background: rgba(168, 85, 247, 0.16); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);
+}
+
+/* ─── SCIENTIFIC ADVANTAGE TABLE ─── */
+.table-wrap {
+  overflow-x: auto; border-radius: 16px; border: 1px solid rgba(56, 189, 248, 0.2);
+  margin-top: 8px;
+}
+table.adv-table {
+  width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;
+}
+table.adv-table th {
+  padding: 12px 14px; background: rgba(10, 18, 48, 0.85); color: #fff; font-weight: 700;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+}
+table.adv-table td {
+  padding: 12px 14px; border-bottom: 1px solid rgba(56, 189, 248, 0.1); color: #cbd5e1;
+}
+table.adv-table tr:last-child td { border-bottom: none; }
+table.adv-table td.rg-col {
+  color: #38bdf8; font-weight: 700; background: rgba(56, 189, 248, 0.06);
+}
+
+/* ─── TESTIMONIALS / QUOTES ─── */
+.quote-card {
+  padding: 22px; border-radius: 18px;
+  background: linear-gradient(160deg, rgba(16, 26, 68, 0.65), rgba(7, 12, 38, 0.7));
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+.quote-text { font-size: 14px; line-height: 1.6; color: #e2e8f0; font-style: italic; margin-bottom: 12px; }
+.quote-author { display: flex; align-items: center; justify-content: space-between; }
+.quote-name { font-weight: 700; font-size: 13px; color: #fff; }
+.quote-affil { font-size: 11.5px; color: #94a3b8; }
+
+/* ─── FINAL CTA PORTAL ─── */
+.portal-card {
+  padding: 44px 38px; border-radius: 28px;
+  background: linear-gradient(145deg, rgba(24, 38, 98, 0.85), rgba(10, 16, 48, 0.95));
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(168, 85, 247, 0.2);
+  pointer-events: auto; text-align: left;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative; z-index: 6; background: rgba(2, 4, 16, 0.95);
+  padding: 60px 48px 30px; border-top: 1px solid rgba(56, 189, 248, 0.15);
+  backdrop-filter: blur(18px);
+}
+.fg {
+  max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr;
+  gap: 40px; margin-bottom: 40px;
+}
+.fg h4 { font-size: 14px; font-weight: 700; color: #fff; margin: 0 0 16px; letter-spacing: 0.04em; }
+.fg a { display: block; font-size: 13.5px; color: #94a3b8; margin-bottom: 10px; transition: color 0.2s; }
+.fg a:hover { color: #38bdf8; }
+.footer-status {
+  display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 99px;
+  background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3);
+  font: 700 11px ui-monospace, monospace; color: #34d399; margin-top: 14px;
+}
+.cp {
+  text-align: center; padding-top: 24px; border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12px; color: #64748b;
+}
+
+/* Scroll reveal helper */
+.rv { opacity: 1; transform: translateY(0); transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+.rv.in { opacity: 1; transform: translateY(0); }
+.rv.in { opacity: 1; transform: translateY(0); }
+
+/* Responsive adjustments */
+@media (max-width: 1000px) {
+  nav, .nav-actions .btn-login { display: none; }
+  header { padding: 14px 20px; }
+  .hero { padding: 110px 20px 260px; }
+  .hero-col { max-width: 100%; }
+  .features-row { grid-template-columns: 1fr; }
+  .stats-bar { grid-template-columns: 1fr 1fr; padding: 16px; bottom: 12px; }
+  .sec-wrap { padding: 60px 20px; }
+  .fg { grid-template-columns: 1fr 1fr; gap: 24px; }
+}
+@media (max-width: 600px) {
+  .stats-bar { grid-template-columns: 1fr; }
+  .fg { grid-template-columns: 1fr; }
+}
 </style>
+</head>
+<body>
+<svg id="lines"></svg>
+<div id="ui"></div>
+<div id="stage"><canvas id="globe" width="1200" height="1200" tabindex="0" aria-label="Interactive knowledge graph globe"></canvas><div class="tip" id="tip" role="status"></div><div class="hint" id="hint" style="display:none"></div></div>
 
-</head><body>
-<svg id="lines"></svg><div id="ui"></div><div id="stage"><canvas id="globe" width="1200" height="1200" tabindex="0" aria-label="Interactive knowledge graph globe. Drag to rotate, hover a node for details, click a node to fly to it."></canvas><div class="tip" id="tip" role="status"></div><div class="hint" id="hint" style="display:none"></div></div>
-<header><a class="logo" href="#top"><span class="mark">⚛</span><span>ResearchGraph <em>AI</em></span><span class="ver">● v2.4</span></a>
-<nav><a href="#top">Cockpit</a><a href="#how">RAG Pipeline</a><a href="#features">3D Topology</a><a href="#features">Knowledge Graph</a><a href="#sources">Data Sources<b>45+</b></a><a href="#about">About Us</a></nav>
-<div class="right">
-    <a href="javascript:void(0)" onclick="notifyParent('NAVIGATE_AUTH', 'LOGIN')">Log In</a>
+<!-- ═══════════════ NAVIGATION HEADER ═══════════════ -->
+<header>
+  <a class="logo" href="#top">
+    <span class="mark">⚛</span>
+    <span>ResearchGraph <em>AI</em></span>
+    <span class="ver">● v2.4 PROD</span>
+  </a>
+  <nav>
+    <a href="#top">Cockpit</a>
+    <a href="#pipeline">Neural Pipeline</a>
+    <a href="#capabilities">3D Topology</a>
+    <a href="#simulation">Consensus Lab</a>
+    <a href="#sources">Data Sources<b>45+</b></a>
+    <a href="javascript:void(0)" onclick="notifyParent('ABOUT')">About Us</a>
+  </nav>
+  <div class="nav-actions">
+    <a class="btn-login" href="javascript:void(0)" onclick="notifyParent('NAVIGATE_AUTH', 'LOGIN')">Sign In</a>
     <a class="btn c" href="javascript:void(0)" onclick="notifyParent('LAUNCH_COCKPIT')">Launch Cockpit →</a>
-  </div></header>
-<section class="hero" id="top"><div class="col">
-<span class="tag">RESEARCH INTELLIGENCE · REIMAGINED</span>
-<h1>Research,<br><span>Connected.</span><u></u></h1>
-<p class="lead">Discover, explore, and connect research papers, authors, and ideas through an intelligent knowledge graph powered by AI.</p>
-<div class="cta">
-    <a class="btn p" href="javascript:void(0)" onclick="notifyParent('LAUNCH_COCKPIT')"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:6px"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7.5-5 8M13 7.5l5 8M8 18h8"/></svg>Explore Research Graph →</a>
-    <a class="btn" href="javascript:void(0)" onclick="notifyParent('OPEN_DEMO')"><svg viewBox="0 0 24 24" width="14" height="14" fill="#38bdf8" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:-2px;margin-right:6px"><polygon points="5 3 19 12 5 21 5 3"/></svg>Watch Overview</a>
   </div>
-<div class="feat">
-  <div><b><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#38bdf8" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Discover</b><small>Find relevant work</small></div>
-  <div><b><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#818cf8" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>Connect</b><small>Follow context</small></div>
-  <div><b><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#34d399" stroke-width="2.5" style="display:inline;vertical-align:-2px;margin-right:6px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Understand</b><small>Get deeper insights</small></div>
-</div>
-<form class="ask" id="askForm" onsubmit="event.preventDefault(); handleAsk();">
-    <svg class="ask-ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input id="askInput" placeholder="Ask anything about 200M+ research papers..." autocomplete="off">
-    <button type="submit" class="btn c">Ask AI →</button>
-  </form>
-<div class="trend">Trending: 
-    <a href="javascript:void(0)" onclick="handleTrend('Vision Transformers')">Vision Transformers</a>
-    <a href="javascript:void(0)" onclick="handleTrend('Graph Neural Networks')">Graph Neural Networks</a>
-    <a href="javascript:void(0)" onclick="handleTrend('CRISPR-Cas12 Specificity')">CRISPR-Cas12 Specificity</a>
-    <a href="javascript:void(0)" onclick="handleTrend('Topological Quantum Codes')">Topological Quantum Codes</a>
-    <a href="javascript:void(0)" onclick="handleTrend('Multimodal Oncology AI')">Multimodal Oncology AI</a>
-  </div>
-</div>
-<div class="stats">
-  <div><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#38bdf8" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></i><b data-n="200" data-s="M+">200M+</b><small>Research Papers</small></div>
-  <div><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#06b6d4" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></i><b data-n="12.4" data-d="1" data-s="M+">12.4M+</b><small>Authors</small></div>
-  <div><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#818cf8" stroke-width="2" style="display:inline;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></i><b data-n="1.8" data-d="1" data-s="M+">1.8M+</b><small>Research Concepts</small></div>
-  <div><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ec4899" stroke-width="2" style="display:inline;vertical-align:middle"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></i><b data-n="250" data-s="M+">250M+</b><small>Citations</small></div>
-</div></section>
+</header>
 
-<div class="mq" id="sources"><div><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM Digital Library</span><span>OpenAlex</span><span>Crossref</span><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM Digital Library</span><span>OpenAlex</span><span>Crossref</span></div></div>
-<section class="sec" id="how">
-  <div class="sec-content rv">
-    <span class="eyebrow">SCIENTIFIC DISCOVERY PIPELINE</span>
-    <h2>From hypothesis to <span>grounded consensus</span></h2>
-    <p class="sec-lead">A multi-hop retrieval architecture anchored in a living 3D knowledge graph, ensuring every synthesized finding cites empirical evidence.</p>
-    <div class="steps">
-      <div class="step">
-        <em>STEP 01</em>
-        <h3>Intent Parsing & Vectorization</h3>
-        <p>Natural language queries and LaTeX formulas decompose into 1,536-dimensional semantic vector embeddings.</p>
+<!-- ═══════════════ HERO OBSERVATORY ═══════════════ -->
+<section class="hero" id="top">
+  <div class="hero-col">
+    <div class="tag-badge">RESEARCH INTELLIGENCE · REIMAGINED</div>
+    <h1 class="hero-title">Research,<br><span>Connected.</span><u></u></h1>
+    <p class="hero-lead">Discover, explore, and connect 204M+ research papers, authors, and methodologies through a living 3D knowledge graph powered by AI consensus.</p>
+    
+    <div class="hero-cta">
+      <a class="btn p" href="javascript:void(0)" onclick="notifyParent('LAUNCH_COCKPIT')">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7.5-5 8M13 7.5l5 8M8 18h8"/></svg>
+        Explore Research Graph →
+      </a>
+      <a class="btn glass" href="javascript:void(0)" onclick="notifyParent('OPEN_DEMO')">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="#38bdf8" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Watch System Overview
+      </a>
+    </div>
+
+    <div class="features-row">
+      <div class="feat-box">
+        <b>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#38bdf8" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          Discover
+        </b>
+        <small>Multi-hop semantic search across 204M+ preprints</small>
       </div>
-      <div class="step">
-        <em>STEP 02</em>
-        <h3>Hybrid Dense + Sparse Retrieval</h3>
-        <p>Simultaneous BM25 lexical indexing and vector search scan 204M+ preprints across arXiv, PubMed, and OpenAlex in under 14ms.</p>
+      <div class="feat-box">
+        <b>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#a855f7" stroke-width="2.5"><path d="M6 3v12"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+          Connect
+        </b>
+        <small>Real-time directional citation topology & lineage</small>
       </div>
-      <div class="step">
-        <em>STEP 03</em>
-        <h3>Multi-Hop Knowledge Graph Traversal</h3>
-        <p>Directional citation edges map foundational lineages, co-authorship clusters, and cross-domain bridges in real time.</p>
+      <div class="feat-box">
+        <b>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Understand
+        </b>
+        <small>Zero-hallucination multi-LLM consensus</small>
       </div>
-      <div class="step">
-        <em>STEP 04</em>
-        <h3>Multi-LLM Consensus Verification</h3>
-        <p>Ensemble synthesis across Claude 3.5 Sonnet, GPT-4o, and Gemini 1.5 Pro cross-checks claims directly against PDF source paragraphs.</p>
+    </div>
+
+    <!-- Live Interactive Search Command Bar -->
+    <form class="ask-wrap" id="askForm" onsubmit="event.preventDefault(); handleAsk();">
+      <svg class="ask-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="askInput" class="ask-input" placeholder="Ask anything about 200M+ research papers..." autocomplete="off">
+      <button type="submit" class="ask-btn">Ask AI →</button>
+    </form>
+
+    <div class="trend-row">
+      <span>Trending:</span>
+      <span class="trend-pill" onclick="handleTrend('Vision Transformers')">Vision Transformers</span>
+      <span class="trend-pill" onclick="handleTrend('Graph Neural Networks')">Graph Neural Networks</span>
+      <span class="trend-pill" onclick="handleTrend('CRISPR-Cas12 Specificity')">CRISPR-Cas12</span>
+      <span class="trend-pill" onclick="handleTrend('Topological Quantum Codes')">Quantum Codes</span>
+      <span class="trend-pill" onclick="handleTrend('Multimodal Oncology AI')">Oncology AI</span>
+    </div>
+  </div>
+
+  <!-- Real-Time Stats Bar -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </div>
+      <div>
+        <div class="stat-val" data-n="204.8" data-d="1" data-s="M+">204.8M+</div>
+        <div class="stat-lbl">Research Works</div>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon" style="color:#06b6d4; background:rgba(6,182,212,0.12); border-color:rgba(6,182,212,0.25)">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>
+      </div>
+      <div>
+        <div class="stat-val" data-n="12.4" data-d="1" data-s="M+">12.4M+</div>
+        <div class="stat-lbl">Indexed Authors</div>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon" style="color:#a855f7; background:rgba(168,85,247,0.12); border-color:rgba(168,85,247,0.25)">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+      </div>
+      <div>
+        <div class="stat-val" data-n="1.8" data-d="1" data-s="M+">1.8M+</div>
+        <div class="stat-lbl">Research Concepts</div>
+      </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-icon" style="color:#ec4899; background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.25)">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </div>
+      <div>
+        <div class="stat-val" data-n="1.24" data-d="2" data-s="B+">1.24B+</div>
+        <div class="stat-lbl">Citation Arcs</div>
       </div>
     </div>
   </div>
 </section>
-<section class="sec" id="features">
-  <div class="sec-content rv">
-    <span class="eyebrow">RESEARCH GRAPH CAPABILITIES</span>
-    <h2>6 Dimensions of the <span>Connected Universe</span></h2>
-    <p class="sec-lead">Interact with papers, authors, ontologies, and empirical benchmarks in one unified knowledge cockpit.</p>
-    <div class="bento">
-      <div class="card">
-        <h3><span style="color:#10b981;margin-right:8px">⬡</span>Knowledge Graph AI-Core</h3>
-        <p>Dynamic 3D topology tracking 1.8M concept taxonomies and 1.24B verified directional citation arcs across 45+ scientific disciplines.</p>
-      </div>
-      <div class="card">
-        <h3><span style="color:#38bdf8;margin-right:8px">📄</span>204M+ Full-Text Literature</h3>
-        <p>Complete indexing of preprints, methodology sections, LaTeX equations, and published benchmark performance tables.</p>
-      </div>
-      <div class="card">
-        <h3><span style="color:#a855f7;margin-right:8px">✦</span>AI Insights & Consensus Engine</h3>
-        <p>Synthesizes divergent viewpoints, surfaces research gaps, and highlights unexplored whitespaces with zero hallucination.</p>
-      </div>
-      <div class="card">
-        <h3><span style="color:#f59e0b;margin-right:8px">🗄</span>Empirical Datasets & Code Links</h3>
-        <p>85K+ experimental datasets, Protein Data Bank (PDB) structures, and GitHub repositories linked directly to papers.</p>
+
+<!-- ═══════════════ SCHOLARLY SOURCES INFINITE MARQUEE ═══════════════ -->
+<div class="sources-section" id="sources">
+  <div class="sources-head">⚡ 60-Second Real-Time Synchronization Across 45+ Scholarly Archives</div>
+  <div style="overflow:hidden; display:flex;">
+    <div class="marquee-track">
+      <span class="src-badge">arXiv</span>
+      <span class="src-badge">PubMed Central</span>
+      <span class="src-badge">Nature</span>
+      <span class="src-badge">IEEE Xplore</span>
+      <span class="src-badge">Semantic Scholar</span>
+      <span class="src-badge">Springer Nature</span>
+      <span class="src-badge">ACM Digital Library</span>
+      <span class="src-badge">OpenAlex</span>
+      <span class="src-badge">Crossref</span>
+      <span class="src-badge">Cell Press</span>
+      <span class="src-badge">BioRxiv</span>
+      <span class="src-badge">MedRxiv</span>
+      <span class="src-badge">Science Direct</span>
+      <span class="src-badge">PLOS ONE</span>
+      <!-- Loop duplicate for seamless scroll -->
+      <span class="src-badge">arXiv</span>
+      <span class="src-badge">PubMed Central</span>
+      <span class="src-badge">Nature</span>
+      <span class="src-badge">IEEE Xplore</span>
+      <span class="src-badge">Semantic Scholar</span>
+      <span class="src-badge">Springer Nature</span>
+      <span class="src-badge">ACM Digital Library</span>
+      <span class="src-badge">OpenAlex</span>
+      <span class="src-badge">Crossref</span>
+      <span class="src-badge">Cell Press</span>
+      <span class="src-badge">BioRxiv</span>
+      <span class="src-badge">MedRxiv</span>
+      <span class="src-badge">Science Direct</span>
+      <span class="src-badge">PLOS ONE</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 4-STAGE NEURAL PIPELINE ═══════════════ -->
+<section class="sec-wrap" id="pipeline">
+  <div class="sec-container rv">
+    <div class="sec-card">
+      <span class="sec-eyebrow">AUTONOMOUS RESEARCH SYNTHESIS</span>
+      <h2 class="sec-title">From hypothesis to <span>verified consensus</span></h2>
+      <p class="sec-desc">A multi-hop neural retrieval architecture anchored in a living 3D knowledge graph, ensuring every synthesized finding cites verifiable empirical evidence.</p>
+      
+      <div class="pipeline-list">
+        <div class="pipe-step">
+          <div class="pipe-header">
+            <span class="pipe-tag">PHASE 01</span>
+            <span class="pipe-metric">&lt; 6ms Latency</span>
+          </div>
+          <h3>Intent Parsing & 1,536-D Vectorization</h3>
+          <p>Decomposes natural language queries, LaTeX mathematical equations, and chemical SMILES into high-dimensional semantic vector embeddings.</p>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-header">
+            <span class="pipe-tag">PHASE 02</span>
+            <span class="pipe-metric">204M+ Works Scanned</span>
+          </div>
+          <h3>Hybrid Dense-Sparse Ingestion</h3>
+          <p>Simultaneous BM25 lexical indexing and HNSW approximate nearest neighbor search scan preprints across arXiv, PubMed, and OpenAlex in under 14ms.</p>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-header">
+            <span class="pipe-tag">PHASE 03</span>
+            <span class="pipe-metric">1.24B Verified Arcs</span>
+          </div>
+          <h3>Multi-Hop Knowledge Graph Traversal</h3>
+          <p>Directional citation edges map foundational lineages, co-authorship clusters, and cross-domain bridges in real time.</p>
+        </div>
+        <div class="pipe-step">
+          <div class="pipe-header">
+            <span class="pipe-tag">PHASE 04</span>
+            <span class="pipe-metric">Zero Hallucination</span>
+          </div>
+          <h3>Multi-LLM Consensus Verification</h3>
+          <p>Ensemble synthesis across Claude 3.5 Sonnet, GPT-4o, and Gemini 1.5 Pro cross-checks claims directly against PDF source paragraphs.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
-<section class="sec" style="padding-top:0">
-  <div class="sec-content rv">
-    <span class="eyebrow">GLOBAL FEDERATED SCALE</span>
-    <h2>The world's research, <span>one living lattice</span></h2>
-    <p class="sec-lead">Continuous 60-second synchronization with open scholarly archives and international academic repositories.</p>
-    <div class="big">
-      <div><b>204.8M+</b><small>Research Works</small></div>
-      <div><b>12.4M+</b><small>Indexed Authors</small></div>
-      <div><b>85K+</b><small>Benchmark Datasets</small></div>
-      <div><b>1.24B+</b><small>Verified Citation Arcs</small></div>
+
+<!-- ═══════════════ 6-DIMENSION CAPABILITIES BENTO ═══════════════ -->
+<section class="sec-wrap" id="capabilities">
+  <div class="sec-container rv">
+    <div class="sec-card">
+      <span class="sec-eyebrow">ENTERPRISE SCIENTIFIC COCKPIT</span>
+      <h2 class="sec-title">6 Dimensions of the <span>Connected Universe</span></h2>
+      <p class="sec-desc">Interact with papers, authors, ontologies, and empirical benchmarks in one unified, real-time scientific workspace.</p>
+      
+      <div class="bento-grid">
+        <div class="bento-card">
+          <div class="bento-head">
+            <div class="bento-icon" style="background:rgba(16,185,129,0.15); color:#10b981;">⬡</div>
+            <h3>3D Knowledge Graph AI-Core</h3>
+          </div>
+          <p>Dynamic 3D topology tracking 1.8M concept taxonomies and 1.24B verified directional citation arcs across 45+ scientific disciplines.</p>
+        </div>
+        <div class="bento-card">
+          <div class="bento-head">
+            <div class="bento-icon" style="background:rgba(56,189,248,0.15); color:#38bdf8;">📄</div>
+            <h3>204M+ Full-Text Literature</h3>
+          </div>
+          <p>Complete indexing of preprints, methodology sections, LaTeX equations, and published benchmark performance tables.</p>
+        </div>
+        <div class="bento-card">
+          <div class="bento-head">
+            <div class="bento-icon" style="background:rgba(168,85,247,0.15); color:#c084fc;">✦</div>
+            <h3>AI Insights & Consensus Engine</h3>
+          </div>
+          <p>Synthesizes divergent viewpoints, surfaces research gaps, and highlights unexplored whitespaces with zero hallucination.</p>
+        </div>
+        <div class="bento-card">
+          <div class="bento-head">
+            <div class="bento-icon" style="background:rgba(245,158,11,0.15); color:#f59e0b;">🗄</div>
+            <h3>Empirical Datasets & Benchmarks</h3>
+          </div>
+          <p>85K+ experimental datasets, Protein Data Bank (PDB) structures, and GitHub repositories linked directly to papers.</p>
+        </div>
+        <div class="bento-card">
+          <div class="bento-head">
+            <div class="bento-icon" style="background:rgba(6,182,212,0.15); color:#06b6d4;">🧬</div>
+            <h3>Author Lineage & Genealogy</h3>
+          </div>
+          <p>Trace advising lineages, laboratory collaborations, institutional migration, and h-index momentum curves.</p>
+        </div>
+        <div class="bento-card">
+          <div class="bento-head">
+            <div class="bento-icon" style="background:rgba(236,72,153,0.15); color:#ec4899;">⚓</div>
+            <h3>Verbatim Sentence Grounding</h3>
+          </div>
+          <p>Every claim links directly to the exact page, paragraph, and sentence in the original published preprint PDF.</p>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-<section class="sec" id="about" style="padding-top:0">
-  <div class="sec-content rv">
-    <div class="cta2">
-      <span class="eyebrow" style="color:#c084fc">ACCELERATE YOUR DISCOVERY</span>
-      <h2>Enter the <span>Research Universe</span></h2>
-      <p>Explore high-dimensional vector spaces, discover hidden methodologies, and automate literature reviews with ResearchGraph AI.</p>
-      <div class="cta" style="display:flex;gap:12px;flex-wrap:wrap">
+
+<!-- ═══════════════ LIVE INTERACTIVE RESEARCH SIMULATION ═══════════════ -->
+<section class="sec-wrap" id="simulation">
+  <div class="sec-container rv">
+    <div class="sec-card">
+      <span class="sec-eyebrow">INTERACTIVE RESEARCH LAB</span>
+      <h2 class="sec-title">Experience <span>Live Synthesis</span></h2>
+      <p class="sec-desc">Test real-time query vectorization, multi-hop retrieval, and paragraph-level consensus verification in action.</p>
+
+      <div class="sim-wrap">
+        <div class="sim-tabs">
+          <div class="sim-tab active" onclick="switchSim(0)">CRISPR-Cas12</div>
+          <div class="sim-tab" onclick="switchSim(1)">Transformers</div>
+          <div class="sim-tab" onclick="switchSim(2)">Quantum Surface Codes</div>
+        </div>
+        <div class="sim-body" id="simBody">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SCIENTIFIC ADVANTAGE TABLE ═══════════════ -->
+<section class="sec-wrap">
+  <div class="sec-container rv">
+    <div class="sec-card">
+      <span class="sec-eyebrow">ARCHITECTURAL SUPERIORITY</span>
+      <h2 class="sec-title">Built for <span>Rigorous Discovery</span></h2>
+      <p class="sec-desc">How ResearchGraph AI compares to traditional discovery engines and generic LLM wrappers.</p>
+
+      <div class="table-wrap">
+        <table class="adv-table">
+          <thead>
+            <tr>
+              <th>Capability</th>
+              <th>Google Scholar</th>
+              <th>Traditional RAG</th>
+              <th class="rg-col">ResearchGraph AI</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>3D Dynamic Citation Graph</td>
+              <td>❌ No</td>
+              <td>❌ No</td>
+              <td class="rg-col">✓ Living 3D Topology</td>
+            </tr>
+            <tr>
+              <td>Multi-Hop Lineage Traversal</td>
+              <td>❌ Manual</td>
+              <td>❌ 1-Hop Vector</td>
+              <td class="rg-col">✓ Recursive N-Hop</td>
+            </tr>
+            <tr>
+              <td>Multi-LLM Consensus Verification</td>
+              <td>❌ None</td>
+              <td>⚠️ Single LLM</td>
+              <td class="rg-col">✓ 3-Model Ensemble</td>
+            </tr>
+            <tr>
+              <td>Direct PDF Sentence Grounding</td>
+              <td>❌ No</td>
+              <td>⚠️ Chunk-level</td>
+              <td class="rg-col">✓ Exact Sentence Anchor</td>
+            </tr>
+            <tr>
+              <td>PDB & Code Repository Links</td>
+              <td>❌ No</td>
+              <td>❌ Rare</td>
+              <td class="rg-col">✓ 85K+ Live Datasets</td>
+            </tr>
+            <tr>
+              <td>Real-Time Archive Sync</td>
+              <td>⚠️ Weeks</td>
+              <td>⚠️ Static Dump</td>
+              <td class="rg-col">⚡ 60-Second Ingestion</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ INSTITUTIONAL ENDORSEMENTS ═══════════════ -->
+<section class="sec-wrap">
+  <div class="sec-container rv">
+    <div class="sec-card">
+      <span class="sec-eyebrow">RESEARCHER ACCREDITATION</span>
+      <h2 class="sec-title">Validated by <span>Leading Scientists</span></h2>
+      <p class="sec-desc">Deployed across laboratories advancing computational biology, deep learning, and theoretical physics.</p>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="quote-card">
+          <div class="quote-text">"ResearchGraph AI reduced our literature survey time from three weeks to 45 seconds while surfacing connections between CRISPR-Cas12 and viral vectors we had completely missed."</div>
+          <div class="quote-author">
+            <span class="quote-name">Dr. Elena Vance</span>
+            <span class="quote-affil">Senior Computational Biologist · Broad Institute</span>
+          </div>
+        </div>
+        <div class="quote-card">
+          <div class="quote-text">"The multi-hop citation graph makes tracking foundational literature lineages effortless. It is the single most valuable tool in our laboratory."</div>
+          <div class="quote-author">
+            <span class="quote-name">Prof. Marcus Lindqvist</span>
+            <span class="quote-affil">Principal Investigator · Oxford AI Lab</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ CALL TO ACTION PORTAL ═══════════════ -->
+<section class="sec-wrap">
+  <div class="sec-container rv">
+    <div class="portal-card">
+      <span class="sec-eyebrow" style="color:#c084fc">ACCELERATE YOUR DISCOVERY</span>
+      <h2 class="sec-title" style="margin-bottom:12px">Enter the <span>Research Universe</span></h2>
+      <p class="sec-desc" style="color:#e2e8f0; margin-bottom:24px">Explore high-dimensional vector spaces, discover hidden methodologies, and automate literature reviews with ResearchGraph AI.</p>
+      
+      <div style="display:flex; gap:12px; flex-wrap:wrap">
         <a class="btn p" href="javascript:void(0)" onclick="notifyParent('LAUNCH_COCKPIT')">Launch Cockpit →</a>
-        <a class="btn" href="#top" style="background:rgba(255,255,255,0.08)">Return to Observatory</a>
+        <a class="btn glass" href="#top">Return to Observatory ↑</a>
       </div>
     </div>
   </div>
 </section>
-<footer><div class="fg"><div><a class="logo" href="#top"><span class="mark">⚛</span>ResearchGraph <em>AI</em></a><p style="margin-top:14px">Discover, explore and connect research with an AI-powered knowledge graph.</p></div><div><h4>Product</h4><a href="#">Cockpit</a><a href="#">RAG Pipeline</a><a href="#">3D Topology</a></div><div><h4>Resources</h4><a href="#">Data Sources</a><a href="#">Documentation</a><a href="#">Changelog</a></div><div><h4>Company</h4><a href="#about">About Us</a><a href="#">Contact</a><a href="#">Privacy</a></div></div><div class="cp">© 2026 ResearchGraph AI · Research, Connected.</div></footer>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="fg">
+    <div>
+      <a class="logo" href="#top">
+        <span class="mark">⚛</span>
+        <span>ResearchGraph <em>AI</em></span>
+      </a>
+      <p style="margin-top:14px; font-size:13.5px; color:#94a3b8; line-height:1.6">Discover, explore, and connect scientific literature with an AI-powered 3D knowledge graph.</p>
+      <div class="footer-status">
+        <span style="width:6px; height:6px; border-radius:50%; background:#10b981; display:inline-block;"></span>
+        All Systems Operational · 204.8M Synced
+      </div>
+    </div>
+    <div>
+      <h4>Architecture</h4>
+      <a href="#pipeline">Neural RAG Pipeline</a>
+      <a href="#capabilities">3D Topology Engine</a>
+      <a href="#simulation">Consensus Lab</a>
+      <a href="#sources">Federated Ingestion</a>
+    </div>
+    <div>
+      <h4>Resources</h4>
+      <a href="#sources">45+ Data Sources</a>
+      <a href="javascript:void(0)" onclick="notifyParent('OPEN_DEMO')">Video Walkthrough</a>
+      <a href="javascript:void(0)" onclick="notifyParent('ABOUT')">System Whitepaper</a>
+      <a href="#">API Documentation</a>
+    </div>
+    <div>
+      <h4>Platform</h4>
+      <a href="javascript:void(0)" onclick="notifyParent('LAUNCH_COCKPIT')">Launch Cockpit</a>
+      <a href="javascript:void(0)" onclick="notifyParent('NAVIGATE_AUTH', 'LOGIN')">Institutional Access</a>
+      <a href="javascript:void(0)" onclick="notifyParent('ABOUT')">Security & Compliance</a>
+      <a href="#">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="cp">© 2026 ResearchGraph AI Inc. · Research, Connected. All rights reserved.</div>
+</footer>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/Pass.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script><script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
 <script>
 const T=THREE,R=new T.WebGLRenderer({antialias:true});let comp=null;
@@ -453,354 +1150,716 @@ const plDeck = new T.PointLight(0x38bdf8, 1.5, 12);
 plDeck.position.set(0, -1.3, 0);
 S.add(plDeck);
 
-/* ---------- platform ---------- */
-const plat=new T.Group();plat.position.y=-2.6;S.add(plat);
-const metal=new T.MeshStandardMaterial({color:0x364878,metalness:0.68,roughness:0.30,envMap:env,envMapIntensity:1.8,bumpMap:panelT,bumpScale:1.0,side:T.DoubleSide});
-const prof=[[0,.6],[2.1,.6],[2.5,.78],[3.3,.62],[4.6,.42],[6.0,.3],[6.6,.12],[6.7,-.15],[6.3,-.5],[4.5,-.8],[2,-1],[0,-1.05]].map(p=>V(p[0],p[1],0));
-plat.add(new T.Mesh(new T.LatheGeometry(prof,96),metal));
-function ring(r,t,col,y,op=1){const m=new T.Mesh(new T.TorusGeometry(r,t,12,128),new T.MeshBasicMaterial({color:col,transparent:true,opacity:op}));m.rotation.x=Math.PI/2;m.position.y=y;plat.add(m);return m}
-const rings=[ring(2.15,.05,0x6fe6ff,.82),ring(2.75,.045,0xb06bff,.74),ring(3.5,.04,0x4aa0ff,.62),ring(4.6,.03,0x3ad0ff,.43),ring(6.1,.045,0x44e0ff,.33),ring(6.62,.03,0xb060ff,.0)];
-{const g=new T.Mesh(new T.CircleGeometry(2.1,64),new T.MeshBasicMaterial({color:0x33ccff,transparent:true,opacity:.55,blending:T.AdditiveBlending,depthWrite:false}));g.rotation.x=-Math.PI/2;g.position.y=.62;plat.add(g)}
-/* rim city */
-const win=new T.MeshBasicMaterial({color:0x2fdcff}),win2=new T.MeshBasicMaterial({color:0xffc86a}),hull=new T.MeshStandardMaterial({color:0x3a4c7e,metalness:0.62,roughness:0.32,envMap:env,envMapIntensity:1.8});
-for(let i=0;i<90;i++){const a=i/90*6.283,r=rnd(4.9,6.1),h=rnd(.2,.55),b=new T.Mesh(new T.BoxGeometry(rnd(.35,.8),h,rnd(.3,.5)),hull);b.position.set(Math.cos(a)*r,.3+(6.2-r)*.12+h/2,Math.sin(a)*r);b.rotation.y=-a;plat.add(b);
-if(Math.random()<.8){const w=new T.Mesh(new T.BoxGeometry(b.geometry.parameters.width*.9,.05,b.geometry.parameters.depth+.02),Math.random()<.85?win:win2);w.position.copy(b.position);w.position.y+=rnd(-h/3,h/3);w.rotation.y=b.rotation.y;plat.add(w)}}
-for(let i=0;i<64;i++){const a=i/64*6.283,w=new T.Mesh(new T.BoxGeometry(.5,.08,.06),win);w.position.set(Math.cos(a)*6.55,-.15,Math.sin(a)*6.55);w.rotation.y=-a;plat.add(w);
-const w2=w.clone();w2.position.set(Math.cos(a)*6.2,-.5,Math.sin(a)*6.2);plat.add(w2)}
-/* spires */
-[[5.6,-1.6,2.6,.1],[5.1,.4,2.2,.07],[-5.7,.3,1.6,.06]].forEach(([x,z,h,r])=>{const s=new T.Mesh(new T.CylinderGeometry(r*.3,r,h,8),hull);s.position.set(x,.5+h/2,z);plat.add(s);const l=sprite(glowT,0x66e8ff,.5,V(0,0,0),1);S.remove(l);l.position.set(x,.5+h,z);plat.add(l)});
-const glass=new T.MeshStandardMaterial({color:0x6fd0ff,metalness:.1,roughness:.05,transparent:true,opacity:.55,emissive:0x1a6aaa,emissiveIntensity:.8,envMap:env});
-[[3.6,1.6,.8],[-3.4,-2.2,.7],[1.4,-3.9,.6],[-1.8,3.7,.65]].forEach(([x,z,r])=>{const b=new T.Mesh(new T.CylinderGeometry(r*1.15,r*1.3,.25,32),hull);b.position.set(x,.55,z);plat.add(b);const d=new T.Mesh(new T.SphereGeometry(r,32,16,0,6.283,0,1.5708),glass);d.position.set(x,.66,z);plat.add(d);const l=new T.PointLight(0x44ccff,.6,4);l.position.set(x,1.1,z);plat.add(l)});
-{const im=new T.InstancedMesh(new T.BoxGeometry(.06,.02,.06),win,300),d=new T.Object3D();for(let i=0;i<300;i++){const a=rnd(0,6.283),r=rnd(2.8,4.4);d.position.set(Math.cos(a)*r,.53+(4.4-r)*.02,Math.sin(a)*r);d.updateMatrix();im.setMatrixAt(i,d.matrix)}plat.add(im)}
-/* rock underside */
-{const g=new T.ConeGeometry(4.9,4.2,96,28,true);g.rotateX(Math.PI);const p=g.attributes.position;for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);const n=Math.sin(x*2.3+y)*Math.cos(z*2.1-y*1.4)*.35+Math.sin(y*5+x*3)*.12+Math.sin(x*9+z*7)*Math.cos(y*8)*.07;const k=1+n*.35;p.setXYZ(i,x*k,y+n*.3,z*k)}g.computeVertexNormals();
-const m=new T.Mesh(g,new T.MeshStandardMaterial({color:0x26335a,roughness:0.75,metalness:0.20,flatShading:true,envMap:env,envMapIntensity:0.9,emissive:0x101a44,side:T.DoubleSide}));m.position.y=-2.9;plat.add(m);
-for(let i=0;i<22;i++){const a=rnd(0,6.28),h=rnd(-5,-1.8),rr=4.5*(1-(-h-1)/5.8)*.95;const s=new T.Mesh(new T.BoxGeometry(.2,.06,.35),win);s.position.set(Math.cos(a)*rr,h,Math.sin(a)*rr);s.rotation.y=-a;plat.add(s)}}
-{const rk=new T.MeshStandardMaterial({color:0x26335a,roughness:0.75,metalness:0.20,flatShading:true,envMap:env,envMapIntensity:0.9,emissive:0x101a44});for(let i=0;i<14;i++){const a=rnd(0,6.28),r=rnd(3,7.5),m=new T.Mesh(new T.IcosahedronGeometry(rnd(.1,.35),0),rk);m.position.set(Math.cos(a)*r,rnd(-6.5,-3),Math.sin(a)*r);m.rotation.set(rnd(0,3),rnd(0,3),0);plat.add(m)}}
-/* thrusters */
-const thr=[];[[-5,-1.6],[-4.6,1.4],[4.7,1.6],[5.3,-1.0],[-1.3,3.5],[0,-.5],[.4,.2]].forEach(([x,z],i)=>{const c=i>3,h=c?1.4:.9;const t=new T.Mesh(new T.CylinderGeometry(.12,.2,h,12),hull);const y=c?-4.4-i*.2:-1.2;t.position.set(x,y,z);plat.add(t);
-const f=new T.Mesh(new T.CylinderGeometry(.1,.03,c?1.4:.7,12,1,true),new T.MeshBasicMaterial({color:0x44ccff,transparent:true,opacity:.6,blending:T.AdditiveBlending,depthWrite:false}));f.position.set(x,y-h/2-(c?.7:.35),z);plat.add(f);thr.push(f);
-const gl=sprite(glowT,0x55ddff,1,V(0,0,0),.9);S.remove(gl);gl.position.set(x,y-h/2,z);plat.add(gl)});
-/* ---------- light beam ---------- */
-// Refined holographic levitation projection: projects from platform deck (y: -2.0) to globe base (y: -1.2)
-const beam = new T.Mesh(new T.CylinderGeometry(1.3, 2.1, 1.1, 64, 1, true), new T.ShaderMaterial({
-  transparent: true, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false, uniforms: { t: { value: 0 } },
-  vertexShader: 'varying vec2 u;varying vec3 p;void main(){u=uv;p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader: 'uniform float t;varying vec2 u;varying vec3 p;void main(){float s=.5+.5*sin(atan(p.z,p.x)*16.+t*1.5);float a=pow(1.-u.y,1.8)*(.15+.12*s);gl_FragColor=vec4(.18,.72,1.,a);}'
-}));
-beam.position.set(0, -1.55, 0);
-S.add(beam);
+/* ---------- CITADEL ROOT GROUP (100% UNIFIED & MECHANICALLY LOCKED) ---------- */
+const citadelGroup = new T.Group();
+S.add(citadelGroup);
 
-// Concentric holographic projector rings on platform deck
-const beamRing1 = ring(1.7, 0.035, 0x38bdf8, 0.64, 0.85);
-const beamRing2 = ring(1.1, 0.03, 0x818cf8, 0.64, 0.75);
+/* ---------- platform ---------- */
+const plat = new T.Group();
+plat.position.set(0, -1.0, 0);
+citadelGroup.add(plat);
+
+const metal = new T.MeshStandardMaterial({
+  color: 0x364878,
+  metalness: 0.68,
+  roughness: 0.30,
+  envMap: env,
+  envMapIntensity: 1.8,
+  bumpMap: panelT,
+  bumpScale: 1.0,
+  side: T.DoubleSide
+});
+
+// Platform lathe profile: top deck at y=0.5, radius 6.4
+const prof = [
+  [0, .5], [1.8, .5], [2.2, .65], [3.0, .52], [4.2, .38], [5.4, .26],
+  [6.0, .12], [6.2, -.12], [5.9, -.42], [4.5, -.70], [2.0, -.88], [0, -.92]
+].map(p => V(p[0], p[1], 0));
+plat.add(new T.Mesh(new T.LatheGeometry(prof, 96), metal));
+
+function ring(r, t, col, y, op = 1) {
+  const m = new T.Mesh(new T.TorusGeometry(r, t, 14, 128), new T.MeshBasicMaterial({ color: col, transparent: true, opacity: op }));
+  m.rotation.x = Math.PI / 2;
+  m.position.y = y;
+  plat.add(m);
+  return m;
+}
+
+// Concentric glowing platform rings
+const rings = [
+  ring(1.85, .045, 0x38bdf8, .75), // Inner projector ring
+  ring(2.50, .040, 0x818cf8, .65),
+  ring(3.30, .035, 0x38bdf8, .55),
+  ring(4.50, .035, 0x60a5fa, .45),
+  ring(5.60, .040, 0x818cf8, .35),
+  ring(6.15, .045, 0x0ea5e9, .25)
+];
+
+// Central holographic projection pad on the deck
+{
+  const g = new T.Mesh(
+    new T.CircleGeometry(1.85, 64),
+    new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: .65, blending: T.AdditiveBlending, depthWrite: false })
+  );
+  g.rotation.x = -Math.PI / 2;
+  g.position.y = .51;
+  plat.add(g);
+}
+
+/* rim city */
+const win = new T.MeshBasicMaterial({ color: 0x2fdcff }),
+      win2 = new T.MeshBasicMaterial({ color: 0xffc86a }),
+      hull = new T.MeshStandardMaterial({ color: 0x3a4c7e, metalness: 0.62, roughness: 0.32, envMap: env, envMapIntensity: 1.8 });
+
+for (let i = 0; i < 90; i++) {
+  const a = i / 90 * 6.283, r = rnd(4.8, 6.0), h = rnd(.2, .55),
+        b = new T.Mesh(new T.BoxGeometry(rnd(.35, .8), h, rnd(.3, .5)), hull);
+  b.position.set(Math.cos(a) * r, .26 + (6.0 - r) * .12 + h / 2, Math.sin(a) * r);
+  b.rotation.y = -a;
+  plat.add(b);
+  if (Math.random() < .8) {
+    const w = new T.Mesh(new T.BoxGeometry(b.geometry.parameters.width * .9, .05, b.geometry.parameters.depth + .02), Math.random() < .85 ? win : win2);
+    w.position.copy(b.position);
+    w.position.y += rnd(-h / 3, h / 3);
+    w.rotation.y = b.rotation.y;
+    plat.add(w);
+  }
+}
+
+for (let i = 0; i < 64; i++) {
+  const a = i / 64 * 6.283, w = new T.Mesh(new T.BoxGeometry(.5, .08, .06), win);
+  w.position.set(Math.cos(a) * 6.05, -.12, Math.sin(a) * 6.05);
+  w.rotation.y = -a;
+  plat.add(w);
+  const w2 = w.clone();
+  w2.position.set(Math.cos(a) * 5.8, -.38, Math.sin(a) * 5.8);
+  plat.add(w2);
+}
+
+/* spires & beacons */
+[[5.4, -1.6, 2.4, .09], [4.8, .4, 2.0, .07], [-5.4, .3, 1.5, .06]].forEach(([x, z, h, r]) => {
+  const s = new T.Mesh(new T.CylinderGeometry(r * .3, r, h, 8), hull);
+  s.position.set(x, .4 + h / 2, z);
+  plat.add(s);
+  const l = sprite(glowT, 0x66e8ff, .5, V(0, 0, 0), 1);
+  S.remove(l);
+  l.position.set(x, .4 + h, z);
+  plat.add(l);
+});
+
+/* glass research domes */
+const glass = new T.MeshStandardMaterial({
+  color: 0x6fd0ff, metalness: .1, roughness: .05, transparent: true, opacity: .55,
+  emissive: 0x1a6aaa, emissiveIntensity: .8, envMap: env
+});
+[[3.4, 1.5, .75], [-3.2, -2.0, .65], [1.3, -3.6, .55], [-1.6, 3.4, .60]].forEach(([x, z, r]) => {
+  const b = new T.Mesh(new T.CylinderGeometry(r * 1.15, r * 1.3, .22, 32), hull);
+  b.position.set(x, .48, z);
+  plat.add(b);
+  const d = new T.Mesh(new T.SphereGeometry(r, 32, 16, 0, 6.283, 0, 1.5708), glass);
+  d.position.set(x, .58, z);
+  plat.add(d);
+  const l = new T.PointLight(0x44ccff, .6, 4);
+  l.position.set(x, 1.0, z);
+  plat.add(l);
+});
+
+/* deck surface tech details */
+{
+  const im = new T.InstancedMesh(new T.BoxGeometry(.06, .02, .06), win, 280), d = new T.Object3D();
+  for (let i = 0; i < 280; i++) {
+    const a = rnd(0, 6.283), r = rnd(2.6, 4.3);
+    d.position.set(Math.cos(a) * r, .48 + (4.3 - r) * .02, Math.sin(a) * r);
+    d.updateMatrix();
+    im.setMatrixAt(i, d.matrix);
+  }
+  plat.add(im);
+}
+
+/* floating rock underside (CRAGGY ASTEROID ISLAND) */
+{
+  const g = new T.ConeGeometry(5.2, 3.8, 96, 28, true);
+  g.rotateX(Math.PI);
+  const p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    const n = Math.sin(x * 2.3 + y) * Math.cos(z * 2.1 - y * 1.4) * .35 +
+              Math.sin(y * 5 + x * 3) * .12 + Math.sin(x * 9 + z * 7) * Math.cos(y * 8) * .07;
+    const k = 1 + n * .35;
+    p.setXYZ(i, x * k, y + n * .3, z * k);
+  }
+  g.computeVertexNormals();
+  const m = new T.Mesh(g, new T.MeshStandardMaterial({
+    color: 0x1e2746, roughness: 0.85, metalness: 0.20, flatShading: true,
+    envMap: env, envMapIntensity: 0.9, emissive: 0x0c142c, side: T.DoubleSide
+  }));
+  m.position.y = -2.6; // extends from -0.7 down to -4.5
+  plat.add(m);
+
+  for (let i = 0; i < 22; i++) {
+    const a = rnd(0, 6.28), h = rnd(-4.5, -1.2), rr = 4.6 * (1 - (-h - 1) / 5.2) * .95;
+    const s = new T.Mesh(new T.BoxGeometry(.2, .06, .35), win);
+    s.position.set(Math.cos(a) * rr, h, Math.sin(a) * rr);
+    s.rotation.y = -a;
+    plat.add(s);
+  }
+}
+
+/* orbiting rock fragments */
+{
+  const rk = new T.MeshStandardMaterial({ color: 0x1e2746, roughness: 0.85, metalness: 0.20, flatShading: true, envMap: env, envMapIntensity: 0.9, emissive: 0x0c142c });
+  for (let i = 0; i < 14; i++) {
+    const a = rnd(0, 6.28), r = rnd(3.2, 7.0), m = new T.Mesh(new T.IcosahedronGeometry(rnd(.1, .32), 0), rk);
+    m.position.set(Math.cos(a) * r, rnd(-5.0, -2.5), Math.sin(a) * r);
+    m.rotation.set(rnd(0, 3), rnd(0, 3), 0);
+    plat.add(m);
+  }
+}
+
+/* graviton thrusters */
+const thr = [];
+[[-4.5, -1.4], [-4.0, 1.2], [4.2, 1.4], [4.6, -1.0], [-1.2, 3.0], [0, -.4], [.3, .2]].forEach(([x, z], i) => {
+  const c = i > 4, h = c ? 1.4 : .9;
+  const t = new T.Mesh(new T.CylinderGeometry(.12, .2, h, 12), hull);
+  const y = c ? -3.8 - i * .15 : -1.0;
+  t.position.set(x, y, z);
+  plat.add(t);
+
+  const f = new T.Mesh(
+    new T.CylinderGeometry(.1, .03, c ? 1.5 : .8, 12, 1, true),
+    new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: .7, blending: T.AdditiveBlending, depthWrite: false })
+  );
+  f.position.set(x, y - h / 2 - (c ? .75 : .4), z);
+  plat.add(f);
+  thr.push(f);
+
+  const gl = sprite(glowT, 0x0284c7, 1.2, V(0, 0, 0), .9);
+  S.remove(gl);
+  gl.position.set(x, y - h / 2, z);
+  plat.add(gl);
+});
+
+/* ---------- HOLOGRAPHIC PROJECTION BEAM (PHYSICALLY CONNECTS PLATFORM TO GLOBE) ---------- */
+// Rich dual-layer holographic projection beam
+const beamGroup = new T.Group();
+citadelGroup.add(beamGroup);
+
+// Outer luminous projection cylinder
+const beam = new T.Mesh(
+  new T.CylinderGeometry(2.0, 1.85, 1.88, 64, 1, true),
+  new T.ShaderMaterial({
+    transparent: true, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false,
+    uniforms: { t: { value: 0 } },
+    vertexShader: 'varying vec2 u;varying vec3 p;void main(){u=uv;p=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader: 'uniform float t;varying vec2 u;varying vec3 p;void main(){float s=.5+.5*sin(atan(p.z,p.x)*18.+t*2.2);float vPulse=sin(p.y*6.-t*3.0);float a=pow(1.-u.y*.7,1.4)*(.28+.14*s+.08*vPulse);gl_FragColor=vec4(.25,.80,1.,a);}'
+  })
+);
+beam.position.set(0, 0.44, 0);
+beamGroup.add(beam);
+
+// Inner high-density core beam
+const innerBeam = new T.Mesh(
+  new T.CylinderGeometry(1.4, 1.3, 1.85, 32, 1, true),
+  new T.ShaderMaterial({
+    transparent: true, side: T.DoubleSide, blending: T.AdditiveBlending, depthWrite: false,
+    uniforms: { t: { value: 0 } },
+    vertexShader: 'varying vec2 u;void main(){u=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader: 'uniform float t;varying vec2 u;void main(){float a=pow(1.-u.y*.8,2.0)*(.18+.08*sin(t*3.0));gl_FragColor=vec4(.45,.88,1.,a);}'
+  })
+);
+innerBeam.position.set(0, 0.44, 0);
+beamGroup.add(innerBeam);
+
+// Concentric projector rings at base of beam on platform deck
+const beamRing1 = ring(1.85, 0.035, 0x38bdf8, 0.52, 0.85);
+const beamRing2 = ring(1.20, 0.030, 0x818cf8, 0.52, 0.75);
 
 // Soft emitter base halo on platform deck
-sprite(glowT, 0x0284c7, 3.6, V(0, -1.92, 0), 0.6);
+const baseHalo = sprite(glowT, 0x0284c7, 3.8, V(0, 0, 0), 0.65);
+S.remove(baseHalo);
+baseHalo.position.set(0, -0.48, 0);
+citadelGroup.add(baseHalo);
 
-/* ---------- globe ---------- */
-const GR=2.3,GY=1.1,globe=new T.Group();globe.position.y=GY;S.add(globe);
-const land={na:[[-168,66],[-140,70],[-95,72],[-80,70],[-62,60],[-55,50],[-67,44],[-76,35],[-81,25],[-90,29],[-97,26],[-97,20],[-88,16],[-83,10],[-78,8],[-86,12],[-96,16],[-106,23],[-112,30],[-117,32],[-124,40],[-125,49],[-140,60]],
-sa:[[-78,8],[-62,10],[-50,0],[-35,-7],[-40,-22],[-48,-28],[-58,-38],[-66,-46],[-68,-55],[-74,-50],[-72,-30],[-70,-18],[-81,-5]],
-gl:[[-55,60],[-45,60],[-20,70],[-20,82],[-60,82],[-70,76]],
-af:[[-17,21],[-10,35],[10,37],[32,31],[43,12],[51,11],[40,-5],[40,-16],[33,-26],[20,-35],[12,-18],[9,4],[-8,4],[-17,14]],
-eu:[[-10,36],[-9,43],[0,50],[10,55],[20,70],[40,68],[70,73],[110,77],[140,72],[180,68],[170,60],[140,50],[130,35],[122,30],[110,20],[105,10],[100,2],[95,17],[80,8],[72,20],[57,24],[44,13],[35,30],[28,37],[10,44]],
-au:[[114,-22],[130,-12],[142,-11],[153,-27],[146,-39],[130,-32],[115,-34]]};
-const gt=(()=>{const mk=cv(512,256),m=mk.getContext('2d');m.fillStyle='#fff';Object.values(land).forEach(poly=>{m.beginPath();poly.forEach(([lo,la],i)=>{const x=(lo+180)/360*512,y=(90-la)/180*256;i?m.lineTo(x,y):m.moveTo(x,y)});m.closePath();m.fill()});
-const d=m.getImageData(0,0,512,256).data;const c=cv(2048,1024),x=c.getContext('2d');
-for(let gy=6;gy<1024;gy+=10)for(let gx=0;gx<2048;gx+=10){const sx=gx>>2,sy=gy>>2;if(d[(sy*512+sx)*4]>128){x.fillStyle=`rgba(${120+rnd(0,80)},${215+rnd(0,40)},255,${rnd(.6,1)})`;x.beginPath();x.arc(gx,gy,2.6,0,7);x.fill()}}
-x.strokeStyle='rgba(80,170,255,.22)';x.lineWidth=1.5;for(let i=0;i<=24;i++){x.beginPath();x.moveTo(i*2048/24,0);x.lineTo(i*2048/24,1024);x.stroke()}for(let i=1;i<12;i++){x.beginPath();x.moveTo(0,i*1024/12);x.lineTo(2048,i*1024/12);x.stroke()}return tex(c)})();
-gt.anisotropy=8;
-const gU={t:{value:0}};globe.add(new T.Mesh(new T.SphereGeometry(GR*.995,64,64),new T.ShaderMaterial({transparent:true,uniforms:gU,vertexShader:'varying vec3 n,p,v;void main(){n=normalize(normalMatrix*normal);p=position;vec4 mv=modelViewMatrix*vec4(position,1.);v=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',fragmentShader:'uniform float t;varying vec3 n,p,v;void main(){float f=pow(1.-max(dot(n,v),0.),2.2);vec3 c=mix(vec3(.01,.08,.28),vec3(.1,.7,1.),f);float s=smoothstep(.9,1.,sin(p.y*6.-t*1.5))*.15;gl_FragColor=vec4(c*.8+s*vec3(.3,.8,1.)*.5+f*.12,.95);}'})));
-globe.add(new T.Mesh(new T.SphereGeometry(GR*.8,48,48),new T.MeshBasicMaterial({color:0x1068ff,transparent:true,opacity:.06,blending:T.AdditiveBlending,depthWrite:false})));
-const dots=new T.Mesh(new T.SphereGeometry(GR,64,64),new T.MeshBasicMaterial({map:gt,transparent:true,blending:T.AdditiveBlending,depthWrite:false}));globe.add(dots);
-// network
-const pts=[];for(let i=0;i<46;i++){const u=rnd(0,6.283),v=Math.acos(rnd(-1,1));pts.push(V(Math.sin(v)*Math.cos(u),Math.cos(v),Math.sin(v)*Math.sin(u)).multiplyScalar(GR*1.012))}
-const lp=[];pts.forEach((a,i)=>pts.forEach((b,j)=>{if(j>i&&a.distanceTo(b)<1.7){const mid=a.clone().add(b).multiplyScalar(.5).normalize().multiplyScalar(GR*1.05);const cu=new T.QuadraticBezierCurve3(a,mid,b).getPoints(10);for(let k=0;k<10;k++)lp.push(cu[k].x,cu[k].y,cu[k].z,cu[k+1].x,cu[k+1].y,cu[k+1].z)}}));
-{const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(lp,3));globe.add(new T.LineSegments(g,new T.LineBasicMaterial({color:0x6fd8ff,transparent:true,opacity:.55,blending:T.AdditiveBlending,depthWrite:false})));
-const g2=new T.BufferGeometry().setFromPoints(pts);globe.add(new T.Points(g2,new T.PointsMaterial({map:glowT,color:0xd9b8ff,size:.28,transparent:true,blending:T.AdditiveBlending,depthWrite:false})))}
-// atmosphere
-const atmo=new T.Mesh(new T.SphereGeometry(GR*1.12,64,64),new T.ShaderMaterial({transparent:true,side:T.BackSide,blending:T.AdditiveBlending,depthWrite:false,vertexShader:'varying vec3 n;void main(){n=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 n;void main(){float i=pow(.78-dot(n,vec3(0,0,1.)),2.5);gl_FragColor=vec4(.2,.6,1.,1.)*i*.35;}'}));atmo.position.set(0,GY,0);S.add(atmo);
-sprite(glowT,0x2a8cff,9.5,V(0,GY,-.5),0);
-// orbit rings
-const orb=[];[[3.6,.2,.1],[3.1,-.35,0],[2.8,.5,.3]].forEach(([r,rx,rz],i)=>{const m=new T.Mesh(new T.TorusGeometry(r,.012,8,160),new T.MeshBasicMaterial({color:i==1?0xb98bff:0x5fdcff,transparent:true,opacity:.7,blending:T.AdditiveBlending,depthWrite:false}));m.rotation.set(Math.PI/2+rx,0,rz);m.position.y=GY;S.add(m);const sat=sprite(glowT,0xffffff,.35,V(0,0,0),1);orb.push({m,sat,r,rx,rz,sp:rnd(.3,.6)*(i%2?-1:1),ph:rnd(0,6)})});
+/* ---------- LUMINOUS 3D RESEARCH GLOBE (PERFECTLY CENTERED IN PROJECTION BEAM) ---------- */
+const GR = 1.85, GY = 1.55;
+const globe = new T.Group();
+globe.position.set(0, GY, 0);
+citadelGroup.add(globe);
+
+const land = {
+  na:[[-168,66],[-140,70],[-95,72],[-80,70],[-62,60],[-55,50],[-67,44],[-76,35],[-81,25],[-90,29],[-97,26],[-97,20],[-88,16],[-83,10],[-78,8],[-86,12],[-96,16],[-106,23],[-112,30],[-117,32],[-124,40],[-125,49],[-140,60]],
+  sa:[[-78,8],[-62,10],[-50,0],[-35,-7],[-40,-22],[-48,-28],[-58,-38],[-66,-46],[-68,-55],[-74,-50],[-72,-30],[-70,-18],[-81,-5]],
+  gl:[[-55,60],[-45,60],[-20,70],[-20,82],[-60,82],[-70,76]],
+  af:[[-17,21],[-10,35],[10,37],[32,31],[43,12],[51,11],[40,-5],[40,-16],[33,-26],[20,-35],[12,-18],[9,4],[-8,4],[-17,14]],
+  eu:[[-10,36],[-9,43],[0,50],[10,55],[20,70],[40,68],[70,73],[110,77],[140,72],[180,68],[170,60],[140,50],[130,35],[122,30],[110,20],[105,10],[100,2],[95,17],[80,8],[72,20],[57,24],[44,13],[35,30],[28,37],[10,44]],
+  au:[[114,-22],[130,-12],[142,-11],[153,-27],[146,-39],[130,-32],[115,-34]]
+};
+
+const gt = (() => {
+  const mk = cv(512, 256), m = mk.getContext('2d');
+  m.fillStyle = '#fff';
+  Object.values(land).forEach(poly => {
+    m.beginPath();
+    poly.forEach(([lo, la], i) => {
+      const x = (lo + 180) / 360 * 512, y = (90 - la) / 180 * 256;
+      i ? m.lineTo(x, y) : m.moveTo(x, y);
+    });
+    m.closePath();
+    m.fill();
+  });
+  const d = m.getImageData(0, 0, 512, 256).data;
+  const c = cv(2048, 1024), x = c.getContext('2d');
+  for (let gy = 6; gy < 1024; gy += 10) {
+    for (let gx = 0; gx < 2048; gx += 10) {
+      const sx = gx >> 2, sy = gy >> 2;
+      if (d[(sy * 512 + sx) * 4] > 128) {
+        x.fillStyle = `rgba(${120 + rnd(0, 80)},${215 + rnd(0, 40)},255,${rnd(.6, 1)})`;
+        x.beginPath();
+        x.arc(gx, gy, 2.6, 0, 7);
+        x.fill();
+      }
+    }
+  }
+  x.strokeStyle = 'rgba(80,170,255,.22)';
+  x.lineWidth = 1.5;
+  for (let i = 0; i <= 24; i++) {
+    x.beginPath(); x.moveTo(i * 2048 / 24, 0); x.lineTo(i * 2048 / 24, 1024); x.stroke();
+  }
+  for (let i = 1; i < 12; i++) {
+    x.beginPath(); x.moveTo(0, i * 1024 / 12); x.lineTo(2048, i * 1024 / 12); x.stroke();
+  }
+  return tex(c);
+})();
+gt.anisotropy = 8;
+
+const gU = { t: { value: 0 } };
+// Ocean base sphere
+globe.add(new T.Mesh(
+  new T.SphereGeometry(GR * .995, 64, 64),
+  new T.ShaderMaterial({
+    transparent: true, uniforms: gU,
+    vertexShader: 'varying vec3 n,p,v;void main(){n=normalize(normalMatrix*normal);p=position;vec4 mv=modelViewMatrix*vec4(position,1.);v=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+    fragmentShader: 'uniform float t;varying vec3 n,p,v;void main(){float f=pow(1.-max(dot(n,v),0.),2.2);vec3 c=mix(vec3(.01,.08,.28),vec3(.1,.7,1.),f);float s=smoothstep(.9,1.,sin(p.y*6.-t*1.5))*.15;gl_FragColor=vec4(c*.8+s*vec3(.3,.8,1.)*.5+f*.12,.95);}'
+  })
+));
+
+globe.add(new T.Mesh(
+  new T.SphereGeometry(GR * .8, 48, 48),
+  new T.MeshBasicMaterial({ color: 0x1068ff, transparent: true, opacity: .06, blending: T.AdditiveBlending, depthWrite: false })
+));
+
+// Continental dots
+const dots = new T.Mesh(
+  new T.SphereGeometry(GR, 64, 64),
+  new T.MeshBasicMaterial({ map: gt, transparent: true, blending: T.AdditiveBlending, depthWrite: false })
+);
+globe.add(dots);
+
+// 3D Research Network arcs
+const pts = [];
+for (let i = 0; i < 46; i++) {
+  const u = rnd(0, 6.283), v = Math.acos(rnd(-1, 1));
+  pts.push(V(Math.sin(v) * Math.cos(u), Math.cos(v), Math.sin(v) * Math.sin(u)).multiplyScalar(GR * 1.012));
+}
+
+const lp = [];
+pts.forEach((a, i) => pts.forEach((b, j) => {
+  if (j > i && a.distanceTo(b) < 1.7) {
+    const mid = a.clone().add(b).multiplyScalar(.5).normalize().multiplyScalar(GR * 1.05);
+    const cu = new T.QuadraticBezierCurve3(a, mid, b).getPoints(10);
+    for (let k = 0; k < 10; k++) lp.push(cu[k].x, cu[k].y, cu[k].z, cu[k + 1].x, cu[k + 1].y, cu[k + 1].z);
+  }
+}));
+
+{
+  const g = new T.BufferGeometry();
+  g.setAttribute('position', new T.Float32BufferAttribute(lp, 3));
+  globe.add(new T.LineSegments(g, new T.LineBasicMaterial({ color: 0x6fd8ff, transparent: true, opacity: .55, blending: T.AdditiveBlending, depthWrite: false })));
+  const g2 = new T.BufferGeometry().setFromPoints(pts);
+  globe.add(new T.Points(g2, new T.PointsMaterial({ map: glowT, color: 0xd9b8ff, size: .28, transparent: true, blending: T.AdditiveBlending, depthWrite: false })));
+}
+
+// 3D Atmosphere shell
+const atmo = new T.Mesh(
+  new T.SphereGeometry(GR * 1.12, 64, 64),
+  new T.ShaderMaterial({
+    transparent: true, side: T.BackSide, blending: T.AdditiveBlending, depthWrite: false,
+    vertexShader: 'varying vec3 n;void main(){n=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader: 'varying vec3 n;void main(){float i=pow(.78-dot(n,vec3(0,0,1.)),2.5);gl_FragColor=vec4(.2,.6,1.,1.)*i*.35;}'
+  })
+);
+atmo.position.set(0, GY, 0);
+citadelGroup.add(atmo);
+
+// 3D Orbital rings with satellites
+const orb = [];
+[[3.2, .2, .1], [2.7, -.35, 0], [2.4, .5, .3]].forEach(([r, rx, rz], i) => {
+  const m = new T.Mesh(
+    new T.TorusGeometry(r, .012, 8, 160),
+    new T.MeshBasicMaterial({ color: i == 1 ? 0xb98bff : 0x5fdcff, transparent: true, opacity: .7, blending: T.AdditiveBlending, depthWrite: false })
+  );
+  m.rotation.set(Math.PI / 2 + rx, 0, rz);
+  m.position.set(0, GY, 0);
+  citadelGroup.add(m);
+  const sat = sprite(glowT, 0xffffff, .35, V(0, 0, 0), 1);
+  S.remove(sat);
+  citadelGroup.add(sat);
+  orb.push({ m, sat, r, rx, rz, sp: rnd(.3, .6) * (i % 2 ? -1 : 1), ph: rnd(0, 6) });
+});
+
+// Hide dark inner spheres so radiant canvas texture on sp shines
+globe.children.forEach(c => c.visible = false);
+atmo.visible = false;
+orb.forEach(o => { o.m.visible = false; o.sat.visible = false; });
+
+const GSZ = 2 * GR * 1200 / 860;
+const gcv = document.getElementById('globe');
+const stg = document.getElementById('stage');
+const gTex = new T.CanvasTexture(gcv);
+gTex.minFilter = T.LinearFilter;
+gTex.generateMipmaps = false;
+
+const sp = new T.Sprite(new T.SpriteMaterial({ map: gTex, transparent: true, depthWrite: false }));
+sp.scale.set(GSZ, GSZ, 1);
+globe.add(sp);
+
+function stageUpdate() {
+  C.updateMatrixWorld();
+  const worldPos = new T.Vector3();
+  globe.getWorldPosition(worldPos);
+  const r0 = new T.Vector3().setFromMatrixColumn(C.matrixWorld, 0).multiplyScalar(GSZ / 2).add(worldPos);
+  const [x0, y0] = proj(worldPos);
+  const [x1] = proj(r0);
+  const w = Math.abs(x1 - x0) * 2;
+  stg.style.left = (x0 - w / 2) + 'px';
+  stg.style.top = (y0 - w / 2) + 'px';
+  stg.style.width = stg.style.height = w + 'px';
+  gcv.style.pointerEvents = (innerWidth >= 1000 && w < 1700) ? 'auto' : 'none';
+}
+
 /* ---------- HIGH-FIDELITY REALISTIC SCI-FI RECON CRAFT (UFO) ---------- */
 const ufo = new T.Group();
 S.add(ufo);
 
 {
-  // Titanium / Tungsten aerospace hull with specular PBR reflection
   const hullMat = new T.MeshStandardMaterial({
-    color: 0x8898b8,
-    metalness: 0.94,
-    roughness: 0.16,
-    envMap: env,
-    envMapIntensity: 2.2,
-    bumpMap: panelT,
-    bumpScale: 1.8
+    color: 0x8898b8, metalness: 0.94, roughness: 0.16,
+    envMap: env, envMapIntensity: 2.2, bumpMap: panelT, bumpScale: 1.8
   });
-  
   const darkRimMat = new T.MeshStandardMaterial({
-    color: 0x1a223e,
-    metalness: 0.88,
-    roughness: 0.25,
-    envMap: env,
-    envMapIntensity: 1.5
+    color: 0x1a223e, metalness: 0.88, roughness: 0.25,
+    envMap: env, envMapIntensity: 1.5
   });
 
-  // Aerodynamic dual-convex saucer disc with precision bevels
   const saucerProfile = [
     [0, 0.22], [0.35, 0.20], [0.72, 0.14], [1.08, 0.06], [1.22, 0.0],
     [1.18, -0.06], [1.05, -0.12], [0.72, -0.19], [0.42, -0.23], [0.28, -0.28], [0, -0.30]
   ].map(p => V(p[0], p[1], 0));
-  
   const saucerMesh = new T.Mesh(new T.LatheGeometry(saucerProfile, 72), hullMat);
   ufo.add(saucerMesh);
 
-  // Outer armor perimeter cowl
   const cowl = new T.Mesh(new T.TorusGeometry(1.12, 0.05, 16, 96), darkRimMat);
   cowl.rotation.x = Math.PI / 2;
   ufo.add(cowl);
 
-  // Optical sensor emitter ring (alternating cyan & amber micro-nodes)
   const sensorRing = new T.Group();
   for (let i = 0; i < 20; i++) {
     const a = (i / 20) * Math.PI * 2;
     const isAmber = i % 4 === 0;
-    const node = new T.Mesh(
-      new T.SphereGeometry(0.038, 12, 12),
-      new T.MeshBasicMaterial({ color: isAmber ? 0xfbbf24 : 0x38bdf8 })
-    );
+    const node = new T.Mesh(new T.SphereGeometry(0.038, 12, 12), new T.MeshBasicMaterial({ color: isAmber ? 0xfbbf24 : 0x38bdf8 }));
     node.position.set(Math.cos(a) * 1.14, 0.01, Math.sin(a) * 1.14);
     sensorRing.add(node);
   }
   ufo.add(sensorRing);
   ufo.userData.sensorRing = sensorRing;
 
-  // Pressurized Crystalline Cockpit Dome (Refractive Glass)
   const domeMat = new T.MeshStandardMaterial({
-    color: 0xa5f3fc,
-    metalness: 0.12,
-    roughness: 0.04,
-    transparent: true,
-    opacity: 0.62,
-    emissive: 0x0284c7,
-    emissiveIntensity: 0.95,
-    envMap: env,
-    envMapIntensity: 2.5
+    color: 0xa5f3fc, metalness: 0.12, roughness: 0.04, transparent: true, opacity: 0.62,
+    emissive: 0x0284c7, emissiveIntensity: 0.95, envMap: env, envMapIntensity: 2.5
   });
   const dome = new T.Mesh(new T.SphereGeometry(0.52, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), domeMat);
   dome.position.y = 0.16;
   dome.scale.y = 0.88;
   ufo.add(dome);
 
-  // Internal Autonomous Quantum Gyroscope (dual counter-rotating gimbal rings)
   const gyroGroup = new T.Group();
   gyroGroup.position.y = 0.26;
-  const gyro1 = new T.Mesh(
-    new T.TorusGeometry(0.24, 0.015, 8, 36),
-    new T.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true })
-  );
-  const gyro2 = new T.Mesh(
-    new T.TorusGeometry(0.16, 0.014, 8, 36),
-    new T.MeshBasicMaterial({ color: 0xa855f7, wireframe: true })
-  );
+  const gyro1 = new T.Mesh(new T.TorusGeometry(0.24, 0.015, 8, 36), new T.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true }));
+  const gyro2 = new T.Mesh(new T.TorusGeometry(0.16, 0.014, 8, 36), new T.MeshBasicMaterial({ color: 0xa855f7, wireframe: true }));
   gyroGroup.add(gyro1);
   gyroGroup.add(gyro2);
   ufo.add(gyroGroup);
   ufo.userData.gyro1 = gyro1;
   ufo.userData.gyro2 = gyro2;
 
-  // Central Quantum AI Singularity Core
   const aiCore = sprite(glowT, 0xe0f2fe, 0.7, V(0, 0, 0), 1.0);
   S.remove(aiCore);
   aiCore.position.y = 0.28;
   ufo.add(aiCore);
 
-  // Underside Graviton Engine Vent
   const vent = new T.Mesh(new T.CircleGeometry(0.36, 32), new T.MeshBasicMaterial({ color: 0x0ea5e9 }));
   vent.rotation.x = Math.PI / 2;
   vent.position.y = -0.305;
   ufo.add(vent);
 
-  // Graviton Plasma Glow Flare
   const plasmaGlow = sprite(glowT, 0x06b6d4, 2.6, V(0, 0, 0), 0.85);
   S.remove(plasmaGlow);
   plasmaGlow.position.y = -0.42;
   ufo.add(plasmaGlow);
 
-  // Volumetric Downward Tractor / Scanner Cone
   const scanCone = new T.Mesh(
     new T.CylinderGeometry(0.25, 1.8, 4.2, 32, 1, true),
-    new T.MeshBasicMaterial({
-      color: 0x38bdf8,
-      transparent: true,
-      opacity: 0.10,
-      blending: T.AdditiveBlending,
-      depthWrite: false,
-      side: T.DoubleSide
-    })
+    new T.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.10, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })
   );
   scanCone.position.y = -2.3;
   ufo.add(scanCone);
   ufo.userData.scanCone = scanCone;
 
-  // Downward Searchlight / Cloud Illuminator
   const ufoLight = new T.PointLight(0x38bdf8, 1.8, 9);
   ufoLight.position.y = -0.6;
   ufo.add(ufoLight);
 }
+ufo.scale.setScalar(0.70);
 
-// 5% scale reduction on UFO as well
-ufo.scale.setScalar(0.82);
+let prevUfoX = 8.8, prevUfoY = 4.4, prevUfoZ = 0.5;
 
-const UC = V(3.2, 2.3, -1);
-let prevUfoX = UC.x, prevUfoY = UC.y, prevUfoZ = UC.z;
-/* ---------- labels ---------- */
-const ui=document.getElementById('ui'),svg=document.getElementById('lines');svg.setAttribute('width','100%');
-const defs=[
-['Knowledge Graph','AI-Core','⬡','#19e6c4',V(-3.6,2.7,0),V(-1.3,GY+1.8,1.1)],
-['Research Papers','204M+','▤','#3fb4ff',V(3.5,2.7,0),V(1.3,GY+1.8,1.1)],
-['AI Insights','Consensus','✦','#b06bff',V(-4.2,1.0,0),V(-2.0,GY+.2,.9)],
-['Authors','12.4M+','☺','#19e6c4',V(4.2,1.0,0),V(2.0,GY+.3,.9)],
-['Concepts','1.8M+','≡','#a05cff',V(-3.9,-.7,0),V(-1.8,GY-1.0,1.0)],
-['Datasets','85K+','◉','#ffc43a',V(3.8,-.7,0),V(1.8,GY-1.0,1.0)],
-['Citations','1.24B+','⛓','#d05cff',V(1.8,-2.2,1.8),V(0,-.8,1.2)]];
-const L=defs.map(([n,b,ic,col,wp,ap])=>{
-  const e=document.createElement('div');
-  e.className='pill';
-  e.style.setProperty('--c',col);
-  e.innerHTML=`<i>${ic}</i>${n} <b>${b}</b>`;
+/* ---------- FLOATING RESEARCH LABELS (PILLS) ---------- */
+const ui = document.getElementById('ui'), svg = document.getElementById('lines');
+svg.setAttribute('width', '100%');
+
+// Defined in local coordinates relative to citadelGroup!
+// Matches Image 1 layout: Knowledge Graph & Papers top; AI Insights & Authors middle; Concepts & Datasets lower; Citations centered at bottom front!
+const defs = [
+  ['Knowledge Graph', 'AI-Core', '⬡', '#19e6c4', V(-3.3, 3.2, 0.2), V(-1.1, GY + 1.1, 1.0)],
+  ['Research Papers', '204M+', '▤', '#38bdf8', V(3.3, 3.2, 0.2), V(1.1, GY + 1.1, 1.0)],
+  ['AI Insights', 'Consensus', '✦', '#b06bff', V(-3.8, 1.7, 0.2), V(-1.6, GY + 0.1, 0.9)],
+  ['Authors', '12.4M+', '☺', '#19e6c4', V(3.8, 1.7, 0.2), V(1.6, GY + 0.1, 0.9)],
+  ['Concepts', '1.8M+', '≡', '#a05cff', V(-3.4, 0.3, 0.2), V(-1.4, GY - 1.1, 1.0)],
+  ['Datasets', '85K+', '◉', '#ffc43a', V(3.4, 0.3, 0.2), V(1.4, GY - 1.1, 1.0)],
+  ['Citations', '1.24B+', '⛓', '#d05cff', V(0.0, -0.85, 2.6), V(0.0, -0.48, 1.5)] // Centered right in the front!
+];
+
+const L = defs.map(([n, b, ic, col, wp, ap]) => {
+  const e = document.createElement('div');
+  e.className = 'pill';
+  e.style.setProperty('--c', col);
+  e.innerHTML = `<i>${ic}</i>${n} <b>${b}</b>`;
   e.onclick = function() { notifyParent('SEARCH', n); };
   e.title = 'Click to search ' + n;
   ui.appendChild(e);
-const ln=document.createElementNS('http://www.w3.org/2000/svg','line');ln.setAttribute('stroke',col);ln.setAttribute('stroke-width','1.3');ln.setAttribute('opacity','.8');svg.appendChild(ln);
-const dt=document.createElementNS('http://www.w3.org/2000/svg','circle');dt.setAttribute('r','5');dt.setAttribute('fill',col);svg.appendChild(dt);return{e,ln,dt,wp,ap}});
-const uTag=document.createElement('div');uTag.className='pill ufo';uTag.style.setProperty('--c','#38bdf8');uTag.innerHTML='<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#38bdf8" stroke-width="2.5" style="display:inline;margin-right:5px;vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polygon points="12 8 8 12 12 16 16 12 12 8"/></svg>RECON SURVEYOR <span id="pc" style="color:#fff;background:rgba(56,189,248,0.2);padding:1px 6px;border-radius:99px;margin-left:4px;">02</span>%';ui.appendChild(uTag);
-function proj(v){const p=v.clone().project(C);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]}
-/* ---------- camera with sticky right-side placement (MEDIUM SIZE & RIGHT-CENTERED) ---------- */
-let ZH = 0, ZD = 0, sH = 0, sD = 0;
-// Vertical center of the entire citadel + globe model assembly
-const MODEL_CENTER_Y = -1.65;
-const tgt = V(0, MODEL_CENTER_Y, 0);
-let th = 0, ph = 1.38;
-// Medium size scale: distance 23.2 provides ideal margins on all four sides
-const BASE_DIST = 23.2;
+  const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  ln.setAttribute('stroke', col);
+  ln.setAttribute('stroke-width', '1.3');
+  ln.setAttribute('opacity', '.8');
+  svg.appendChild(ln);
+  const dt = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  dt.setAttribute('r', '5');
+  dt.setAttribute('fill', col);
+  svg.appendChild(dt);
+  return { e, ln, dt, wp, ap };
+});
+
+const uTag = document.createElement('div');
+uTag.className = 'pill ufo';
+uTag.style.setProperty('--c', '#38bdf8');
+uTag.innerHTML = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#38bdf8" stroke-width="2.5" style="display:inline;margin-right:5px;vertical-align:-1px"><circle cx="12" cy="12" r="10"/><polygon points="12 8 8 12 12 16 16 12 12 8"/></svg>RECON SURVEYOR <span id="pc" style="color:#fff;background:rgba(56,189,248,0.2);padding:1px 6px;border-radius:99px;margin-left:4px;">02</span>%';
+ui.appendChild(uTag);
+
+function proj(v) {
+  const p = v.clone().project(C);
+  return [(p.x + 1) / 2 * innerWidth, (1 - p.y) / 2 * innerHeight];
+}
+
+/* ---------- CAMERA (CLEAN SYMMETRIC PERSPECTIVE - NO SHEAR) ---------- */
+let th = 0, ph = 1.26;
+const BASE_DIST = 21.0;
 let dist = BASE_DIST;
 
 function cam() {
-  const w = innerWidth, h = innerHeight, wide = w >= 900;
-  const maxScroll = Math.max(1, document.body.scrollHeight - innerHeight);
-  const scrollProg = Math.min(1, Math.max(0, scrollY / maxScroll));
-  const parallaxY = MODEL_CENTER_Y + scrollProg * 0.35;
-  const pe = ph;
-  
-  C.fov = 42;
-  // -w * 0.222 places the citadel exactly at the center of the right half (71% of screen width)
-  // giving 120px clear margin from the left text and 95px clear margin from the right edge
-  C.setViewOffset(w, h, wide ? -w * 0.222 : 0, wide ? 0 : -h * 0.24, w, h);
+  const w = innerWidth, wide = w >= 900;
+  C.clearViewOffset();
+  C.fov = 40;
+  C.aspect = w / innerHeight;
   C.updateProjectionMatrix();
-  
-  const sp = Math.sin(pe);
-  C.position.set(dist * sp * Math.sin(th), parallaxY + dist * Math.cos(pe), dist * sp * Math.cos(th));
-  C.lookAt(0, parallaxY, 0);
+
+  const citadelX = wide ? (w > 1400 ? 4.2 : 3.8) : 0;
+  const citadelY = wide ? 0.30 : -0.5;
+  citadelGroup.position.x = citadelX;
+
+  const sp = Math.sin(ph);
+  const targetX = wide ? 1.2 : 0;
+  const targetY = wide ? 0.40 : -0.2;
+
+  C.position.set(
+    targetX + dist * sp * Math.sin(th),
+    targetY + dist * Math.cos(ph),
+    dist * sp * Math.cos(th)
+  );
+  C.lookAt(targetX, targetY, 0);
 }
 
 let drag = false, lx = 0, ly = 0;
 addEventListener('pointerdown', e => {
-  if (e.target.id === 'globe' || e.target.closest('.sec-content') || e.target.closest('.col') || e.target.closest('header')) return;
+  if (e.target.closest('.sec-content') || e.target.closest('.col') || e.target.closest('header') || e.target.closest('.hero-col') || e.target.closest('button') || e.target.closest('input')) return;
   drag = true; lx = e.clientX; ly = e.clientY;
 });
 addEventListener('pointerup', () => drag = false);
 addEventListener('pointermove', e => {
   if (!drag) return;
   th -= (e.clientX - lx) * 0.005;
-  ph = Math.min(1.85, Math.max(1.15, ph - (e.clientY - ly) * 0.004));
+  ph = Math.min(1.70, Math.max(1.05, ph - (e.clientY - ly) * 0.004));
   lx = e.clientX; ly = e.clientY;
 });
 
 function fit() {
   const w = innerWidth, h = innerHeight, wide = w >= 900;
   C.aspect = w / h;
-  C.fov = 44;
-  dist = (wide ? 19 + Math.max(0, 1400 - w) / 100 * 1.2 : 34) * 1.05; // 5% model scale reduction
-  C.setViewOffset(w, h, wide ? -w * (w > 1600 ? 0.235 : 0.215) : 0, wide ? 0 : -h * 0.26, w, h);
+  C.fov = 40;
+  dist = wide ? 21.0 : 30.0;
+  C.clearViewOffset();
   C.updateProjectionMatrix();
   R.setSize(w, h);
   if (comp) comp.setSize(w, h);
 }
 addEventListener('resize', fit);
 fit();
-/* ---------- loop ---------- */
-let mx=0,my=0;addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
-const tw=[];for(let i=0;i<50;i++){const s=sprite(glowT,[0xffffff,0x9fd0ff,0xd0b0ff][i%3],rnd(.8,2),V(rnd(-90,90),rnd(-30,50),-100),.8);s.userData.p=rnd(0,9);tw.push(s)}
-const pulses=[];for(let i=0;i<16;i++){const s=new T.Sprite(new T.SpriteMaterial({map:glowT,color:i%3?0x7fe8ff:0xe0a8ff,transparent:true,blending:T.AdditiveBlending,depthWrite:false}));s.scale.set(.32,.32,1);globe.add(s);pulses.push({s,a:pts[i%pts.length],b:pts[(i*7+5)%pts.length],t:Math.random(),sp:rnd(.003,.008)})}
-const pr=[0,1,2].map(i=>{const m=new T.Mesh(new T.RingGeometry(.96,1,96),new T.MeshBasicMaterial({color:0x44ddff,transparent:true,side:T.DoubleSide,depthWrite:false,blending:T.AdditiveBlending}));m.rotation.x=-Math.PI/2;m.position.y=.64;plat.add(m);return{m,o:i/3}});
-const sh=[0,1].map(i=>{const l=new T.Line(new T.BufferGeometry().setFromPoints([V(0,0,0),V(-8,-2,0)]),new T.LineBasicMaterial({color:0xcfe8ff,transparent:true,opacity:0,blending:T.AdditiveBlending}));S.add(l);return{l,t:i*2.1}});
-const trail=[];for(let i=0;i<24;i++)trail.push(sprite(glowT,0x55e0ff,.4,V(0,0,0),0));const hist=[];
-function anim(t){gU.t.value=t;gTex.needsUpdate=true;hist.unshift(ufo.position.clone());if(hist.length>72)hist.pop();trail.forEach((s,i)=>{const h=hist[Math.min(i*3,hist.length-1)];if(h){s.position.copy(h);s.material.opacity=.7*(1-i/24);s.scale.setScalar(.5*(1-i/30))}});tw.forEach(s=>s.material.opacity=.3+.7*Math.abs(Math.sin(t*1.2+s.userData.p)));
-pulses.forEach(p=>{p.t+=p.sp;if(p.t>1){p.t=0;p.a=pts[(Math.random()*pts.length)|0];p.b=pts[(Math.random()*pts.length)|0]}p.s.position.copy(p.a).lerp(p.b,p.t).normalize().multiplyScalar(GR*(1.012+.07*Math.sin(Math.PI*p.t)));p.s.material.opacity=Math.sin(Math.PI*p.t)});
-pr.forEach(r=>{const k=(t*.18+r.o)%1;r.m.scale.setScalar(2+k*4.6);r.m.material.opacity=.5*(1-k)});
-sh.forEach(o=>{const k=(t*.25+o.t)%4;if(k<1){o.l.material.opacity=1-k;o.l.position.set(-20+k*30+o.t*5,30-k*14,-70)}else o.l.material.opacity=0})}
-globe.children.forEach(c=>c.visible=false);atmo.visible=false;orb.forEach(o=>{o.m.visible=false;o.sat.visible=false});
-const GSZ=2*GR*1200/860,gcv=document.getElementById('globe'),stg=document.getElementById('stage'),gTex=new T.CanvasTexture(gcv);gTex.minFilter=T.LinearFilter;gTex.generateMipmaps=false;
-{const sp=new T.Sprite(new T.SpriteMaterial({map:gTex,transparent:true,depthWrite:false}));sp.scale.set(GSZ,GSZ,1);globe.add(sp)}
-function stageUpdate(){C.updateMatrixWorld();const c0=globe.position.clone(),r0=new T.Vector3().setFromMatrixColumn(C.matrixWorld,0).multiplyScalar(GSZ/2).add(c0),[x0,y0]=proj(c0),[x1]=proj(r0),w=Math.abs(x1-x0)*2;stg.style.left=(x0-w/2)+'px';stg.style.top=(y0-w/2)+'px';stg.style.width=stg.style.height=w+'px';gcv.style.pointerEvents=(innerWidth>=1000&&ZH<.35&&w<1700)?'auto':'none'}
-const paperT=(()=>{const c=cv(64,88),x=c.getContext('2d');x.fillStyle='#e8f4ff';x.fillRect(0,0,64,88);x.fillStyle='#3b82ff';x.fillRect(8,10,48,6);x.fillStyle='#7aa8d8';for(let i=0;i<7;i++)x.fillRect(8,26+i*8,i%3==2?30:48,3);return tex(c)})();
-const dust=(()=>{const p=[];for(let i=0;i<700;i++){const r=rnd(3,16),u=rnd(0,6.283),v=Math.acos(rnd(-1,1));p.push(r*Math.sin(v)*Math.cos(u),GY+r*Math.cos(v),r*Math.sin(v)*Math.sin(u))}const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));const m=new T.Points(g,new T.PointsMaterial({size:.07,color:0x9fe8ff,transparent:true,opacity:.2,blending:T.AdditiveBlending,depthWrite:false}));S.add(m);return m})();
-/* ---------- PHOTOREALISTIC SOARING RESEARCH BIRDS (FULL-PAGE TRAVERSAL) ---------- */
-// 4 Panoramic flight corridors spanning the entire webpage:
-// Zone 0: High over left headline/search (X: -6.5 to -4.0)
-// Zone 1: Midfield glide between text & citadel (X: -3.0 to -0.8)
-// Zone 2: Soaring over the luminous research globe (X: -0.2 to +1.8)
-// Zone 3: Banking into the starry space right of citadel (X: +2.5 to +5.2)
+
+/* ---------- LOOP & ANIMATIONS ---------- */
+let mx = 0, my = 0;
+addEventListener('pointermove', e => {
+  mx = e.clientX / innerWidth - .5;
+  my = e.clientY / innerHeight - .5;
+});
+
+const tw = [];
+for (let i = 0; i < 50; i++) {
+  const s = sprite(glowT, [0xffffff, 0x9fd0ff, 0xd0b0ff][i % 3], rnd(.8, 2), V(rnd(-90, 90), rnd(-30, 50), -100), .8);
+  s.userData.p = rnd(0, 9);
+  tw.push(s);
+}
+
+const pulses = [];
+for (let i = 0; i < 16; i++) {
+  const s = new T.Sprite(new T.SpriteMaterial({ map: glowT, color: i % 3 ? 0x7fe8ff : 0xe0a8ff, transparent: true, blending: T.AdditiveBlending, depthWrite: false }));
+  s.scale.set(.32, .32, 1);
+  globe.add(s);
+  pulses.push({ s, a: pts[i % pts.length], b: pts[(i * 7 + 5) % pts.length], t: Math.random(), sp: rnd(.003, .008) });
+}
+
+const pr = [0, 1, 2].map(i => {
+  const m = new T.Mesh(new T.RingGeometry(.96, 1, 96), new T.MeshBasicMaterial({ color: 0x44ddff, transparent: true, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending }));
+  m.rotation.x = -Math.PI / 2;
+  m.position.y = .52;
+  plat.add(m);
+  return { m, o: i / 3 };
+});
+
+const sh = [0, 1].map(i => {
+  const l = new T.Line(new T.BufferGeometry().setFromPoints([V(0, 0, 0), V(-8, -2, 0)]), new T.LineBasicMaterial({ color: 0xcfe8ff, transparent: true, opacity: 0, blending: T.AdditiveBlending }));
+  S.add(l);
+  return { l, t: i * 2.1 };
+});
+
+const trail = [];
+for (let i = 0; i < 24; i++) trail.push(sprite(glowT, 0x55e0ff, .4, V(0, 0, 0), 0));
+const hist = [];
+
+function anim(t) {
+  gU.t.value = t;
+  gTex.needsUpdate = true;
+  hist.unshift(ufo.position.clone());
+  if (hist.length > 72) hist.pop();
+  trail.forEach((s, i) => {
+    const h = hist[Math.min(i * 3, hist.length - 1)];
+    if (h) {
+      s.position.copy(h);
+      s.material.opacity = .7 * (1 - i / 24);
+      s.scale.setScalar(.5 * (1 - i / 30));
+    }
+  });
+  tw.forEach(s => s.material.opacity = .3 + .7 * Math.abs(Math.sin(t * 1.2 + s.userData.p)));
+  pulses.forEach(p => {
+    p.t += p.sp;
+    if (p.t > 1) {
+      p.t = 0;
+      p.a = pts[(Math.random() * pts.length) | 0];
+      p.b = pts[(Math.random() * pts.length) | 0];
+    }
+    p.s.position.copy(p.a).lerp(p.b, p.t).normalize().multiplyScalar(GR * (1.012 + .07 * Math.sin(Math.PI * p.t)));
+    p.s.material.opacity = Math.sin(Math.PI * p.t);
+  });
+  pr.forEach(r => {
+    const k = (t * .18 + r.o) % 1;
+    r.m.scale.setScalar(2 + k * 4.6);
+    r.m.material.opacity = .5 * (1 - k);
+  });
+  sh.forEach(o => {
+    const k = (t * .25 + o.t) % 4;
+    if (k < 1) {
+      o.l.material.opacity = 1 - k;
+      o.l.position.set(-20 + k * 30 + o.t * 5, 30 - k * 14, -70);
+    } else o.l.material.opacity = 0;
+  });
+}
+
+const paperT = (() => {
+  const c = cv(64, 88), x = c.getContext('2d');
+  x.fillStyle = '#e8f4ff'; x.fillRect(0, 0, 64, 88);
+  x.fillStyle = '#3b82ff'; x.fillRect(8, 10, 48, 6);
+  x.fillStyle = '#7aa8d8';
+  for (let i = 0; i < 7; i++) x.fillRect(8, 26 + i * 8, i % 3 == 2 ? 30 : 48, 3);
+  return tex(c);
+})();
+
+const dust = (() => {
+  const p = [];
+  for (let i = 0; i < 700; i++) {
+    const r = rnd(3, 16), u = rnd(0, 6.283), v = Math.acos(rnd(-1, 1));
+    p.push(r * Math.sin(v) * Math.cos(u), GY + r * Math.cos(v), r * Math.sin(v) * Math.sin(u));
+  }
+  const g = new T.BufferGeometry();
+  g.setAttribute('position', new T.Float32BufferAttribute(p, 3));
+  const m = new T.Points(g, new T.PointsMaterial({ size: .07, color: 0x9fe8ff, transparent: true, opacity: .2, blending: T.AdditiveBlending, depthWrite: false }));
+  citadelGroup.add(m);
+  return m;
+})();
+
+/* ---------- PHOTOREALISTIC SOARING RESEARCH BIRDS ---------- */
 const farPt = (z = 0) => getWaypoint(z);
 function getWaypoint(zone) {
-  if (zone === 0) return V(rnd(-6.8, -4.2), rnd(2.2, 4.0), rnd(-1.0, 2.5));
-  if (zone === 1) return V(rnd(-3.2, -1.0), rnd(1.2, 2.8), rnd(0.5, 3.2));
-  if (zone === 2) return V(rnd(-0.4, 1.8), rnd(1.0, 2.6), rnd(-0.5, 2.0));
-  return V(rnd(2.6, 5.4), rnd(2.4, 4.4), rnd(-2.0, 1.5));
+  if (zone === 0) return V(rnd(-6.8, -4.2), rnd(2.5, 4.5), rnd(-2.0, 1.5));
+  if (zone === 1) return V(rnd(-2.8, -0.6), rnd(1.8, 3.2), rnd(0.5, 2.8));
+  if (zone === 2) return V(rnd(0.0, 2.2), rnd(2.0, 3.5), rnd(-1.0, 1.8));
+  return V(rnd(3.0, 6.0), rnd(2.6, 4.6), rnd(-2.5, 1.0));
 }
+
 const bz = (a, b, c, t) => {
   const u = 1 - t;
   return a.clone().multiplyScalar(u * u).addScaledVector(b, 2 * u * t).addScaledVector(c, t * t);
 };
-const rdir = () => V(rnd(-1, 1), rnd(-0.4, 0.8), rnd(-0.2, 1)).normalize();
 
-// Build an anatomically articulated bird with shoulder and elbow joints
-function createPhotorealisticBird(scale = 0.88, seed = 0) {
+function createPhotorealisticBird(scale = 0.45, seed = 0) {
   const birdGroup = new T.Group();
   birdGroup.scale.setScalar(scale);
 
   const inner = new T.Group();
   birdGroup.add(inner);
 
-  // Pearlescent plumage with subtle specular sheen
   const featherMat = new T.MeshStandardMaterial({
-    color: 0xf1f5f9,
-    roughness: 0.32,
-    metalness: 0.22,
-    envMap: env,
-    envMapIntensity: 1.6,
-    side: T.DoubleSide
+    color: 0xf8fafc, roughness: 0.32, metalness: 0.22,
+    envMap: env, envMapIntensity: 1.6, side: T.DoubleSide
   });
 
   const goldAccentMat = new T.MeshStandardMaterial({
-    color: 0xd97706,
-    metalness: 0.65,
-    roughness: 0.35,
-    emissive: 0x78350f,
-    emissiveIntensity: 0.4
+    color: 0xd97706, metalness: 0.65, roughness: 0.35, emissive: 0x78350f, emissiveIntensity: 0.4
   });
 
-  // 1. Aerodynamic Contoured Avian Torso
   const bodyGeo = new T.CylinderGeometry(0.045, 0.14, 0.62, 14, 3);
   bodyGeo.rotateX(Math.PI / 2);
   const body = new T.Mesh(bodyGeo, featherMat);
   body.scale.set(0.9, 0.8, 1.0);
   inner.add(body);
 
-  // 2. Sculpted Head & Beak
   const head = new T.Mesh(new T.SphereGeometry(0.095, 16, 12), featherMat);
   head.position.set(0, 0.06, 0.38);
   inner.add(head);
@@ -811,7 +1870,6 @@ function createPhotorealisticBird(scale = 0.88, seed = 0) {
   beak.position.set(0, 0.03, 0.50);
   inner.add(beak);
 
-  // 3. Fanned Tail Feathers (pitch articulated)
   const tailGroup = new T.Group();
   tailGroup.position.set(0, 0.02, -0.34);
   for (let k = -2; k <= 2; k++) {
@@ -823,136 +1881,84 @@ function createPhotorealisticBird(scale = 0.88, seed = 0) {
   }
   inner.add(tailGroup);
 
-  // 4. Dual-Segment Articulated Wings (Shoulder -> Arm -> Elbow -> Forearm)
   function buildWing(side) {
     const shoulderJoint = new T.Group();
     shoulderJoint.position.set(side * 0.12, 0.05, 0.06);
 
-    // Inner wing arm (humerus)
     const armShape = new T.Shape();
     armShape.moveTo(0, 0.14);
     armShape.lineTo(0.48, 0.10);
-    armShape.lineTo(0.44, -0.16);
+    armShape.lineTo(0.45, -0.16);
     armShape.lineTo(0, -0.18);
-    const armGeo = new T.ShapeGeometry(armShape);
-    armGeo.rotateX(Math.PI / 2);
-    const armMesh = new T.Mesh(armGeo, featherMat);
-    shoulderJoint.add(armMesh);
+    armShape.closePath();
+    const arm = new T.Mesh(new T.ShapeGeometry(armShape), featherMat);
+    arm.rotation.x = Math.PI / 2;
+    arm.scale.x = side;
+    shoulderJoint.add(arm);
 
-    // Elbow/wrist joint with primary flight feathers
     const elbowJoint = new T.Group();
-    elbowJoint.position.set(side * 0.46, 0, 0);
+    elbowJoint.position.set(side * 0.48, 0, 0);
 
-    const primaryShape = new T.Shape();
-    primaryShape.moveTo(0, 0.10);
-    primaryShape.lineTo(0.68, -0.06);
-    primaryShape.lineTo(0.60, -0.22);
-    primaryShape.lineTo(0.40, -0.26);
-    primaryShape.lineTo(0, -0.16);
-    const primaryGeo = new T.ShapeGeometry(primaryShape);
-    primaryGeo.rotateX(Math.PI / 2);
-    const primaryMesh = new T.Mesh(primaryGeo, featherMat);
+    const tipShape = new T.Shape();
+    tipShape.moveTo(0, 0.10);
+    tipShape.lineTo(0.68, 0.02);
+    tipShape.lineTo(0.55, -0.12);
+    tipShape.lineTo(0, -0.16);
+    tipShape.closePath();
+    const forearm = new T.Mesh(new T.ShapeGeometry(tipShape), featherMat);
+    forearm.rotation.x = Math.PI / 2;
+    forearm.scale.x = side;
+    elbowJoint.add(forearm);
 
-    // Subtle cyan starlight glint along leading wing edge
-    const wingGlow = new T.Mesh(
-      primaryGeo,
-      new T.MeshBasicMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.18,
-        blending: T.AdditiveBlending,
-        depthWrite: false
-      })
-    );
-    wingGlow.scale.set(1.02, 1, 1.05);
-    primaryMesh.add(wingGlow);
-
-    elbowJoint.add(primaryMesh);
     shoulderJoint.add(elbowJoint);
-
-    shoulderJoint.scale.x = side;
-    inner.add(shoulderJoint);
-
     return { shoulder: shoulderJoint, elbow: elbowJoint };
   }
 
-  const wingL = buildWing(1);
-  const wingR = buildWing(-1);
-
-  // Research citation parchment scroll carried in claws
-  const paper = new T.Mesh(new T.PlaneGeometry(0.18, 0.25), new T.MeshBasicMaterial({ map: paperT, side: T.DoubleSide }));
-  paper.position.y = -0.26;
-  paper.rotation.y = Math.PI / 2;
-  birdGroup.add(paper);
-
-  const paperGlow = sprite(glowT, 0x38bdf8, 0.45, V(0, 0, 0), 0.6);
-  S.remove(paperGlow);
-  paperGlow.position.y = -0.26;
-  birdGroup.add(paperGlow);
+  const wL = buildWing(-1);
+  const wR = buildWing(1);
+  inner.add(wL.shoulder);
+  inner.add(wR.shoulder);
 
   S.add(birdGroup);
 
   return {
-    g: birdGroup,
-    inner,
-    tail: tailGroup,
-    wL: wingL,
-    wR: wingR,
-    pp: paper,
-    gs: paperGlow,
-    seed: seed,
-    ph: 0,
-    t: rnd(0.05, 0.6),
-    sp: rnd(0.0024, 0.0034),
-    a: getWaypoint(0),
-    m: V(0, 0, 0),
-    cp: V(0, 0, 0),
-    dir: rdir(),
-    f: 0,
-    fp: V(0, 0, 0)
+    root: birdGroup, inner, wL, wR, tail: tailGroup,
+    seed, t: Math.random(),
+    zone: Math.floor(Math.random() * 4),
+    a: getWaypoint(0), cp: getWaypoint(1),
+    m: V(0, 2.5, 0),
+    speed: 0.0022 + Math.random() * 0.0016,
+    prevPos: V(0, 0, 0)
   };
 }
 
-// Instantiate 2 soaring birds with staggered phases for natural companionship
-const birds = [
-  createPhotorealisticBird(1.3, 0.0),
-  createPhotorealisticBird(1.1, 2.4),
-  createPhotorealisticBird(0.95, 4.8)
+const avianFlock = [
+  createPhotorealisticBird(0.42, 0.1),
+  createPhotorealisticBird(0.46, 2.4),
+  createPhotorealisticBird(0.38, 4.8)
 ];
-birds.forEach((b, i) => {
-  b.zone = i * 2; // staggered across full page
-  b.t = i * 0.33;
-  b.sp = 0.0018 + i * 0.0004;
-  b.a = getWaypoint(b.zone % 4);
-  b.cp = getWaypoint((b.zone + 1) % 4);
-  b.m = b.a.clone().lerp(b.cp, 0.5).add(V(rnd(-1.5, 1.5), rnd(0.8, 2.2), rnd(-1, 1)));
-});
 
 function birdsUpdate(t) {
-  dust.material.opacity = 0.12;
-  birds.forEach((b, idx) => {
-    b.t += b.sp;
-    const k = Math.min(b.t, 1);
+  avianFlock.forEach(b => {
+    b.t += b.speed;
+    const pos = bz(b.a, b.m, b.cp, Math.min(1, b.t));
+    b.root.position.copy(pos);
 
-    const p = bz(b.a, b.m, b.cp, k);
-    const pn = bz(b.a, b.m, b.cp, Math.min(k + 0.02, 1));
-    b.g.position.copy(p);
+    const dir = pos.clone().sub(b.prevPos);
+    b.prevPos.copy(pos);
 
-    const vel = pn.clone().sub(p);
-    if (vel.lengthSq() > 0.0001) {
-      b.g.lookAt(pn);
-      // Realistic banking into turns with wing dihedral
-      const bank = -vel.x * 3.0;
-      b.inner.rotation.z = bank + Math.sin(t * 1.6 + b.seed) * 0.05;
-      b.tail.rotation.x = -vel.y * 3.2;
+    if (dir.lengthSq() > 0.00001) {
+      dir.normalize();
+      const lookTarget = pos.clone().add(dir);
+      b.inner.lookAt(lookTarget);
+      const targetRoll = -dir.x * 0.85;
+      b.inner.rotation.z += (targetRoll - b.inner.rotation.z) * 0.08;
     }
 
-    // Flap vs Thermal Glide Cycle: Soars smoothly across the page and flaps in bursts
-    const glideCycle = Math.sin(t * 0.32 + b.seed);
-    const isGliding = glideCycle > 0.12;
+    const flapPhase = (t * 1.2 + b.seed) % (Math.PI * 2);
+    const isGliding = flapPhase > 2.2;
 
     if (isGliding) {
-      // Wings spread wide in soaring positive dihedral V-shape
       const targetShoulder = 0.14 + Math.sin(t * 1.8 + b.seed) * 0.03;
       const targetElbow = 0.06;
       b.wL.shoulder.rotation.z += (targetShoulder - b.wL.shoulder.rotation.z) * 0.1;
@@ -960,7 +1966,6 @@ function birdsUpdate(t) {
       b.wL.elbow.rotation.z += (targetElbow - b.wL.elbow.rotation.z) * 0.1;
       b.wR.elbow.rotation.z = -b.wL.elbow.rotation.z;
     } else {
-      // Fluid undulating wingbeat (shoulder leads, primary tips flex naturally)
       const flapRate = t * 4.4 + b.seed;
       const wingAmp = 0.40;
       const shoulderAngle = Math.sin(flapRate) * wingAmp;
@@ -972,77 +1977,113 @@ function birdsUpdate(t) {
       b.wR.elbow.rotation.z = -elbowAngle;
     }
 
-    // Advance to next panoramic waypoint across the webpage
     if (b.t >= 1) {
       b.zone = (b.zone + 1) % 4;
       b.a = b.cp.clone();
       b.cp = getWaypoint(b.zone);
-      b.m = b.a.clone().lerp(b.cp, 0.5).add(V(rnd(-1.8, 1.8), rnd(0.8, 2.4), rnd(-1.2, 1.2)));
+      b.m = b.a.clone().lerp(b.cp, 0.5).add(V(rnd(-1.8, 1.8), rnd(0.6, 2.0), rnd(-1.2, 1.2)));
       b.t = 0;
     }
   });
 }
-try{comp=new T.EffectComposer(R);comp.addPass(new T.RenderPass(S,C));comp.addPass(new T.UnrealBloomPass(new T.Vector2(innerWidth,innerHeight),.30,.32,.82));comp.setSize(innerWidth,innerHeight)}catch(e){comp=null}
-const clk=new T.Clock();
-function loop(){const t=clk.getElapsedTime();
-globe.rotation.y=t*.12+.5;plat.rotation.y=Math.sin(t*.15)*.22;plat.position.y=-2.6+Math.sin(t*.8)*.12;globe.position.y=GY+Math.sin(t*.8)*.12;
-rings.forEach((r,i)=>r.material.opacity=.55+.4*Math.sin(t*2+i));thr.forEach((f,i)=>f.scale.y=1+.25*Math.sin(t*9+i));beam.material.uniforms.t.value=t*2;
-orb.forEach(o=>{o.m.rotation.z=o.rz+t*.05;const a=t*o.sp+o.ph;const p=V(Math.cos(a)*o.r,0,Math.sin(a)*o.r).applyEuler(o.m.rotation);o.sat.position.copy(p).add(V(0,GY,0))});
-clouds.forEach((c,i)=>c.position.x+=Math.sin(t*.1+i)*.0015);
-// ─── DYNAMIC SCI-FI UFO FLIGHT & INERTIA ───
-// Panoramic traversal across entire page width:
-// Sweeps smoothly between X = -6.8 (above headline & search) and X = +4.4 (past right citadel)
-// Altitude Y: 3.4 to 4.4, providing clean sightlines over the globe
-const uTime = t * 0.18 + 0.8;
-const ufx = -1.2 + Math.sin(uTime) * 5.2 + Math.cos(t * 0.24) * 0.9;
-const ufy = 3.5 + Math.cos(uTime * 1.1) * 0.55 + Math.sin(t * 0.30) * 0.25;
-const ufz = Math.sin(uTime * 0.75) * 2.4 + Math.cos(t * 0.18) * 0.5;
 
-const uvx = ufx - prevUfoX;
-const uvy = ufy - prevUfoY;
-const uvz = ufz - prevUfoZ;
-prevUfoX = ufx; prevUfoY = ufy; prevUfoZ = ufz;
+try {
+  comp = new T.EffectComposer(R);
+  comp.addPass(new T.RenderPass(S, C));
+  comp.addPass(new T.UnrealBloomPass(new T.Vector2(innerWidth, innerHeight), .30, .32, .82));
+  comp.setSize(innerWidth, innerHeight);
+} catch (e) { comp = null; }
 
-// Realistic banking & yaw into turns with inertia damping
-const targetRoll = -uvx * 7.5;
-const targetPitch = uvz * 4.5 - uvy * 2.2;
-const targetYaw = Math.atan2(-uvx, -uvz);
-ufo.rotation.z += (targetRoll - ufo.rotation.z) * 0.07;
-ufo.rotation.x += (targetPitch - ufo.rotation.x) * 0.07;
-ufo.rotation.y += (targetYaw - ufo.rotation.y) * 0.07;
-ufo.position.set(ufx, ufy, ufz);
+const clk = new T.Clock();
+function loop() {
+  const t = clk.getElapsedTime();
 
-// Subtle scan cone pulse
-if (ufo.userData.scanCone) {
-  ufo.userData.scanCone.material.opacity = 0.08 + Math.sin(t * 2.5) * 0.04;
-}
-if (ufo.userData.gyro1) {
-  ufo.userData.gyro1.rotation.x = t * 1.8;
-  ufo.userData.gyro2.rotation.y = -t * 1.5;
-}
-if (ufo.userData.sensorRing) {
-  ufo.userData.sensorRing.rotation.y = t * 1.2;
-}
+  // Subtle collective breathing levitation of the entire citadel assembly
+  const baseCitadelY = innerWidth >= 900 ? 0.30 : -0.5;
+  citadelGroup.position.y = baseCitadelY + Math.sin(t * 0.8) * 0.08;
 
-if (!drag && Math.abs(th) < 0.0001) th = 0;
-cam();
-if (!drag) {
-  th += (Math.sin(t * 0.2) * 0.05 + mx * 0.12 - th) * 0.03;
-  ph += (1.36 + my * 0.08 - ph) * 0.03;
+  // Slow smooth rotation
+  globe.rotation.y = t * .12 + .5;
+  plat.rotation.y = Math.sin(t * .15) * .18;
+
+  rings.forEach((r, i) => r.material.opacity = .55 + .4 * Math.sin(t * 2 + i));
+  thr.forEach((f, i) => f.scale.y = 1 + .25 * Math.sin(t * 9 + i));
+  beam.material.uniforms.t.value = t * 2;
+  if (typeof innerBeam !== 'undefined' && innerBeam.material && innerBeam.material.uniforms) {
+    innerBeam.material.uniforms.t.value = t * 2.5;
+  }
+
+  orb.forEach(o => {
+    o.m.rotation.z = o.rz + t * .05;
+    const a = t * o.sp + o.ph;
+    const p = V(Math.cos(a) * o.r, 0, Math.sin(a) * o.r).applyEuler(o.m.rotation);
+    o.sat.position.copy(p).add(V(0, GY, 0));
+  });
+
+  clouds.forEach((c, i) => c.position.x += Math.sin(t * .1 + i) * .0015);
+
+  // ─── DYNAMIC SCI-FI UFO FLIGHT (UPPER SKY PATROL) ───
+  const cX = citadelGroup.position.x;
+  const cY = citadelGroup.position.y;
+  const uTime = t * 0.22 + 1.2;
+  const ufx = cX + 4.6 + Math.sin(uTime) * 1.5 + Math.cos(t * 0.25) * 0.6;
+  const ufy = cY + 4.2 + Math.cos(uTime * 1.1) * 0.35 + Math.sin(t * 0.3) * 0.15;
+  const ufz = Math.sin(uTime * 0.8) * 1.2 + Math.cos(t * 0.2) * 0.3;
+
+  const uvx = ufx - prevUfoX, uvy = ufy - prevUfoY, uvz = ufz - prevUfoZ;
+  prevUfoX = ufx; prevUfoY = ufy; prevUfoZ = ufz;
+
+  const targetRoll = -uvx * 5.0;
+  const targetPitch = uvz * 3.5 - uvy * 1.8;
+  const targetYaw = Math.atan2(-uvx, -uvz);
+  ufo.rotation.z += (targetRoll - ufo.rotation.z) * 0.07;
+  ufo.rotation.x += (targetPitch - ufo.rotation.x) * 0.07;
+  ufo.rotation.y += (targetYaw - ufo.rotation.y) * 0.07;
+  ufo.position.set(ufx, ufy, ufz);
+
+  if (ufo.userData.scanCone) {
+    ufo.userData.scanCone.material.opacity = 0.08 + Math.sin(t * 2.5) * 0.04;
+  }
+  if (ufo.userData.gyro1) {
+    ufo.userData.gyro1.rotation.x = t * 1.8;
+    ufo.userData.gyro2.rotation.y = -t * 1.5;
+  }
+  if (ufo.userData.sensorRing) {
+    ufo.userData.sensorRing.rotation.y = t * 1.2;
+  }
+
+  if (!drag && Math.abs(th) < 0.0001) th = 0;
+  cam();
+  if (!drag) {
+    th += (Math.sin(t * 0.2) * 0.04 + mx * 0.08 - th) * 0.03;
+    ph += (1.26 + my * 0.06 - ph) * 0.03;
+  }
+
+  stageUpdate();
+
+  // Update labels - projected from citadelGroup world positions!
+  citadelGroup.updateMatrixWorld();
+  L.forEach(o => {
+    const worldWp = o.wp.clone().applyMatrix4(citadelGroup.matrixWorld);
+    const worldAp = o.ap.clone().applyMatrix4(citadelGroup.matrixWorld);
+    const [x, y] = proj(worldWp), [ax, ay] = proj(worldAp);
+    o.e.style.transform = `translate(${x - o.e.offsetWidth / 2}px,${y - o.e.offsetHeight / 2}px)`;
+    o.ln.setAttribute('x1', x); o.ln.setAttribute('y1', y);
+    o.ln.setAttribute('x2', ax); o.ln.setAttribute('y2', ay);
+    o.dt.setAttribute('cx', ax); o.dt.setAttribute('cy', ay);
+  });
+
+  {
+    const uPos = ufo.position.clone().add(V(0, 0.85, 0));
+    const [x, y] = proj(uPos);
+    uTag.style.transform = `translate(${x - uTag.offsetWidth / 2}px,${y - uTag.offsetHeight / 2}px)`;
+  }
+
+  anim(t);
+  birdsUpdate(t);
+  if (comp) comp.render(); else R.render(S, C);
+  requestAnimationFrame(loop);
 }
-stageUpdate();
-L.forEach(o => {
-  const [x, y] = proj(o.wp), [ax, ay] = proj(o.ap);
-  o.e.style.transform = `translate(${x - o.e.offsetWidth / 2}px,${y - o.e.offsetHeight / 2}px)`;
-  o.ln.setAttribute('x1', x); o.ln.setAttribute('y1', y);
-  o.ln.setAttribute('x2', ax); o.ln.setAttribute('y2', ay);
-  o.dt.setAttribute('cx', ax); o.dt.setAttribute('cy', ay);
-});
-{
-  const uPos = ufo.position.clone().add(V(0, 0.85, 0)); const [x, y] = proj(uPos);
-  uTag.style.transform = `translate(${x - uTag.offsetWidth / 2}px,${y - uTag.offsetHeight / 2}px)`;
-}
-anim(t);birdsUpdate(t);if(comp)comp.render();else R.render(S,C);requestAnimationFrame(loop)}
 loop();
 </script><script>
 const io = new IntersectionObserver(es => es.forEach(e => {
@@ -1127,7 +2168,7 @@ function rot(p){var ca=Math.cos(ang),sa=Math.sin(ang),X=p.x*ca-p.z*sa,Z=p.x*sa+p
 function arc(a,b){var m={x:a.x+b.x,y:a.y+b.y,z:a.z+b.z},l=Math.hypot(m.x,m.y,m.z),h=1+Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z)*.2;return{x:m.x/l*h,y:m.y/l*h,z:m.z/l*h}}
 function hit(mx,my){var b=-1,bd=900;for(var i=0;i<P.length;i++){var p=P[i];if(p.z<.05)continue;var d=(p.x-mx)*(p.x-mx)+(p.y-my)*(p.y-my);if(d<bd){bd=d;b=i}}return b}
 function clampT(t){return Math.max(-.3,Math.min(.9,t))}
-function loop(t){if(!vis){raf=0;return}raf=requestAnimationFrame(loop);
+function loop(t){vis=true;raf=requestAnimationFrame(loop);
  var dt=Math.min(.05,(t-last)/1000||.016);last=t;if(!still)T+=dt*60;
  if(!drag){
   if(tgt){var da=((tgt.a-ang+Math.PI)%TAU+TAU)%TAU-Math.PI;ang+=da*.09;var dtl=tgt.t-tilt;if(Math.abs(dtl)>.002)setTilt(tilt+dtl*.09);if(Math.abs(da)<.003&&Math.abs(dtl)<.004)tgt=null;idle=t+4000}
@@ -1175,7 +2216,8 @@ c.addEventListener('pointerup',end);c.addEventListener('pointercancel',end);
 c.addEventListener('pointerleave',function(){if(!drag){mp=null;hov=-1}});
 c.addEventListener('keydown',function(e){var m={ArrowLeft:[-.12,0],ArrowRight:[.12,0],ArrowUp:[0,.06],ArrowDown:[0,-.06]}[e.key];if(!m)return;e.preventDefault();ang+=m[0];setTilt(clampT(tilt+m[1]));idle=performance.now()+2500;hint.classList.add('off')});
 setTimeout(function(){hint.classList.add('off')},8000);
-new IntersectionObserver(function(en){vis=en[0].isIntersecting;if(vis&&!raf){last=performance.now();raf=requestAnimationFrame(loop)}}).observe(c);
+vis=true;
+try { loop(performance.now()); } catch(e) {}
 raf=requestAnimationFrame(loop);
 })();
 
@@ -1206,3 +2248,78 @@ function handleTrend(term) {
 </script>
 
 </body></html>
+
+<script>
+// Interactive Research Simulation Data
+const simData = [
+  {
+    query: "Off-target cleavage frequency of CRISPR-Cas12a vs SpCas9 in human somatic cell therapy",
+    telemetry: ["18 Verified Preprints", "Latency: 11.4ms", "Consensus: 96% High Agreement"],
+    result: "Cas12a (Cpf1) exhibits significantly lower genome-wide off-target indels (<0.1%) compared to wild-type SpCas9, driven by strict 18-nt protospacer seed requirements and 5'-TTTV PAM constraints. T-cell editing viability increases by 34%.",
+    citations: ["Kim et al. (Nature Biotech 2023)", "Zetsche et al. (Cell 2022)", "Kleinstiver et al. (Nat Struct Mol Biol)"]
+  },
+  {
+    query: "Attention Sink mechanisms and streaming multi-million token context in autoregressive LLMs",
+    telemetry: ["14 Verified Preprints", "Latency: 9.8ms", "Consensus: 92% Strong Consensus"],
+    result: "Initial tokens in autoregressive models act as attention sinks absorbing disproportionate softmax attention logits, enabling unbounded inference without performance degradation through StreamingLLM window caching.",
+    citations: ["Xiao et al. (ICLR 2024)", "Vaswani et al. (NeurIPS 2017)", "Dao et al. (FlashAttention-2 2023)"]
+  },
+  {
+    query: "Fault-tolerant threshold bounds for rotated planar surface codes under biased Pauli noise",
+    telemetry: ["22 Verified Works", "Latency: 14.1ms", "Consensus: 98% Mathematical Proof"],
+    result: "Biased noise architectures exceed the standard 1% fault-tolerant threshold, achieving effective thresholds up to 4.3% when XZZX surface codes are mapped to cat-qubit hardware platforms.",
+    citations: ["Bonilla Ataides et al. (Nature Comm 2021)", "Fowler et al. (Phys Rev A)", "Google Quantum AI (Nature 2023)"]
+  }
+];
+
+function switchSim(idx) {
+  const tabs = document.querySelectorAll('.sim-tab');
+  tabs.forEach((t, i) => t.classList.toggle('active', i === idx));
+  const data = simData[idx];
+  const body = document.getElementById('simBody');
+  if (!body) return;
+  body.innerHTML = `
+    <div class="sim-query-box">
+      <div style="font-size:11px; color:#38bdf8; font-weight:700; margin-bottom:4px;">QUERY VECTOR:</div>
+      "${data.query}"
+    </div>
+    <div class="sim-telemetry">
+      ${data.telemetry.map(t => '<span>' + t + '</span>').join('')}
+    </div>
+    <div class="sim-result">
+      ${data.result}
+    </div>
+    <div class="sim-citations">
+      ${data.citations.map(c => '<span class="sim-cit-pill">✓ ' + c + '</span>').join('')}
+    </div>
+  `;
+}
+setTimeout(() => switchSim(0), 100);
+
+// Auto-typewriter for the search input
+const askInput = document.getElementById('askInput');
+const queryPhrases = [
+  'Ask anything about 204M+ academic papers...',
+  'Summarize CRISPR-Cas12 off-target specificity...',
+  'Which papers extend the Transformer attention mechanism?',
+  'What are the latest breakthroughs in topological quantum computing?',
+  'Compare AlphaFold 3 and ESMFold structural predictions...'
+];
+let phraseIdx = 0, charIdx = 0, isDeleting = false;
+setInterval(() => {
+  if (!askInput) return;
+  const curr = queryPhrases[phraseIdx];
+  if (!isDeleting) {
+    charIdx++;
+    if (charIdx > curr.length + 20) isDeleting = true;
+  } else {
+    charIdx -= 2;
+    if (charIdx <= 0) {
+      isDeleting = false;
+      phraseIdx = (phraseIdx + 1) % queryPhrases.length;
+      charIdx = 0;
+    }
+  }
+  askInput.placeholder = curr.slice(0, Math.max(0, Math.min(charIdx, curr.length))) + (charIdx > 0 && charIdx <= curr.length ? '▏' : '');
+}, 50);
+</script>
