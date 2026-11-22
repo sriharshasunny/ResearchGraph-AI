@@ -745,8 +745,8 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
             </div>
 
             {/* ─── RIGHT COLUMN: ROTATING GLOBE & CLEAN ORBITAL LABELS (NO CARDS) ─── */}
-            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[480px] sm:min-h-[560px] lg:translate-x-[50px] lg:-translate-y-12">
-              {/* Atmospheric Backglow Centered on Citadel Platform */}
+            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[480px] sm:min-h-[560px] lg:translate-x-[15px] lg:-translate-y-20">
+              {/* Atmospheric Backglow Centered on Citadel Dais */}
               <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-cyan-500/20 via-blue-500/15 to-purple-500/15 blur-[95px] pointer-events-none" />
 
               {/* The Authentic Rotating Globe Centerpiece with 7 Orbital Labels */}
