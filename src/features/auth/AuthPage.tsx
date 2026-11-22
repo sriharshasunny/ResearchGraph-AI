@@ -81,7 +81,9 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
       {/* --- PAGE CONTENT CONTAINER --- */}
       <div 
         ref={scrollContainerRef}
-        className="relative z-20 w-full h-full overflow-y-auto overflow-x-hidden scroll-smooth"
+        className={`relative z-20 w-full h-full ${
+          pageState === 'LANDING' ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden scroll-smooth'
+        }`}
       >
         <AnimatePresence mode="wait">
 
@@ -95,7 +97,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="w-full flex flex-col relative"
+              className="w-full h-full flex flex-col relative overflow-hidden"
             >
               <LandingView 
                 onNavigateAuth={(mode) => triggerTraversal('AUTH', mode)} 
