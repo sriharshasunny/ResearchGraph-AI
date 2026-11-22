@@ -6,7 +6,7 @@ import {
   BrainCircuit, Microscope, ChevronDown, X, Menu,
   ArrowUpRight
 } from 'lucide-react';
-import { ResearchKnowledgeCore } from '../../components/ResearchKnowledgeCore';
+import { ResearchHangingPlatformView } from '../../components/ResearchHangingPlatformView';
 
 interface LandingViewProps {
   onNavigateAuth: (mode: 'LOGIN' | 'REGISTER') => void;
@@ -54,13 +54,13 @@ const ResearchSpacecraftUFO: React.FC<{
   // S-Curve Flight Waypoints across 7 sections
   // [progress, xPercent, yPercent, tiltAngle, scale]
   const waypoints = [
-    { p: 0.00, x: 84, y: 16, tilt: -6,  scale: 0.95 },  // Hero upper right survey
-    { p: 0.16, x: 10, y: 28, tilt: 14,  scale: 1.00 },  // Discovery Pipeline left
+    { p: 0.00, x: 84, y: 16, tilt: -6, scale: 0.95 },  // Hero upper right survey
+    { p: 0.16, x: 10, y: 28, tilt: 14, scale: 1.00 },  // Discovery Pipeline left
     { p: 0.34, x: 91, y: 44, tilt: -12, scale: 1.05 },  // 6 Dimensions right
-    { p: 0.52, x: 8,  y: 58, tilt: 12,  scale: 1.00 },  // Knowledge Graph left
+    { p: 0.52, x: 8, y: 58, tilt: 12, scale: 1.00 },  // Knowledge Graph left
     { p: 0.68, x: 91, y: 72, tilt: -10, scale: 1.05 },  // AI Assistant right
-    { p: 0.84, x: 9,  y: 84, tilt: 8,   scale: 1.00 },  // RAG Pipeline left
-    { p: 1.00, x: 50, y: 94, tilt: 0,   scale: 1.15 }   // Final CTA bottom center
+    { p: 0.84, x: 9, y: 84, tilt: 8, scale: 1.00 },  // RAG Pipeline left
+    { p: 1.00, x: 50, y: 94, tilt: 0, scale: 1.15 }   // Final CTA bottom center
   ];
 
   const p = scrollProgress;
@@ -86,16 +86,9 @@ const ResearchSpacecraftUFO: React.FC<{
   let targetTilt = currentWp.tilt + (nextWp.tilt - currentWp.tilt) * easeT;
   const targetScale = currentWp.scale + (nextWp.scale - currentWp.scale) * easeT;
 
-  // When at Hero (p < 0.05), add gentle sinusoidal atmospheric patrol hovering
-  const isHero = p < 0.06;
-  if (isHero) {
-    targetX += Math.sin(ambientTime * 0.45) * 4.5 + Math.cos(ambientTime * 0.2) * 2;
-    targetY += Math.cos(ambientTime * 0.4) * 3.2;
-    targetTilt += Math.sin(ambientTime * 0.45) * 5;
-  } else {
-    // Subtle float while browsing any section
-    targetY += Math.sin(ambientTime * 0.8) * 1.5;
-  }
+  // When at Hero (p < 0.06), the hero scene already features the primary autonomous UFO survey craft.
+  // We activate the traveling UFO once the user starts scrolling into the workflow and discovery sections.
+  if (scrollProgress < 0.06) return null;
 
   // Periodic subtle scanning tractor beam (pulses every ~8s for 2.5s)
   const beamCycle = (ambientTime * 0.5) % 8;
@@ -111,10 +104,9 @@ const ResearchSpacecraftUFO: React.FC<{
       }}
     >
       {/* Downward Conical Scanning Tractor Beam */}
-      <div 
-        className={`absolute top-[80%] left-1/2 -translate-x-1/2 w-36 h-56 pointer-events-none overflow-hidden transition-opacity duration-700 ${
-          beamActive || p > 0.08 ? 'opacity-85' : 'opacity-20'
-        }`}
+      <div
+        className={`absolute top-[80%] left-1/2 -translate-x-1/2 w-36 h-56 pointer-events-none overflow-hidden transition-opacity duration-700 ${beamActive || p > 0.08 ? 'opacity-85' : 'opacity-20'
+          }`}
       >
         <div
           className="w-full h-full"
@@ -622,18 +614,13 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
         ref={heroRef}
         className="relative w-full min-h-[92vh] flex flex-col justify-between overflow-hidden bg-[#060B19]"
       >
-        {/* Layer 1: Scenic Cosmic Horizon Background (Clean, No Text Overlays) */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
-          style={{
-            backgroundImage: "url('/landing_hero_universe.jpg')",
-          }}
-        />
-
-        {/* Layer 2: Deep Space Contrast Gradient Vignettes */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#060B19]/95 via-[#060B19]/80 to-transparent pointer-events-none lg:w-[62%]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#060B19] via-transparent to-transparent pointer-events-none h-44 bottom-0 top-auto" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#060B19]/80 via-transparent to-transparent pointer-events-none h-24 top-0" />
+        {/* Layer 1: Pure Cosmic Space Background with Nebula Glows */}
+        <div className="absolute inset-0 bg-[#060B19] pointer-events-none overflow-hidden">
+          <div className="absolute -top-[15%] -left-[10%] w-[65%] h-[85%] rounded-full bg-gradient-to-br from-indigo-950/45 via-purple-950/25 to-transparent blur-[140px]" />
+          <div className="absolute top-[5%] right-[0%] w-[60%] h-[90%] rounded-full bg-gradient-to-bl from-cyan-950/40 via-blue-950/30 to-transparent blur-[150px]" />
+          <div className="absolute bottom-0 inset-x-0 h-44 bg-gradient-to-t from-[#060B19] via-[#060B19]/80 to-transparent" />
+          <div className="absolute top-0 inset-x-0 h-28 bg-gradient-to-b from-[#060B19]/90 to-transparent" />
+        </div>
 
         {/* Ambient Cosmic Radial Glows */}
         <div className="absolute top-[22%] right-[20%] w-[520px] h-[520px] rounded-full bg-cyan-500/15 blur-[120px] pointer-events-none" />
@@ -715,7 +702,7 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                     type="text"
                     value={heroSearchQuery}
                     onChange={(e) => setHeroSearchQuery(e.target.value)}
-                    placeholder="Ask anything about 200M+ academic papers..."
+                    placeholder="Ask anything about 200M+ research papers..."
                     className="w-full bg-transparent py-2.5 pl-3 pr-24 text-sm text-white placeholder-gray-400 focus:outline-none"
                   />
                   <button
@@ -744,14 +731,14 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               </div>
             </div>
 
-            {/* ─── RIGHT COLUMN: ROTATING GLOBE & CLEAN ORBITAL LABELS (NO CARDS) ─── */}
-            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[480px] sm:min-h-[560px] lg:translate-x-[15px] lg:-translate-y-20">
+            {/* ─── RIGHT COLUMN: 3D HANGING CITADEL PLATFORM & ROTATING KNOWLEDGE GLOBE ─── */}
+            <div className="lg:col-span-7 relative flex items-center justify-center overflow-visible min-h-[500px] sm:min-h-[560px]">
               {/* Atmospheric Backglow Centered on Citadel Dais */}
-              <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-cyan-500/20 via-blue-500/15 to-purple-500/15 blur-[95px] pointer-events-none" />
+              <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-cyan-500/25 via-blue-500/15 to-purple-500/20 blur-[100px] pointer-events-none" />
 
-              {/* The Authentic Rotating Globe Centerpiece with 7 Orbital Labels */}
-              <div className="relative w-full max-w-[720px] mx-auto overflow-visible select-none pointer-events-auto">
-                <ResearchKnowledgeCore onNavigate={() => onNavigateAuth('LOGIN')} />
+              {/* The 3D Hanging Platform Centerpiece with 3D Globe & Orbital Labels */}
+              <div className="relative w-full max-w-[880px] mx-auto overflow-visible select-none pointer-events-auto">
+                <ResearchHangingPlatformView onNavigate={() => onNavigateAuth('LOGIN')} />
               </div>
             </div>
 
@@ -830,11 +817,10 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                 <button
                   key={step.num}
                   onClick={() => setActiveWorkflowStep(idx)}
-                  className={`p-3.5 sm:p-4 rounded-2xl text-left transition-all border ${
-                    isActive
+                  className={`p-3.5 sm:p-4 rounded-2xl text-left transition-all border ${isActive
                       ? 'bg-white border-blue-500 shadow-md ring-2 ring-blue-500/20'
                       : 'bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-white'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <span className={`text-xs font-mono font-bold ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>
@@ -972,11 +958,10 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               <button
                 key={key}
                 onClick={() => setActiveDomain(key)}
-                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${
-                  activeDomain === key
+                className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all ${activeDomain === key
                     ? 'bg-blue-600 text-white shadow-md'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
+                  }`}
               >
                 {domainData[key].title}
               </button>
@@ -1050,11 +1035,10 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
               <button
                 key={idx}
                 onClick={() => setActiveChatTab(idx)}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border ${
-                  activeChatTab === idx
+                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border ${activeChatTab === idx
                     ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md'
                     : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
-                }`}
+                  }`}
               >
                 {scen.domain}
               </button>
@@ -1306,11 +1290,10 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth, scroll
                       <button
                         key={v.id}
                         onClick={() => setActiveVideoIdx(i)}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                          activeVideoIdx === i
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${activeVideoIdx === i
                             ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/40'
                             : 'bg-white/5 text-gray-400 hover:text-white'
-                        }`}
+                          }`}
                       >
                         {v.title}
                       </button>
