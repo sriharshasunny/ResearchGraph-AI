@@ -504,6 +504,50 @@ footer {
   .fg { grid-template-columns: 1fr; }
 }
 </style>
+
+<style id="rg-ufo-paper-delivery">
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 12px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #7dd3fc;
+  background: rgba(14, 165, 233, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(8px);
+}
+.live i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
+  animation: livePulse 1.8s infinite;
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+.live b {
+  color: #fff;
+  font-weight: 700;
+}
+.rg-courier-panel{position:fixed;z-index:12;right:clamp(16px,3vw,38px);bottom:clamp(112px,14vh,150px);width:min(340px,calc(100vw - 32px));padding:13px 15px 12px;border:1px solid rgba(115,190,232,.24);border-radius:14px;background:linear-gradient(145deg,rgba(5,17,37,.94),rgba(4,10,25,.91));box-shadow:0 14px 38px rgba(0,0,0,.34);backdrop-filter:blur(14px);opacity:0;transform:translate3d(0,10px,0);pointer-events:none;transition:opacity .35s ease,transform .35s ease}
+.rg-courier-panel.is-visible{opacity:1;transform:translate3d(0,0,0)}
+.rg-cp-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.rg-cp-kicker{font:700 9px/1.2 ui-monospace,monospace;letter-spacing:.16em;color:#83c9e8}
+.rg-cp-demo{font:600 8px/1 ui-monospace,monospace;letter-spacing:.1em;color:#4da5d8;background:rgba(40,120,180,.18);padding:2px 6px;border-radius:4px}
+.rg-cp-main{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+.rg-cp-icon{font-size:15px;color:#6ee7b7;line-height:1;margin-top:1px}
+.rg-cp-copy strong{display:block;font-size:12.5px;font-weight:600;color:#f1f5f9;line-height:1.3}
+.rg-cp-copy small{display:block;font-size:11px;color:#94a3b8;line-height:1.35;margin-top:2px}
+.rg-cp-track{width:100%;height:3px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+.rg-cp-track i{display:block;height:100%;width:0%;background:linear-gradient(90deg,#38bdf8,#818cf8);border-radius:2px;transition:width .3s ease}
+</style>
+
 </head>
 <body>
 <svg id="lines"></svg>
@@ -534,7 +578,10 @@ footer {
 <!-- ═══════════════ HERO OBSERVATORY ═══════════════ -->
 <section class="hero" id="top">
   <div class="hero-col">
-    <div class="tag-badge">RESEARCH INTELLIGENCE · REIMAGINED</div>
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px;">
+      <div class="tag-badge">RESEARCH INTELLIGENCE · REIMAGINED</div>
+      <div class="live" style="margin-bottom: 0;"><i></i><span><b id="cnt">0</b> papers merged · Courier Active</span></div>
+    </div>
     <h1 class="hero-title">Research,<br><span>Connected.</span><u></u></h1>
     <p class="hero-lead">Discover, explore, and connect 204M+ research papers, authors, and methodologies through a living 3D knowledge graph powered by AI consensus.</p>
     
@@ -1531,6 +1578,7 @@ function stageUpdate() {
   const [x0, y0] = proj(worldPos);
   const [x1] = proj(r0);
   const w = Math.abs(x1 - x0) * 2;
+  GS.x = x0; GS.y = y0; GS.r = w * 0.44;
   stg.style.left = (x0 - w / 2) + 'px';
   stg.style.top = (y0 - w / 2) + 'px';
   stg.style.width = stg.style.height = w + 'px';
@@ -1675,27 +1723,49 @@ let th = 0, ph = 1.26;
 const BASE_DIST = 21.0;
 let dist = BASE_DIST;
 
+let targetScroll = window.scrollY || 0, currentScroll = window.scrollY || 0;
+window.addEventListener('scroll', () => {
+  targetScroll = window.scrollY;
+}, { passive: true });
+
 function cam() {
-  const w = innerWidth, wide = w >= 900;
+  const w = innerWidth, h = innerHeight, wide = w >= 900;
   C.clearViewOffset();
   C.fov = 40;
-  C.aspect = w / innerHeight;
+  C.aspect = w / h;
   C.updateProjectionMatrix();
 
-  const citadelX = wide ? (w > 1400 ? 4.2 : 3.8) : 0;
+  // Smooth cinematic scroll pullback into deep space
+  currentScroll += (targetScroll - currentScroll) * 0.045;
+  const heroH = Math.max(h, 680);
+  const pullProgress = Math.min(1, Math.max(0, currentScroll / (heroH * 2.2)));
+  const pull = pullProgress * pullProgress * (3 - 2 * pullProgress);
+
+  // 10% further to the right on desktop (citadelX = 5.2 on wide screen)
+  const citadelX = wide ? (w > 1400 ? 5.2 : 4.6) : 0;
   const citadelY = wide ? 0.30 : -0.5;
   citadelGroup.position.x = citadelX;
 
+  // Base hero distance pulls back from ~20 to ~72 in deep space
+  const baseDist = wide ? (19 + Math.max(0, 1400 - w) / 100 * 1.2) : 34;
+  const currentDist = baseDist * (1 + 2.65 * pull);
+
   const sp = Math.sin(ph);
-  const targetX = wide ? 1.2 : 0;
-  const targetY = wide ? 0.40 : -0.2;
+  const targetX = wide ? (0.8 + 0.3 * pull) : 0;
+  const targetY = wide ? (0.40 - 0.2 * pull) : -0.2;
 
   C.position.set(
-    targetX + dist * sp * Math.sin(th),
-    targetY + dist * Math.cos(ph),
-    dist * sp * Math.cos(th)
+    targetX + currentDist * sp * Math.sin(th),
+    targetY + currentDist * Math.cos(ph),
+    currentDist * sp * Math.cos(th)
   );
   C.lookAt(targetX, targetY, 0);
+
+  // Smoothly fade hero pills and lines when scrolling out of hero
+  const heroPillsOpacity = Math.max(0, 1 - currentScroll / 320);
+  if (ui) ui.style.opacity = heroPillsOpacity;
+  const svgLines = document.getElementById('lines');
+  if (svgLines) svgLines.style.opacity = heroPillsOpacity;
 }
 
 let drag = false, lx = 0, ly = 0;
@@ -1824,167 +1894,292 @@ const dust = (() => {
   return m;
 })();
 
-/* ---------- PHOTOREALISTIC SOARING RESEARCH BIRDS ---------- */
-const farPt = (z = 0) => getWaypoint(z);
-function getWaypoint(zone) {
-  if (zone === 0) return V(rnd(-6.8, -4.2), rnd(2.5, 4.5), rnd(-2.0, 1.5));
-  if (zone === 1) return V(rnd(-2.8, -0.6), rnd(1.8, 3.2), rnd(0.5, 2.8));
-  if (zone === 2) return V(rnd(0.0, 2.2), rnd(2.0, 3.5), rnd(-1.0, 1.8));
-  return V(rnd(3.0, 6.0), rnd(2.6, 4.6), rnd(-2.5, 1.0));
+/* ===== UFO COURIER: DISTANT RESEARCH PAPER COLLECTION & 3D GLOBE MERGE ===== */
+const GS = { x: 0, y: 0, r: 0 }, DD = 10, AG = new T.Group(), tmpV = V(0, 0, 0), tmpE = new T.Euler(), tq = new T.Quaternion();
+S.add(AG);
+const cl = (v, a, b) => Math.max(a, Math.min(b, v));
+const ease3 = x => { x = cl(x, 0, 1); return x * x * (3 - 2 * x); };
+const s2w = (px, py, dd, o) => {
+  o.set(px / innerWidth * 2 - 1, 1 - py / innerHeight * 2, 0.5).unproject(C);
+  return o.sub(C.position).normalize().multiplyScalar(dd).add(C.position);
+};
+let WPP = 0.01, agInit = false, merged = 0;
+
+/* Visual HUD Courier Status Panel */
+const courierPanel = document.createElement('div');
+courierPanel.className = 'rg-courier-panel';
+courierPanel.setAttribute('role', 'status');
+courierPanel.setAttribute('aria-live', 'polite');
+courierPanel.innerHTML = `<div class="rg-cp-head"><span class="rg-cp-kicker">RESEARCH PLATFORM</span><span class="rg-cp-demo">VISUAL COURIER</span></div><div class="rg-cp-main"><span class="rg-cp-icon">⌁</span><div class="rg-cp-copy"><strong id="rgCpTitle">Awaiting incoming paper</strong><small id="rgCpDetail">The survey craft is scanning distant space.</small></div></div><div class="rg-cp-track"><i id="rgCpProgress"></i></div>`;
+ui.appendChild(courierPanel);
+let panelHideTimer = 0;
+function courierMessage(title, detail, progress, hideAfter) {
+  const titleEl = document.getElementById('rgCpTitle');
+  const detailEl = document.getElementById('rgCpDetail');
+  const bar = document.getElementById('rgCpProgress');
+  if (titleEl) titleEl.textContent = title;
+  if (detailEl) detailEl.textContent = detail;
+  if (bar) bar.style.width = progress + '%';
+  courierPanel.classList.add('is-visible');
+  if (panelHideTimer) clearTimeout(panelHideTimer);
+  if (hideAfter) panelHideTimer = setTimeout(() => courierPanel.classList.remove('is-visible'), hideAfter);
 }
 
-const bz = (a, b, c, t) => {
-  const u = 1 - t;
-  return a.clone().multiplyScalar(u * u).addScaledVector(b, 2 * u * t).addScaledVector(c, t * t);
+/* 9 Floating Research Paper Sprites in Space */
+const pps = [];
+for (let i = 0; i < 9; i++) {
+  const sm = new T.SpriteMaterial({ map: paperT, transparent: true, opacity: 0, depthWrite: false, side: T.DoubleSide });
+  const s = new T.Sprite(sm);
+  const g = sprite(glowT, 0x75dfff, 1, V(0, 0, 0), 0);
+  AG.add(s, g);
+  pps.push({ s, g, hx: 0, hy: 0, x: 0, y: 0, vis: 0, opacity: 0, taken: false, respawn: 0, phase: rnd(0, 7), scale: 1 });
+}
+function pHome(p) {
+  const zones = [
+    [0.06, 0.23, 0.15, 0.82], [0.77, 0.95, 0.14, 0.84],
+    [0.25, 0.75, 0.08, 0.20], [0.24, 0.74, 0.80, 0.92]
+  ];
+  let px = innerWidth * 0.12, py = innerHeight * 0.2, tries = 0;
+  do {
+    const z = zones[(Math.random() * zones.length) | 0];
+    px = rnd(z[0], z[1]) * innerWidth;
+    py = rnd(z[2], z[3]) * innerHeight;
+    tries++;
+  } while (tries < 36 && GS.r > 0 && Math.hypot(px - GS.x, py - GS.y) < GS.r * 1.38);
+  p.hx = p.x = px; p.hy = p.y = py; p.vis = 0; p.opacity = 0;
+  p.s.material.opacity = 0; p.g.material.opacity = 0;
+  p.taken = false; p.respawn = 0; p.scale = 1;
+}
+addEventListener('resize', () => { if (agInit) pps.forEach(p => { if (!p.taken) pHome(p); }); });
+
+/* Tractor Beam for Paper Acquisition */
+const pickupBeam = new T.Mesh(
+  new T.CylinderGeometry(0.035, 0.24, 1, 18, 1, true),
+  new T.MeshBasicMaterial({ color: 0x83eaff, transparent: true, opacity: 0, blending: T.AdditiveBlending, depthWrite: false, side: T.DoubleSide })
+);
+S.add(pickupBeam);
+
+const uR = () => cl(innerWidth * 0.033, 34, 56);
+const courier = {
+  x: innerWidth * 0.18, y: innerHeight * 0.27, vx: 0, vy: 0, tx: innerWidth * 0.18, ty: innerHeight * 0.27,
+  state: 'scan', timer: 0, nextScan: 1.5, paper: null, heading: 0, turn: 0,
+  startX: 0, startY: 0, controlX: 0, controlY: 0, targetX: 0, targetY: 0, depth: DD,
+  flightDuration: 2.7, launched: false, collectConfirmed: false
 };
 
-function createPhotorealisticBird(scale = 0.45, seed = 0) {
-  const birdGroup = new T.Group();
-  birdGroup.scale.setScalar(scale);
-
-  const inner = new T.Group();
-  birdGroup.add(inner);
-
-  const featherMat = new T.MeshStandardMaterial({
-    color: 0xf8fafc, roughness: 0.32, metalness: 0.22,
-    envMap: env, envMapIntensity: 1.6, side: T.DoubleSide
-  });
-
-  const goldAccentMat = new T.MeshStandardMaterial({
-    color: 0xd97706, metalness: 0.65, roughness: 0.35, emissive: 0x78350f, emissiveIntensity: 0.4
-  });
-
-  const bodyGeo = new T.CylinderGeometry(0.045, 0.14, 0.62, 14, 3);
-  bodyGeo.rotateX(Math.PI / 2);
-  const body = new T.Mesh(bodyGeo, featherMat);
-  body.scale.set(0.9, 0.8, 1.0);
-  inner.add(body);
-
-  const head = new T.Mesh(new T.SphereGeometry(0.095, 16, 12), featherMat);
-  head.position.set(0, 0.06, 0.38);
-  inner.add(head);
-
-  const beakGeo = new T.ConeGeometry(0.035, 0.16, 10);
-  beakGeo.rotateX(Math.PI / 2);
-  const beak = new T.Mesh(beakGeo, goldAccentMat);
-  beak.position.set(0, 0.03, 0.50);
-  inner.add(beak);
-
-  const tailGroup = new T.Group();
-  tailGroup.position.set(0, 0.02, -0.34);
-  for (let k = -2; k <= 2; k++) {
-    const f = new T.Mesh(new T.PlaneGeometry(0.07, 0.44), featherMat);
-    f.rotation.x = -Math.PI / 2;
-    f.rotation.y = k * 0.14;
-    f.position.z = -0.22;
-    tailGroup.add(f);
+function steerCourier(tx, ty, dt, maxSpeed = 390) {
+  courier.tx = tx; courier.ty = ty;
+  const dx = tx - courier.x, dy = ty - courier.y, d = Math.hypot(dx, dy) || 1;
+  const desired = Math.min(maxSpeed, Math.max(48, d * 1.15));
+  const ax = dx / d * desired, ay = dy / d * desired;
+  const a = 1 - Math.exp(-2.0 * Math.min(dt, 0.05));
+  courier.vx += (ax - courier.vx) * a; courier.vy += (ay - courier.vy) * a;
+  courier.x += courier.vx * dt; courier.y += courier.vy * dt;
+  const speed = Math.hypot(courier.vx, courier.vy);
+  if (speed > 4) {
+    const wanted = Math.atan2(courier.vy, courier.vx);
+    let delta = ((wanted - courier.heading + Math.PI) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2) - Math.PI;
+    courier.heading += delta * (1 - Math.exp(-3.2 * dt));
+    courier.turn = cl(delta, -0.6, 0.6);
   }
-  inner.add(tailGroup);
-
-  function buildWing(side) {
-    const shoulderJoint = new T.Group();
-    shoulderJoint.position.set(side * 0.12, 0.05, 0.06);
-
-    const armShape = new T.Shape();
-    armShape.moveTo(0, 0.14);
-    armShape.lineTo(0.48, 0.10);
-    armShape.lineTo(0.45, -0.16);
-    armShape.lineTo(0, -0.18);
-    armShape.closePath();
-    const arm = new T.Mesh(new T.ShapeGeometry(armShape), featherMat);
-    arm.rotation.x = Math.PI / 2;
-    arm.scale.x = side;
-    shoulderJoint.add(arm);
-
-    const elbowJoint = new T.Group();
-    elbowJoint.position.set(side * 0.48, 0, 0);
-
-    const tipShape = new T.Shape();
-    tipShape.moveTo(0, 0.10);
-    tipShape.lineTo(0.68, 0.02);
-    tipShape.lineTo(0.55, -0.12);
-    tipShape.lineTo(0, -0.16);
-    tipShape.closePath();
-    const forearm = new T.Mesh(new T.ShapeGeometry(tipShape), featherMat);
-    forearm.rotation.x = Math.PI / 2;
-    forearm.scale.x = side;
-    elbowJoint.add(forearm);
-
-    shoulderJoint.add(elbowJoint);
-    return { shoulder: shoulderJoint, elbow: elbowJoint };
-  }
-
-  const wL = buildWing(-1);
-  const wR = buildWing(1);
-  inner.add(wL.shoulder);
-  inner.add(wR.shoulder);
-
-  S.add(birdGroup);
-
-  return {
-    root: birdGroup, inner, wL, wR, tail: tailGroup,
-    seed, t: Math.random(),
-    zone: Math.floor(Math.random() * 4),
-    a: getWaypoint(0), cp: getWaypoint(1),
-    m: V(0, 2.5, 0),
-    speed: 0.0022 + Math.random() * 0.0016,
-    prevPos: V(0, 0, 0)
-  };
+  return d;
+}
+function chooseRemotePaper() {
+  const available = pps.filter(p => !p.taken && p.respawn <= 0 && p.vis > 0.72 && p.opacity > 0.72);
+  if (!available.length) return null;
+  available.sort((a, b) => Math.hypot(b.hx - courier.x, b.hy - courier.y) - Math.hypot(a.hx - courier.x, a.hy - courier.y));
+  const far = available.filter(p => Math.hypot(p.hx - courier.x, p.hy - courier.y) > innerWidth * 0.24);
+  return (far.length ? far : available)[0];
+}
+function setPaperScreen(p, x, y, depth, dt) {
+  const w = s2w(x, y, depth, tmpV); p.s.position.copy(w); p.g.position.copy(w);
+  p.s.scale.set(36 * WPP * p.scale, 49 * WPP * p.scale, 1);
+  p.g.scale.setScalar(78 * WPP * p.scale);
+  p.s.material.opacity = p.opacity; p.g.material.opacity = p.opacity * 0.42;
+  p.s.material.rotation = Math.sin(performance.now() * 0.0015) * 0.08;
+}
+function chooseGlobeEntry() {
+  const a = rnd(0, Math.PI * 2), r = GS.r * 0.67;
+  courier.targetX = GS.x + Math.cos(a) * r;
+  courier.targetY = GS.y + Math.sin(a) * r;
+}
+function launchPaper() {
+  const p = courier.paper;
+  courier.startX = courier.x;
+  courier.startY = courier.y + uR() * 0.9;
+  chooseGlobeEntry();
+  const dx = courier.targetX - courier.startX, dy = courier.targetY - courier.startY;
+  const len = Math.max(1, Math.hypot(dx, dy)), side = Math.random() < 0.5 ? -1 : 1;
+  const bend = Math.min(150, len * 0.2) * side;
+  courier.controlX = (courier.startX + courier.targetX) * 0.5 - (dy / len) * bend;
+  courier.controlY = (courier.startY + courier.targetY) * 0.5 + (dx / len) * bend - Math.max(92, Math.min(188, len * 0.19));
+  courier.flightDuration = cl(len / 430, 2.15, 3.15);
+  courier.timer = 0; courier.state = 'launch'; courier.launched = true;
+  courierMessage('PAPER THROWN TO GLOBE', 'The UFO has thrown the collected paper along a curved delivery path.', 38, 0);
+  const pcEl = document.getElementById('pc');
+  if (pcEl) pcEl.textContent = 'DELIVERING';
 }
 
-const avianFlock = [
-  createPhotorealisticBird(0.42, 0.1),
-  createPhotorealisticBird(0.46, 2.4),
-  createPhotorealisticBird(0.38, 4.8)
-];
+/* 3D Knowledge Network Node Merge on Globe */
+const mergedNodesGroup = new T.Group();
+globe.add(mergedNodesGroup);
+const burstWaves = [];
 
-function birdsUpdate(t) {
-  avianFlock.forEach(b => {
-    b.t += b.speed;
-    const pos = bz(b.a, b.m, b.cp, Math.min(1, b.t));
-    b.root.position.copy(pos);
+window.gMerge = function(nx, ny) {
+  const r2 = nx * nx + ny * ny;
+  let cnx = nx, cny = ny;
+  if (r2 > 0.85) {
+    const k = Math.sqrt(0.85 / r2);
+    cnx *= k; cny *= k;
+  }
+  const cnz = Math.sqrt(Math.max(0, 1 - cnx * cnx - cny * cny));
+  const localVec = new T.Vector3(cnx * GR * 1.018, cny * GR * 1.018, cnz * GR * 1.018);
+  localVec.applyAxisAngle(new T.Vector3(0, 1, 0), -globe.rotation.y);
 
-    const dir = pos.clone().sub(b.prevPos);
-    b.prevPos.copy(pos);
+  const goldenMat = new T.SpriteMaterial({ map: glowT, color: 0xffd36a, transparent: true, blending: T.AdditiveBlending, depthWrite: false });
+  const goldenNode = new T.Sprite(goldenMat);
+  goldenNode.position.copy(localVec);
+  goldenNode.scale.set(0.42, 0.42, 1);
+  mergedNodesGroup.add(goldenNode);
 
-    if (dir.lengthSq() > 0.00001) {
-      dir.normalize();
-      const lookTarget = pos.clone().add(dir);
-      b.inner.lookAt(lookTarget);
-      const targetRoll = -dir.x * 0.85;
-      b.inner.rotation.z += (targetRoll - b.inner.rotation.z) * 0.08;
-    }
+  let nearest = null, minDist = 999;
+  pts.forEach(pt => {
+    const d = pt.distanceTo(localVec);
+    if (d < minDist && d > 0.1) { minDist = d; nearest = pt; }
+  });
+  if (nearest) {
+    const mid = localVec.clone().add(nearest).multiplyScalar(0.5).normalize().multiplyScalar(GR * 1.05);
+    const curve = new T.QuadraticBezierCurve3(localVec, mid, nearest);
+    const lineGeo = new T.BufferGeometry().setFromPoints(curve.getPoints(12));
+    const lineMat = new T.LineBasicMaterial({ color: 0xffd36a, transparent: true, opacity: 0.85, blending: T.AdditiveBlending, depthWrite: false });
+    mergedNodesGroup.add(new T.Line(lineGeo, lineMat));
+  }
 
-    const flapPhase = (t * 1.2 + b.seed) % (Math.PI * 2);
-    const isGliding = flapPhase > 2.2;
+  const ringGeo = new T.RingGeometry(0.04, 0.08, 32);
+  const ringMat = new T.MeshBasicMaterial({ color: 0xffe28a, transparent: true, opacity: 0.9, side: T.DoubleSide, depthWrite: false, blending: T.AdditiveBlending });
+  const ringMesh = new T.Mesh(ringGeo, ringMat);
+  ringMesh.position.copy(localVec);
+  ringMesh.lookAt(localVec.clone().multiplyScalar(2));
+  mergedNodesGroup.add(ringMesh);
+  burstWaves.push({ mesh: ringMesh, t: 0 });
+};
 
-    if (isGliding) {
-      const targetShoulder = 0.14 + Math.sin(t * 1.8 + b.seed) * 0.03;
-      const targetElbow = 0.06;
-      b.wL.shoulder.rotation.z += (targetShoulder - b.wL.shoulder.rotation.z) * 0.1;
-      b.wR.shoulder.rotation.z = -b.wL.shoulder.rotation.z;
-      b.wL.elbow.rotation.z += (targetElbow - b.wL.elbow.rotation.z) * 0.1;
-      b.wR.elbow.rotation.z = -b.wL.elbow.rotation.z;
-    } else {
-      const flapRate = t * 4.4 + b.seed;
-      const wingAmp = 0.40;
-      const shoulderAngle = Math.sin(flapRate) * wingAmp;
-      const elbowAngle = Math.sin(flapRate - 0.72) * (wingAmp * 1.45);
+function ufoCourierUpdate(t, dt) {
+  ufo.visible = AG.visible = true;
+  C.updateMatrixWorld();
+  WPP = 2 * DD * Math.tan(C.fov * Math.PI / 360) / innerHeight;
+  if (!agInit && GS.r > 20) { agInit = true; pps.forEach(pHome); courier.nextScan = t + 0.8; }
+  if (!agInit) return;
 
-      b.wL.shoulder.rotation.z = shoulderAngle;
-      b.wR.shoulder.rotation.z = -shoulderAngle;
-      b.wL.elbow.rotation.z = elbowAngle;
-      b.wR.elbow.rotation.z = -elbowAngle;
-    }
-
-    if (b.t >= 1) {
-      b.zone = (b.zone + 1) % 4;
-      b.a = b.cp.clone();
-      b.cp = getWaypoint(b.zone);
-      b.m = b.a.clone().lerp(b.cp, 0.5).add(V(rnd(-1.8, 1.8), rnd(0.6, 2.0), rnd(-1.2, 1.2)));
-      b.t = 0;
+  pps.forEach(p => {
+    if (p.respawn > 0) { p.respawn -= dt; if (p.respawn <= 0) pHome(p); }
+    if (!p.taken) {
+      p.opacity += (1 - p.opacity) * Math.min(1, dt * 2.2);
+      p.x = p.hx; p.y = p.hy + Math.sin(t * 0.9 + p.phase) * 4;
+      const onScreen = p.x > innerWidth * 0.035 && p.x < innerWidth * 0.965 && p.y > innerHeight * 0.035 && p.y < innerHeight * 0.965;
+      p.vis = (onScreen && p.opacity > 0.72) ? 1 : 0;
     }
   });
+
+  const U = courier, ur = uR();
+  const pcEl = document.getElementById('pc');
+  if (U.state === 'scan') {
+    if (t >= U.nextScan) {
+      const p = chooseRemotePaper();
+      if (p) {
+        U.paper = p; p.taken = true; U.state = 'approach'; U.timer = 0; U.nextScan = t + 1.2;
+        if (pcEl) pcEl.textContent = 'INBOUND';
+      } else {
+        U.nextScan = t + 1.4;
+        U.tx = innerWidth * 0.12 + rnd(0, 0.76) * innerWidth;
+        U.ty = innerHeight * 0.15 + rnd(0, 0.68) * innerHeight;
+      }
+    }
+    if (!U.paper) steerCourier(U.tx || innerWidth * 0.18, U.ty || innerHeight * 0.28, dt, 245);
+  }
+  else if (U.state === 'approach') {
+    const p = U.paper, tx = p.hx, ty = p.hy - ur * 1.05;
+    const d = steerCourier(tx, ty, dt, 430);
+    if (d < Math.max(24, ur * 0.55)) {
+      U.state = 'collect'; U.timer = 0; U.collectConfirmed = false; U.vx *= 0.35; U.vy *= 0.35;
+      courierMessage('TRACTOR BEAM LOCKED', 'The UFO has reached a distant paper and is drawing it aboard.', 22, 0);
+      if (pcEl) pcEl.textContent = 'ACQUIRING';
+    }
+  }
+  else if (U.state === 'collect') {
+    U.timer += dt;
+    U.x += (U.paper.hx - U.x) * Math.min(1, dt * 2.8);
+    U.y += (U.paper.hy - ur * 1.05 - U.y) * Math.min(1, dt * 2.8);
+    U.vx *= Math.exp(-4 * dt); U.vy *= Math.exp(-4 * dt);
+    const k = ease3(U.timer / 0.82), px = U.paper.hx + (U.x - U.paper.hx) * k, py = U.paper.hy + (U.y + ur * 0.92 - U.paper.hy) * k;
+    U.paper.x = px; U.paper.y = py; U.paper.opacity = 1; U.paper.scale = 1 - k * 0.08;
+    if (U.timer > 0.72 && !U.collectConfirmed) {
+      U.collectConfirmed = true;
+      courierMessage('PAPER COLLECTED', 'The research paper is secured beneath the UFO and ready for delivery.', 34, 0);
+    }
+    if (U.timer > 1.2) launchPaper();
+  }
+  else if (U.state === 'launch') {
+    U.timer += dt;
+    const raw = cl(U.timer / U.flightDuration, 0, 1), k = 1 - Math.pow(1 - raw, 2.15), m = 1 - k;
+    const p = U.paper;
+    p.x = m * m * U.startX + 2 * m * k * U.controlX + k * k * U.targetX;
+    p.y = m * m * U.startY + 2 * m * k * U.controlY + k * k * U.targetY;
+    p.opacity = 1; p.scale = 1 - 0.12 * Math.sin(Math.PI * k);
+    const depth = DD + 0.35 - 0.65 * Math.sin(Math.PI * k);
+    setPaperScreen(p, p.x, p.y, depth, dt);
+    p.s.material.rotation = Math.atan2(2 * m * (U.controlY - U.startY) + 2 * k * (U.targetY - U.controlY), 2 * m * (U.controlX - U.startX) + 2 * k * (U.targetX - U.controlX)) * 0.24 + raw * Math.PI * 2;
+    U.vx *= Math.exp(-2.5 * dt); U.vy *= Math.exp(-2.5 * dt);
+    if (raw >= 1) {
+      if (window.gMerge) window.gMerge((U.targetX - GS.x) / GS.r, -(U.targetY - GS.y) / GS.r);
+      merged++;
+      const cntEl = document.getElementById('cnt');
+      if (cntEl) cntEl.textContent = merged.toLocaleString();
+      p.opacity = 0; p.s.material.opacity = 0; p.g.material.opacity = 0; p.respawn = 4.2; p.taken = true;
+      courierMessage('ADDED TO RESEARCH GRAPH', 'A new paper node has joined the globe and its connected research network.', 100, 3400);
+      if (pcEl) pcEl.textContent = 'MERGED';
+      U.paper = null; U.state = 'depart'; U.timer = 0; U.launched = false;
+      const goLeft = GS.x > innerWidth * 0.5;
+      U.tx = goLeft ? innerWidth * 0.1 : innerWidth * 0.9;
+      U.ty = innerHeight * rnd(0.16, 0.78);
+    }
+  }
+  else if (U.state === 'depart') {
+    const d = steerCourier(U.tx, U.ty, dt, 360);
+    if (d < 36) {
+      U.state = 'scan'; U.timer = 0; U.nextScan = t + 1.0;
+      if (pcEl) pcEl.textContent = 'SCANNING';
+    }
+  }
+
+  pps.forEach(p => {
+    if (p === U.paper) {
+      if (U.state === 'collect') setPaperScreen(p, p.x, p.y, DD + 0.3, dt);
+      else if (U.state !== 'launch') setPaperScreen(p, p.x, p.y, DD + 0.3, dt);
+    } else if (!p.taken) {
+      setPaperScreen(p, p.x, p.y, DD + 0.6, dt);
+    }
+  });
+
+  s2w(U.x, U.y, DD, tmpV); ufo.position.copy(tmpV);
+  ufo.scale.setScalar(ur * 2 * WPP / 2.4 * 0.9);
+  ufo.quaternion.copy(C.quaternion).multiply(tq.setFromEuler(tmpE.set(0.12 + cl(U.vy * 0.00045, -0.16, 0.16), 0, -cl(U.vx * 0.00055, -0.24, 0.24))));
+
+  if (U.state === 'collect' && U.paper) {
+    const top = s2w(U.x, U.y + ur * 0.36, DD, V(0, 0, 0));
+    const bot = s2w(U.paper.x, U.paper.y, DD + 0.3, V(0, 0, 0));
+    const vec = top.clone().sub(bot);
+    pickupBeam.position.copy(top).add(bot).multiplyScalar(0.5);
+    pickupBeam.scale.set(24 * WPP, vec.length(), 24 * WPP);
+    pickupBeam.quaternion.setFromUnitVectors(V(0, 1, 0), vec.normalize());
+    pickupBeam.material.opacity = 0.22 + 0.08 * Math.sin(t * 7);
+  } else {
+    pickupBeam.material.opacity = 0;
+  }
+
+  const tag = uTag;
+  tag.style.transform = 'translate(' + (U.x - tag.offsetWidth / 2) + 'px,' + (U.y - ur - tag.offsetHeight - 10) + 'px)';
+  tag.style.opacity = 1;
 }
 
 try {
@@ -1995,8 +2190,11 @@ try {
 } catch (e) { comp = null; }
 
 const clk = new T.Clock();
+let lastFrameTime = 0;
 function loop() {
   const t = clk.getElapsedTime();
+  const dt = Math.min(0.04, lastFrameTime ? t - lastFrameTime : 1 / 60);
+  lastFrameTime = t;
 
   // Subtle collective breathing levitation of the entire citadel assembly
   const baseCitadelY = innerWidth >= 900 ? 0.30 : -0.5;
@@ -2022,28 +2220,7 @@ function loop() {
 
   clouds.forEach((c, i) => c.position.x += Math.sin(t * .1 + i) * .0015);
 
-  // ─── DYNAMIC SCI-FI UFO FLIGHT (UPPER SKY PATROL) ───
-  const cX = citadelGroup.position.x;
-  const cY = citadelGroup.position.y;
-  const uTime = t * 0.22 + 1.2;
-  const ufx = cX + 4.6 + Math.sin(uTime) * 1.5 + Math.cos(t * 0.25) * 0.6;
-  const ufy = cY + 4.2 + Math.cos(uTime * 1.1) * 0.35 + Math.sin(t * 0.3) * 0.15;
-  const ufz = Math.sin(uTime * 0.8) * 1.2 + Math.cos(t * 0.2) * 0.3;
-
-  const uvx = ufx - prevUfoX, uvy = ufy - prevUfoY, uvz = ufz - prevUfoZ;
-  prevUfoX = ufx; prevUfoY = ufy; prevUfoZ = ufz;
-
-  const targetRoll = -uvx * 5.0;
-  const targetPitch = uvz * 3.5 - uvy * 1.8;
-  const targetYaw = Math.atan2(-uvx, -uvz);
-  ufo.rotation.z += (targetRoll - ufo.rotation.z) * 0.07;
-  ufo.rotation.x += (targetPitch - ufo.rotation.x) * 0.07;
-  ufo.rotation.y += (targetYaw - ufo.rotation.y) * 0.07;
-  ufo.position.set(ufx, ufy, ufz);
-
-  if (ufo.userData.scanCone) {
-    ufo.userData.scanCone.material.opacity = 0.08 + Math.sin(t * 2.5) * 0.04;
-  }
+  // Rotate UFO sensors & internal gyros
   if (ufo.userData.gyro1) {
     ufo.userData.gyro1.rotation.x = t * 1.8;
     ufo.userData.gyro2.rotation.y = -t * 1.5;
@@ -2052,6 +2229,7 @@ function loop() {
     ufo.userData.sensorRing.rotation.y = t * 1.2;
   }
 
+  // Camera orientation & scroll pullback
   if (!drag && Math.abs(th) < 0.0001) th = 0;
   cam();
   if (!drag) {
@@ -2060,6 +2238,25 @@ function loop() {
   }
 
   stageUpdate();
+
+  // Run autonomous UFO courier: distant paper pickup, tractor beam, throw to globe
+  ufoCourierUpdate(t, dt);
+
+  // Animate 3D globe node merge pulse rings
+  for (let i = burstWaves.length - 1; i >= 0; i--) {
+    const b = burstWaves[i];
+    b.t += dt * 1.4;
+    if (b.t >= 1) {
+      mergedNodesGroup.remove(b.mesh);
+      b.mesh.geometry.dispose();
+      b.mesh.material.dispose();
+      burstWaves.splice(i, 1);
+    } else {
+      const scale = 1 + b.t * 5;
+      b.mesh.scale.set(scale, scale, 1);
+      b.mesh.material.opacity = (1 - b.t) * 0.9;
+    }
+  }
 
   // Update labels - projected from citadelGroup world positions!
   citadelGroup.updateMatrixWorld();
@@ -2073,18 +2270,11 @@ function loop() {
     o.dt.setAttribute('cx', ax); o.dt.setAttribute('cy', ay);
   });
 
-  {
-    const uPos = ufo.position.clone().add(V(0, 0.85, 0));
-    const [x, y] = proj(uPos);
-    uTag.style.transform = `translate(${x - uTag.offsetWidth / 2}px,${y - uTag.offsetHeight / 2}px)`;
-  }
-
   anim(t);
-  birdsUpdate(t);
   if (comp) comp.render(); else R.render(S, C);
   requestAnimationFrame(loop);
 }
-loop();
+try { loop(); } catch(e) { console.error(e); }
 </script><script>
 const io = new IntersectionObserver(es => es.forEach(e => {
   if (e.isIntersecting) {
@@ -2107,9 +2297,11 @@ setInterval(()=>{const q=qs[qi];if(!del){ci++;if(ci>q.length+22)del=1}else{ci-=2
 <script>
 const dvE=document.querySelector('.dive'),dts=[...document.querySelectorAll('.dt')],colE=document.querySelector('.col'),stE=document.querySelector('.stats'),uiE=document.getElementById('ui'),lnE=document.getElementById('lines'),depE=document.getElementById('dep');
 function zp() {
-  // Sticky right-side layout: 3D canvas and HUD stay 100% active and visible throughout
-  if (uiE) uiE.style.opacity = '1';
-  if (lnE) lnE.style.opacity = '0.9';
+  const heroEl = document.querySelector('.hero') || document.getElementById('top');
+  const heroH = heroEl ? heroEl.offsetHeight : innerHeight;
+  const fade = Math.max(0, 1 - scrollY / (heroH * 0.42));
+  if (uiE) uiE.style.opacity = fade;
+  if (lnE) lnE.style.opacity = (fade * 0.9).toString();
 }
 addEventListener('scroll', zp, { passive: true });
 addEventListener('resize', zp);
