@@ -1,6 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import * as THREE from 'three';
 import { useApp } from '../context/AppContext';
 import { GLOBE_RAW_BASE64 } from './researchGraphGlobeRaw';
+import { 
+  Network, 
+  Sparkles, 
+  Layers, 
+  Link2, 
+  FileText, 
+  Users, 
+  Database,
+  RotateCcw
+} from 'lucide-react';
 
 interface ResearchKnowledgeCoreProps {
   onNavigate?: (target: string) => void;
@@ -8,75 +19,99 @@ interface ResearchKnowledgeCoreProps {
 
 export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ onNavigate }) => {
   const { setActivePage, setSearchQuery } = useApp();
-  const stageRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const tipRef = useRef<HTMLDivElement>(null);
-  const hintRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
 
-  const handleSearch = (term: string) => {
+  const handleAction = useCallback((page: any) => {
+    if (onNavigate) {
+      onNavigate(page);
+    } else {
+      setActivePage(page);
+    }
+  }, [onNavigate, setActivePage]);
+
+  const handleSearch = useCallback((term: string) => {
     if (onNavigate) {
       onNavigate(term);
     } else {
       setSearchQuery(term);
       setActivePage('search');
     }
-  };
+  }, [onNavigate, setSearchQuery, setActivePage]);
 
-  const handleAction = (page: any) => {
-    if (onNavigate) {
-      onNavigate(page);
-    } else {
-      setActivePage(page);
+  // Pill and Badge definitions matching Image 2
+  const pillDefs = [
+    { id: 'graph', name: 'Knowledge Graph', tag: 'AI-Core', color: '#10b981', icon: Network, action: () => handleAction('graph'), wp: new THREE.Vector3(-1.85, 1.25, 0.2), ap: new THREE.Vector3(-0.75, 0.45, 0.65) },
+    { id: 'papers', name: 'Research Papers', tag: '204M+', color: '#38bdf8', icon: FileText, action: () => handleAction('search'), wp: new THREE.Vector3(1.85, 1.20, 0.2), ap: new THREE.Vector3(0.75, 0.45, 0.65) },
+    { id: 'insights', name: 'AI Insights', tag: 'Consensus', color: '#a855f7', icon: Sparkles, action: () => handleAction('chat'), wp: new THREE.Vector3(-2.05, 0.35, 0.2), ap: new THREE.Vector3(-0.85, 0.05, 0.6) },
+    { id: 'authors', name: 'Authors', tag: '12.4M+', color: '#14b8a6', icon: Users, action: () => handleSearch('Research authors'), wp: new THREE.Vector3(2.05, 0.30, 0.2), ap: new THREE.Vector3(0.85, 0.05, 0.6) },
+    { id: 'concepts', name: 'Concepts', tag: '1.8M+', color: '#818cf8', icon: Layers, action: () => handleSearch('Ontological concepts'), wp: new THREE.Vector3(-1.80, -0.48, 0.2), ap: new THREE.Vector3(-0.65, -0.35, 0.6) },
+    { id: 'datasets', name: 'Datasets', tag: '85K+', color: '#f59e0b', icon: Database, action: () => handleSearch('Empirical datasets'), wp: new THREE.Vector3(1.90, -0.48, 0.2), ap: new THREE.Vector3(0.65, -0.35, 0.6) },
+    { id: 'citations', name: 'Citations', tag: '1.24B+', color: '#ec4899', icon: Link2, action: () => handleAction('graph'), wp: new THREE.Vector3(1.30, -1.35, 1.0), ap: new THREE.Vector3(0.65, -1.05, 0.75) }
+  ];
+
+  const [pillPositions, setPillPositions] = useState<{ [key: string]: { x: number; y: number; ax: number; ay: number } }>({});
+  const [ufoPos, setUfoPos] = useState<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    const canvas = canvasRef.current;
+    if (!container || !canvas) return;
+
+    let width = container.clientWidth || 640;
+    let height = container.clientHeight || 420;
+
+    // 1. WebGL Renderer with full alpha transparency
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+        powerPreference: 'high-performance'
+      });
+    } catch (e) {
+      return;
     }
-  };
 
-function initResearchGraphGlobe(
-  c: HTMLCanvasElement,
-  x: CanvasRenderingContext2D,
-  stage: HTMLDivElement,
-  tip: HTMLDivElement,
-  hint: HTMLDivElement
-) {
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.25;
 
+    // 2. Scene & Camera
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 0.25, 5.4);
+    camera.lookAt(0, 0.05, 0);
+
+    // 3. Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    scene.add(ambientLight);
+
+    const sunDir = new THREE.Vector3(-0.62, 0.38, 0.69).normalize();
+    const sunLight = new THREE.DirectionalLight(0xfff6ea, 1.4);
+    sunLight.position.copy(sunDir).multiplyScalar(10);
+    scene.add(sunLight);
+
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.1);
+    rimLight.position.set(4, 2, -3);
+    scene.add(rimLight);
+
+    // 4. Master Levitation & Rotation Root Group
+    const masterGroup = new THREE.Group();
+    scene.add(masterGroup);
+
+    // ─────────────────────────────────────────────────────────────
+    // A. PROCEDURAL TEXTURES FROM GLOBE_RAW_BASE64
+    // ─────────────────────────────────────────────────────────────
     const MW = 1440;
     const MH = 720;
-    const W = 1200;
-    // A compact globe leaves clear space for the surrounding evidence cards.
-    const R = 360;
-    const cx = W / 2;
-    const cy = W / 2;
-    const D = Math.PI / 180;
-    const TAU = Math.PI * 2;
-    const S = 560;
-    const H = S / 2;
-    let T = 0;
-
-    // Decode base64 land bitmask
     const raw = atob(GLOBE_RAW_BASE64);
     const land = new Uint8Array(MW * MH);
-    const coast = new Uint8Array(MW * MH);
-
     for (let i = 0; i < MW * MH; i++) {
       land[i] = (raw.charCodeAt(i >> 3) >> (7 - (i & 7))) & 1;
-    }
-    for (let j = 0; j < MH; j++) {
-      for (let i = 0; i < MW; i++) {
-        const k = j * MW + i;
-        if (!land[k]) continue;
-        if (!land[j * MW + ((i + 1) % MW)] || !land[j * MW + ((i + MW - 1) % MW)] || (j > 0 && !land[k - MW]) || (j < MH - 1 && !land[k + MW])) {
-          coast[k] = 1;
-        }
-      }
-    }
-    const c2 = new Uint8Array(coast);
-    for (let j = 0; j < MH - 1; j++) {
-      for (let i = 0; i < MW - 1; i++) {
-        const k = j * MW + i;
-        if (coast[k]) {
-          c2[k + 1] = 1;
-          c2[k + MW] = 1;
-        }
-      }
     }
 
     function isLand(la: number, lo: number) {
@@ -85,1120 +120,848 @@ function initResearchGraphGlobe(
       return land[v * MW + u];
     }
 
-    function rnd(seed: number) {
-      let s = seed;
-      return function () {
-        s = (s * 16807) % 2147483647;
-        return (s - 1) / 2147483646;
-      };
-    }
-    const r = rnd(11);
+    // Helper to create texture from canvas
+    const createTex = (w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void) => {
+      const c = document.createElement('canvas');
+      c.width = w; c.height = h;
+      const ctx = c.getContext('2d')!;
+      draw(ctx);
+      const tex = new THREE.CanvasTexture(c);
+      tex.anisotropy = 4;
+      return tex;
+    };
 
-    // Per-pixel sphere vector precomputation
-    const n = S * S;
-    const NX = new Float32Array(n);
-    const NY = new Float32Array(n);
-    const NZ = new Float32Array(n);
-    const LI = new Float32Array(n);
-    const AL = new Uint8Array(n);
-    const LON = new Float32Array(n);
-    const LATD = new Float32Array(n);
-    const FV = new Float32Array(n);
-    const CV = new Int32Array(n);
-    const VI = new Int32Array(n);
+    // 1. Soft Glow Sprite Texture
+    const glowTexture = createTex(128, 128, ctx => {
+      const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(0.28, 'rgba(120,220,255,0.6)');
+      g.addColorStop(1, 'rgba(0,180,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 128, 128);
+    });
 
-    for (let j = 0; j < S; j++) {
-      for (let i = 0; i < S; i++) {
-        const p = j * S + i;
-        const nx = (i + 0.5 - H) / H;
-        const ny = -(j + 0.5 - H) / H;
-        const rr = nx * nx + ny * ny;
-        if (rr >= 1.02) continue;
-        const nz = Math.sqrt(Math.max(0, 1 - rr));
-        NX[p] = nx;
-        NY[p] = ny;
-        NZ[p] = nz;
-        LI[p] = Math.max(0, -0.45 * nx + 0.5 * ny + 0.74 * nz);
-        AL[p] = Math.max(0, Math.min(255, (1 - Math.sqrt(rr)) * H * 255 / 1.5));
-      }
-    }
-
-    let tilt = 0.33;
-    let ct = Math.cos(tilt);
-    let st = Math.sin(tilt);
-
-    function setTilt(t: number) {
-      tilt = t;
-      ct = Math.cos(t);
-      st = Math.sin(t);
-      for (let p = 0; p < n; p++) {
-        if (!AL[p]) continue;
-        const nz = NZ[p];
-        const y = NY[p] * ct + nz * st;
-        const z = -NY[p] * st + nz * ct;
-        const la = Math.asin(y > 1 ? 1 : y < -1 ? -1 : y) / D;
-        const v = (90 - la) / 180 * MH;
-        LON[p] = Math.atan2(NX[p], z);
-        VI[p] = Math.min(MH - 1, Math.max(0, Math.floor(v)));
-        FV[p] = (v / 4) % 1;
-        CV[p] = Math.floor(v / 4);
-        LATD[p] = la;
-      }
-    }
-    setTilt(0.33);
-
-    const oc = document.createElement('canvas');
-    oc.width = oc.height = S;
-    const ox = oc.getContext('2d')!;
-    const img = ox.createImageData(S, S);
-    const buf = new Uint32Array(img.data.buffer);
-
-    function shade(ang: number) {
-      const off = ang / TAU + 0.5;
-      for (let p = 0; p < n; p++) {
-        const a = AL[p];
-        if (!a) {
-          buf[p] = 0;
-          continue;
-        }
-        let u = (LON[p] / TAU + off) * MW;
-        u = u - Math.floor(u / MW) * MW;
-        const ui = u | 0;
-        const kk = VI[p] * MW + ui;
-        const nz = NZ[p];
-        const lt = 0.62 + 0.55 * LI[p];
-        const fu = (u / 4) % 1;
-        const fvv = FV[p];
-        const dx = fu - 0.5;
-        const dy = fvv - 0.5;
-        const dd = Math.sqrt(dx * dx + dy * dy);
-        const dot = dd < 0.2 ? 1 : dd < 0.38 ? (0.38 - dd) / 0.18 : 0;
-        const fr = Math.pow(1 - nz, 2.8);
-        const lw = (LON[p] + ang) / D;
-        const la = LATD[p];
-        const gl = ((Math.abs(((la + 5) % 10 + 10) % 10 - 5) < 0.22) || (Math.abs(((lw + 5) % 10 + 10) % 10 - 5) * Math.cos(la * D) < 0.22)) ? 0.4 : 0;
-
-        let rr: number;
-        let gg: number;
-        let bb: number;
-
-        if (land[kk]) {
-          const h = (((ui >> 2) * 73856093) ^ (CV[p] * 19349663)) >>> 0;
-          const hh = (h % 1000) / 1000;
-          rr = 18 * lt + dot * 80 * lt + gl * 10;
-          gg = 66 * lt + dot * 175 * lt + gl * 50;
-          bb = 150 * lt + dot * 255 * lt + gl * 90;
-          if (hh > 0.972) {
-            rr += dot * 230;
-            gg += dot * 150;
-            bb += dot * 40;
+    // 2. Procedural Day Earth Texture
+    const dayTexture = createTex(1024, 512, ctx => {
+      const img = ctx.createImageData(1024, 512);
+      const d = img.data;
+      for (let j = 0; j < 512; j++) {
+        const lat = 90 - (j / 512) * 180;
+        for (let i = 0; i < 1024; i++) {
+          const lon = (i / 1024) * 360 - 180;
+          const idx = (j * 1024 + i) * 4;
+          const l = isLand(lat, lon);
+          if (l) {
+            // Natural land tones with subtle variation
+            const tone = (Math.sin(lat * 0.12) * Math.cos(lon * 0.14) + 1) * 0.5;
+            d[idx + 0] = Math.floor(40 + tone * 45); // R
+            d[idx + 1] = Math.floor(88 + tone * 35); // G
+            d[idx + 2] = Math.floor(52 + tone * 25); // B
+          } else {
+            // Deep oceanic navy blue
+            const depth = Math.abs(lat) / 90;
+            d[idx + 0] = Math.floor(8 + depth * 10);
+            d[idx + 1] = Math.floor(28 + depth * 22);
+            d[idx + 2] = Math.floor(68 + depth * 35);
           }
-          if (c2[kk]) {
-            rr += 10;
-            gg += 70;
-            bb += 140;
-            if (coast[kk]) {
-              rr += 30;
-              gg += 60;
-              bb += 60;
+          d[idx + 3] = 255;
+        }
+      }
+      ctx.putImageData(img, 0, 0);
+    });
+
+    // 3. Procedural Night City Lights Texture
+    const nightTexture = createTex(1024, 512, ctx => {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, 1024, 512);
+      ctx.fillStyle = 'rgba(255, 218, 120, 0.9)';
+      for (let j = 0; j < 512; j += 2) {
+        const lat = 90 - (j / 512) * 180;
+        if (Math.abs(lat) > 65) continue;
+        for (let i = 0; i < 1024; i += 2) {
+          const lon = (i / 1024) * 360 - 180;
+          if (isLand(lat, lon)) {
+            // Population cluster probability
+            const isPopulated = (
+              (lat > 22 && lat < 55 && lon > -125 && lon < -68) || // North America
+              (lat > 35 && lat < 60 && lon > -10 && lon < 45) ||   // Europe
+              (lat > 15 && lat < 45 && lon > 70 && lon < 142)      // Asia
+            );
+            const prob = isPopulated ? 0.35 : 0.07;
+            if (Math.random() < prob) {
+              const sz = Math.random() < 0.2 ? 2.2 : 1.2;
+              ctx.fillRect(i, j, sz, sz);
             }
           }
-        } else {
-          rr = 4 * lt + dot * 8 + gl * 20;
-          gg = 16 * lt + dot * 30 + gl * 80;
-          bb = 54 * lt + dot * 80 + gl * 150;
-        }
-
-        // Upward holographic bounce from platform emitter beam
-        const bottomBounce = Math.max(0, -NY[p]) * 0.42;
-        rr += bottomBounce * 35;
-        gg += bottomBounce * 120;
-        bb += bottomBounce * 190;
-
-        rr += fr * 100;
-        gg += fr * 190;
-        bb += fr * 255;
-        rr = rr > 255 ? 255 : rr;
-        gg = gg > 255 ? 255 : gg;
-        bb = bb > 255 ? 255 : bb;
-        buf[p] = (a << 24) | (bb << 16) | (gg << 8) | rr;
-      }
-      ox.putImageData(img, 0, 0);
-    }
-
-    // Network cities and connections
-    const cities = [
-      [40, -74], [34, -118], [19, -99], [-23, -46], [-34, -58], [51, 0], [48, 2], [52, 13],
-      [30, 31], [19, 73], [28, 77], [31, 121], [35, 139], [37, 127], [-34, 151], [6, 3],
-      [-26, 28], [55, 37], [41, 29], [23, 113], [1, 104], [-12, -77], [4, -74], [45, -73],
-      [41, -87], [29, -95], [25, -80], [60, 10], [35, 51], [9, -79], [-33, -70], [49, -123],
-      [38, -122], [43, -79], [15, -90], [-1, 36], [14, -17], [39, 116], [13, 100]
-    ];
-    const cols = ['#ffffff', '#7cd4ff', '#38b6ff', '#a58bff', '#22e0ff', '#e08cff'];
-    const types = ['Papers', 'Authors', 'Datasets', 'Concepts', 'Citations'];
-    interface NodeItem {
-      x: number;
-      y: number;
-      z: number;
-      c: string;
-      s: number;
-      t: string;
-      n: number;
-      lk: any[];
-    }
-    const nodes: NodeItem[] = [];
-
-    function ll(la: number, lo: number) {
-      const q = Math.cos(la * D);
-      return { x: q * Math.sin(lo * D), y: Math.sin(la * D), z: q * Math.cos(lo * D) };
-    }
-    function mk(p: { x: number; y: number; z: number }, s: number): NodeItem {
-      const idx = nodes.length;
-      return {
-        ...p,
-        c: cols[idx % 6],
-        s,
-        t: types[(idx * 7 + 3) % 5],
-        n: 120 + Math.floor(r() * 4800),
-        lk: []
-      };
-    }
-    cities.forEach(q => nodes.push(mk(ll(q[0], q[1]), 4 + r() * 3.5)));
-    let tr = 0;
-    while (nodes.length < 170 && tr++ < 8000) {
-      const la = Math.asin(2 * r() - 1) / D;
-      const lo = r() * 360 - 180;
-      if (!isLand(la, lo) || Math.abs(la) > 72) continue;
-      nodes.push(mk(ll(la, lo), 2 + r() * 2.4));
-    }
-
-    const links: Array<{ a: number; b: number; ph: number; sp: number }> = [];
-    const seen: Record<string, number> = {};
-    nodes.forEach((nd, i) => {
-      const d = nodes.map((m, j) => ({
-        j,
-        d: (nd.x - m.x) * (nd.x - m.x) + (nd.y - m.y) * (nd.y - m.y) + (nd.z - m.z) * (nd.z - m.z)
-      })).sort((p, q) => p.d - q.d);
-
-      for (let k = 1; k <= 4; k++) {
-        if (!d[k]) continue;
-        const j = d[k].j;
-        const key = Math.min(i, j) + '-' + Math.max(i, j);
-        if (!seen[key] && d[k].d < (k < 4 ? 0.5 : 1.1)) {
-          seen[key] = 1;
-          const L = { a: i, b: j, ph: r(), sp: 0.004 + r() * 0.004 };
-          links.push(L);
-          nd.lk.push(L);
-          nodes[j].lk.push(L);
         }
       }
     });
 
-    const spr: Record<string, HTMLCanvasElement> = {};
-    function sprite(col: string) {
-      if (spr[col]) return spr[col];
-      const o = document.createElement('canvas');
-      o.width = o.height = 64;
-      const q = o.getContext('2d')!;
-      const g = q.createRadialGradient(32, 32, 0, 32, 32, 32);
-      g.addColorStop(0, col);
-      g.addColorStop(0.3, col);
-      g.addColorStop(1, 'rgba(0,0,0,0)');
-      q.fillStyle = g;
-      q.fillRect(0, 0, 64, 64);
-      return spr[col] = o;
-    }
-
-    let ang = -1.36;
-    let vel = 0;
-    let drag: { px: number; py: number; t: number; moved: number } | null = null;
-    let idle = 0;
-    let mp: { x: number; y: number } | null = null;
-    let hov = -1;
-    let sel = -1;
-    let selT = 0;
-    let tgt: { a: number; t: number } | null = null;
-    let last = performance.now();
-    let vis = true;
-    let raf = 0;
-    let P: Array<{ x: number; y: number; z: number }> = [];
-
-    function rot(p: { x: number; y: number; z: number }) {
-      const ca = Math.cos(ang);
-      const sa = Math.sin(ang);
-      const X = p.x * ca - p.z * sa;
-      let Z = p.x * sa + p.z * ca;
-      const Y = p.y * ct - Z * st;
-      Z = p.y * st + Z * ct;
-      return { x: cx + X * R, y: cy - Y * R, z: Z };
-    }
-
-    function arc(a: { x: number; y: number; z: number }, b: { x: number; y: number; z: number }) {
-      const m = { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z };
-      const l = Math.hypot(m.x, m.y, m.z);
-      const h = 1 + Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z) * 0.2;
-      return { x: m.x / l * h, y: m.y / l * h, z: m.z / l * h };
-    }
-
-    function hit(mx: number, my: number) {
-      let b = -1;
-      let bd = 900;
-      for (let i = 0; i < P.length; i++) {
-        const p = P[i];
-        if (p.z < 0.05) continue;
-        const d = (p.x - mx) * (p.x - mx) + (p.y - my) * (p.y - my);
-        if (d < bd) {
-          bd = d;
-          b = i;
+    // 4. Specular Map for oceans
+    const specTexture = createTex(512, 256, ctx => {
+      const img = ctx.createImageData(512, 256);
+      const d = img.data;
+      for (let j = 0; j < 256; j++) {
+        const lat = 90 - (j / 256) * 180;
+        for (let i = 0; i < 512; i++) {
+          const lon = (i / 512) * 360 - 180;
+          const idx = (j * 512 + i) * 4;
+          const val = isLand(lat, lon) ? 0 : 255;
+          d[idx] = d[idx + 1] = d[idx + 2] = val;
+          d[idx + 3] = 255;
         }
       }
-      return b;
-    }
+      ctx.putImageData(img, 0, 0);
+    });
 
-    function clampT(t: number) {
-      return Math.max(-0.3, Math.min(0.9, t));
-    }
-
-    function loop(t: number) {
-      if (!vis) {
-        raf = 0;
-        return;
+    // 5. Procedural Swirling Clouds Texture
+    const cloudTexture = createTex(512, 256, ctx => {
+      ctx.fillStyle = 'rgba(0,0,0,0)';
+      ctx.fillRect(0, 0, 512, 256);
+      for (let k = 0; k < 120; k++) {
+        const x = Math.random() * 512;
+        const y = 30 + Math.random() * 196;
+        const rx = 20 + Math.random() * 60;
+        const ry = 8 + Math.random() * 18;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, rx);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+        grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.25)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.ellipse(x, y, rx, ry, Math.random() * 0.4 - 0.2, 0, Math.PI * 2);
+        ctx.fill();
       }
-      raf = requestAnimationFrame(loop);
-      const dt = Math.min(0.05, (t - last) / 1000 || 0.016);
-      last = t;
-      T += dt * 60;
+    });
 
-      if (!drag) {
-        if (tgt) {
-          const da = ((tgt.a - ang + Math.PI) % TAU + TAU) % TAU - Math.PI;
-          ang += da * 0.09;
-          const dtl = tgt.t - tilt;
-          if (Math.abs(dtl) > 0.002) setTilt(tilt + dtl * 0.09);
-          if (Math.abs(da) < 0.003 && Math.abs(dtl) < 0.004) tgt = null;
-          idle = t + 4000;
-        } else {
-          // Continuous smooth rotation (living research planet)
-          const autoRot = t > idle ? 0.20 : 0.14;
-          ang += (autoRot + vel * 60) * dt;
-          vel *= Math.pow(0.94, dt * 60);
+    // ─────────────────────────────────────────────────────────────
+    // B. REALISTIC 3D EARTH GLOBE
+    // ─────────────────────────────────────────────────────────────
+    const globeGroup = new THREE.Group();
+    globeGroup.position.set(0, 0.45, 0);
+    masterGroup.add(globeGroup);
+
+    const GLOBE_R = 1.0;
+
+    // Custom Realistic Shader Material (Day/Night, Specular, Fresnel Atmosphere)
+    const earthMat = new THREE.ShaderMaterial({
+      uniforms: {
+        dayT: { value: dayTexture },
+        nightT: { value: nightTexture },
+        specT: { value: specTexture },
+        sun: { value: sunDir }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vPos;
+        void main() {
+          vUv = uv;
+          vNormal = normalize(normalMatrix * normal);
+          vPos = (modelViewMatrix * vec4(position, 1.0)).xyz;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
-      }
-      ang = ((ang + Math.PI) % TAU + TAU) % TAU - Math.PI;
+      `,
+      fragmentShader: `
+        uniform sampler2D dayT;
+        uniform sampler2D nightT;
+        uniform sampler2D specT;
+        uniform vec3 sun;
+        varying vec2 vUv;
+        varying vec3 vNormal;
+        varying vec3 vPos;
+        void main() {
+          vec3 N = normalize(vNormal);
+          vec3 V = normalize(-vPos);
+          float nd = dot(N, sun);
+          float lit = smoothstep(-0.25, 0.25, nd);
+          vec3 day = texture2D(dayT, vUv).rgb;
+          vec3 night = texture2D(nightT, vUv).rgb;
+          float spec = texture2D(specT, vUv).r;
 
-      x.globalCompositeOperation = 'source-over';
-      x.globalAlpha = 1;
-      x.clearRect(0, 0, W, W);
+          // Diffuse day light + night lights on shadow side
+          vec3 col = day * (0.12 + 1.1 * max(0.0, nd)) * mix(vec3(0.7, 0.85, 1.0), vec3(1.0, 0.98, 0.92), lit);
+          col += night * (1.0 - lit) * 1.8;
 
-      // Outer radial aura
-      const g = x.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.4);
-      g.addColorStop(0, 'rgba(70,165,255,.8)');
-      g.addColorStop(0.3, 'rgba(40,110,255,.2)');
-      g.addColorStop(1, 'rgba(0,0,0,0)');
-      x.fillStyle = g;
-      x.beginPath();
-      x.arc(cx, cy, R * 1.4, 0, 7);
-      x.fill();
+          // Specular sun reflection on water
+          vec3 H = normalize(sun + V);
+          col += vec3(0.85, 0.95, 1.0) * pow(max(dot(N, H), 0.0), 180.0) * spec * 0.65 * step(0.0, nd);
 
-      // Shaded globe
-      shade(ang);
-      x.imageSmoothingEnabled = true;
-      x.imageSmoothingQuality = 'high';
-      x.drawImage(oc, cx - R, cy - R, R * 2, R * 2);
+          // Atmospheric Fresnel edge glow
+          float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.2);
+          col += vec3(0.28, 0.65, 1.0) * fresnel * (0.25 + 0.8 * smoothstep(-0.3, 0.5, nd));
 
-      x.globalCompositeOperation = 'lighter';
-      if ('filter' in x) {
-        x.filter = 'blur(10px)';
-        x.globalAlpha = 0.5;
-        x.drawImage(oc, cx - R, cy - R, R * 2, R * 2);
-        x.filter = 'none';
-        x.globalAlpha = 1;
-      }
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
 
-      P = nodes.map(rot);
-      if (mp && !drag) hov = hit(mp.x, mp.y);
-      else if (!mp) hov = -1;
-      const f = hov >= 0 ? hov : sel;
+    const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R, 64, 48), earthMat);
+    globeGroup.add(earthMesh);
 
-      // Arc Links
-      links.forEach(l => {
-        const A = nodes[l.a];
-        const B = nodes[l.b];
-        const pa = P[l.a];
-        const pb = P[l.b];
-        const m = rot(arc(A, B));
-        if (Math.min(pa.z, pb.z, m.z) < 0) return;
+    // Clouds Sphere
+    const cloudsMat = new THREE.MeshLambertMaterial({
+      map: cloudTexture,
+      transparent: true,
+      opacity: 0.42,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+    const cloudsMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R * 1.015, 64, 48), cloudsMat);
+    globeGroup.add(cloudsMesh);
 
-        const on = f >= 0 && (l.a === f || l.b === f);
-        const dim = f >= 0 && !on ? 0.45 : 1;
-        const al = (0.3 + 0.45 * Math.min(1, (pa.z + pb.z) / 1.3)) * dim;
-        const cxp = 2 * m.x - (pa.x + pb.x) / 2;
-        const cyp = 2 * m.y - (pa.y + pb.y) / 2;
+    // Atmospheric Outer Rim Glow
+    const atmoMat = new THREE.ShaderMaterial({
+      transparent: true,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      uniforms: {
+        sun: { value: sunDir }
+      },
+      vertexShader: `
+        varying vec3 vn;
+        void main() {
+          vn = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vn;
+        void main() {
+          float d = clamp(-vn.z, 0.0, 1.0);
+          float a = pow(1.0 - d, 2.8) * 0.58;
+          gl_FragColor = vec4(0.22, 0.62, 1.0, a);
+        }
+      `
+    });
+    const atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R * 1.12, 64, 48), atmoMat);
+    globeGroup.add(atmoMesh);
 
-        x.strokeStyle = on ? 'rgba(190,240,255,.95)' : 'rgba(140,225,255,' + al + ')';
-        x.lineWidth = on ? 2.2 : 1.1;
-        x.beginPath();
-        x.moveTo(pa.x, pa.y);
-        x.quadraticCurveTo(cxp, cyp, pb.x, pb.y);
-        x.stroke();
+    // Atmospheric Soft Glow Sprite
+    const haloSprite = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: glowTexture,
+        color: 0x2a8cff,
+        transparent: true,
+        opacity: 0.35,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      })
+    );
+    haloSprite.scale.set(3.4, 3.4, 1);
+    haloSprite.position.z = -0.3;
+    globeGroup.add(haloSprite);
 
-        const q = (l.ph + T * l.sp * (on ? 2.5 : 1)) % 1;
-        const u = 1 - q;
-        const qx = u * u * pa.x + 2 * u * q * cxp + q * q * pb.x;
-        const qy = u * u * pa.y + 2 * u * q * cyp + q * q * pb.y;
-        x.fillStyle = 'rgba(90,225,255,' + (0.3 * dim) + ')';
-        x.beginPath();
-        x.arc(qx, qy, 7, 0, 7);
-        x.fill();
-        x.fillStyle = 'rgba(255,255,255,' + (0.95 * dim) + ')';
-        x.beginPath();
-        x.arc(qx, qy, 2.4, 0, 7);
-        x.fill();
+    // Citation Arcs on Earth surface
+    const arcGroup = new THREE.Group();
+    globeGroup.add(arcGroup);
+
+    const latLonToV3 = (lat: number, lon: number, r: number) => {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+      return new THREE.Vector3(
+        -(r * Math.sin(phi) * Math.cos(theta)),
+        r * Math.cos(phi),
+        r * Math.sin(phi) * Math.sin(theta)
+      );
+    };
+
+    const hubs = [
+      latLonToV3(42.36, -71.09, GLOBE_R), // Boston
+      latLonToV3(37.42, -122.17, GLOBE_R), // SF
+      latLonToV3(51.50, -0.12, GLOBE_R),  // London
+      latLonToV3(35.68, 139.76, GLOBE_R), // Tokyo
+      latLonToV3(1.35, 103.82, GLOBE_R),  // Singapore
+      latLonToV3(-33.86, 151.21, GLOBE_R) // Sydney
+    ];
+
+    const arcCurves: THREE.QuadraticBezierCurve3[] = [];
+    const photonBeads: THREE.Mesh[] = [];
+
+    [[0, 1], [0, 2], [2, 3], [3, 4], [4, 5]].forEach(([iA, iB]) => {
+      const pA = hubs[iA];
+      const pB = hubs[iB];
+      const mid = new THREE.Vector3().addVectors(pA, pB).multiplyScalar(0.5);
+      mid.normalize().multiplyScalar(GLOBE_R * 1.25);
+      const curve = new THREE.QuadraticBezierCurve3(pA, mid, pB);
+      arcCurves.push(curve);
+
+      const pts = curve.getPoints(24);
+      const curveGeo = new THREE.BufferGeometry().setFromPoints(pts);
+      const curveMat = new THREE.LineBasicMaterial({
+        color: 0x67e8f9,
+        transparent: true,
+        opacity: 0.65,
+        blending: THREE.AdditiveBlending
       });
+      arcGroup.add(new THREE.Line(curveGeo, curveMat));
 
-      // City & Research Nodes
-      P.forEach((p, i) => {
-        if (p.z < 0.02) return;
-        const nd = nodes[i];
-        const isF = i === f;
-        const s = nd.s * (0.55 + p.z * 0.7) * (isF ? 1.35 : 1);
-        const pu = 1 + 0.25 * Math.sin(T * 0.05 + i);
+      const bead = new THREE.Mesh(
+        new THREE.SphereGeometry(0.024, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      arcGroup.add(bead);
+      photonBeads.push(bead);
+    });
 
-        x.globalAlpha = isF ? 1 : 0.75;
-        x.drawImage(sprite(nd.c), p.x - s * 6, p.y - s * 6, s * 12, s * 12);
-        x.globalAlpha = 1;
+    // ─────────────────────────────────────────────────────────────
+    // C. HANGING CITADEL PLATFORM UNDER THE EARTH
+    // ─────────────────────────────────────────────────────────────
+    const platformGroup = new THREE.Group();
+    platformGroup.position.set(0, -0.75, 0);
+    platformGroup.scale.setScalar(0.38);
+    platformGroup.rotation.x = 0.22;
+    masterGroup.add(platformGroup);
 
-        x.fillStyle = '#fff';
-        x.beginPath();
-        x.arc(p.x, p.y, s * 0.85, 0, 7);
-        x.fill();
+    // Platform Lathe Hull
+    const platProf = [
+      [0, 0.5], [1.8, 0.5], [2.2, 0.65], [3.0, 0.52], [4.2, 0.38], [5.4, 0.26],
+      [6.0, 0.12], [6.2, -0.12], [5.9, -0.42], [4.5, -0.70], [2.0, -0.88], [0, -0.92]
+    ].map(p => new THREE.Vector2(p[0], p[1]));
 
-        if (s > 4.2 || isF) {
-          x.strokeStyle = nd.c;
-          x.lineWidth = 1.5;
-          x.beginPath();
-          x.arc(p.x, p.y, (s + 4) * pu, 0, 7);
-          x.stroke();
-        }
-      });
+    const platHullMat = new THREE.MeshStandardMaterial({
+      color: 0x1a264a,
+      metalness: 0.88,
+      roughness: 0.32
+    });
+    const platLathe = new THREE.Mesh(new THREE.LatheGeometry(platProf, 64), platHullMat);
+    platformGroup.add(platLathe);
 
-      // Ripple on Selected Node
-      if (sel >= 0 && P[sel] && P[sel].z > 0) {
-        const qq = ((T - selT) % 90) / 90;
-        const p = P[sel];
-        x.strokeStyle = 'rgba(160,230,255,' + (1 - qq) + ')';
-        x.lineWidth = 2;
-        x.beginPath();
-        x.arc(p.x, p.y, 10 + qq * 70, 0, 7);
-        x.stroke();
-      }
+    // Concentric Glowing Neon Rings
+    const addPlatRing = (r: number, t: number, color: number, y: number, op = 1) => {
+      const m = new THREE.Mesh(
+        new THREE.TorusGeometry(r, t, 12, 64),
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, blending: THREE.AdditiveBlending })
+      );
+      m.rotation.x = Math.PI / 2;
+      m.position.y = y;
+      platformGroup.add(m);
+      return m;
+    };
 
-      // Orbital rings with rotating research signals. A signal stays closed at
-      // the back of the globe, then opens into a small coloured star of links
-      // only as it reaches the front-facing arc.
-      // Primary orbital ring with glowing cyan edge
-      x.strokeStyle = 'rgba(90,185,255,.45)';
-      x.lineWidth = 1.3;
-      x.beginPath();
-      x.ellipse(cx, cy, R * 1.27, R * 0.34, -0.35, 0, 7);
-      x.stroke();
+    addPlatRing(1.85, 0.045, 0x00f0ff, 0.82);
+    addPlatRing(2.60, 0.040, 0x818cf8, 0.72);
+    addPlatRing(3.50, 0.035, 0x38bdf8, 0.60);
+    addPlatRing(4.80, 0.038, 0x60a5fa, 0.48);
+    addPlatRing(6.15, 0.045, 0x0ea5e9, 0.32);
 
-      // Secondary tilted orbital ring (purple/indigo resonance)
-      x.strokeStyle = 'rgba(168,85,247,.35)';
-      x.lineWidth = 1.1;
-      x.beginPath();
-      x.ellipse(cx, cy, R * 1.40, R * 0.40, 0.42, 0, 7);
-      x.stroke();
+    // Central Holographic Emitter Pad
+    const padMesh = new THREE.Mesh(
+      new THREE.CircleGeometry(1.85, 48),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false })
+    );
+    padMesh.rotation.x = -Math.PI / 2;
+    padMesh.position.y = 0.51;
+    platformGroup.add(padMesh);
 
-      const orbitColors = ['#77d7ff', '#a98bff', '#5de0c5', '#ff8dd8'];
-      for (let k = 0; k < 4; k++) {
-        const a = T * 0.006 + k * (TAU / 4);
-        const qx = Math.cos(a) * R * 1.27;
-        const qy = Math.sin(a) * R * 0.34;
-        const rx = cx + qx * Math.cos(-0.35) - qy * Math.sin(-0.35);
-        const ry = cy + qx * Math.sin(-0.35) + qy * Math.cos(-0.35);
-        const inFront = (Math.sin(a) + 1) / 2;
-        const open = Math.max(0, Math.min(1, (inFront - 0.66) / 0.34));
-        const pulse = 0.55 + Math.sin(T * 0.08 + k * 1.7) * 0.45;
-        const spread = open * open * pulse;
-        const color = orbitColors[k];
+    // Rim City Buildings
+    const winCyan = new THREE.MeshBasicMaterial({ color: 0x2fdcff });
+    const winGold = new THREE.MeshBasicMaterial({ color: 0xffc86a });
+    const buildingMat = new THREE.MeshStandardMaterial({ color: 0x1e2748, metalness: 0.85, roughness: 0.35 });
 
-        const glow = x.createRadialGradient(rx, ry, 0, rx, ry, 24 + spread * 26);
-        glow.addColorStop(0, color);
-        glow.addColorStop(0.3, color + 'aa');
-        glow.addColorStop(1, 'rgba(0,0,0,0)');
-        x.fillStyle = glow;
-        x.beginPath();
-        x.arc(rx, ry, 24 + spread * 26, 0, TAU);
-        x.fill();
+    for (let i = 0; i < 60; i++) {
+      const a = (i / 60) * Math.PI * 2;
+      const r = 4.8 + Math.random() * 1.1;
+      const h = 0.2 + Math.random() * 0.45;
+      const b = new THREE.Mesh(new THREE.BoxGeometry(0.4 + Math.random() * 0.4, h, 0.3 + Math.random() * 0.2), buildingMat);
+      b.position.set(Math.cos(a) * r, 0.26 + (6.0 - r) * 0.12 + h / 2, Math.sin(a) * r);
+      b.rotation.y = -a;
+      platformGroup.add(b);
 
-        if (spread > 0.02) {
-          x.save();
-          x.translate(rx, ry);
-          x.rotate(T * 0.025 + k);
-          x.strokeStyle = color;
-          x.globalAlpha = 0.2 + spread * 0.72;
-          x.lineWidth = 1.4;
-          for (let ray = 0; ray < 6; ray++) {
-            const theta = ray * TAU / 6;
-            const length = 10 + spread * 38;
-            x.beginPath();
-            x.moveTo(Math.cos(theta) * 5, Math.sin(theta) * 5);
-            x.lineTo(Math.cos(theta) * length, Math.sin(theta) * length);
-            x.stroke();
-          }
-          x.restore();
-          x.globalAlpha = 1;
-        }
-
-        x.fillStyle = color;
-        x.beginPath();
-        x.arc(rx, ry, 4.2 + spread * 3.6, 0, TAU);
-        x.fill();
-        x.fillStyle = '#ffffff';
-        x.beginPath();
-        x.arc(rx, ry, 1.5 + spread * 1.2, 0, TAU);
-        x.fill();
-      }
-      x.globalCompositeOperation = 'source-over';
-
-      // Cursor & Tooltip
-      c.style.cursor = drag ? 'grabbing' : (hov >= 0 ? 'pointer' : 'grab');
-      if (hov >= 0 && !drag) {
-        const nd2 = nodes[hov];
-        const p2 = P[hov];
-        const b = c.getBoundingClientRect();
-        const sb = stage.getBoundingClientRect();
-        tip.textContent = nd2.t + ' · ' + nd2.n.toLocaleString('en-US') + ' links';
-        tip.style.setProperty('--c', nd2.c);
-        tip.style.transform = 'translate(' + (b.left - sb.left + p2.x / W * b.width) + 'px,' + (b.top - sb.top + p2.y / W * b.height) + 'px) translate(-50%,-150%)';
-        tip.classList.add('on');
-      } else {
-        tip.classList.remove('on');
+      if (Math.random() < 0.75) {
+        const w = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.05, 0.32), Math.random() < 0.8 ? winCyan : winGold);
+        w.position.copy(b.position);
+        w.rotation.y = b.rotation.y;
+        platformGroup.add(w);
       }
     }
 
-    function cpos(e: PointerEvent) {
-      const b = c!.getBoundingClientRect();
-      return {
-        x: (e.clientX - b.left) / b.width * W,
-        y: (e.clientY - b.top) / b.height * W,
-        k: 1 / (b.width * R / W)
-      };
+    // Glass Research Domes
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: 0x6fd0ff,
+      metalness: 0.1,
+      roughness: 0.05,
+      transparent: true,
+      opacity: 0.6,
+      emissive: 0x1a6aaa,
+      emissiveIntensity: 0.8
+    });
+    [[3.2, 1.4, 0.7], [-3.0, -1.8, 0.6], [1.2, -3.2, 0.55], [-1.5, 3.2, 0.58]].forEach(([x, z, r]) => {
+      const d = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), glassMat);
+      d.position.set(x, 0.52, z);
+      platformGroup.add(d);
+    });
+
+    // Inverted Craggy Asteroid Rock Base
+    const rockGeo = new THREE.ConeGeometry(5.2, 3.6, 48, 16, true);
+    rockGeo.rotateX(Math.PI);
+    const rPos = rockGeo.attributes.position;
+    for (let i = 0; i < rPos.count; i++) {
+      const x = rPos.getX(i), y = rPos.getY(i), z = rPos.getZ(i);
+      const n = Math.sin(x * 2.3 + y) * Math.cos(z * 2.1 - y * 1.4) * 0.32;
+      rPos.setXYZ(i, x * (1 + n * 0.3), y + n * 0.25, z * (1 + n * 0.3));
     }
+    rockGeo.computeVertexNormals();
+    const rockMesh = new THREE.Mesh(
+      rockGeo,
+      new THREE.MeshStandardMaterial({ color: 0x161d36, roughness: 0.88, metalness: 0.2, flatShading: true, side: THREE.DoubleSide })
+    );
+    rockMesh.position.y = -2.4;
+    platformGroup.add(rockMesh);
+
+    // Graviton Thrusters with Plasma Beams
+    const thrusters: THREE.Mesh[] = [];
+    [[-4.2, -1.2], [-3.8, 1.0], [4.0, 1.2], [4.2, -0.9], [-1.0, 2.8], [0, -0.4]].forEach(([x, z]) => {
+      const f = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12, 0.04, 1.2, 12, 1, true),
+        new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false })
+      );
+      f.position.set(x, -1.6, z);
+      platformGroup.add(f);
+      thrusters.push(f);
+    });
+
+    // Holographic Projection Cylinder Beam connecting Platform to Earth
+    const holoBeam = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.3, 1.85, 2.2, 32, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.28,
+        blending: THREE.AdditiveBlending,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      })
+    );
+    holoBeam.position.set(0, 1.5, 0);
+    platformGroup.add(holoBeam);
+
+    // ─────────────────────────────────────────────────────────────
+    // D. 3D UFO RECON CRAFT
+    // ─────────────────────────────────────────────────────────────
+    const ufoGroup = new THREE.Group();
+    // Saucer Disc Hull
+    const saucerGeo = new THREE.CylinderGeometry(0.38, 0.44, 0.08, 24);
+    const saucerMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.25 });
+    const saucer = new THREE.Mesh(saucerGeo, saucerMat);
+    ufoGroup.add(saucer);
+
+    // Cabin Dome
+    const domeGeo = new THREE.SphereGeometry(0.22, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+    const domeMat = new THREE.MeshBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.85 });
+    const dome = new THREE.Mesh(domeGeo, domeMat);
+    dome.position.y = 0.04;
+    ufoGroup.add(dome);
+
+    // Rotating Rim Light Ring
+    const rimGeo = new THREE.TorusGeometry(0.42, 0.02, 8, 24);
+    const rimMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const rim = new THREE.Mesh(rimGeo, rimMat);
+    rim.rotation.x = Math.PI / 2;
+    ufoGroup.add(rim);
+
+    // Default High-Orbit Position
+    const UFO_ORBIT_POS = new THREE.Vector3(1.7, 1.5, 0.4);
+    ufoGroup.position.copy(UFO_ORBIT_POS);
+    ufoGroup.rotation.set(0.18, -0.4, 0.12);
+    masterGroup.add(ufoGroup);
+
+    // ─────────────────────────────────────────────────────────────
+    // E. 3D ORIGAMI / CYBER BIRD
+    // ─────────────────────────────────────────────────────────────
+    const birdGroup = new THREE.Group();
+    const birdMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      metalness: 0.2,
+      roughness: 0.5,
+      side: THREE.DoubleSide
+    });
+
+    // Bird Body
+    const bodyGeo = new THREE.ConeGeometry(0.08, 0.45, 4);
+    bodyGeo.rotateX(Math.PI / 2);
+    const birdBody = new THREE.Mesh(bodyGeo, birdMat);
+    birdGroup.add(birdBody);
+
+    // Articulated Wings
+    const wingL = new THREE.Group();
+    const wingR = new THREE.Group();
+
+    const wingGeo = new THREE.BufferGeometry();
+    const wVerts = new Float32Array([
+      0, 0, 0,
+      -0.45, 0.08, -0.2,
+      -0.3, 0, 0.25
+    ]);
+    wingGeo.setAttribute('position', new THREE.BufferAttribute(wVerts, 3));
+    wingGeo.computeVertexNormals();
+
+    const wMeshL = new THREE.Mesh(wingGeo, birdMat);
+    wingL.add(wMeshL);
+
+    const wingGeoR = new THREE.BufferGeometry();
+    const wVertsR = new Float32Array([
+      0, 0, 0,
+      0.45, 0.08, -0.2,
+      0.3, 0, 0.25
+    ]);
+    wingGeoR.setAttribute('position', new THREE.BufferAttribute(wVertsR, 3));
+    wingGeoR.computeVertexNormals();
+
+    const wMeshR = new THREE.Mesh(wingGeoR, birdMat);
+    wingR.add(wMeshR);
+
+    birdGroup.add(wingL);
+    birdGroup.add(wingR);
+
+    // Default High-Orbit Position
+    const BIRD_ORBIT_POS = new THREE.Vector3(-1.6, 1.45, 0.3);
+    birdGroup.position.copy(BIRD_ORBIT_POS);
+    masterGroup.add(birdGroup);
+
+    // ─────────────────────────────────────────────────────────────
+    // F. MINIMAL PAPER COURIER ANIMATION (ZERO CLUTTER)
+    // ─────────────────────────────────────────────────────────────
+    // A single glowing paper document carried during delivery
+    const paperGeo = new THREE.PlaneGeometry(0.22, 0.28);
+    const paperMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0
+    });
+    const paperMesh = new THREE.Mesh(paperGeo, paperMat);
+    paperMesh.rotation.x = -Math.PI / 3;
+    scene.add(paperMesh);
+
+    // Ripple Mesh for when a paper merges into the globe
+    const rippleGeo = new THREE.RingGeometry(0.04, 0.08, 32);
+    const rippleMat = new THREE.MeshBasicMaterial({
+      color: 0x67e8f9,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending
+    });
+    const rippleMesh = new THREE.Mesh(rippleGeo, rippleMat);
+    scene.add(rippleMesh);
+
+    let courierTimer = 0;
+    let courierType: 'bird' | 'ufo' = 'bird';
+    let courierPhase = 0; // 0: standby, 1: arriving with paper, 2: delivering, 3: returning
+    let courierProgress = 0;
+    let rippleProgress = 1.0;
+
+    // ─────────────────────────────────────────────────────────────
+    // G. DRAG TO ROTATE & POINTER CONTROLS
+    // ─────────────────────────────────────────────────────────────
+    let isDragging = false;
+    let prevX = 0;
+    let rotVelY = 0;
+    let targetRotY = 0;
 
     const onPointerDown = (e: PointerEvent) => {
-      const q = cpos(e);
-      if (Math.hypot(q.x - cx, q.y - cy) > R * 1.3) return;
-      c.setPointerCapture(e.pointerId);
-      drag = { px: e.clientX, py: e.clientY, t: e.timeStamp, moved: 0 };
-      vel = 0;
-      tgt = null;
-      hint.classList.add('off');
+      isDragging = true;
+      prevX = e.clientX;
+      rotVelY = 0;
+      canvas.setPointerCapture(e.pointerId);
     };
 
     const onPointerMove = (e: PointerEvent) => {
-      const q = cpos(e);
-      mp = { x: q.x, y: q.y };
-      if (!drag) return;
-      const dx = e.clientX - drag.px;
-      const dy = e.clientY - drag.py;
-      const dtm = Math.max(1, e.timeStamp - drag.t);
-      drag.moved += Math.abs(dx) + Math.abs(dy);
-      ang -= dx * q.k;
-      const nt = clampT(tilt + dy * q.k * 0.8);
-      if (Math.abs(nt - tilt) > 0.001) setTilt(nt);
-      vel = -dx * q.k / dtm * 16 * 0.5 + vel * 0.5;
-      drag.px = e.clientX;
-      drag.py = e.clientY;
-      drag.t = e.timeStamp;
+      if (!isDragging) return;
+      const dx = e.clientX - prevX;
+      prevX = e.clientX;
+      rotVelY = dx * 0.005;
+      targetRotY += rotVelY;
     };
 
-    const end = () => {
-      if (!drag) return;
-      const click = drag.moved < 5;
-      drag = null;
-      idle = performance.now() + 2500;
-      if (click && mp) {
-        const i = hit(mp.x, mp.y);
-        if (i >= 0) {
-          sel = i;
-          selT = T;
-          tgt = { a: Math.atan2(nodes[i].x, nodes[i].z), t: clampT(Math.asin(nodes[i].y)) };
+    const onPointerUp = (e: PointerEvent) => {
+      isDragging = false;
+      try { canvas.releasePointerCapture(e.pointerId); } catch {}
+    };
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+
+    // Resize handler
+    const handleResize = () => {
+      if (!container) return;
+      width = container.clientWidth || 640;
+      height = container.clientHeight || 420;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    };
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(container);
+
+    // 3D to 2D Screen projection helper
+    const projectToScreen = (v: THREE.Vector3) => {
+      const p = v.clone().project(camera);
+      return {
+        x: (p.x + 1) * 0.5 * width,
+        y: (1 - p.y) * 0.5 * height
+      };
+    };
+
+    let animId: number;
+    const clock = new THREE.Clock();
+
+    const animate = () => {
+      animId = requestAnimationFrame(animate);
+      const dt = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
+
+      // 1. Master Group Levitation
+      masterGroup.position.y = Math.sin(elapsed * 1.3) * 0.05;
+
+      // 2. Drag Rotation with momentum
+      if (!isDragging) {
+        rotVelY *= 0.94;
+        targetRotY += rotVelY;
+      }
+      masterGroup.rotation.y += (targetRotY - masterGroup.rotation.y) * 0.08;
+
+      // 3. Earth Globe slow spin
+      earthMesh.rotation.y += 0.0035;
+      cloudsMesh.rotation.y += 0.0042;
+
+      // 4. Thruster pulse
+      thrusters.forEach((t, i) => {
+        (t.material as THREE.MeshBasicMaterial).opacity = 0.5 + Math.sin(elapsed * 12 + i) * 0.25;
+      });
+
+      // 5. Travelling citation photons
+      photonBeads.forEach((bead, i) => {
+        const curve = arcCurves[i];
+        if (curve) {
+          const prog = (elapsed * 0.4 + i * 0.2) % 1.0;
+          bead.position.copy(curve.getPoint(prog));
+        }
+      });
+
+      // 6. Minimal Courier Paper Delivery State Machine
+      courierTimer += dt;
+      if (courierPhase === 0 && courierTimer > 7.5) {
+        // Start a minimal delivery mission
+        courierTimer = 0;
+        courierPhase = 1;
+        courierProgress = 0;
+        courierType = Math.random() < 0.5 ? 'bird' : 'ufo';
+        paperMat.opacity = 1.0;
+      }
+
+      if (courierPhase === 1) {
+        // Approaching the globe from off-screen / invisible side
+        courierProgress += dt * 0.55;
+        const tClamped = Math.min(1.0, courierProgress);
+
+        if (courierType === 'bird') {
+          // Bird swoops in from upper left off-screen
+          const start = new THREE.Vector3(-4.2, 2.2, -1.0);
+          const end = new THREE.Vector3(-0.45, 0.65, 0.95);
+          const current = new THREE.Vector3().lerpVectors(start, end, tClamped);
+          birdGroup.position.copy(current);
+          birdGroup.rotation.y = Math.PI * 0.4;
+          birdGroup.rotation.z = -0.25;
+          paperMesh.position.copy(current).add(new THREE.Vector3(0, -0.15, 0.1));
         } else {
-          sel = -1;
+          // UFO glides in from upper right off-screen
+          const start = new THREE.Vector3(4.2, 2.4, -1.0);
+          const end = new THREE.Vector3(0.5, 0.75, 0.95);
+          const current = new THREE.Vector3().lerpVectors(start, end, tClamped);
+          ufoGroup.position.copy(current);
+          ufoGroup.rotation.z = -0.2;
+          paperMesh.position.copy(current).add(new THREE.Vector3(0, -0.22, 0.05));
+        }
+
+        if (courierProgress >= 1.0) {
+          // Deliver paper into globe
+          courierPhase = 2;
+          courierProgress = 0;
+          rippleProgress = 0;
+          rippleMesh.position.copy(paperMesh.position);
+          rippleMesh.quaternion.copy(camera.quaternion);
+        }
+      } else if (courierPhase === 2) {
+        // Delivery moment: paper fades into surface with ripple
+        courierProgress += dt * 2.0;
+        paperMat.opacity = Math.max(0, 1.0 - courierProgress);
+        if (courierProgress >= 1.0) {
+          courierPhase = 3;
+          courierProgress = 0;
+        }
+      } else if (courierPhase === 3) {
+        // Returning gracefully to high orbit position
+        courierProgress += dt * 0.45;
+        const tClamped = Math.min(1.0, courierProgress);
+
+        if (courierType === 'bird') {
+          birdGroup.position.lerp(BIRD_ORBIT_POS, tClamped);
+          birdGroup.rotation.set(0, 0, 0);
+        } else {
+          ufoGroup.position.lerp(UFO_ORBIT_POS, tClamped);
+          ufoGroup.rotation.set(0.18, -0.4, 0.12);
+        }
+
+        if (courierProgress >= 1.0) {
+          courierPhase = 0;
+          courierTimer = 0;
+          birdGroup.position.copy(BIRD_ORBIT_POS);
+          ufoGroup.position.copy(UFO_ORBIT_POS);
         }
       }
-    };
 
-    const onPointerLeave = () => {
-      if (!drag) {
-        mp = null;
-        hov = -1;
+      // Bird wing flap animation
+      const flap = Math.sin(elapsed * 11) * 0.45;
+      wingL.rotation.z = flap;
+      wingR.rotation.z = -flap;
+
+      // Ripple animation on paper merge
+      if (rippleProgress < 1.0) {
+        rippleProgress += dt * 1.5;
+        rippleMesh.scale.setScalar(0.2 + rippleProgress * 1.4);
+        rippleMat.opacity = (1.0 - rippleProgress) * 0.85;
+      } else {
+        rippleMat.opacity = 0;
       }
+
+      // 7. Update Pill and UFO 2D Screen Positions
+      masterGroup.updateMatrixWorld(true);
+      const newPositions: { [key: string]: { x: number; y: number; ax: number; ay: number } } = {};
+
+      pillDefs.forEach(p => {
+        const worldWp = p.wp.clone().applyMatrix4(masterGroup.matrixWorld);
+        const worldAp = p.ap.clone().applyMatrix4(masterGroup.matrixWorld);
+        const screenWp = projectToScreen(worldWp);
+        const screenAp = projectToScreen(worldAp);
+        newPositions[p.id] = {
+          x: screenWp.x,
+          y: screenWp.y,
+          ax: screenAp.x,
+          ay: screenAp.y
+        };
+      });
+
+      setPillPositions(newPositions);
+
+      // Project UFO position for RECON tag
+      const ufoWorld = ufoGroup.position.clone().applyMatrix4(masterGroup.matrixWorld);
+      const ufoScreen = projectToScreen(ufoWorld);
+      setUfoPos(ufoScreen);
+
+      renderer.render(scene, camera);
     };
 
-    const onKeyDown = (e: KeyboardEvent) => {
-      const m: Record<string, [number, number]> = {
-        ArrowLeft: [-0.12, 0],
-        ArrowRight: [0.12, 0],
-        ArrowUp: [0, 0.06],
-        ArrowDown: [0, -0.06]
-      };
-      if (!m[e.key]) return;
-      e.preventDefault();
-      ang += m[e.key][0];
-      setTilt(clampT(tilt + m[e.key][1]));
-      idle = performance.now() + 2500;
-      hint.classList.add('off');
-    };
-
-    c.addEventListener('pointerdown', onPointerDown);
-    c.addEventListener('pointermove', onPointerMove);
-    c.addEventListener('pointerup', end);
-    c.addEventListener('pointercancel', end);
-    c.addEventListener('pointerleave', onPointerLeave);
-    c.addEventListener('keydown', onKeyDown);
-
-    const hintTimer = setTimeout(() => {
-      hint.classList.add('off');
-    }, 8000);
-
-    const observer = new IntersectionObserver(en => {
-      vis = en[0].isIntersecting;
-      if (vis && !raf) {
-        last = performance.now();
-        raf = requestAnimationFrame(loop);
-      }
-    });
-    observer.observe(c);
-    raf = requestAnimationFrame(loop);
+    animate();
 
     return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(hintTimer);
-      observer.disconnect();
-      c.removeEventListener('pointerdown', onPointerDown);
-      c.removeEventListener('pointermove', onPointerMove);
-      c.removeEventListener('pointerup', end);
-      c.removeEventListener('pointercancel', end);
-      c.removeEventListener('pointerleave', onPointerLeave);
-      c.removeEventListener('keydown', onKeyDown);
+      cancelAnimationFrame(animId);
+      resizeObserver.disconnect();
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
+      renderer.dispose();
     };
-  }
-
-  useEffect(() => {
-    const c = canvasRef.current;
-    const stage = stageRef.current;
-    const tip = tipRef.current;
-    const hint = hintRef.current;
-    if (!c || !stage || !tip || !hint) return;
-
-    const x = c.getContext('2d');
-    if (!x) return;
-
-    return initResearchGraphGlobe(c, x, stage, tip, hint);
-  }, []);
+  }, [handleAction, handleSearch]);
 
   return (
-    <div className="rg-wrapper w-full overflow-visible select-none">
-      <style>{`
-        .rg-stage {
-          position: relative;
-          container-type: inline-size;
-          aspect-ratio: 1000/600;
-          width: 100%;
-          max-width: 960px;
-          margin: 0 auto;
-        }
-        .rg-stage canvas {
-          position: absolute;
-          left: 50%;
-          top: 36%;
-          width: 42%;
-          aspect-ratio: 1;
-          transform: translate(-50%, -50%);
-          cursor: grab;
-          touch-action: pan-y;
-          outline: none;
-          -webkit-tap-highlight-color: transparent;
-          z-index: 10;
-          animation: rg-globe-float 6.5s ease-in-out infinite;
-        }
-        .rg-stage canvas:focus-visible {
-          outline: 2px solid #35c6ff;
-          outline-offset: -4px;
-          border-radius: 50%;
-        }
+    <div 
+      ref={containerRef} 
+      className="relative w-full h-[400px] sm:h-[430px] lg:h-[450px] select-none flex items-center justify-center overflow-visible"
+    >
+      {/* 3D WebGL Canvas */}
+      <canvas 
+        ref={canvasRef} 
+        className="w-full h-full cursor-grab active:cursor-grabbing block focus:outline-none"
+        aria-label="Interactive 3D Hanging Platform with Realistic Knowledge Earth"
+      />
 
-        @keyframes rg-globe-float {
-          0%, 100% {
-            transform: translate(-50%, -50%) translateY(0px);
-          }
-          50% {
-            transform: translate(-50%, -50%) translateY(-6px);
-          }
-        }
+      {/* SVG Connector Lines and Anchor Dots */}
+      <svg 
+        ref={svgRef}
+        className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
+      >
+        {pillDefs.map(p => {
+          const pos = pillPositions[p.id];
+          if (!pos) return null;
+          return (
+            <g key={p.id}>
+              <line
+                x1={pos.x}
+                y1={pos.y}
+                x2={pos.ax}
+                y2={pos.ay}
+                stroke={p.color}
+                strokeWidth="1.2"
+                strokeDasharray="3 3"
+                opacity="0.65"
+              />
+              <circle
+                cx={pos.ax}
+                cy={pos.ay}
+                r="3.5"
+                fill={p.color}
+                className="animate-pulse"
+              />
+            </g>
+          );
+        })}
+      </svg>
 
-        /* ── CITADEL PROJECTION LEVITATION BEAM SYSTEM (ANCHORED TO ELEVATED DAIS) ── */
-        .rg-projector-pedestal {
-          position: absolute;
-          left: 50%;
-          top: 64%;
-          transform: translate(-50%, -50%);
-          width: 36cqw;
-          height: 16cqw;
-          pointer-events: none;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 5;
-        }
-        /* 1. Volumetric Conical Energy Beam */
-        .rg-projector-beam {
-          position: absolute;
-          bottom: 22%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 32cqw;
-          height: 28cqw;
-          background: linear-gradient(to top, rgba(6,182,212,0.52) 0%, rgba(56,189,248,0.3) 45%, rgba(129,140,248,0.12) 80%, transparent 100%);
-          clip-path: polygon(18% 100%, 82% 100%, 94% 0%, 6% 0%);
-          filter: blur(4px);
-          opacity: 0.92;
-          animation: rg-beam-pulse 4.5s ease-in-out infinite;
-        }
-        /* Inner Scanline Filament */
-        .rg-projector-filament {
-          position: absolute;
-          bottom: 24%;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 20cqw;
-          height: 26cqw;
-          background: linear-gradient(to top, rgba(165,243,252,0.7) 0%, rgba(56,189,248,0.35) 50%, transparent 100%);
-          clip-path: polygon(25% 100%, 75% 100%, 85% 0%, 15% 0%);
-          filter: blur(2px);
-          opacity: 0.8;
-          animation: rg-beam-pulse 3s ease-in-out infinite alternate;
-        }
-        /* 2. Platform Reflective Disc & Concentric Emitter Rings on Dais */
-        .rg-emitter-disc {
-          position: absolute;
-          width: 34cqw;
-          height: 10cqw;
-          border-radius: 50%;
-          background: radial-gradient(ellipse at center, rgba(6,182,212,0.5) 0%, rgba(56,189,248,0.28) 45%, rgba(99,102,241,0.08) 65%, transparent 80%);
-          filter: blur(3px);
-          animation: rg-ring-pulse 4s ease-in-out infinite;
-        }
-        .rg-projector-ring {
-          position: absolute;
-          border-radius: 50%;
-          border: 1.5px solid rgba(6, 182, 212, 0.75);
-          box-shadow: 0 0 14px rgba(6, 182, 212, 0.5), inset 0 0 10px rgba(99, 102, 241, 0.35);
-        }
-        .rg-projector-ring.r1 {
-          width: 30cqw;
-          height: 8cqw;
-          border-color: rgba(6, 182, 212, 0.65);
-          animation: rg-ring-pulse 4.5s ease-in-out infinite;
-        }
-        .rg-projector-ring.r2 {
-          width: 22cqw;
-          height: 6cqw;
-          border-color: rgba(56, 189, 248, 0.9);
-          box-shadow: 0 0 16px rgba(56, 189, 248, 0.65);
-          animation: rg-ring-pulse 3s ease-in-out infinite reverse;
-        }
-        .rg-projector-ring.r3 {
-          width: 14cqw;
-          height: 4cqw;
-          border-color: rgba(207, 250, 254, 0.95);
-          box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
-        }
+      {/* 7 Interactive Orbital Navigation Pills matching Image 2 */}
+      {pillDefs.map(p => {
+        const pos = pillPositions[p.id];
+        if (!pos) return null;
+        const Icon = p.icon;
+        return (
+          <button
+            key={p.id}
+            type="button"
+            onClick={p.action}
+            style={{
+              transform: `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`,
+              borderColor: p.color,
+              boxShadow: `0 4px 18px rgba(0,0,0,0.45), 0 0 12px ${p.color}40`
+            }}
+            className="absolute left-0 top-0 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0b142c]/90 hover:bg-[#111f42] text-white text-[11px] sm:text-xs font-semibold backdrop-blur-md transition-transform duration-200 hover:scale-105 border cursor-pointer group"
+          >
+            <span 
+              className="w-2 h-2 rounded-full" 
+              style={{ backgroundColor: p.color, boxShadow: `0 0 6px ${p.color}` }} 
+            />
+            <Icon className="w-3.5 h-3.5" style={{ color: p.color }} />
+            <span>{p.name}</span>
+            <span className="text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-200 font-bold">
+              {p.tag}
+            </span>
+          </button>
+        );
+      })}
 
-        /* 3. Soft Levitation Halo right beneath globe */
-        .rg-levitation-halo {
-          position: absolute;
-          left: 50%;
-          top: 55%;
-          transform: translate(-50%, -50%);
-          width: 28cqw;
-          height: 8cqw;
-          border-radius: 50%;
-          background: radial-gradient(ellipse at center, rgba(56,189,248,0.58) 0%, rgba(99,102,241,0.25) 50%, transparent 75%);
-          filter: blur(7px);
-          pointer-events: none;
-          z-index: 6;
-          animation: rg-beam-pulse 4.5s ease-in-out infinite;
-        }
-
-        /* 4. Subtle Planetary Equatorial Orbital Ring */
-        .rg-orbital-ring {
-          position: absolute;
-          left: 50%;
-          top: 36%;
-          width: 50cqw;
-          height: 14cqw;
-          transform: translate(-50%, -50%) rotate(-14deg);
-          border-radius: 50%;
-          border: 1px solid rgba(56, 189, 248, 0.32);
-          box-shadow: 0 0 12px rgba(56, 189, 248, 0.18), inset 0 0 10px rgba(129, 140, 248, 0.15);
-          pointer-events: none;
-          z-index: 9;
-        }
-
-        @keyframes rg-beam-pulse {
-          0%, 100% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
-          50% { opacity: 1; transform: translateX(-50%) scaleY(1.06); }
-        }
-        @keyframes rg-ring-pulse {
-          0%, 100% { transform: scale(0.97); opacity: 0.75; }
-          50% { transform: scale(1.03); opacity: 1; }
-        }
-        .rg-tip {
-          position: absolute;
-          left: 0;
-          top: 0;
-          pointer-events: none;
-          opacity: 0;
-          transition: opacity .15s;
-          padding: .7cqw 1.4cqw;
-          border-radius: 2cqw;
-          font-size: 1.35cqw;
-          font-weight: 600;
-          white-space: nowrap;
-          background: rgba(6,16,42,.95);
-          border: 1px solid var(--c, #4aa0ff);
-          color: #eaf2ff;
-          box-shadow: 0 0 1.6cqw -.3cqw var(--c, #4aa0ff);
-          z-index: 35;
-        }
-        .rg-tip.on { opacity: 1; }
-        .rg-hint {
-          position: absolute;
-          left: 50%;
-          top: 95%;
-          transform: translateX(-50%);
-          display: flex;
-          gap: .8cqw;
-          align-items: center;
-          padding: .5cqw 1.3cqw;
-          border-radius: 2cqw;
-          font-size: 1.2cqw;
-          color: #9fb6e6;
-          background: rgba(6,16,42,.85);
-          border: 1px solid rgba(120,150,220,.25);
-          pointer-events: none;
-          transition: opacity .6s;
-          z-index: 30;
-          white-space: nowrap;
-        }
-        .rg-hint.off { opacity: 0; }
-        .rg-hint svg {
-          width: 1.8cqw;
-          height: 1.8cqw;
-          stroke: #9fb6e6;
-          fill: none;
-          stroke-width: 2;
-          stroke-linecap: round;
-          stroke-linejoin: round;
-        }
-        .rg-links-svg {
-          position: absolute;
-          inset: 0;
-          width: 100%;
-          height: 100%;
-          overflow: visible;
-          pointer-events: none;
-        }
-        .rg-links-svg line {
-          stroke-width: 1.5;
-          stroke-linecap: round;
-          opacity: .8;
-        }
-        .rg-links-svg .g {
-          filter: drop-shadow(0 0 4px currentColor);
-        }
-        .rg-links-svg .p {
-          animation: rg-pl 2.8s ease-in-out infinite;
-          transform-box: fill-box;
-          transform-origin: center;
-        }
-        @keyframes rg-pl {
-          50% { transform: scale(1.7); opacity: .15; }
-        }
-        /* ── ELEGANT FLOATING ORBITAL NODES & LABELS (REPLACES HEAVY CARDS) ── */
-        .rg-orbit-pill {
-          position: absolute;
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          padding: 5px 13px 5px 9px;
-          border-radius: 999px;
-          font-weight: 700;
-          font-size: 11.5px;
-          letter-spacing: 0.02em;
-          white-space: nowrap;
-          color: #f1f5f9;
-          transform: translate(-50%, -50%);
-          z-index: 25;
-          cursor: pointer;
-          background: rgba(7, 13, 31, 0.85);
-          backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5), 0 0 12px var(--glow, rgba(56, 189, 248, 0.2));
-          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s, border-color 0.25s;
-        }
-        .rg-orbit-pill:hover {
-          transform: translate(-50%, -50%) scale(1.08);
-          border-color: var(--c, #38bdf8);
-          box-shadow: 0 6px 24px rgba(0, 0, 0, 0.65), 0 0 22px var(--glow, rgba(56, 189, 248, 0.5));
-        }
-        .rg-orbit-pill .dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: var(--c, #38bdf8);
-          box-shadow: 0 0 8px var(--c, #38bdf8);
-          flex-shrink: 0;
-        }
-        .rg-orbit-pill svg {
-          width: 13px;
-          height: 13px;
-          stroke: var(--c, #38bdf8);
-          fill: none;
-          stroke-width: 2;
-          flex-shrink: 0;
-        }
-        .rg-orbit-pill .tag {
-          font-family: ui-monospace, Menlo, Monaco, monospace;
-          font-size: 9.5px;
-          font-weight: 600;
-          color: #94a3b8;
-          padding: 1px 5px;
-          border-radius: 4px;
-          background: rgba(255, 255, 255, 0.06);
-          margin-left: 2px;
-        }
-      `}</style>
-
-      <div className="rg-stage" id="stage" ref={stageRef}>
-        <canvas
-          id="globe"
-          ref={canvasRef}
-          width={1200}
-          height={1200}
-          tabIndex={0}
-          aria-label="Interactive knowledge graph globe. Drag to rotate, hover a node for details, click a node to fly to it."
-        />
-
-        {/* Citadel Platform Holographic Projector Pedestal Base */}
-        <div className="rg-projector-pedestal" aria-hidden="true">
-          <div className="rg-emitter-disc" />
-          <div className="rg-projector-beam" />
-          <div className="rg-projector-filament" />
-          <div className="rg-projector-ring r1" />
-          <div className="rg-projector-ring r2" />
-          <div className="rg-projector-ring r3" />
+      {/* RECON SURVEYOR • 02% Badge next to UFO */}
+      {ufoPos && (
+        <div
+          style={{
+            transform: `translate(${ufoPos.x + 28}px, ${ufoPos.y - 24}px) translate(-50%, -50%)`
+          }}
+          className="absolute left-0 top-0 z-20 pointer-events-none flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#07132b]/85 border border-sky-400/60 text-[9.5px] font-mono text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.45)] backdrop-blur-sm"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping" />
+          <span>RECON SURVEYOR • 02%</span>
         </div>
+      )}
 
-        {/* Soft Levitation Halo beneath the globe */}
-        <div className="rg-levitation-halo" aria-hidden="true" />
-
-        {/* Subtle Equatorial Orbital Ring */}
-        <div className="rg-orbital-ring" aria-hidden="true" />
-
-        {/* Fine Animated Orbital Connection Vectors */}
-        <svg className="rg-links-svg" viewBox="0 0 1000 585" aria-hidden="true">
-          {/* 1. Knowledge Graph Link (Upper Left) */}
-          <g style={{ color: '#10b981' }} className="g">
-            <line x1="200" y1="72" x2="410" y2="160" stroke="#10b981" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="200" cy="72" r="3" fill="#10b981" />
-            <circle cx="410" cy="160" r="2.5" fill="#fff" />
-          </g>
-
-          {/* 2. Research Papers Link (Upper Right) */}
-          <g style={{ color: '#38bdf8' }} className="g">
-            <line x1="800" y1="72" x2="590" y2="160" stroke="#38bdf8" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="800" cy="72" r="3" fill="#38bdf8" />
-            <circle cx="590" cy="160" r="2.5" fill="#fff" />
-          </g>
-
-          {/* 3. AI Insights Link (Mid Left) */}
-          <g style={{ color: '#6366f1' }} className="g">
-            <line x1="120" y1="210" x2="380" y2="216" stroke="#6366f1" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="120" cy="210" r="3" fill="#6366f1" />
-            <circle cx="380" cy="216" r="2.5" fill="#fff" />
-          </g>
-
-          {/* 4. Authors Link (Mid Right) */}
-          <g style={{ color: '#06b6d4' }} className="g">
-            <line x1="880" y1="210" x2="620" y2="216" stroke="#06b6d4" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="880" cy="210" r="3" fill="#06b6d4" />
-            <circle cx="620" cy="216" r="2.5" fill="#fff" />
-          </g>
-
-          {/* 5. Concepts Link (Lower Left) */}
-          <g style={{ color: '#a855f7' }} className="g">
-            <line x1="160" y1="350" x2="395" y2="275" stroke="#a855f7" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="160" cy="350" r="3" fill="#a855f7" />
-            <circle cx="395" cy="275" r="2.5" fill="#fff" />
-          </g>
-
-          {/* 6. Datasets Link (Lower Right) */}
-          <g style={{ color: '#f59e0b' }} className="g">
-            <line x1="840" y1="350" x2="605" y2="275" stroke="#f59e0b" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="840" cy="350" r="3" fill="#f59e0b" />
-            <circle cx="605" cy="275" r="2.5" fill="#fff" />
-          </g>
-
-          {/* 7. Citations Link (Lower Flank) */}
-          <g style={{ color: '#ec4899' }} className="g">
-            <line x1="700" y1="455" x2="570" y2="310" stroke="#ec4899" strokeDasharray="3 3" opacity="0.55" />
-            <circle cx="700" cy="455" r="3" fill="#ec4899" />
-            <circle cx="570" cy="310" r="2.5" fill="#fff" />
-          </g>
-        </svg>
-
-        {/* 7 Sleek, Compact Orbital Nodes (Zero Clutter, Zero Overlap) */}
-        {/* 1. Knowledge Graph */}
-        <button
-          type="button"
-          onClick={() => handleAction('graph')}
-          className="rg-orbit-pill"
-          style={{
-            left: '18%',
-            top: '12%',
-            '--c': '#10b981',
-            '--glow': 'rgba(16, 185, 129, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="18" r="2.5"/><circle cx="19" cy="18" r="2.5"/><path d="m11 7.5-5 8M13 7.5l5 8M8 18h8"/></svg>
-          <span>Knowledge Graph</span>
-          <span className="tag">AI-Core</span>
-        </button>
-
-        {/* 2. Research Papers */}
-        <button
-          type="button"
-          onClick={() => handleAction('search')}
-          className="rg-orbit-pill"
-          style={{
-            left: '80%',
-            top: '12%',
-            '--c': '#38bdf8',
-            '--glow': 'rgba(56, 189, 248, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><path d="M6 3h8l5 5v13H6zM14 3v5h5M9 13h7M9 17h7"/></svg>
-          <span>Research Papers</span>
-          <span className="tag">204M+</span>
-        </button>
-
-        {/* 3. AI Insights */}
-        <button
-          type="button"
-          onClick={() => handleAction('search')}
-          className="rg-orbit-pill"
-          style={{
-            left: '10%',
-            top: '36%',
-            '--c': '#818cf8',
-            '--glow': 'rgba(129, 140, 248, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          <span>AI Insights</span>
-          <span className="tag">Consensus</span>
-        </button>
-
-        {/* 4. Authors */}
-        <button
-          type="button"
-          onClick={() => handleSearch('Research authors')}
-          className="rg-orbit-pill"
-          style={{
-            left: '88%',
-            top: '36%',
-            '--c': '#06b6d4',
-            '--glow': 'rgba(6, 182, 212, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          <span>Authors</span>
-          <span className="tag">12.4M</span>
-        </button>
-
-        {/* 5. Concepts */}
-        <button
-          type="button"
-          onClick={() => handleSearch('Ontological concepts')}
-          className="rg-orbit-pill"
-          style={{
-            left: '14%',
-            top: '60%',
-            '--c': '#a855f7',
-            '--glow': 'rgba(168, 85, 247, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg>
-          <span>Concepts</span>
-          <span className="tag">1.8M</span>
-        </button>
-
-        {/* 6. Datasets */}
-        <button
-          type="button"
-          onClick={() => handleSearch('Empirical datasets')}
-          className="rg-orbit-pill"
-          style={{
-            left: '84%',
-            top: '60%',
-            '--c': '#f59e0b',
-            '--glow': 'rgba(245, 158, 11, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></svg>
-          <span>Datasets</span>
-          <span className="tag">85K+</span>
-        </button>
-
-        {/* 7. Citations */}
-        <button
-          type="button"
-          onClick={() => handleSearch('Citation networks')}
-          className="rg-orbit-pill"
-          style={{
-            left: '70%',
-            top: '78%',
-            '--c': '#ec4899',
-            '--glow': 'rgba(236, 72, 153, 0.4)'
-          } as React.CSSProperties}
-        >
-          <span className="dot" />
-          <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
-          <span>Citations</span>
-          <span className="tag">1.24B</span>
-        </button>
-
-        <div className="rg-tip" id="tip" ref={tipRef} role="status" />
-        <div className="rg-hint" id="hint" ref={hintRef}>
-          <svg viewBox="0 0 24 24">
-            <path d="M12 3a9 9 0 1 0 9 9" />
-            <path d="M21 3v6h-6" />
-          </svg>
-          Drag to rotate &middot; click a node
-        </div>
+      {/* Drag hint at bottom */}
+      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900/60 dark:bg-black/60 border border-white/10 text-[10px] text-cyan-200/80 pointer-events-none backdrop-blur-xs">
+        <RotateCcw className="w-2.5 h-2.5 text-cyan-400" />
+        <span>Drag to rotate 3D Earth</span>
       </div>
     </div>
   );
 };
-
