@@ -57,7 +57,8 @@ export const LandingView: React.FC<LandingViewProps> = ({ onNavigateAuth }) => {
       const { type, payload } = event.data;
 
       if (type === 'NAVIGATE_AUTH') {
-        onNavigateAuth(payload || 'LOGIN');
+        const mode = (payload === 'SIGNUP' || payload === 'REGISTER') ? 'REGISTER' : 'LOGIN';
+        onNavigateAuth(mode);
       } else if (type === 'LAUNCH_COCKPIT') {
         onNavigateAuth('LOGIN');
       } else if (type === 'SEARCH') {
