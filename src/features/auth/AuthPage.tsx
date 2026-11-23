@@ -75,8 +75,10 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
       pageState === 'LANDING' ? 'bg-[#060B19] text-white' : 'bg-[#030712] text-white'
     }`}>
 
-      {/* --- INTERACTIVE 3D SPACE BACKGROUND --- */}
-      <InteractiveSpaceBackground pageState={pageState} authMode={authMode} />
+      {/* --- INTERACTIVE 3D SPACE BACKGROUND (Active only on AUTH mode to avoid duplicate canvas loop on LANDING) --- */}
+      {pageState === 'AUTH' && (
+        <InteractiveSpaceBackground pageState={pageState} authMode={authMode} />
+      )}
 
       {/* --- PAGE CONTENT CONTAINER --- */}
       <div 
