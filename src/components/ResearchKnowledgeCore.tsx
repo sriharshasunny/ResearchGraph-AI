@@ -40,15 +40,15 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     }
   }, [onNavigate, setSearchQuery, setActivePage]);
 
-  // Pill and Badge definitions matching Image 2
+  // 7 Orbital Navigation Pills matching Image 2
   const pillDefs = [
-    { id: 'graph', name: 'Knowledge Graph', tag: 'AI-Core', color: '#10b981', icon: Network, action: () => handleAction('graph'), wp: new THREE.Vector3(-1.85, 1.25, 0.2), ap: new THREE.Vector3(-0.75, 0.45, 0.65) },
-    { id: 'papers', name: 'Research Papers', tag: '204M+', color: '#38bdf8', icon: FileText, action: () => handleAction('search'), wp: new THREE.Vector3(1.85, 1.20, 0.2), ap: new THREE.Vector3(0.75, 0.45, 0.65) },
-    { id: 'insights', name: 'AI Insights', tag: 'Consensus', color: '#a855f7', icon: Sparkles, action: () => handleAction('chat'), wp: new THREE.Vector3(-2.05, 0.35, 0.2), ap: new THREE.Vector3(-0.85, 0.05, 0.6) },
-    { id: 'authors', name: 'Authors', tag: '12.4M+', color: '#14b8a6', icon: Users, action: () => handleSearch('Research authors'), wp: new THREE.Vector3(2.05, 0.30, 0.2), ap: new THREE.Vector3(0.85, 0.05, 0.6) },
-    { id: 'concepts', name: 'Concepts', tag: '1.8M+', color: '#818cf8', icon: Layers, action: () => handleSearch('Ontological concepts'), wp: new THREE.Vector3(-1.80, -0.48, 0.2), ap: new THREE.Vector3(-0.65, -0.35, 0.6) },
-    { id: 'datasets', name: 'Datasets', tag: '85K+', color: '#f59e0b', icon: Database, action: () => handleSearch('Empirical datasets'), wp: new THREE.Vector3(1.90, -0.48, 0.2), ap: new THREE.Vector3(0.65, -0.35, 0.6) },
-    { id: 'citations', name: 'Citations', tag: '1.24B+', color: '#ec4899', icon: Link2, action: () => handleAction('graph'), wp: new THREE.Vector3(1.30, -1.35, 1.0), ap: new THREE.Vector3(0.65, -1.05, 0.75) }
+    { id: 'graph', name: 'Knowledge Graph', tag: 'AI-Core', color: '#10b981', icon: Network, action: () => handleAction('graph'), wp: new THREE.Vector3(-1.80, 0.95, 0.2), ap: new THREE.Vector3(-0.95, 0.45, 0.65) },
+    { id: 'papers', name: 'Research Papers', tag: '204M+', color: '#38bdf8', icon: FileText, action: () => handleAction('search'), wp: new THREE.Vector3(1.80, 0.95, 0.2), ap: new THREE.Vector3(0.95, 0.45, 0.65) },
+    { id: 'insights', name: 'AI Insights', tag: 'Consensus', color: '#a855f7', icon: Sparkles, action: () => handleAction('chat'), wp: new THREE.Vector3(-2.05, 0.05, 0.2), ap: new THREE.Vector3(-1.15, 0.0, 0.5) },
+    { id: 'authors', name: 'Authors', tag: '12.4M+', color: '#14b8a6', icon: Users, action: () => handleSearch('Research authors'), wp: new THREE.Vector3(2.05, 0.05, 0.2), ap: new THREE.Vector3(1.15, 0.0, 0.5) },
+    { id: 'concepts', name: 'Concepts', tag: '1.8M+', color: '#818cf8', icon: Layers, action: () => handleSearch('Ontological concepts'), wp: new THREE.Vector3(-1.75, -0.85, 0.2), ap: new THREE.Vector3(-0.85, -0.55, 0.65) },
+    { id: 'datasets', name: 'Datasets', tag: '85K+', color: '#f59e0b', icon: Database, action: () => handleSearch('Empirical datasets'), wp: new THREE.Vector3(1.85, -0.85, 0.2), ap: new THREE.Vector3(0.85, -0.55, 0.65) },
+    { id: 'citations', name: 'Citations', tag: '1.24B+', color: '#ec4899', icon: Link2, action: () => handleAction('graph'), wp: new THREE.Vector3(0.0, -1.35, 1.0), ap: new THREE.Vector3(0.0, -1.15, 0.55) }
   ];
 
   const [pillPositions, setPillPositions] = useState<{ [key: string]: { x: number; y: number; ax: number; ay: number } }>({});
@@ -71,7 +71,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         alpha: true,
         powerPreference: 'high-performance'
       });
-    } catch (e) {
+    } catch {
       return;
     }
 
@@ -83,11 +83,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     // 2. Scene & Camera
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-    camera.position.set(0, 0.25, 5.4);
-    camera.lookAt(0, 0.05, 0);
+    camera.position.set(0, 0.05, 5.2);
+    camera.lookAt(0, 0, 0);
 
     // 3. Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.88);
     scene.add(ambientLight);
 
     const sunDir = new THREE.Vector3(-0.62, 0.38, 0.69).normalize();
@@ -95,7 +95,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     sunLight.position.copy(sunDir).multiplyScalar(10);
     scene.add(sunLight);
 
-    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.1);
+    const rimLight = new THREE.DirectionalLight(0x38bdf8, 1.0);
     rimLight.position.set(4, 2, -3);
     scene.add(rimLight);
 
@@ -120,7 +120,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       return land[v * MW + u];
     }
 
-    // Helper to create texture from canvas
     const createTex = (w: number, h: number, draw: (ctx: CanvasRenderingContext2D) => void) => {
       const c = document.createElement('canvas');
       c.width = w; c.height = h;
@@ -131,7 +130,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       return tex;
     };
 
-    // 1. Soft Glow Sprite Texture
+    // Soft Glow Sprite Texture
     const glowTexture = createTex(128, 128, ctx => {
       const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
       g.addColorStop(0, 'rgba(255,255,255,1)');
@@ -141,7 +140,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       ctx.fillRect(0, 0, 128, 128);
     });
 
-    // 2. Procedural Day Earth Texture
+    // Procedural Day Earth Texture
     const dayTexture = createTex(1024, 512, ctx => {
       const img = ctx.createImageData(1024, 512);
       const d = img.data;
@@ -152,13 +151,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           const idx = (j * 1024 + i) * 4;
           const l = isLand(lat, lon);
           if (l) {
-            // Natural land tones with subtle variation
             const tone = (Math.sin(lat * 0.12) * Math.cos(lon * 0.14) + 1) * 0.5;
-            d[idx + 0] = Math.floor(40 + tone * 45); // R
-            d[idx + 1] = Math.floor(88 + tone * 35); // G
-            d[idx + 2] = Math.floor(52 + tone * 25); // B
+            d[idx + 0] = Math.floor(40 + tone * 45);
+            d[idx + 1] = Math.floor(88 + tone * 35);
+            d[idx + 2] = Math.floor(52 + tone * 25);
           } else {
-            // Deep oceanic navy blue
             const depth = Math.abs(lat) / 90;
             d[idx + 0] = Math.floor(8 + depth * 10);
             d[idx + 1] = Math.floor(28 + depth * 22);
@@ -170,7 +167,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       ctx.putImageData(img, 0, 0);
     });
 
-    // 3. Procedural Night City Lights Texture
+    // Procedural Night City Lights Texture
     const nightTexture = createTex(1024, 512, ctx => {
       ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, 1024, 512);
@@ -181,11 +178,10 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         for (let i = 0; i < 1024; i += 2) {
           const lon = (i / 1024) * 360 - 180;
           if (isLand(lat, lon)) {
-            // Population cluster probability
             const isPopulated = (
-              (lat > 22 && lat < 55 && lon > -125 && lon < -68) || // North America
-              (lat > 35 && lat < 60 && lon > -10 && lon < 45) ||   // Europe
-              (lat > 15 && lat < 45 && lon > 70 && lon < 142)      // Asia
+              (lat > 22 && lat < 55 && lon > -125 && lon < -68) ||
+              (lat > 35 && lat < 60 && lon > -10 && lon < 45) ||
+              (lat > 15 && lat < 45 && lon > 70 && lon < 142)
             );
             const prob = isPopulated ? 0.35 : 0.07;
             if (Math.random() < prob) {
@@ -197,7 +193,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
     });
 
-    // 4. Specular Map for oceans
+    // Specular Map
     const specTexture = createTex(512, 256, ctx => {
       const img = ctx.createImageData(512, 256);
       const d = img.data;
@@ -214,7 +210,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       ctx.putImageData(img, 0, 0);
     });
 
-    // 5. Procedural Swirling Clouds Texture
+    // Procedural Clouds Texture
     const cloudTexture = createTex(512, 256, ctx => {
       ctx.fillStyle = 'rgba(0,0,0,0)';
       ctx.fillRect(0, 0, 512, 256);
@@ -235,15 +231,15 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     });
 
     // ─────────────────────────────────────────────────────────────
-    // B. REALISTIC 3D EARTH GLOBE
+    // B. EXACT 3D REALISTIC EARTH GLOBE (CENTERED IN HERO STAGE)
     // ─────────────────────────────────────────────────────────────
     const globeGroup = new THREE.Group();
-    globeGroup.position.set(0, 0.45, 0);
+    // Perfectly centered in stage - NO hanging platform underneath!
+    globeGroup.position.set(0, 0, 0);
     masterGroup.add(globeGroup);
 
-    const GLOBE_R = 1.0;
+    const GLOBE_R = 1.25;
 
-    // Custom Realistic Shader Material (Day/Night, Specular, Fresnel Atmosphere)
     const earthMat = new THREE.ShaderMaterial({
       uniforms: {
         dayT: { value: dayTexture },
@@ -279,15 +275,12 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           vec3 night = texture2D(nightT, vUv).rgb;
           float spec = texture2D(specT, vUv).r;
 
-          // Diffuse day light + night lights on shadow side
           vec3 col = day * (0.12 + 1.1 * max(0.0, nd)) * mix(vec3(0.7, 0.85, 1.0), vec3(1.0, 0.98, 0.92), lit);
           col += night * (1.0 - lit) * 1.8;
 
-          // Specular sun reflection on water
           vec3 H = normalize(sun + V);
           col += vec3(0.85, 0.95, 1.0) * pow(max(dot(N, H), 0.0), 180.0) * spec * 0.65 * step(0.0, nd);
 
-          // Atmospheric Fresnel edge glow
           float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.2);
           col += vec3(0.28, 0.65, 1.0) * fresnel * (0.25 + 0.8 * smoothstep(-0.3, 0.5, nd));
 
@@ -349,7 +342,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         depthWrite: false
       })
     );
-    haloSprite.scale.set(3.4, 3.4, 1);
+    haloSprite.scale.set(4.0, 4.0, 1);
     haloSprite.position.z = -0.3;
     globeGroup.add(haloSprite);
 
@@ -398,7 +391,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       arcGroup.add(new THREE.Line(curveGeo, curveMat));
 
       const bead = new THREE.Mesh(
-        new THREE.SphereGeometry(0.024, 8, 8),
+        new THREE.SphereGeometry(0.025, 8, 8),
         new THREE.MeshBasicMaterial({ color: 0xffffff })
       );
       arcGroup.add(bead);
@@ -406,169 +399,37 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     });
 
     // ─────────────────────────────────────────────────────────────
-    // C. HANGING CITADEL PLATFORM UNDER THE EARTH
-    // ─────────────────────────────────────────────────────────────
-    const platformGroup = new THREE.Group();
-    platformGroup.position.set(0, -0.75, 0);
-    platformGroup.scale.setScalar(0.38);
-    platformGroup.rotation.x = 0.22;
-    masterGroup.add(platformGroup);
-
-    // Platform Lathe Hull
-    const platProf = [
-      [0, 0.5], [1.8, 0.5], [2.2, 0.65], [3.0, 0.52], [4.2, 0.38], [5.4, 0.26],
-      [6.0, 0.12], [6.2, -0.12], [5.9, -0.42], [4.5, -0.70], [2.0, -0.88], [0, -0.92]
-    ].map(p => new THREE.Vector2(p[0], p[1]));
-
-    const platHullMat = new THREE.MeshStandardMaterial({
-      color: 0x1a264a,
-      metalness: 0.88,
-      roughness: 0.32
-    });
-    const platLathe = new THREE.Mesh(new THREE.LatheGeometry(platProf, 64), platHullMat);
-    platformGroup.add(platLathe);
-
-    // Concentric Glowing Neon Rings
-    const addPlatRing = (r: number, t: number, color: number, y: number, op = 1) => {
-      const m = new THREE.Mesh(
-        new THREE.TorusGeometry(r, t, 12, 64),
-        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, blending: THREE.AdditiveBlending })
-      );
-      m.rotation.x = Math.PI / 2;
-      m.position.y = y;
-      platformGroup.add(m);
-      return m;
-    };
-
-    addPlatRing(1.85, 0.045, 0x00f0ff, 0.82);
-    addPlatRing(2.60, 0.040, 0x818cf8, 0.72);
-    addPlatRing(3.50, 0.035, 0x38bdf8, 0.60);
-    addPlatRing(4.80, 0.038, 0x60a5fa, 0.48);
-    addPlatRing(6.15, 0.045, 0x0ea5e9, 0.32);
-
-    // Central Holographic Emitter Pad
-    const padMesh = new THREE.Mesh(
-      new THREE.CircleGeometry(1.85, 48),
-      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false })
-    );
-    padMesh.rotation.x = -Math.PI / 2;
-    padMesh.position.y = 0.51;
-    platformGroup.add(padMesh);
-
-    // Rim City Buildings
-    const winCyan = new THREE.MeshBasicMaterial({ color: 0x2fdcff });
-    const winGold = new THREE.MeshBasicMaterial({ color: 0xffc86a });
-    const buildingMat = new THREE.MeshStandardMaterial({ color: 0x1e2748, metalness: 0.85, roughness: 0.35 });
-
-    for (let i = 0; i < 60; i++) {
-      const a = (i / 60) * Math.PI * 2;
-      const r = 4.8 + Math.random() * 1.1;
-      const h = 0.2 + Math.random() * 0.45;
-      const b = new THREE.Mesh(new THREE.BoxGeometry(0.4 + Math.random() * 0.4, h, 0.3 + Math.random() * 0.2), buildingMat);
-      b.position.set(Math.cos(a) * r, 0.26 + (6.0 - r) * 0.12 + h / 2, Math.sin(a) * r);
-      b.rotation.y = -a;
-      platformGroup.add(b);
-
-      if (Math.random() < 0.75) {
-        const w = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.05, 0.32), Math.random() < 0.8 ? winCyan : winGold);
-        w.position.copy(b.position);
-        w.rotation.y = b.rotation.y;
-        platformGroup.add(w);
-      }
-    }
-
-    // Glass Research Domes
-    const glassMat = new THREE.MeshStandardMaterial({
-      color: 0x6fd0ff,
-      metalness: 0.1,
-      roughness: 0.05,
-      transparent: true,
-      opacity: 0.6,
-      emissive: 0x1a6aaa,
-      emissiveIntensity: 0.8
-    });
-    [[3.2, 1.4, 0.7], [-3.0, -1.8, 0.6], [1.2, -3.2, 0.55], [-1.5, 3.2, 0.58]].forEach(([x, z, r]) => {
-      const d = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), glassMat);
-      d.position.set(x, 0.52, z);
-      platformGroup.add(d);
-    });
-
-    // Inverted Craggy Asteroid Rock Base
-    const rockGeo = new THREE.ConeGeometry(5.2, 3.6, 48, 16, true);
-    rockGeo.rotateX(Math.PI);
-    const rPos = rockGeo.attributes.position;
-    for (let i = 0; i < rPos.count; i++) {
-      const x = rPos.getX(i), y = rPos.getY(i), z = rPos.getZ(i);
-      const n = Math.sin(x * 2.3 + y) * Math.cos(z * 2.1 - y * 1.4) * 0.32;
-      rPos.setXYZ(i, x * (1 + n * 0.3), y + n * 0.25, z * (1 + n * 0.3));
-    }
-    rockGeo.computeVertexNormals();
-    const rockMesh = new THREE.Mesh(
-      rockGeo,
-      new THREE.MeshStandardMaterial({ color: 0x161d36, roughness: 0.88, metalness: 0.2, flatShading: true, side: THREE.DoubleSide })
-    );
-    rockMesh.position.y = -2.4;
-    platformGroup.add(rockMesh);
-
-    // Graviton Thrusters with Plasma Beams
-    const thrusters: THREE.Mesh[] = [];
-    [[-4.2, -1.2], [-3.8, 1.0], [4.0, 1.2], [4.2, -0.9], [-1.0, 2.8], [0, -0.4]].forEach(([x, z]) => {
-      const f = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.12, 0.04, 1.2, 12, 1, true),
-        new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.75, blending: THREE.AdditiveBlending, depthWrite: false })
-      );
-      f.position.set(x, -1.6, z);
-      platformGroup.add(f);
-      thrusters.push(f);
-    });
-
-    // Holographic Projection Cylinder Beam connecting Platform to Earth
-    const holoBeam = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.3, 1.85, 2.2, 32, 1, true),
-      new THREE.MeshBasicMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.28,
-        blending: THREE.AdditiveBlending,
-        side: THREE.DoubleSide,
-        depthWrite: false
-      })
-    );
-    holoBeam.position.set(0, 1.5, 0);
-    platformGroup.add(holoBeam);
-
-    // ─────────────────────────────────────────────────────────────
-    // D. 3D UFO RECON CRAFT
+    // C. EXACT 3D UFO RECON CRAFT FROM LANDING PAGE
     // ─────────────────────────────────────────────────────────────
     const ufoGroup = new THREE.Group();
     // Saucer Disc Hull
-    const saucerGeo = new THREE.CylinderGeometry(0.38, 0.44, 0.08, 24);
+    const saucerGeo = new THREE.CylinderGeometry(0.42, 0.48, 0.09, 24);
     const saucerMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.9, roughness: 0.25 });
     const saucer = new THREE.Mesh(saucerGeo, saucerMat);
     ufoGroup.add(saucer);
 
     // Cabin Dome
-    const domeGeo = new THREE.SphereGeometry(0.22, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+    const domeGeo = new THREE.SphereGeometry(0.24, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2);
     const domeMat = new THREE.MeshBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.85 });
     const dome = new THREE.Mesh(domeGeo, domeMat);
-    dome.position.y = 0.04;
+    dome.position.y = 0.045;
     ufoGroup.add(dome);
 
     // Rotating Rim Light Ring
-    const rimGeo = new THREE.TorusGeometry(0.42, 0.02, 8, 24);
+    const rimGeo = new THREE.TorusGeometry(0.46, 0.022, 8, 24);
     const rimMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
     const rim = new THREE.Mesh(rimGeo, rimMat);
     rim.rotation.x = Math.PI / 2;
     ufoGroup.add(rim);
 
     // Default High-Orbit Position
-    const UFO_ORBIT_POS = new THREE.Vector3(1.7, 1.5, 0.4);
+    const UFO_ORBIT_POS = new THREE.Vector3(1.85, 1.45, 0.4);
     ufoGroup.position.copy(UFO_ORBIT_POS);
     ufoGroup.rotation.set(0.18, -0.4, 0.12);
     masterGroup.add(ufoGroup);
 
     // ─────────────────────────────────────────────────────────────
-    // E. 3D ORIGAMI / CYBER BIRD
+    // D. EXACT 3D ORIGAMI / CYBER BIRD FROM LANDING PAGE
     // ─────────────────────────────────────────────────────────────
     const birdGroup = new THREE.Group();
     const birdMat = new THREE.MeshStandardMaterial({
@@ -579,7 +440,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     });
 
     // Bird Body
-    const bodyGeo = new THREE.ConeGeometry(0.08, 0.45, 4);
+    const bodyGeo = new THREE.ConeGeometry(0.09, 0.48, 4);
     bodyGeo.rotateX(Math.PI / 2);
     const birdBody = new THREE.Mesh(bodyGeo, birdMat);
     birdGroup.add(birdBody);
@@ -591,8 +452,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     const wingGeo = new THREE.BufferGeometry();
     const wVerts = new Float32Array([
       0, 0, 0,
-      -0.45, 0.08, -0.2,
-      -0.3, 0, 0.25
+      -0.48, 0.08, -0.22,
+      -0.32, 0, 0.26
     ]);
     wingGeo.setAttribute('position', new THREE.BufferAttribute(wVerts, 3));
     wingGeo.computeVertexNormals();
@@ -603,8 +464,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     const wingGeoR = new THREE.BufferGeometry();
     const wVertsR = new Float32Array([
       0, 0, 0,
-      0.45, 0.08, -0.2,
-      0.3, 0, 0.25
+      0.48, 0.08, -0.22,
+      0.32, 0, 0.26
     ]);
     wingGeoR.setAttribute('position', new THREE.BufferAttribute(wVertsR, 3));
     wingGeoR.computeVertexNormals();
@@ -616,14 +477,13 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     birdGroup.add(wingR);
 
     // Default High-Orbit Position
-    const BIRD_ORBIT_POS = new THREE.Vector3(-1.6, 1.45, 0.3);
+    const BIRD_ORBIT_POS = new THREE.Vector3(-1.75, 1.40, 0.3);
     birdGroup.position.copy(BIRD_ORBIT_POS);
     masterGroup.add(birdGroup);
 
     // ─────────────────────────────────────────────────────────────
-    // F. MINIMAL PAPER COURIER ANIMATION (ZERO CLUTTER)
+    // E. MINIMAL PAPER COURIER ANIMATION (ZERO CLUTTER)
     // ─────────────────────────────────────────────────────────────
-    // A single glowing paper document carried during delivery
     const paperGeo = new THREE.PlaneGeometry(0.22, 0.28);
     const paperMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
@@ -654,7 +514,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     let rippleProgress = 1.0;
 
     // ─────────────────────────────────────────────────────────────
-    // G. DRAG TO ROTATE & POINTER CONTROLS
+    // F. DRAG TO ROTATE & POINTER CONTROLS
     // ─────────────────────────────────────────────────────────────
     let isDragging = false;
     let prevX = 0;
@@ -699,7 +559,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(container);
 
-    // 3D to 2D Screen projection helper
     const projectToScreen = (v: THREE.Vector3) => {
       const p = v.clone().project(camera);
       return {
@@ -716,7 +575,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const dt = clock.getDelta();
       const elapsed = clock.getElapsedTime();
 
-      // 1. Master Group Levitation
+      // 1. Master Group Floating Levitation
       masterGroup.position.y = Math.sin(elapsed * 1.3) * 0.05;
 
       // 2. Drag Rotation with momentum
@@ -730,12 +589,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       earthMesh.rotation.y += 0.0035;
       cloudsMesh.rotation.y += 0.0042;
 
-      // 4. Thruster pulse
-      thrusters.forEach((t, i) => {
-        (t.material as THREE.MeshBasicMaterial).opacity = 0.5 + Math.sin(elapsed * 12 + i) * 0.25;
-      });
-
-      // 5. Travelling citation photons
+      // 4. Travelling citation photons
       photonBeads.forEach((bead, i) => {
         const curve = arcCurves[i];
         if (curve) {
@@ -744,10 +598,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         }
       });
 
-      // 6. Minimal Courier Paper Delivery State Machine
+      // 5. Minimal Courier Paper Delivery State Machine
       courierTimer += dt;
-      if (courierPhase === 0 && courierTimer > 7.5) {
-        // Start a minimal delivery mission
+      if (courierPhase === 0 && courierTimer > 8.0) {
         courierTimer = 0;
         courierPhase = 1;
         courierProgress = 0;
@@ -756,23 +609,20 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
 
       if (courierPhase === 1) {
-        // Approaching the globe from off-screen / invisible side
         courierProgress += dt * 0.55;
         const tClamped = Math.min(1.0, courierProgress);
 
         if (courierType === 'bird') {
-          // Bird swoops in from upper left off-screen
-          const start = new THREE.Vector3(-4.2, 2.2, -1.0);
-          const end = new THREE.Vector3(-0.45, 0.65, 0.95);
+          const start = new THREE.Vector3(-4.2, 2.0, -1.0);
+          const end = new THREE.Vector3(-0.45, 0.45, 1.15);
           const current = new THREE.Vector3().lerpVectors(start, end, tClamped);
           birdGroup.position.copy(current);
           birdGroup.rotation.y = Math.PI * 0.4;
           birdGroup.rotation.z = -0.25;
           paperMesh.position.copy(current).add(new THREE.Vector3(0, -0.15, 0.1));
         } else {
-          // UFO glides in from upper right off-screen
-          const start = new THREE.Vector3(4.2, 2.4, -1.0);
-          const end = new THREE.Vector3(0.5, 0.75, 0.95);
+          const start = new THREE.Vector3(4.2, 2.2, -1.0);
+          const end = new THREE.Vector3(0.5, 0.55, 1.15);
           const current = new THREE.Vector3().lerpVectors(start, end, tClamped);
           ufoGroup.position.copy(current);
           ufoGroup.rotation.z = -0.2;
@@ -780,7 +630,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         }
 
         if (courierProgress >= 1.0) {
-          // Deliver paper into globe
           courierPhase = 2;
           courierProgress = 0;
           rippleProgress = 0;
@@ -788,7 +637,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           rippleMesh.quaternion.copy(camera.quaternion);
         }
       } else if (courierPhase === 2) {
-        // Delivery moment: paper fades into surface with ripple
         courierProgress += dt * 2.0;
         paperMat.opacity = Math.max(0, 1.0 - courierProgress);
         if (courierProgress >= 1.0) {
@@ -796,7 +644,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           courierProgress = 0;
         }
       } else if (courierPhase === 3) {
-        // Returning gracefully to high orbit position
         courierProgress += dt * 0.45;
         const tClamped = Math.min(1.0, courierProgress);
 
@@ -830,7 +677,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         rippleMat.opacity = 0;
       }
 
-      // 7. Update Pill and UFO 2D Screen Positions
+      // 6. Update Pill and UFO 2D Screen Positions
       masterGroup.updateMatrixWorld(true);
       const newPositions: { [key: string]: { x: number; y: number; ax: number; ay: number } } = {};
 
@@ -879,7 +726,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       <canvas 
         ref={canvasRef} 
         className="w-full h-full cursor-grab active:cursor-grabbing block focus:outline-none"
-        aria-label="Interactive 3D Hanging Platform with Realistic Knowledge Earth"
+        aria-label="Interactive 3D Realistic Knowledge Earth with UFO and Bird"
       />
 
       {/* SVG Connector Lines and Anchor Dots */}
@@ -914,7 +761,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         })}
       </svg>
 
-      {/* 7 Interactive Orbital Navigation Pills matching Image 2 */}
+      {/* 7 Interactive Orbital Navigation Pills */}
       {pillDefs.map(p => {
         const pos = pillPositions[p.id];
         if (!pos) return null;
