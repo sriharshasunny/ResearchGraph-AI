@@ -82,16 +82,83 @@ h1 span,h2 span{background:linear-gradient(135deg,#38bdf8 20%,#a855f7 70%,#ec489
 .rv{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1);will-change:opacity,transform;contain:content}.rv.in{opacity:1;transform:none}
 footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26px + env(safe-area-inset-bottom,0px));color:#7783b8;font-size:14px;border-top:1px solid var(--bd);text-align:center}
 @media(max-width:900px){nav,.hr .btn:not(.c){display:none}header{padding-inline:18px}body::before{background:linear-gradient(rgba(2,4,14,.2),rgba(2,4,14,.8) 45%)}.L,.W{width:auto;margin:0 18px}.hero{align-items:flex-start;padding-top:calc(46svh + 10px)}.feat,.g3{grid-template-columns:1fr}.sec{padding:56px 0;background:linear-gradient(transparent,rgba(2,4,14,.82) 14%)}#feed{left:12px;right:12px;bottom:12px;width:auto}.stats{grid-template-columns:1fr 1fr}}
-</style></head><body>
+</style>
+<style id="rg-reference-hero-refinement">
+  :root{--bg:#030817;--mu:#a9b8d1;--cy:#48d8ff;--pu:#8b72ff;--bd:rgba(91,151,226,.2)}
+  body{background:#030817}
+  body::before{background:linear-gradient(90deg,rgba(2,6,18,.74),rgba(2,6,18,.34) 40%,transparent 68%)}
+  body::after{background:radial-gradient(ellipse at 70% 46%,transparent 48%,rgba(0,3,12,.42))}
+  header{padding-inline:clamp(20px,3vw,42px);background:linear-gradient(180deg,rgba(2,7,20,.76),rgba(2,7,20,.24))}
+  header.sc{background:rgba(3,7,20,.9);backdrop-filter:blur(14px)}
+  nav a{padding:8px 14px;font-size:13px}
+  .L{width:min(520px,41vw);margin-left:clamp(30px,4.6vw,78px)}
+  .hero{padding:112px 0 60px;min-height:100svh}
+  .tag{font-size:10.5px;padding:7px 12px;margin-bottom:17px;letter-spacing:.105em}
+  h1{font-size:clamp(42px,4.1vw,64px);line-height:.97;letter-spacing:-.05em}
+  h1 span{background:linear-gradient(110deg,#22c9ef 5%,#4e8cff 52%,#a65bf2 100%);-webkit-background-clip:text;background-clip:text}
+  .lead{max-width:475px;margin:16px 0 20px;font-size:clamp(15px,1.06vw,17px);line-height:1.48;color:#c5d2e8}
+  .cta{gap:10px;margin-bottom:18px}
+  .btn{padding:11px 18px;font-size:14px}
+  .btn.p{background:linear-gradient(105deg,#924eff,#3f6cff);border-color:rgba(173,139,255,.8);box-shadow:0 7px 24px rgba(99,75,255,.2)}
+  .btn.c{background:linear-gradient(105deg,#0db7e8,#2f69f5);border-color:rgba(94,203,255,.7);box-shadow:0 6px 20px rgba(14,165,233,.2)}
+  .feat{gap:8px;margin-bottom:16px}
+  .feat div{padding:10px 11px;border-radius:12px;background:linear-gradient(155deg,rgba(12,23,51,.86),rgba(5,12,29,.78));border-color:rgba(97,148,218,.19)}
+  .feat small{font-size:8px}
+  .feat b{font-size:15px}
+  .feat span{font-size:10.5px}
+  .ask{padding:5px 5px 5px 12px;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.2);max-width:520px}
+  .ask input{font-size:13.5px}
+  .ask-prefix{font-size:8px;padding:4px 7px}
+  .ask .btn{padding:9px 14px}
+  .live{margin-top:13px;padding:7px 12px;font-size:10px;letter-spacing:.02em}
+  #feed{right:clamp(14px,2.5vw,34px);bottom:clamp(14px,2.5vh,26px);width:min(300px,26vw)}
+  .toast{padding:9px 12px;background:rgba(5,13,31,.9);border-color:rgba(45,180,153,.35)}
+  .synthesizer-tag{padding:5px 10px;border-radius:8px;font-size:9px;letter-spacing:.055em;background:rgba(5,18,39,.92);backdrop-filter:blur(8px)}
+  .paper-station-tag{color:#c4b5fd;border-color:rgba(167,139,250,.48);box-shadow:0 0 14px rgba(139,92,246,.14)}
+  @media(max-width:1100px){
+    .L{width:min(500px,44vw);margin-left:28px}
+    h1{font-size:clamp(38px,4.3vw,52px)}
+    #feed{width:270px}
+  }
+  @media(max-width:900px){
+    header{padding-inline:16px}
+    nav{display:none}
+    .hero{align-items:flex-start;padding-top:118px;padding-bottom:250px}
+    .L{width:min(620px,calc(100% - 40px));margin-left:20px}
+    h1{font-size:clamp(40px,8vw,58px)}
+    .lead{max-width:520px}
+    .feat{grid-template-columns:repeat(3,minmax(0,1fr))}
+    #feed{left:12px;right:12px;bottom:12px;width:auto;max-width:320px}
+    .chip{display:none!important}
+    .synthesizer-tag{font-size:8px}
+  }
+  @media(max-width:560px){
+    .hero{padding-top:104px;padding-bottom:230px}
+    .L{width:calc(100% - 32px);margin-left:16px}
+    h1{font-size:clamp(38px,10.4vw,50px)}
+    .tag{font-size:9px;letter-spacing:.07em}
+    .lead{font-size:14px}
+    .feat div{padding:9px 8px}
+    .feat b{font-size:13px}
+    .feat span{font-size:9px}
+    .ask{gap:6px}
+    .ask-prefix{display:none}
+    .ask .btn{padding:8px 11px}
+    .live{font-size:8.5px}
+    #feed{max-width:255px}
+  }
+  @media(prefers-reduced-motion:reduce){.btn,.toast{transition:none!important}}
+</style>
+</head><body>
 <canvas id="c" aria-hidden="true"></canvas><div id="ui"></div><div id="feed"></div>
 <header><a class="logo" href="#top"><span class="mark">⚛</span>ResearchGraph <em>AI</em></a>
-<nav><a href="#top">Cockpit</a><a href="#how">RAG Pipeline</a><a href="#features">Capabilities</a><a href="#sources">Data Sources</a></nav>
+<nav><a href="#top">Cockpit</a><a href="#how">RAG Pipeline</a><a href="#features">Knowledge Graph</a><a href="#sources">Data Sources</a></nav>
 <div class="hr"><a class="btn" href="#">Log in</a><a class="btn c" href="#">Launch Cockpit →</a></div></header>
 <section class="hero" id="top"><div class="L">
-<span class="tag"><span>⬡</span> HYPER-DIMENSIONAL GRAPH RAG · REAL-TIME ARX-V2</span>
-<h1>The Quantum Graph<br>for <span>Autonomous Research.</span></h1>
-<p class="lead">Connect 204M+ peer-reviewed papers across arXiv, PubMed, and IEEE with multi-agent reasoning. Language models deconstruct methodologies, neural graphs map citation topologies, and every insight arrives with verifiable lineage.</p>
-<div class="cta"><a class="btn p" href="#how"><span>⌬</span> Launch Neural Graph →</a><a class="btn" href="#features">System Telemetry</a></div>
+<span class="tag"><span>⬡</span> HYPER-DIMENSIONAL GRAPH RAG · REAL-TIME ARXIV</span>
+<h1>The Quantum<br>Graph for<br><span>Autonomous</span><br><span>Research.</span></h1>
+<p class="lead">Connect research papers, build knowledge graphs, and get reliable AI insights.</p>
+<div class="cta"><a class="btn p" href="#"><span>⌬</span> Launch Neural Graph →</a><a class="btn" href="#features">System Telemetry</a></div>
 <div class="feat">
 <div><small>CORPUS INDEX</small><b>204M+</b><span>Global Papers</span></div>
 <div><small>GRAPH TOPOLOGY</small><b>1.24B+</b><span>Neural Synapses</span></div>
@@ -99,10 +166,10 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
 </div>
 <div class="ask">
 <div class="ask-prefix"><i>⌕</i><span>PROMPT</span></div>
-<input id="askInput" aria-label="Ask an academic question" placeholder="Investigate cross-attention convergence in Graph Transformers...">
+<input id="askInput" aria-label="Ask an academic question" placeholder="Ask anything about academic papers...">
 <a class="btn c" href="#">Ask AI →</a>
 </div>
-<div class="live"><i></i><span><b id="cnt">0</b> PAPERS INGESTED &amp; SYNTHESIZED · AUTONOMOUS AGENT FLEET ACTIVE</span></div>
+<div class="live"><i></i><span><b id="cnt">0</b> new papers merged into the graph · arXiv &amp; PubMed</span></div>
 </div></section>
 <div class="mq" id="sources"><div><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM DL</span><span>OpenAlex</span><span>Crossref</span><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM DL</span><span>OpenAlex</span><span>Crossref</span></div></div>
 <section class="sec" id="how"><div class="W">
@@ -328,7 +395,8 @@ const RG=5;let D=22,AS=1.6,GPX={x:0,y:0,r:200},comp=null,wide=true,L0={nx:.36,ny
 const bnd=z=>{const h=(D-z)*TH;return{h,w:h*AS}};
 const chipsD=[['Papers','204M+','#3fb4ff',-.64],['Authors','12.4M+','#19e6c4',-.32],['Concepts','1.8M+','#a05cff',0],['Datasets','85K+','#ffc43a',.32],['Citations','1.24B+','#d05cff',.64]];
 const ui=$('ui'),chips=chipsD.map(c=>{const e=document.createElement('div');e.className='chip';e.style.setProperty('--c',c[2]);e.innerHTML='<i></i>'+c[0]+' <b>'+c[1]+'</b>';ui.appendChild(e);return e});
-const synTag=document.createElement('div');synTag.className='synthesizer-tag';synTag.innerHTML='<i>⬡</i> QUANTUM SYNTHESIZER <b>ACTIVE</b>';ui.appendChild(synTag);
+const synTag=document.createElement('div');synTag.className='synthesizer-tag';synTag.innerHTML='SYNTHESIZER · MULTI-AGENT RAG';ui.appendChild(synTag);
+const stationTag=document.createElement('div');stationTag.className='synthesizer-tag paper-station-tag';stationTag.textContent='PAPER COLLECTION';ui.appendChild(stationTag);
 const camAt=(p)=>{
   const p1=sm(0,0.22,p),p2=sm(0.18,0.62,p),p3=sm(0.55,1.0,p);
   const targetZ=D*(1.0 + 2.2*p1 + 1.6*p2 + 2.2*p3);
@@ -340,7 +408,7 @@ function placePlanets(){const c0=camAt(0),c1=camAt(1),f=(c,q,o)=>o.set(c.x+q[0]*
 let cachedScrollHeight=Math.max(1,document.documentElement.scrollHeight-innerHeight);
 function updateScrollBounds(){cachedScrollHeight=Math.max(1,document.documentElement.scrollHeight-innerHeight);}
 function layout(){const w=innerWidth,h=innerHeight;wide=w>=900;updateScrollBounds();R.setSize(w,h,false);if(comp)comp.setSize(w,h);AS=w/h;C.aspect=AS;C.updateProjectionMatrix();
-let px,cx,cy;if(wide){px=Math.min(h*.236,w*.131);cx=w*.69;cy=h*.52}else{px=Math.min(w*.245,h*.122);cx=w*.5;cy=h*.25}
+let px,cx,cy;if(wide){px=Math.min(h*.218,w*.122);cx=w*.70;cy=h*.51}else{px=Math.min(w*.245,h*.122);cx=w*.5;cy=h*.25}
 D=h*RG/(2*TH*px);C.rotation.set(0,0,0);G.position.set((cx/w*2-1)*D*TH*AS,(1-cy/h*2)*D*TH,0);G.scale.setScalar(RG);GPX={x:cx,y:cy,r:px};GW.copy(G.position);L0={nx:cx/w*2-1,ny:1-cy/h*2,px};placePlanets();updateKbPos();
 chips.forEach((e,i)=>{const dy=chipsD[i][3]*px,ex=cx+Math.sqrt(px*px-dy*dy)+16;e.style.display=w>=1100?'block':'none';e.style.transform=`translate(${ex}px,${cy+dy-e.offsetHeight/2}px)`})}
 /* ---------- 3D Quantum Knowledge Synthesizer ---------- */
@@ -401,10 +469,12 @@ x.fillStyle='#d9d4c4';x.beginPath();x.moveTo(W,0);x.lineTo(W-34,0);x.lineTo(W,34
 const vg=x.createLinearGradient(0,0,W,0);vg.addColorStop(0,'rgba(0,0,0,.07)');vg.addColorStop(.06,'rgba(0,0,0,0)');vg.addColorStop(.94,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.09)');x.fillStyle=vg;x.fillRect(0,0,W,H);return tex(c)}
 const paperGeo=()=>{const g=new T.PlaneGeometry(.57,.76,4,6),p=g.attributes.position;for(let k=0;k<p.count;k++)p.setZ(k,.035*Math.sin(p.getX(k)*5)*(p.getY(k)+.4)-.02*p.getY(k)*p.getY(k));g.computeVertexNormals();return g};
 const papers=[];for(let i=0;i<10;i++){const title=TITLES[i%TITLES.length],tx=paperTex(title),m=new T.Mesh(paperGeo(),new T.MeshStandardMaterial({map:tx,color:0xa8a8a8,envMapIntensity:.2,emissive:0xffffff,emissiveMap:tx,emissiveIntensity:.04,side:T.DoubleSide,roughness:.92,metalness:0,transparent:true,opacity:0}));
-const gl=spr(glowT,0x5fd8ff,1.3,0),rg=spr(ringT,0x9fe8ff,.3,0);S.add(m);papers.push({m,gl,rg,pos:V(0,0,0),home:V(0,0,0),st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})}
+const gl=spr(glowT,0x5fd8ff,1.3,0),rg=spr(ringT,0x9fe8ff,.3,0);S.add(m);papers.push({m,gl,rg,pos:V(0,0,0),home:V(0,0,0),slot:i,st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})}
 const rz=front=>front?rnd(RG+.8,RG+4):rnd(-RG-6,-RG-2);
 function paperHome(p){
-  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET);
+  const fanX=(p.slot-1)*.34;
+  const fanY=p.slot===1?.08:(p.slot===0?-.025:-.025);
+  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET).add(V(fanX,fanY,Math.abs(p.slot-1)*.035));
   p.pos.copy(p.home);
   p.title=TITLES[(Math.random()*TITLES.length)|0];
   if(p.m.material.map)p.m.material.map.dispose();
@@ -548,7 +618,7 @@ if(p.st==='gone'){p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacit
 p.m.visible=true;p.m.position.copy(p.pos);p.m.scale.setScalar(Math.max(.01,p.sc)*1.0);p.m.material.opacity=p.st==='fly'?1:p.vis;
 p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.35:p.vis*.22);p.gl.scale.setScalar(1.5*p.sc);
 if(p.sp===2){p.t+=dt;const k=p.t/.9;p.rg.position.copy(p.pos);p.rg.scale.setScalar(.3+k*2.2);p.rg.material.opacity=Math.max(0,.8*(1-k));if(k>=1){p.sp=0;p.t=0}}else p.rg.material.opacity=0})}
-papers.forEach((p,i)=>{if(i===0){paperHome(p);p.sp=1;p.vis=1;p.st='free';}else{p.st='gone';p.vis=0;p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;}});
+papers.forEach((p,i)=>{if(i<3){paperHome(p);p.sp=1;p.vis=1;p.st='free';}else{p.st='gone';p.vis=0;p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;}});
 /* ---------- interaction + loop ---------- */
 let mx=0,my=0,drag=false,lx=0,sv=0;const cv_=$('c');
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;if(drag){const d=(e.clientX-lx)*.006;spin.rotation.y+=d;sv=d*60;lx=e.clientX}});
@@ -703,12 +773,14 @@ function loop(){
   });
 
   if(wide&&newFeedOp>0.01){
-    tagUpd(tgs[0],ufo.g.position,'UFO · '+LB.u[U.st],34);
-    tagUpd(tgs[1],bird.g.position,'BIRD · '+LB.b[B.st],30);
-    tagUpd(synTag,kbGroup.position.clone().add(V(0,1.4,0)),'SYNTHESIZER · ACTIVE',16);
+    tagUpd(tgs[0],ufo.g.position,'UFO · '+LB.u[U.st],22);
+    tagUpd(tgs[1],bird.g.position,'BIRD · '+LB.b[B.st],24);
+    tagUpd(synTag,ufo.g.position.clone().add(V(0,1.35,0)),'SYNTHESIZER · MULTI-AGENT RAG',12);
+    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.42,0)),'PAPER COLLECTION',14);
   }else{
     if(wide)tgs.forEach(el=>el.style.transform='translate3d(-9999px,-9999px,0)');
     synTag.style.transform='translate3d(-9999px,-9999px,0)';
+    stationTag.style.transform='translate3d(-9999px,-9999px,0)';
   }
 
   layers.forEach(g=>g.position.y=sy*g.userData.k*0.4);
@@ -761,7 +833,7 @@ loop();
 const headerEl=document.querySelector('header');if(headerEl){addEventListener('scroll',()=>headerEl.classList.toggle('sc', (window.scrollY||0)>20),{passive:true});}
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');const n=e.target.querySelector('[data-n]');if(n){const v=+n.dataset.n,t0=performance.now(),f=x=>{const k=Math.min(1,(x-t0)/1400);n.textContent=(v*(1-Math.pow(1-k,3))).toFixed(v<10?2:v%1?1:0)+(n.dataset.n=='204'?'M+':'');if(k<1)requestAnimationFrame(f)};requestAnimationFrame(f)}io.unobserve(e.target)}),{threshold:.2});
 document.querySelectorAll('.rv').forEach(e=>io.observe(e));
-const inp=document.querySelector('.ask input'),qs=['Ask anything about 200M+ academic papers','Which papers extend the Transformer architecture?','Summarize CRISPR-Cas12 off-target research'];let qi=0,ci=0,dl=0;
+const inp=document.querySelector('.ask input'),qs=['Ask anything about academic papers...','Which papers extend Transformer models?','Summarize recent GraphRAG research.'];let qi=0,ci=0,dl=0;
 setInterval(()=>{const q=qs[qi];if(!dl){ci++;if(ci>q.length+22)dl=1}else{ci-=2;if(ci<=0){dl=0;qi=(qi+1)%qs.length;ci=0}}inp.placeholder=q.slice(0,Math.max(0,Math.min(ci,q.length)))+(ci>0&&ci<=q.length?'▏':'')},55);
 </script>
 <script>
@@ -782,6 +854,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
     const href = (target.getAttribute('href') || '').trim();
     const text = (target.textContent || '').trim().toLowerCase();
+
+    // Launch Neural Graph uses the existing React registration flow.
+    if (text.includes('launch neural graph')) {
+      e.preventDefault();
+      notifyParent('NAVIGATE_AUTH', 'REGISTER');
+      return;
+    }
 
     // Smooth scroll for hash anchor navigation inside the page (#top, #how, #features, #sources)
     if (href.startsWith('#') && href.length > 1) {
