@@ -49,8 +49,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: FileText,
       action: () => handleAction('search'),
       side: 'left' as const,
-      slotYOffset: -0.65,
-      rimAngle: -0.44
+      slotYOffset: -0.58,
+      rimAngle: -0.42
     },
     {
       id: 'authors',
@@ -71,8 +71,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Database,
       action: () => handleSearch('Empirical datasets'),
       side: 'left' as const,
-      slotYOffset: 0.65,
-      rimAngle: 0.44
+      slotYOffset: 0.58,
+      rimAngle: 0.42
     },
 
     // RIGHT COLUMN (top to bottom)
@@ -84,8 +84,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Network,
       action: () => handleAction('graph'),
       side: 'right' as const,
-      slotYOffset: -0.65,
-      rimAngle: -0.44
+      slotYOffset: -0.58,
+      rimAngle: -0.42
     },
     {
       id: 'insights',
@@ -106,8 +106,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Layers,
       action: () => handleSearch('Ontological concepts'),
       side: 'right' as const,
-      slotYOffset: 0.65,
-      rimAngle: 0.44
+      slotYOffset: 0.58,
+      rimAngle: 0.42
     },
 
     // BOTTOM CENTER
@@ -501,9 +501,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           vec3 H = normalize(sun + Vv);
           col += vec3(0.9, 0.95, 1.0) * pow(max(dot(N, H), 0.0), 160.0) * sp * 0.55 * step(-0.05, nd);
 
-          // Natural atmospheric limb Fresnel:
-          float f = pow(1.0 - max(dot(N, Vv), 0.0), 2.8);
-          col += vec3(0.25, 0.55, 1.0) * f * (0.25 + 0.75 * smoothstep(-0.3, 0.6, nd));
+          // Natural atmospheric limb Fresnel directly on Earth's surface (No outer mesh, zero black ring):
+          float f = pow(1.0 - max(dot(N, Vv), 0.0), 3.0);
+          col += vec3(0.32, 0.62, 1.0) * f * (0.35 + 0.85 * smoothstep(-0.25, 0.5, nd));
 
           gl_FragColor = vec4(col, 1.0);
         }
@@ -520,40 +520,40 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         map: E.cloud,
         transparent: true,
         depthWrite: false,
-        opacity: 0.68,
+        opacity: 0.65,
         blending: THREE.AdditiveBlending
       })
     );
     spinGroup.add(cloudsMesh);
 
-    // Soft Atmosphere Glow from landing page (BackSide blend)
-    const atmoMat = new THREE.ShaderMaterial({
+    // Subtle Ambient Research Constellation Particles (Twinkling subtle stars/dust across hero mountains)
+    const DUST_COUNT = 75;
+    const dustGeo = new THREE.BufferGeometry();
+    const dustPos = new Float32Array(DUST_COUNT * 3);
+    const dustColors = new Float32Array(DUST_COUNT * 3);
+    const dustPhases = new Float32Array(DUST_COUNT);
+    for (let i = 0; i < DUST_COUNT; i++) {
+      dustPos[i * 3] = (Math.random() - 0.45) * 11;
+      dustPos[i * 3 + 1] = (Math.random() - 0.35) * 4.2;
+      dustPos[i * 3 + 2] = rnd(0.2, 3.2);
+      const isCyan = Math.random() > 0.45;
+      dustColors[i * 3] = isCyan ? 0.38 : 0.98;
+      dustColors[i * 3 + 1] = isCyan ? 0.78 : 0.82;
+      dustColors[i * 3 + 2] = isCyan ? 1.0 : 0.45;
+      dustPhases[i] = Math.random() * Math.PI * 2;
+    }
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+    dustGeo.setAttribute('color', new THREE.BufferAttribute(dustColors, 3));
+    const dustMat = new THREE.PointsMaterial({
+      size: 0.038,
+      vertexColors: true,
       transparent: true,
-      side: THREE.BackSide,
+      opacity: 0.62,
       blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      uniforms: { sun: { value: sunDir }, k: { value: 0.75 } },
-      vertexShader: `
-        varying vec3 vn, wn;
-        void main() {
-          vn = normalize(normalMatrix * normal);
-          wn = normalize(mat3(modelMatrix) * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform vec3 sun;
-        uniform float k;
-        varying vec3 vn, wn;
-        void main() {
-          float d = clamp(-vn.z / 0.5, 0.0, 1.0);
-          float i = pow(d, 2.4);
-          gl_FragColor = vec4(vec3(0.25, 0.58, 1.0) * i * (0.35 + 1.1 * smoothstep(-0.4, 0.5, dot(wn, sun))) * k, 1.0);
-        }
-      `
+      depthWrite: false
     });
-    const atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R * 1.12, 64, 48), atmoMat);
-    masterGlobe.add(atmoMesh);
+    const dustParticles = new THREE.Points(dustGeo, dustMat);
+    scene.add(dustParticles);
 
     // ── Global Hub Beacons & Dynamic Citation Arcs ──
     const llToV3 = (lat: number, lon: number, r: number) => {
@@ -785,8 +785,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     wr.sh.position.set(-0.13, 0.075, 0.12);
     birdBodyGroup.add(wl.sh, wr.sh);
 
-    // Miniature bird scale so it roams comfortably and gracefully in 3D across the entire hero banner
-    birdRoot.scale.setScalar(0.12);
+    // High-visibility scholar bird scale so it roams with presence across the hero banner
+    birdRoot.scale.setScalar(0.138);
     scene.add(birdRoot);
 
     // ── Visual Effect Enhancement: Aerodynamic Wind Wisp Particle Trail ──
@@ -878,19 +878,24 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     scene.add(rippleMesh);
 
     // ─────────────────────────────────────────────────────────────
-    // 4. BIRD AUTONOMOUS 3D ROAMING (PEACEFUL, 30% SLOWER SPEED)
+    // 4. BIRD AUTONOMOUS 3D ROAMING (CONTINUOUSLY VISIBLE, -30% SPEED)
     // ─────────────────────────────────────────────────────────────
     // Collision avoidance buffer with Earth globe in world space
+    // CRITICAL: Bird ALWAYS stays in front of the Earth plane (z >= 0.95), never disappears behind globe
     const keepOut = (p: THREE.Vector3, minDist: number) => {
+      if (p.z < 0.95) {
+        p.z = 0.95;
+      }
       const rel = p.clone().sub(masterGlobe.position);
       const len = rel.length();
       if (len < minDist) {
         rel.multiplyScalar(minDist / (len || 0.001));
+        if (rel.z < 0.25) rel.z = 0.25;
         p.copy(masterGlobe.position).add(rel);
       }
     };
 
-    // Cross-Banner Waypoint Generator: Ensures bird soars across the ENTIRE hero section
+    // Cross-Banner Waypoint Generator: Ensures bird stays continuously visible across hero section
     const getNextWaypoint = () => {
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
@@ -898,11 +903,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const curX = birdState.pos.x;
       let zone: 'left' | 'center' | 'right';
 
-      if (curX > 0.15 * vw) {
-        // Near globe -> glide back across mountains to center/left
+      if (curX > 0.25 * vw) {
+        // Near globe -> glide across mountains toward center or left
         zone = Math.random() < 0.6 ? 'left' : 'center';
-      } else if (curX < -0.20 * vw) {
-        // Far-left above search -> cruise toward center or globe
+      } else if (curX < -0.15 * vw) {
+        // Over search/mountains -> cruise toward center or globe
         zone = Math.random() < 0.6 ? 'right' : 'center';
       } else {
         zone = Math.random() < 0.5 ? 'left' : 'right';
@@ -913,43 +918,44 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       let targetZ = 0;
 
       if (W >= 900) {
+        const gX = masterGlobe.position.x || (0.52 * vw);
         if (zone === 'left') {
-          targetX = rnd(-vw * 0.82, -vw * 0.32);
-          targetY = rnd(-0.20, vh * 0.65);
-          targetZ = rnd(1.1, 2.2);
+          targetX = rnd(-vw * 0.46, -vw * 0.10);
+          targetY = rnd(-vh * 0.15, vh * 0.42);
+          targetZ = rnd(1.15, 1.65);
         } else if (zone === 'center') {
-          targetX = rnd(-vw * 0.22, vw * 0.16);
-          targetY = rnd(-0.15, vh * 0.65);
-          targetZ = rnd(1.0, 2.0);
+          targetX = rnd(-vw * 0.10, vw * 0.24);
+          targetY = rnd(-vh * 0.12, vh * 0.38);
+          targetZ = rnd(1.10, 1.55);
         } else {
-          const gX = masterGlobe.position.x || (0.42 * vw);
-          const side = Math.random() < 0.5 ? 1 : -1;
-          targetX = gX + side * rnd(GLOBE_R * 1.35, GLOBE_R * 2.2);
-          targetY = rnd(-vh * 0.35, vh * 0.65);
-          targetZ = rnd(1.1, 2.1);
+          // Around and in front of the Earth
+          targetX = gX + rnd(-0.62, 0.48);
+          targetY = rnd(-vh * 0.20, vh * 0.38);
+          targetZ = rnd(1.15, 1.70);
         }
       } else {
-        targetX = rnd(-vw * 0.75, vw * 0.75);
-        targetY = rnd(-vh * 0.55, vh * 0.55);
-        targetZ = rnd(1.1, 2.2);
+        targetX = rnd(-vw * 0.55, vw * 0.55);
+        targetY = rnd(-vh * 0.32, vh * 0.35);
+        targetZ = rnd(1.15, 1.65);
       }
 
-      targetX = THREE.MathUtils.clamp(targetX, -vw * 0.86, vw * 0.86);
-      targetY = THREE.MathUtils.clamp(targetY, -vh * 0.65, vh * 0.68);
-      targetZ = THREE.MathUtils.clamp(targetZ, 0.9, 2.3);
+      // Constrain waypoints strictly inside the visible hero camera frustum
+      targetX = THREE.MathUtils.clamp(targetX, -vw * 0.50, vw * 0.84);
+      targetY = THREE.MathUtils.clamp(targetY, -vh * 0.32, vh * 0.46);
+      targetZ = THREE.MathUtils.clamp(targetZ, 1.05, 1.78);
 
       return new THREE.Vector3(targetX, targetY, targetZ);
     };
 
-    // Bird Flight State: Tuned 30% slower for graceful, non-distracting hero ambiance
+    // Bird Flight State: Tuned 30% slower with active waypoint cycle for continuous visibility
     const birdState = {
-      pos: new THREE.Vector3(-2.2, 0.8, 1.4),
-      target: new THREE.Vector3(-1.0, 0.4, 1.2),
+      pos: new THREE.Vector3(-1.8, 0.45, 1.35),
+      target: new THREE.Vector3(-0.6, 0.25, 1.25),
       yaw: 0,
       pitch: 0,
       bank: 0,
       yawRate: 0,
-      speed: 1.45, // Reduced by 30% from 2.2
+      speed: 1.45,
       isGliding: false,
       glideTimer: 0,
       flapPhase: 0,
@@ -1018,7 +1024,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
-        masterGlobe.position.x = 0.42 * vw;
+        masterGlobe.position.x = 0.52 * vw; // Shifted right by 10%
       } else {
         masterGlobe.position.x = 0;
       }
@@ -1043,11 +1049,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const dt = clock.getDelta();
       const elapsed = clock.getElapsedTime();
 
-      // 1. Globe Panoramic Positioning & Soft Levitation
+      // 1. Globe Panoramic Positioning (10% shifted to the right) & Soft Levitation
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
-        masterGlobe.position.x = 0.42 * vw;
+        masterGlobe.position.x = 0.52 * vw;
         masterGlobe.position.y = Math.sin(elapsed * 0.9) * 0.03;
       } else {
         masterGlobe.position.x = 0;
@@ -1065,6 +1071,14 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       earthMesh.rotation.y += 0.0022;
       cloudsMesh.rotation.y += 0.0030;
 
+      // Animate ambient research constellation particles
+      const posAttr = dustGeo.attributes.position;
+      for (let i = 0; i < DUST_COUNT; i++) {
+        const py = posAttr.getY(i) + Math.sin(elapsed * 0.7 + dustPhases[i]) * 0.0006;
+        posAttr.setY(i, py);
+      }
+      posAttr.needsUpdate = true;
+
       // 3. Citation Arc Photon Pulses
       photonBeads.forEach((bead, i) => {
         const curve = arcCurves[i];
@@ -1075,11 +1089,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       });
 
       // ─────────────────────────────────────────────────────────
-      // 4. BIRD AERODYNAMICS (PEACEFUL & SOARING, -30% SPEED)
+      // 4. BIRD AERODYNAMICS (CONTINUOUSLY VISIBLE, -30% SPEED)
       // ─────────────────────────────────────────────────────────
       birdState.waypointTimer += dt;
       const bDist = birdState.pos.distanceTo(birdState.target);
-      if (bDist < 0.45 || birdState.waypointTimer > 7.0) {
+      if (bDist < 0.45 || birdState.waypointTimer > 3.8) {
         birdState.target = getNextWaypoint();
         birdState.waypointTimer = 0;
       }
@@ -1095,17 +1109,17 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       let diffYaw = desiredYaw - birdState.yaw;
       diffYaw = Math.atan2(Math.sin(diffYaw), Math.cos(diffYaw));
 
-      const maxTurn = bDist < 1.0 ? 2.2 : 1.4;
-      birdState.yawRate += (THREE.MathUtils.clamp(diffYaw * 1.8, -maxTurn, maxTurn) - birdState.yawRate) * Math.min(1, dt * 3.5);
+      const maxTurn = bDist < 1.0 ? 2.4 : 1.6;
+      birdState.yawRate += (THREE.MathUtils.clamp(diffYaw * 1.8, -maxTurn, maxTurn) - birdState.yawRate) * Math.min(1, dt * 3.8);
       birdState.yaw += birdState.yawRate * dt;
 
-      const desiredPitch = THREE.MathUtils.clamp(Math.asin(THREE.MathUtils.clamp(bDy / bTotalDist, -0.5, 0.5)), -0.45, 0.45);
-      birdState.pitch += (desiredPitch - birdState.pitch) * Math.min(1, dt * 2.2);
+      const desiredPitch = THREE.MathUtils.clamp(Math.asin(THREE.MathUtils.clamp(bDy / bTotalDist, -0.4, 0.4)), -0.32, 0.32);
+      birdState.pitch += (desiredPitch - birdState.pitch) * Math.min(1, dt * 2.5);
 
       // Roll realistically into turns
       birdState.bank += (THREE.MathUtils.clamp(-birdState.yawRate * 0.55, -0.65, 0.65) - birdState.bank) * Math.min(1, dt * 3.2);
 
-      // Speed modulation: 30% slower than before (cruises ~1.4, clamped 1.1 to 2.2)
+      // Speed modulation: 30% slower (cruises ~1.45)
       const targetSpeed = 1.45 - birdState.pitch * 0.7;
       birdState.speed = THREE.MathUtils.clamp(birdState.speed + (targetSpeed - birdState.speed) * dt * 1.8, 1.1, 2.2);
 
@@ -1116,7 +1130,12 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         Math.cos(birdState.pitch) * Math.cos(birdState.yaw)
       );
       birdState.pos.addScaledVector(bFw, birdState.speed * dt);
-      keepOut(birdState.pos, GLOBE_R * 1.25);
+
+      // CRITICAL: Ensure bird NEVER drops behind the Earth or outside camera frustum
+      birdState.pos.z = THREE.MathUtils.clamp(birdState.pos.z, 0.95, 1.95);
+      birdState.pos.x = THREE.MathUtils.clamp(birdState.pos.x, -vw * 0.54, vw * 0.86);
+      birdState.pos.y = THREE.MathUtils.clamp(birdState.pos.y, -vh * 0.35, vh * 0.50);
+      keepOut(birdState.pos, GLOBE_R * 1.30);
 
       // Gliding vs Flapping state transitions
       birdState.glideTimer -= dt;
@@ -1165,7 +1184,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       // 5. MICRO-PAPER COURIER & REFINED PARABOLIC THROW
       // ─────────────────────────────────────────────────────────
       courierTimer += dt;
-      if (courierPhase === 0 && courierTimer > 15.0) {
+      if (courierPhase === 0 && courierTimer > 10.0) {
         courierTimer = 0;
         courierPhase = 1;
         courierProgress = 0;
@@ -1175,7 +1194,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
 
       if (courierPhase === 1) {
         // Phase 1: Bird carrying the small paper
-        courierProgress += dt * 0.75;
+        courierProgress += dt * 0.85;
         paperMat.opacity = Math.min(1.0, courierProgress * 2.0);
         activePaper.position.copy(birdRoot.position).add(
           new THREE.Vector3(0, -0.045, 0.02).applyEuler(birdRoot.rotation)
@@ -1195,7 +1214,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         }
       } else if (courierPhase === 2) {
         // Phase 2: Parabolic toss arc toward the Earth
-        courierProgress += dt * 1.1;
+        courierProgress += dt * 1.25;
         const t = Math.min(1.0, courierProgress);
         const arcY = Math.sin(t * Math.PI) * 0.16;
         activePaper.position.lerpVectors(throwStartPos, throwDestPos, t);
@@ -1244,39 +1263,41 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const G_X = globeScreen.x;
       const G_Y = globeScreen.y;
       const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
-      const pillGap = Math.max(72, Math.min(98, W * 0.07));
+      const pillGap = Math.max(56, Math.min(76, W * 0.055));
 
       pillDefs.forEach(p => {
         let px = 0;
-        let py = G_Y + p.slotYOffset * screenGlobeR * 0.85;
+        let py = G_Y + p.slotYOffset * screenGlobeR * 0.88;
         let startX = 0;
-        const startY = py;
+        let startY = py;
         let ax = 0;
         let ay = 0;
 
         if (p.side === 'left') {
           px = G_X - screenGlobeR - pillGap;
-          startX = px + 54; // Right edge of left pill
-          // Connects strictly to the left rim of the Earth (NEVER crosses over or behind)
+          px = Math.max(px, 74);
+          startX = px + 62; // Starts from right edge of left pill
+          // Connects strictly to the left rim of the Earth
           ax = G_X - screenGlobeR * Math.cos(p.rimAngle);
           ay = G_Y + screenGlobeR * Math.sin(p.rimAngle);
         } else if (p.side === 'right') {
           px = G_X + screenGlobeR + pillGap;
-          startX = px - 54; // Left edge of right pill
+          px = Math.min(px, W - 78);
+          startX = px - 62; // Starts from left edge of right pill
           // Connects strictly to the right rim of the Earth
           ax = G_X + screenGlobeR * Math.cos(p.rimAngle);
           ay = G_Y + screenGlobeR * Math.sin(p.rimAngle);
         } else {
           // Bottom center pill
           px = G_X;
-          py = G_Y + screenGlobeR + 28;
+          py = G_Y + screenGlobeR + 32;
           startX = px;
+          startY = py - 14;
           ax = G_X;
-          ay = G_Y + screenGlobeR * 0.98;
+          ay = G_Y + screenGlobeR;
         }
 
-        px = THREE.MathUtils.clamp(px, 55, W - 55);
-        py = THREE.MathUtils.clamp(py, 22, H - 22);
+        py = THREE.MathUtils.clamp(py, 22, H - 24);
 
         newPos[p.id] = {
           x: px,
@@ -1325,8 +1346,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
       >
         <defs>
-          <filter id="coreGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="2" result="blur" />
+          <filter id="coreGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -1345,17 +1366,23 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
                 x2={pos.ax}
                 y2={pos.ay}
                 stroke={p.color}
-                strokeWidth="1.2"
+                strokeWidth="1.4"
                 strokeDasharray="4 3"
-                opacity="0.65"
+                opacity="0.75"
               />
               {/* Subtle glowing anchor beacon dot on the globe rim */}
               <circle
                 cx={pos.ax}
                 cy={pos.ay}
-                r="2.8"
+                r="3.2"
                 fill={p.color}
                 filter="url(#coreGlow)"
+              />
+              <circle
+                cx={pos.ax}
+                cy={pos.ay}
+                r="1.2"
+                fill="#ffffff"
               />
             </g>
           );
@@ -1374,18 +1401,24 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
             onClick={p.action}
             style={{
               transform: `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`,
-              borderColor: `${p.color}90`,
-              boxShadow: `0 4px 18px rgba(0,0,0,0.5), 0 0 12px ${p.color}40`
+              borderColor: `${p.color}75`,
+              boxShadow: `0 4px 20px rgba(0,0,0,0.5), 0 0 14px ${p.color}35`
             }}
-            className="absolute left-0 top-0 z-20 flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full bg-[#07132b]/90 hover:bg-[#0e214d] text-white text-[10.5px] sm:text-xs font-semibold backdrop-blur-md transition-transform duration-200 hover:scale-105 border cursor-pointer pointer-events-auto whitespace-nowrap group"
+            className="absolute left-0 top-0 z-20 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full bg-slate-950/85 dark:bg-[#071328]/90 hover:bg-slate-900 dark:hover:bg-[#0e214d] text-white text-[11px] sm:text-xs font-semibold backdrop-blur-md transition-all duration-200 hover:scale-105 border cursor-pointer pointer-events-auto whitespace-nowrap group"
           >
-            <span
-              className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full flex-shrink-0"
-              style={{ backgroundColor: p.color, boxShadow: `0 0 6px ${p.color}` }}
-            />
-            <Icon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" style={{ color: p.color }} />
-            <span className="leading-none">{p.name}</span>
-            <span className="text-[9px] sm:text-[9.5px] font-mono px-1.5 py-0.5 rounded bg-white/10 text-slate-200 font-bold leading-none">
+            <span className="relative flex h-2 w-2 flex-shrink-0">
+              <span
+                className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                style={{ backgroundColor: p.color }}
+              />
+              <span
+                className="relative inline-flex rounded-full h-2 w-2"
+                style={{ backgroundColor: p.color, boxShadow: `0 0 6px ${p.color}` }}
+              />
+            </span>
+            <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: p.color }} />
+            <span className="leading-none text-slate-100 group-hover:text-white transition-colors">{p.name}</span>
+            <span className="text-[9px] sm:text-[9.5px] font-mono px-1.5 py-0.5 rounded font-bold leading-none bg-white/10 text-slate-200 border border-white/10 group-hover:bg-white/20 transition-colors">
               {p.tag}
             </span>
           </button>
