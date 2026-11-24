@@ -975,18 +975,18 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       let targetZ = 0;
 
       if (W >= 900) {
-        const gX = masterGlobe.position.x || (0.42 * vw);
+        const gX = masterGlobe.position.x || (0.22 * vw);
         if (zone === 'left') {
           targetX = rnd(-vw * 0.46, -vw * 0.16);
           targetY = rnd(-vh * 0.10, vh * 0.42);
           targetZ = rnd(1.15, 1.65);
         } else if (zone === 'center') {
-          targetX = rnd(-vw * 0.16, vw * 0.16);
+          targetX = rnd(-vw * 0.16, vw * 0.08);
           targetY = rnd(-vh * 0.12, vh * 0.38);
           targetZ = rnd(1.10, 1.55);
         } else {
           // Around and in front of the Earth
-          targetX = gX + rnd(-0.65, 0.15);
+          targetX = gX + rnd(-0.55, 0.25);
           targetY = rnd(-vh * 0.18, vh * 0.35);
           targetZ = rnd(1.15, 1.65);
         }
@@ -1081,7 +1081,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
-        masterGlobe.position.x = 0.42 * vw; // Balanced position with all 7 labels on the right
+        masterGlobe.position.x = 0.22 * vw; // Shifted leftward to guarantee ~190px open distance for right-side HUD pills
       } else {
         masterGlobe.position.x = 0;
       }
@@ -1110,7 +1110,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
-        masterGlobe.position.x = 0.42 * vw;
+        masterGlobe.position.x = 0.22 * vw;
         masterGlobe.position.y = Math.sin(elapsed * 0.9) * 0.03;
       } else {
         masterGlobe.position.x = 0;
@@ -1415,38 +1415,39 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const G_X = globeScreen.x;
       const G_Y = globeScreen.y;
       const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
-      const pillGap = Math.max(46, Math.min(64, W * 0.052));
 
       const totalPills = pillDefs.length;
+      const pillHalfWidth = 78;
+      const rightMargin = Math.max(20, Math.min(42, W * 0.03));
+
+      // Right-align all pills completely on the far right side of the hero section
+      let targetPx = W - rightMargin - pillHalfWidth;
+      // Guarantee substantial breathing room from the globe rim (at least 120px clearance)
+      targetPx = Math.max(targetPx, G_X + screenGlobeR + 120 + pillHalfWidth);
 
       pillDefs.forEach((p, index) => {
         // Vertical slot normalized between -1.0 (top) and +1.0 (bottom)
         const tSlot = (index - (totalPills - 1) / 2) / ((totalPills - 1) / 2);
 
-        // Vertical distribution across the right side of the globe
-        const verticalSpan = Math.min(H * 0.38, screenGlobeR * 1.48);
+        // Vertical distribution across the hero section
+        const verticalSpan = Math.min(H * 0.36, screenGlobeR * 1.45);
         let py = G_Y + tSlot * verticalSpan;
 
-        // Rim anchor angle on the right hemisphere of the Earth (-56 deg to +56 deg)
-        const rimAngle = tSlot * (Math.PI * 0.31);
+        // Rim anchor angle on the right hemisphere of the Earth (-50 deg to +50 deg)
+        const rimAngle = tSlot * (Math.PI * 0.28);
 
         // Exact anchor coordinate on the right rim of the Earth
         const ax = G_X + screenGlobeR * Math.cos(rimAngle);
         const ay = G_Y + screenGlobeR * Math.sin(rimAngle);
 
-        // Horizontal position of the pill on the right side
-        // Soft curve that follows the globe contour
-        let px = G_X + screenGlobeR + pillGap + (1 - Math.cos(rimAngle)) * 16;
-        px = Math.min(px, W - 78);
-
         py = THREE.MathUtils.clamp(py, 22, H - 24);
 
         // Left edge of the right-side pill where the connector line begins
-        const startX = px - 62;
+        const startX = targetPx - pillHalfWidth;
         const startY = py;
 
         newPos[p.id] = {
-          x: px,
+          x: targetPx,
           y: py,
           startX,
           startY,
