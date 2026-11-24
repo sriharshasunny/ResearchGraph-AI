@@ -37,7 +37,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     }
   }, [onNavigate, setSearchQuery, setActivePage]);
 
-  // 7 HUD Navigation Pills — arranged in dedicated non-overlapping zones
+  // 7 HUD Navigation Pills — arranged symmetrically around the 3D Earth Globe
   // Left column (3), Right column (3), Bottom center (1)
   const pillDefs = [
     // LEFT COLUMN (top to bottom)
@@ -49,8 +49,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: FileText,
       action: () => handleAction('search'),
       side: 'left',
-      slotY: 0.22,
-      ap: new THREE.Vector3(-0.75, 0.35, 0.55)
+      slotYOffset: -0.65,
+      ap: new THREE.Vector3(-0.62, 0.35, 0.45).normalize().multiplyScalar(0.74)
     },
     {
       id: 'authors',
@@ -60,8 +60,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Users,
       action: () => handleSearch('Research authors'),
       side: 'left',
-      slotY: 0.50,
-      ap: new THREE.Vector3(-0.90, 0.05, 0.45)
+      slotYOffset: 0.0,
+      ap: new THREE.Vector3(-0.78, 0.05, 0.35).normalize().multiplyScalar(0.74)
     },
     {
       id: 'datasets',
@@ -71,8 +71,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Database,
       action: () => handleSearch('Empirical datasets'),
       side: 'left',
-      slotY: 0.78,
-      ap: new THREE.Vector3(-0.70, -0.38, 0.55)
+      slotYOffset: 0.65,
+      ap: new THREE.Vector3(-0.62, -0.35, 0.45).normalize().multiplyScalar(0.74)
     },
 
     // RIGHT COLUMN (top to bottom)
@@ -84,8 +84,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Network,
       action: () => handleAction('graph'),
       side: 'right',
-      slotY: 0.22,
-      ap: new THREE.Vector3(0.75, 0.35, 0.55)
+      slotYOffset: -0.65,
+      ap: new THREE.Vector3(0.62, 0.35, 0.45).normalize().multiplyScalar(0.74)
     },
     {
       id: 'insights',
@@ -95,8 +95,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Sparkles,
       action: () => handleAction('chat'),
       side: 'right',
-      slotY: 0.50,
-      ap: new THREE.Vector3(0.90, 0.05, 0.45)
+      slotYOffset: 0.0,
+      ap: new THREE.Vector3(0.78, 0.05, 0.35).normalize().multiplyScalar(0.74)
     },
     {
       id: 'concepts',
@@ -106,8 +106,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Layers,
       action: () => handleSearch('Ontological concepts'),
       side: 'right',
-      slotY: 0.78,
-      ap: new THREE.Vector3(0.70, -0.38, 0.55)
+      slotYOffset: 0.65,
+      ap: new THREE.Vector3(0.62, -0.35, 0.45).normalize().multiplyScalar(0.74)
     },
 
     // BOTTOM CENTER
@@ -119,8 +119,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       icon: Link2,
       action: () => handleAction('graph'),
       side: 'center',
-      slotY: 0.94,
-      ap: new THREE.Vector3(0.0, -0.85, 0.45)
+      slotYOffset: 1.0,
+      ap: new THREE.Vector3(0.0, -0.76, 0.35).normalize().multiplyScalar(0.74)
     }
   ];
 
@@ -240,22 +240,27 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           const l = isLand(lat, lon);
           if (l) {
             if (absLat > 64) {
-              d[idx] = 232; d[idx + 1] = 242; d[idx + 2] = 252;
+              // Polar ice & glaciers
+              d[idx] = 236; d[idx + 1] = 246; d[idx + 2] = 255;
             } else if (lat > 15 && lat < 34 && lon > -15 && lon < 55) {
-              d[idx] = 172; d[idx + 1] = 142; d[idx + 2] = 92;
+              // Sahara & Arabian deserts - warm golden dunes
+              d[idx] = 210; d[idx + 1] = 175; d[idx + 2] = 115;
             } else if (lat < -18 && lat > -32 && lon > 115 && lon < 145) {
-              d[idx] = 178; d[idx + 1] = 108; d[idx + 2] = 68;
+              // Australian outback - terracotta ochre
+              d[idx] = 198; d[idx + 1] = 132; d[idx + 2] = 85;
             } else {
+              // Lush vegetation, savannas, forests
               const v = (Math.sin(lat * 0.15) * Math.cos(lon * 0.15) + 1) * 0.5;
-              d[idx] = Math.floor(46 + v * 32);
-              d[idx + 1] = Math.floor(96 + v * 36);
-              d[idx + 2] = Math.floor(54 + v * 20);
+              d[idx] = Math.floor(52 + v * 38);
+              d[idx + 1] = Math.floor(128 + v * 42);
+              d[idx + 2] = Math.floor(68 + v * 24);
             }
           } else {
+            // Luminous azure ocean waters (blends beautifully into mountain daytime sky)
             const depth = absLat / 90;
-            d[idx] = Math.floor(12 + depth * 8);
-            d[idx + 1] = Math.floor(30 + depth * 16);
-            d[idx + 2] = Math.floor(62 + depth * 22);
+            d[idx] = Math.floor(22 + (1 - depth) * 18);
+            d[idx + 1] = Math.floor(82 + (1 - depth) * 36);
+            d[idx + 2] = Math.floor(168 + (1 - depth) * 48);
           }
           d[idx + 3] = 255;
         }
@@ -335,11 +340,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     const spinGroup = new THREE.Group();
     masterGlobe.add(spinGroup);
 
-    // Reduced globe radius for ideal proportions and zero background obstruction
-    const GLOBE_R = 0.92;
+    // Reduced globe radius (reduced by 10% to 0.74 for optimal hero proportions and label clearance)
+    const GLOBE_R = 0.74;
 
     // Earth Shader with clean natural limb lighting on sphere surface
-    // (NO outer black meshes or opaque halos)
+    // Full daylight wrap & soft sky ambient fill — NO pitch-black hemisphere or dark rims!
     const earthMat = new THREE.ShaderMaterial({
       uniforms: {
         dayT: { value: dayTex },
@@ -353,9 +358,10 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         varying vec3 vPos;
         void main() {
           vUv = uv;
-          vNormal = normalize(normalMatrix * normal);
-          vPos = (modelViewMatrix * vec4(position, 1.0)).xyz;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          vNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
+          vec4 wPos = modelMatrix * vec4(position, 1.0);
+          vPos = wPos.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wPos;
         }
       `,
       fragmentShader: `
@@ -368,23 +374,35 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         varying vec3 vPos;
         void main() {
           vec3 N = normalize(vNormal);
-          vec3 V = normalize(-vPos);
+          vec3 V = normalize(cameraPosition - vPos);
           float nd = dot(N, sun);
-          float lit = smoothstep(-0.15, 0.20, nd);
+
+          // Full daylight wrap illumination: ambient baseline is 0.58 so the shaded side is NEVER black!
+          // Seamlessly blends with the mountain background image
+          float ambient = 0.58 + 0.12 * max(0.0, dot(N, vec3(0.0, 1.0, 0.0)));
+          float direct = 0.55 * max(0.0, nd);
+          float daylight = ambient + direct;
+
+          vec3 skyTint = vec3(0.78, 0.88, 1.0); // Ambient mountain sky illumination
+          vec3 sunTint = vec3(1.0, 0.98, 0.92);  // Direct sunlight
+          vec3 light = mix(skyTint, sunTint, smoothstep(-0.1, 0.4, nd));
+
           vec3 day = texture2D(dayT, vUv).rgb;
           vec3 night = texture2D(nightT, vUv).rgb;
           float spec = texture2D(specT, vUv).r;
 
-          vec3 col = day * (0.12 + 1.15 * max(0.0, nd)) * mix(vec3(0.85, 0.92, 1.0), vec3(1.0, 0.98, 0.92), lit);
-          col += night * (1.0 - lit) * 1.6;
+          vec3 col = day * daylight * light;
+
+          // Soft golden research city lights visible on shaded hemisphere
+          col += night * (1.0 - smoothstep(-0.15, 0.25, nd)) * 0.95;
 
           // Ocean Specular Glint
           vec3 H = normalize(sun + V);
-          col += vec3(1.0, 0.98, 0.92) * pow(max(dot(N, H), 0.0), 240.0) * spec * 0.72 * step(0.0, nd);
+          col += vec3(1.0, 0.98, 0.94) * pow(max(dot(N, H), 0.0), 140.0) * spec * 0.60 * step(-0.05, nd);
 
-          // Rayleigh limb scattering directly on sphere edge (NO dark outer halo!)
-          float limb = pow(1.0 - max(dot(N, V), 0.0), 3.8);
-          col += vec3(0.25, 0.55, 0.95) * limb * smoothstep(-0.2, 0.4, nd) * 0.45;
+          // Soft atmospheric Fresnel rim that blends seamlessly with the background sky & clouds
+          float fresnel = pow(1.0 - max(dot(N, V), 0.0), 2.6);
+          col += vec3(0.38, 0.72, 1.0) * fresnel * 0.55;
 
           gl_FragColor = vec4(col, 1.0);
         }
@@ -638,8 +656,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     wr.sh.position.set(-0.13, 0.075, 0.12);
     birdBodyGroup.add(wl.sh, wr.sh);
 
-    // Miniature bird scale so it roams comfortably in 3D around the globe
-    birdRoot.scale.setScalar(0.16);
+    // Miniature bird scale so it roams comfortably and gracefully in 3D across the entire hero banner
+    birdRoot.scale.setScalar(0.12);
     scene.add(birdRoot);
 
     // ─────────────────────────────────────────────────────────────
@@ -809,20 +827,42 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     tractorBeam.position.y = -0.85;
     ufoModel.add(tractorBeam);
 
-    // Miniature UFO scale
-    ufoRoot.scale.setScalar(0.18);
+    // Miniature UFO scale (sleek, perfectly proportioned scout ship)
+    ufoRoot.scale.setScalar(0.11);
     scene.add(ufoRoot);
 
     // ─────────────────────────────────────────────────────────────
     // 4. FLOATING PAPER & DELIVERY REACTION
     // ─────────────────────────────────────────────────────────────
-    const paperMat = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
+    // High-resolution canvas texture for micro research paper (prevents raw white blocks)
+    const miniPaperTex = (() => {
+      const c = mkc(128, 170), ctx = c.getContext('2d')!;
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 128, 170);
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 9px serif';
+      ctx.fillText('Research Paper', 10, 18);
+      ctx.fillStyle = '#64748b';
+      ctx.font = '7px sans-serif';
+      ctx.fillText('arXiv:2611 · cs.AI', 10, 30);
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(10, 36, 108, 1.5);
+      for (let i = 0; i < 9; i++) {
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(10, 46 + i * 12, i % 2 === 0 ? 108 : 82, 4);
+      }
+      return tex(c);
+    })();
+
+    const paperMat = new THREE.MeshStandardMaterial({
+      map: miniPaperTex,
+      roughness: 0.8,
+      metalness: 0.05,
       side: THREE.DoubleSide,
       transparent: true,
       opacity: 0
     });
-    const activePaper = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.22), paperMat);
+    const activePaper = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.24), paperMat);
     activePaper.visible = false;
     scene.add(activePaper);
 
@@ -837,41 +877,88 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     scene.add(rippleMesh);
 
     // ─────────────────────────────────────────────────────────────
-    // 5. ORGANIC 3D ROAMING AUTONOMOUS AGENTS (NON-CIRCULAR FLIGHT)
+    // 5. ORGANIC 3D ROAMING AUTONOMOUS AGENTS (ACROSS ENTIRE HERO BANNER)
     // ─────────────────────────────────────────────────────────────
     const rnd = (min: number, max: number) => min + Math.random() * (max - min);
 
-    // Collision avoidance buffer with Earth globe
+    // Collision avoidance buffer with Earth globe in world space
     const keepOut = (p: THREE.Vector3, minDist: number) => {
-      const len = p.length();
+      const rel = p.clone().sub(masterGlobe.position);
+      const len = rel.length();
       if (len < minDist) {
-        p.multiplyScalar(minDist / (len || 0.001));
+        rel.multiplyScalar(minDist / (len || 0.001));
+        p.copy(masterGlobe.position).add(rel);
       }
     };
 
-    // Random 3D Waypoint Generator around the globe
+    // Cross-Banner Waypoint Generator: Ensures agents soar across the ENTIRE hero section
+    // Moves across: Left (search form & alpine sky) <-> Center (cloud pass) <-> Right (Earth globe)
+    // Never loops or circles strictly around the globe
     const getNextWaypoint = (isBird: boolean) => {
-      // Pick random 3D position wrapping all sides of the globe
-      const theta = rnd(0, Math.PI * 2);
-      const phi = rnd(0.3, Math.PI - 0.3);
-      const r = isBird ? rnd(1.35, 1.95) : rnd(1.45, 2.25);
-      return new THREE.Vector3(
-        r * Math.sin(phi) * Math.cos(theta),
-        r * Math.cos(phi) * (isBird ? 0.75 : 0.85),
-        r * Math.sin(phi) * Math.sin(theta)
-      );
+      const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
+      const vw = vh * (W / H);
+
+      const curX = isBird ? birdState.pos.x : ufoState.pos.x;
+      let zone: 'left' | 'center' | 'right';
+
+      if (curX > 0.15 * vw) {
+        // Currently on right side (near globe) -> traverse back across mountains and valley to left/center
+        zone = Math.random() < 0.6 ? 'left' : 'center';
+      } else if (curX < -0.20 * vw) {
+        // Currently on far-left side (above search form) -> traverse across to center or right
+        zone = Math.random() < 0.6 ? 'right' : 'center';
+      } else {
+        // In central pass -> pick left or right
+        zone = Math.random() < 0.5 ? 'left' : 'right';
+      }
+
+      let targetX = 0;
+      let targetY = 0;
+      let targetZ = 0;
+
+      if (W >= 900) {
+        if (zone === 'left') {
+          // Zone 1: Far-left alpine peaks and open sky above search section
+          targetX = rnd(-vw * 0.82, -vw * 0.32);
+          targetY = isBird ? rnd(-0.25, vh * 0.70) : rnd(-0.15, vh * 0.72);
+          targetZ = rnd(1.1, 2.3);
+        } else if (zone === 'center') {
+          // Zone 2: Central cloud ridge and alpine valley between left and globe
+          targetX = rnd(-vw * 0.22, vw * 0.16);
+          targetY = isBird ? rnd(-0.20, vh * 0.68) : rnd(0.0, vh * 0.72);
+          targetZ = rnd(1.0, 2.1);
+        } else {
+          // Zone 3: Right sector cruising past the Earth globe
+          const gX = masterGlobe.position.x || (0.42 * vw);
+          const side = Math.random() < 0.5 ? 1 : -1;
+          targetX = gX + side * rnd(GLOBE_R * 1.35, GLOBE_R * 2.4);
+          targetY = rnd(-vh * 0.40, vh * 0.68);
+          targetZ = rnd(1.1, 2.2);
+        }
+      } else {
+        // Mobile layout: roaming throughout full canvas bounds
+        targetX = rnd(-vw * 0.75, vw * 0.75);
+        targetY = rnd(-vh * 0.60, vh * 0.60);
+        targetZ = rnd(1.1, 2.3);
+      }
+
+      targetX = THREE.MathUtils.clamp(targetX, -vw * 0.86, vw * 0.86);
+      targetY = THREE.MathUtils.clamp(targetY, -vh * 0.68, vh * 0.72);
+      targetZ = THREE.MathUtils.clamp(targetZ, 0.9, 2.4);
+
+      return new THREE.Vector3(targetX, targetY, targetZ);
     };
 
     // Bird Flight State: Realistic aerodynamic steering, banking, and flapping bursts
     const birdState = {
-      pos: new THREE.Vector3(-1.4, 0.6, 1.1),
+      pos: new THREE.Vector3(-2.2, 0.8, 1.4),
       vel: new THREE.Vector3(0, 0, 0),
-      target: getNextWaypoint(true),
+      target: new THREE.Vector3(-1.0, 0.4, 1.2),
       yaw: 0,
       pitch: 0,
       bank: 0,
       yawRate: 0,
-      speed: 1.8,
+      speed: 2.2,
       isGliding: false,
       glideTimer: 0,
       flapPhase: 0,
@@ -880,9 +967,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
 
     // UFO Flight State: Anti-gravity thruster acceleration, inertia, hovering wobble
     const ufoState = {
-      pos: new THREE.Vector3(1.5, 0.5, 1.2),
+      pos: new THREE.Vector3(1.8, 0.6, 1.3),
       vel: new THREE.Vector3(0, 0, 0),
-      target: getNextWaypoint(false),
+      target: new THREE.Vector3(0.5, 0.7, 1.0),
       rx: 0.15,
       rz: 0.0,
       wobbleSeed: rnd(0, 10),
@@ -893,10 +980,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     let courierPhase = 0; // 0=roaming, 1=paper pickup, 2=fly into globe, 3=ripple
     let courierProgress = 0;
     let courierType: 'bird' | 'ufo' = 'bird';
+    const courierDest = new THREE.Vector3();
     let rippleProg = 1.0;
 
     // ─────────────────────────────────────────────────────────────
-    // 6. DRAG TO ROTATE
+    // 6. DRAG TO ROTATE (CLUSTERS DIRECTLY OVER EARTH GLOBE)
     // ─────────────────────────────────────────────────────────────
     let isDragging = false;
     let prevX = 0;
@@ -904,10 +992,20 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     let targetRotY = 0;
 
     const onPointerDown = (e: PointerEvent) => {
-      isDragging = true;
-      prevX = e.clientX;
-      rotVelY = 0;
-      canvas.setPointerCapture(e.pointerId);
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      const globeScreen = projectToScreen(masterGlobe.position);
+      const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
+      const dist = Math.hypot(clickX - globeScreen.x, clickY - globeScreen.y);
+
+      // Only initiate globe dragging when clicking near Earth globe
+      if (dist < screenGlobeR * 1.6) {
+        isDragging = true;
+        prevX = e.clientX;
+        rotVelY = 0;
+        canvas.setPointerCapture(e.pointerId);
+      }
     };
 
     const onPointerMove = (e: PointerEvent) => {
@@ -935,6 +1033,14 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
       renderer.setSize(W, H);
+
+      const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
+      const vw = vh * (W / H);
+      if (W >= 900) {
+        masterGlobe.position.x = 0.42 * vw;
+      } else {
+        masterGlobe.position.x = 0;
+      }
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
@@ -956,8 +1062,16 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const dt = clock.getDelta();
       const elapsed = clock.getElapsedTime();
 
-      // 1. Globe Levitation
-      masterGlobe.position.y = Math.sin(elapsed * 1.1) * 0.035;
+      // 1. Globe Levitation & Panoramic Screen Placement
+      const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
+      const vw = vh * (W / H);
+      if (W >= 900) {
+        masterGlobe.position.x = 0.42 * vw;
+        masterGlobe.position.y = Math.sin(elapsed * 1.1) * 0.035;
+      } else {
+        masterGlobe.position.x = 0;
+        masterGlobe.position.y = -vh * 0.28 + Math.sin(elapsed * 1.1) * 0.035;
+      }
 
       // 2. Drag Rotation
       if (!isDragging) {
@@ -1018,8 +1132,8 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       birdState.bank += (THREE.MathUtils.clamp(-birdState.yawRate * 0.65, -0.75, 0.75) - birdState.bank) * Math.min(1, dt * 4.0);
 
       // Speed modulation: faster when pitching down, slower in steep climbs
-      const targetSpeed = 1.6 - birdState.pitch * 0.8;
-      birdState.speed = THREE.MathUtils.clamp(birdState.speed + (targetSpeed - birdState.speed) * dt * 2.0, 1.2, 2.8);
+      const targetSpeed = 2.4 - birdState.pitch * 1.2;
+      birdState.speed = THREE.MathUtils.clamp(birdState.speed + (targetSpeed - birdState.speed) * dt * 2.0, 1.8, 3.6);
 
       // Forward flight translation
       const bFw = new THREE.Vector3(
@@ -1028,7 +1142,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         Math.cos(birdState.pitch) * Math.cos(birdState.yaw)
       );
       birdState.pos.addScaledVector(bFw, birdState.speed * dt);
-      keepOut(birdState.pos, GLOBE_R * 1.26);
+      keepOut(birdState.pos, GLOBE_R * 1.25);
 
       // Gliding vs Flapping state transitions
       birdState.glideTimer -= dt;
@@ -1073,22 +1187,22 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
 
       // Anti-gravity smooth acceleration towards target
-      const uAx = THREE.MathUtils.clamp((ufoState.target.x - ufoState.pos.x) * 3.2 - ufoState.vel.x * 2.2, -6.0, 6.0);
-      const uAy = THREE.MathUtils.clamp((ufoState.target.y - ufoState.pos.y) * 3.2 - ufoState.vel.y * 2.2, -6.0, 6.0);
-      const uAz = THREE.MathUtils.clamp((ufoState.target.z - ufoState.pos.z) * 3.2 - ufoState.vel.z * 2.2, -6.0, 6.0);
+      const uAx = THREE.MathUtils.clamp((ufoState.target.x - ufoState.pos.x) * 3.8 - ufoState.vel.x * 2.4, -7.0, 7.0);
+      const uAy = THREE.MathUtils.clamp((ufoState.target.y - ufoState.pos.y) * 3.8 - ufoState.vel.y * 2.4, -7.0, 7.0);
+      const uAz = THREE.MathUtils.clamp((ufoState.target.z - ufoState.pos.z) * 3.8 - ufoState.vel.z * 2.4, -7.0, 7.0);
 
       ufoState.vel.x += uAx * dt;
       ufoState.vel.y += uAy * dt;
       ufoState.vel.z += uAz * dt;
 
       // Speed cap for smooth graceful roaming
-      if (ufoState.vel.length() > 2.4) {
-        ufoState.vel.setLength(2.4);
+      if (ufoState.vel.length() > 3.2) {
+        ufoState.vel.setLength(3.2);
       }
 
       ufoState.pos.addScaledVector(ufoState.vel, dt);
       ufoState.pos.y += Math.sin(elapsed * 2.2 + ufoState.wobbleSeed) * 0.12 * dt;
-      keepOut(ufoState.pos, GLOBE_R * 1.30);
+      keepOut(ufoState.pos, GLOBE_R * 1.28);
 
       // Bank realistically based on velocity & lateral acceleration
       ufoState.rx += (0.18 + THREE.MathUtils.clamp(ufoState.vel.z * 0.05 - uAy * 0.015, -0.35, 0.35) - ufoState.rx) * Math.min(1, dt * 5.0);
@@ -1125,17 +1239,17 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         if (courierProgress >= 1.0) {
           courierPhase = 2;
           courierProgress = 0;
+          courierDest.set(
+            masterGlobe.position.x + (Math.random() - 0.5) * 0.30,
+            masterGlobe.position.y + (Math.random() - 0.5) * 0.20,
+            GLOBE_R * 0.98
+          );
         }
       } else if (courierPhase === 2) {
         courierProgress += dt * 0.75;
         const t = Math.min(1.0, courierProgress);
         const carrier = courierType === 'bird' ? birdRoot : ufoRoot;
-        const target = new THREE.Vector3(
-          (Math.random() - 0.5) * 0.4,
-          (Math.random() - 0.5) * 0.3,
-          GLOBE_R * 0.96
-        );
-        activePaper.position.lerpVectors(carrier.position, target, t);
+        activePaper.position.lerpVectors(carrier.position, courierDest, t);
         paperMat.opacity = 1.0 - t * 0.2;
 
         if (courierProgress >= 1.0) {
@@ -1168,22 +1282,30 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       // ─────────────────────────────────────────────────────────
       spinGroup.updateMatrixWorld(true);
       const newPos: Record<string, { x: number; y: number; ax: number; ay: number }> = {};
+      const globeScreen = projectToScreen(masterGlobe.position);
+      const G_X = globeScreen.x;
+      const G_Y = globeScreen.y;
+      const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
+      const pillGap = Math.max(68, Math.min(95, W * 0.065));
 
       pillDefs.forEach(p => {
-        const worldAp = p.ap.clone().applyMatrix4(spinGroup.matrixWorld);
+        const worldAp = p.ap.clone().applyMatrix4(spinGroup.matrixWorld).add(masterGlobe.position);
         const screenAp = projectToScreen(worldAp);
 
         let px = 0;
-        let py = p.slotY * H;
+        let py = G_Y + p.slotYOffset * screenGlobeR * 0.88;
 
         if (p.side === 'left') {
-          px = Math.max(75, W * 0.12);
+          px = G_X - screenGlobeR - pillGap;
         } else if (p.side === 'right') {
-          px = Math.min(W - 75, W * 0.88);
+          px = G_X + screenGlobeR + pillGap;
         } else {
-          px = W * 0.5;
-          py = Math.min(H - 24, p.slotY * H);
+          px = G_X;
+          py = G_Y + screenGlobeR + 25;
         }
+
+        px = THREE.MathUtils.clamp(px, 60, W - 60);
+        py = THREE.MathUtils.clamp(py, 22, H - 22);
 
         newPos[p.id] = {
           x: px,
@@ -1195,10 +1317,13 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
 
       setPillPositions(newPos);
 
-      // Track UFO on screen for RECON SURVEYOR badge
+      // Track UFO on screen for RECON SURVEYOR badge (smoothly clamped within hero banner)
       const ufoWorld = ufoRoot.position.clone();
       const ufoScreen = projectToScreen(ufoWorld);
-      setUfoScreenPos(ufoScreen);
+      setUfoScreenPos({
+        x: THREE.MathUtils.clamp(ufoScreen.x, 60, W - 60),
+        y: THREE.MathUtils.clamp(ufoScreen.y, 25, H - 25)
+      });
 
       renderer.render(scene, camera);
     };
@@ -1219,12 +1344,12 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[390px] sm:h-[420px] lg:h-[450px] select-none flex items-center justify-center overflow-visible"
+      className="relative w-full h-full min-h-[420px] lg:min-h-[446px] select-none flex items-center justify-center overflow-visible"
     >
-      {/* 3D WebGL Canvas — Transparent alpha, blends cleanly into background image */}
+      {/* 3D WebGL Canvas — Transparent alpha, blends cleanly into background image across full hero banner */}
       <canvas
         ref={canvasRef}
-        className="w-full h-full cursor-grab active:cursor-grabbing block focus:outline-none"
+        className="w-full h-full cursor-default active:cursor-grabbing block focus:outline-none pointer-events-auto"
         style={{ background: 'transparent' }}
         aria-label="3D Knowledge Earth with roaming bird and UFO"
       />

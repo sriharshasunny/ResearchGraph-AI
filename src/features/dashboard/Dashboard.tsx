@@ -108,8 +108,13 @@ export const Dashboard: React.FC = () => {
             backgroundRepeat: 'no-repeat',
           }}
         >
-          <div className="grid min-h-[343px] lg:min-h-[363px] items-center gap-3 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)] xl:gap-5">
-            <div className="relative z-10 max-w-[610px] lg:-translate-y-1">
+          {/* Full-bleed 3D Interactive Stage: Bird and UFO roam across the ENTIRE hero banner */}
+          <div className="absolute inset-0 z-0 overflow-hidden" aria-label="Interactive research knowledge core">
+            <ResearchKnowledgeCore />
+          </div>
+
+          <div className="relative z-10 grid min-h-[343px] lg:min-h-[363px] items-center gap-3 lg:grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)] xl:gap-5 pointer-events-none">
+            <div className="relative max-w-[610px] lg:-translate-y-1 pointer-events-auto">
               {/* Badge */}
               <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-blue-200/90 dark:border-indigo-400/40 bg-white/90 dark:bg-slate-900/90 px-3 py-1 text-[9.5px] font-bold tracking-[0.12em] text-[#4F46E5] dark:text-indigo-300 shadow-[0_2px_10px_rgba(37,99,235,0.12)] dark:shadow-[0_2px_14px_rgba(99,102,241,0.25)] backdrop-blur-md transition-colors duration-200">
                 <Sparkles className="h-3 w-3 text-[#4F46E5] dark:text-indigo-300" />
@@ -169,10 +174,8 @@ export const Dashboard: React.FC = () => {
 
             </div>
 
-            {/* Right Side: Exact ResearchGraph Model & Interactive Stage */}
-            <div className="relative mx-auto flex w-full max-w-[715px] items-center justify-center overflow-visible" aria-label="Interactive research knowledge core">
-              <ResearchKnowledgeCore />
-            </div>
+            {/* Right Side Spacer maintaining layout clearance on desktop and mobile */}
+            <div className="min-h-[280px] lg:min-h-[343px] pointer-events-none" />
           </div>
         </motion.section>
 
