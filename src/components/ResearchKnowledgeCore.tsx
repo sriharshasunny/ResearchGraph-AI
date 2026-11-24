@@ -975,13 +975,13 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       let targetZ = 0;
 
       if (W >= 900) {
-        const gX = masterGlobe.position.x || (0.22 * vw);
+        const gX = masterGlobe.position.x || (0.35 * vw);
         if (zone === 'left') {
           targetX = rnd(-vw * 0.46, -vw * 0.16);
           targetY = rnd(-vh * 0.10, vh * 0.42);
           targetZ = rnd(1.15, 1.65);
         } else if (zone === 'center') {
-          targetX = rnd(-vw * 0.16, vw * 0.08);
+          targetX = rnd(-vw * 0.16, vw * 0.16);
           targetY = rnd(-vh * 0.12, vh * 0.38);
           targetZ = rnd(1.10, 1.55);
         } else {
@@ -1080,8 +1080,10 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
 
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
-      if (W >= 900) {
-        masterGlobe.position.x = 0.22 * vw; // Shifted leftward to guarantee ~190px open distance for right-side HUD pills
+      if (W >= 1150) {
+        masterGlobe.position.x = 0.35 * vw; // Right-positioned globe with organic contoured HUD clearance
+      } else if (W >= 900) {
+        masterGlobe.position.x = 0.30 * vw;
       } else {
         masterGlobe.position.x = 0;
       }
@@ -1109,8 +1111,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       // 1. Globe Panoramic Positioning & Soft Levitation
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
-      if (W >= 900) {
-        masterGlobe.position.x = 0.22 * vw;
+      if (W >= 1150) {
+        masterGlobe.position.x = 0.35 * vw;
+        masterGlobe.position.y = Math.sin(elapsed * 0.9) * 0.03;
+      } else if (W >= 900) {
+        masterGlobe.position.x = 0.30 * vw;
         masterGlobe.position.y = Math.sin(elapsed * 0.9) * 0.03;
       } else {
         masterGlobe.position.x = 0;
@@ -1404,7 +1409,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
 
       // ─────────────────────────────────────────────────────────
-      // 6. ALL 7 HUD PILLS ORGANIZED STRICTLY ON THE RIGHT SIDE
+      // 6. ALL 7 HUD PILLS CONTOURED ORGANICALLY ALONG EARTH'S CURVATURE
       // ─────────────────────────────────────────────────────────
       const newPos: Record<
         string,
@@ -1417,37 +1422,38 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
 
       const totalPills = pillDefs.length;
-      const pillHalfWidth = 78;
-      const rightMargin = Math.max(20, Math.min(42, W * 0.03));
-
-      // Right-align all pills completely on the far right side of the hero section
-      let targetPx = W - rightMargin - pillHalfWidth;
-      // Guarantee substantial breathing room from the globe rim (at least 120px clearance)
-      targetPx = Math.max(targetPx, G_X + screenGlobeR + 120 + pillHalfWidth);
 
       pillDefs.forEach((p, index) => {
-        // Vertical slot normalized between -1.0 (top) and +1.0 (bottom)
+        // Vertical slot normalized between -1.0 (top pill, index 0) and +1.0 (bottom pill, index 6)
         const tSlot = (index - (totalPills - 1) / 2) / ((totalPills - 1) / 2);
 
-        // Vertical distribution across the hero section
-        const verticalSpan = Math.min(H * 0.36, screenGlobeR * 1.45);
-        let py = G_Y + tSlot * verticalSpan;
+        // Even vertical distribution across the right hemisphere
+        const stepY = Math.min(50, Math.max(42, (H - 96) / 6));
+        let py = G_Y + tSlot * (3 * stepY);
+        py = THREE.MathUtils.clamp(py, 22, H - 26);
 
-        // Rim anchor angle on the right hemisphere of the Earth (-50 deg to +50 deg)
-        const rimAngle = tSlot * (Math.PI * 0.28);
+        // Rim anchor angle on the right hemisphere of Earth (-56 deg to +56 deg)
+        const rimAngle = tSlot * (Math.PI * 0.31);
 
-        // Exact anchor coordinate on the right rim of the Earth
+        // Exact anchor coordinate directly on the Earth rim perimeter
         const ax = G_X + screenGlobeR * Math.cos(rimAngle);
         const ay = G_Y + screenGlobeR * Math.sin(rimAngle);
 
-        py = THREE.MathUtils.clamp(py, 22, H - 24);
+        // Staggered contour curve matching the reference design:
+        // Apex (equator) steps furthest right (+32px), top & bottom step gently inward
+        const baseLineLen = 46;
+        const contourOffset = Math.cos(tSlot * (Math.PI * 0.48)) * 32;
+        let startX = ax + baseLineLen + contourOffset;
 
-        // Left edge of the right-side pill where the connector line begins
-        const startX = targetPx - pillHalfWidth;
+        // Ensure pill stays within hero banner boundary
+        const maxStartX = W - 185;
+        if (startX > maxStartX) startX = maxStartX;
+        if (startX < ax + 28) startX = ax + 28;
+
         const startY = py;
 
         newPos[p.id] = {
-          x: targetPx,
+          x: startX,
           y: py,
           startX,
           startY,
@@ -1487,7 +1493,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         aria-label="3D Natural Knowledge Earth with soaring research courier bird"
       />
 
-      {/* SVG Connector Lines from HUD Pills to 3D Earth Rim Anchors (Clean, Non-Overlapping) */}
+      {/* SVG Connector Lines from HUD Pills to 3D Earth Rim Anchors (Clean, Contoured & Glowing) */}
       <svg
         ref={svgRef}
         className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
@@ -1506,29 +1512,47 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           if (!pos) return null;
           return (
             <g key={p.id}>
-              {/* Clean, short connector line from pill edge directly to its local globe rim anchor */}
+              {/* Soft ambient optical glow line */}
               <line
                 x1={pos.startX}
                 y1={pos.startY}
                 x2={pos.ax}
                 y2={pos.ay}
                 stroke={p.color}
-                strokeWidth="1.4"
-                strokeDasharray="4 3"
-                opacity="0.75"
+                strokeWidth="2.8"
+                opacity="0.30"
+                filter="url(#coreGlow)"
               />
-              {/* Subtle glowing anchor beacon dot on the globe rim */}
+              {/* Crisp colored connector line from pill left edge directly to Earth rim beacon */}
+              <line
+                x1={pos.startX}
+                y1={pos.startY}
+                x2={pos.ax}
+                y2={pos.ay}
+                stroke={p.color}
+                strokeWidth="1.3"
+                opacity="0.85"
+              />
+              {/* Multi-tier glowing beacon on Earth rim */}
               <circle
                 cx={pos.ax}
                 cy={pos.ay}
-                r="3.2"
+                r="6.5"
                 fill={p.color}
+                opacity="0.45"
                 filter="url(#coreGlow)"
               />
               <circle
                 cx={pos.ax}
                 cy={pos.ay}
-                r="1.2"
+                r="3.5"
+                fill={p.color}
+                opacity="0.95"
+              />
+              <circle
+                cx={pos.ax}
+                cy={pos.ay}
+                r="1.5"
                 fill="#ffffff"
               />
             </g>
@@ -1536,7 +1560,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         })}
       </svg>
 
-      {/* 7 Neatly Arranged Non-Overlapping Interactive HUD Pills */}
+      {/* 7 Neatly Arranged Contoured Interactive Frosted Glass HUD Pills */}
       {pillDefs.map(p => {
         const pos = pillPositions[p.id];
         if (!pos) return null;
@@ -1547,25 +1571,22 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
             type="button"
             onClick={p.action}
             style={{
-              transform: `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%)`,
-              borderColor: `${p.color}75`,
-              boxShadow: `0 4px 20px rgba(0,0,0,0.5), 0 0 14px ${p.color}35`
+              left: `${pos.startX}px`,
+              top: `${pos.startY}px`,
+              transform: 'translateY(-50%)',
+              borderColor: 'rgba(255, 255, 255, 0.22)',
+              boxShadow: `0 8px 32px rgba(0, 0, 0, 0.36), 0 0 16px ${p.color}18`
             }}
-            className="absolute left-0 top-0 z-20 flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full bg-slate-950/85 dark:bg-[#071328]/90 hover:bg-slate-900 dark:hover:bg-[#0e214d] text-white text-[11px] sm:text-xs font-semibold backdrop-blur-md transition-all duration-200 hover:scale-105 border cursor-pointer pointer-events-auto whitespace-nowrap group"
+            className="absolute z-20 flex items-center gap-2 sm:gap-2.5 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full bg-slate-900/45 dark:bg-[#071328]/55 hover:bg-slate-800/60 dark:hover:bg-[#0c1f44]/75 text-white text-[11px] sm:text-xs font-semibold backdrop-blur-xl transition-all duration-200 hover:scale-105 hover:border-white/40 border cursor-pointer pointer-events-auto whitespace-nowrap group"
           >
-            <span className="relative flex h-2 w-2 flex-shrink-0">
-              <span
-                className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                style={{ backgroundColor: p.color }}
-              />
-              <span
-                className="relative inline-flex rounded-full h-2 w-2"
-                style={{ backgroundColor: p.color, boxShadow: `0 0 6px ${p.color}` }}
-              />
+            <Icon
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 transition-transform group-hover:scale-110"
+              style={{ color: p.color, filter: `drop-shadow(0 0 6px ${p.color})` }}
+            />
+            <span className="leading-none text-white/95 group-hover:text-white font-medium tracking-tight transition-colors">
+              {p.name}
             </span>
-            <Icon className="w-3.5 h-3.5 flex-shrink-0" style={{ color: p.color }} />
-            <span className="leading-none text-slate-100 group-hover:text-white transition-colors">{p.name}</span>
-            <span className="text-[9px] sm:text-[9.5px] font-mono px-1.5 py-0.5 rounded font-bold leading-none bg-white/10 text-slate-200 border border-white/10 group-hover:bg-white/20 transition-colors">
+            <span className="text-[9.5px] sm:text-[10px] font-mono px-2 py-0.5 rounded-full font-bold leading-none bg-white/15 text-white/90 border border-white/20 group-hover:bg-white/25 transition-colors shadow-sm">
               {p.tag}
             </span>
           </button>
