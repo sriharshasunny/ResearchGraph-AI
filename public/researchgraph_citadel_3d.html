@@ -215,6 +215,27 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
     .hero{padding-top:104px;padding-bottom:230px}
   }
 </style>
+<style id="rg-clear-hero-overlay">
+  /* Keep the cinematic page vignette below the fold, but never tint the
+     homepage hero's space canvas or its 3D scene. */
+  body{position:relative}
+  body::before,body::after{
+    position:absolute;
+    inset:0;
+    -webkit-mask-image:linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(100svh - 1px),
+      #000 calc(100svh + 112px)
+    );
+    mask-image:linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent calc(100svh - 1px),
+      #000 calc(100svh + 112px)
+    );
+  }
+</style>
 </head><body>
 <canvas id="c" aria-hidden="true"></canvas><div id="ui"></div><div id="feed"></div>
 <header><a class="logo" href="#top"><span class="mark">⚛</span>ResearchGraph <em>AI</em></a>
