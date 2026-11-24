@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { useApp } from '../context/AppContext';
-import { GLOBE_RAW_BASE64 } from './researchGraphGlobeRaw';
 import type { PageType } from '../types';
 import {
   Network,
@@ -48,9 +47,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#38bdf8',
       icon: FileText,
       action: () => handleAction('search'),
-      side: 'left',
+      side: 'left' as const,
       slotYOffset: -0.65,
-      ap: new THREE.Vector3(-0.62, 0.35, 0.45).normalize().multiplyScalar(0.74)
+      rimAngle: -0.44
     },
     {
       id: 'authors',
@@ -59,9 +58,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#14b8a6',
       icon: Users,
       action: () => handleSearch('Research authors'),
-      side: 'left',
+      side: 'left' as const,
       slotYOffset: 0.0,
-      ap: new THREE.Vector3(-0.78, 0.05, 0.35).normalize().multiplyScalar(0.74)
+      rimAngle: 0.0
     },
     {
       id: 'datasets',
@@ -70,9 +69,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#f59e0b',
       icon: Database,
       action: () => handleSearch('Empirical datasets'),
-      side: 'left',
+      side: 'left' as const,
       slotYOffset: 0.65,
-      ap: new THREE.Vector3(-0.62, -0.35, 0.45).normalize().multiplyScalar(0.74)
+      rimAngle: 0.44
     },
 
     // RIGHT COLUMN (top to bottom)
@@ -83,9 +82,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#10b981',
       icon: Network,
       action: () => handleAction('graph'),
-      side: 'right',
+      side: 'right' as const,
       slotYOffset: -0.65,
-      ap: new THREE.Vector3(0.62, 0.35, 0.45).normalize().multiplyScalar(0.74)
+      rimAngle: -0.44
     },
     {
       id: 'insights',
@@ -94,9 +93,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#a855f7',
       icon: Sparkles,
       action: () => handleAction('chat'),
-      side: 'right',
+      side: 'right' as const,
       slotYOffset: 0.0,
-      ap: new THREE.Vector3(0.78, 0.05, 0.35).normalize().multiplyScalar(0.74)
+      rimAngle: 0.0
     },
     {
       id: 'concepts',
@@ -105,9 +104,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#818cf8',
       icon: Layers,
       action: () => handleSearch('Ontological concepts'),
-      side: 'right',
+      side: 'right' as const,
       slotYOffset: 0.65,
-      ap: new THREE.Vector3(0.62, -0.35, 0.45).normalize().multiplyScalar(0.74)
+      rimAngle: 0.44
     },
 
     // BOTTOM CENTER
@@ -118,14 +117,15 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       color: '#ec4899',
       icon: Link2,
       action: () => handleAction('graph'),
-      side: 'center',
+      side: 'center' as const,
       slotYOffset: 1.0,
-      ap: new THREE.Vector3(0.0, -0.76, 0.35).normalize().multiplyScalar(0.74)
+      rimAngle: Math.PI / 2
     }
   ];
 
-  const [pillPositions, setPillPositions] = useState<Record<string, { x: number; y: number; ax: number; ay: number }>>({});
-  const [ufoScreenPos, setUfoScreenPos] = useState<{ x: number; y: number } | null>(null);
+  const [pillPositions, setPillPositions] = useState<
+    Record<string, { x: number; y: number; startX: number; startY: number; ax: number; ay: number }>
+  >({});
 
   useEffect(() => {
     const container = containerRef.current;
@@ -167,7 +167,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     sunLight.position.copy(sunDir).multiplyScalar(20);
     scene.add(sunLight);
 
-    const ambientLight = new THREE.AmbientLight(0xd4e4ff, 0.55);
+    const ambientLight = new THREE.AmbientLight(0xd4e4ff, 0.7);
     scene.add(ambientLight);
 
     const spaceBackLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
@@ -214,218 +214,85 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     };
 
     // ─────────────────────────────────────────────────────────────
-    // 1. COMPACT, PHOTOREALISTIC EARTH GLOBE (GLOBE_R = 0.92)
+    // 1. RESTORED PREVIOUS GLOBE MODEL (globe.webp + Atmospheric Shells)
     // ─────────────────────────────────────────────────────────────
-    const MW = 1440, MH = 720;
-    const raw = atob(GLOBE_RAW_BASE64);
-    const land = new Uint8Array(MW * MH);
-    for (let i = 0; i < MW * MH; i++) {
-      land[i] = (raw.charCodeAt(i >> 3) >> (7 - (i & 7))) & 1;
-    }
-    const isLand = (la: number, lo: number) => {
-      const u = (Math.floor((lo + 180) / 360 * MW) % MW + MW) % MW;
-      const v = Math.min(MH - 1, Math.max(0, Math.floor((90 - la) / 180 * MH)));
-      return land[v * MW + u];
-    };
-
-    // High fidelity Day Texture
-    const dayTex = (() => {
-      const c = mkc(1024, 512), ctx = c.getContext('2d')!;
-      const img = ctx.createImageData(1024, 512), d = img.data;
-      for (let j = 0; j < 512; j++) {
-        const lat = 90 - (j / 512) * 180, absLat = Math.abs(lat);
-        for (let i = 0; i < 1024; i++) {
-          const lon = (i / 1024) * 360 - 180;
-          const idx = (j * 1024 + i) * 4;
-          const l = isLand(lat, lon);
-          if (l) {
-            if (absLat > 64) {
-              // Polar ice & glaciers
-              d[idx] = 236; d[idx + 1] = 246; d[idx + 2] = 255;
-            } else if (lat > 15 && lat < 34 && lon > -15 && lon < 55) {
-              // Sahara & Arabian deserts - warm golden dunes
-              d[idx] = 210; d[idx + 1] = 175; d[idx + 2] = 115;
-            } else if (lat < -18 && lat > -32 && lon > 115 && lon < 145) {
-              // Australian outback - terracotta ochre
-              d[idx] = 198; d[idx + 1] = 132; d[idx + 2] = 85;
-            } else {
-              // Lush vegetation, savannas, forests
-              const v = (Math.sin(lat * 0.15) * Math.cos(lon * 0.15) + 1) * 0.5;
-              d[idx] = Math.floor(52 + v * 38);
-              d[idx + 1] = Math.floor(128 + v * 42);
-              d[idx + 2] = Math.floor(68 + v * 24);
-            }
-          } else {
-            // Luminous azure ocean waters (blends beautifully into mountain daytime sky)
-            const depth = absLat / 90;
-            d[idx] = Math.floor(22 + (1 - depth) * 18);
-            d[idx + 1] = Math.floor(82 + (1 - depth) * 36);
-            d[idx + 2] = Math.floor(168 + (1 - depth) * 48);
-          }
-          d[idx + 3] = 255;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-      return tex(c);
-    })();
-
-    // Night City Lights Texture
-    const nightTex = (() => {
-      const c = mkc(1024, 512), ctx = c.getContext('2d')!;
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, 1024, 512);
-      ctx.fillStyle = 'rgba(255, 215, 115, 0.95)';
-      for (let j = 0; j < 512; j += 2) {
-        const lat = 90 - (j / 512) * 180;
-        if (Math.abs(lat) > 65) continue;
-        for (let i = 0; i < 1024; i += 2) {
-          const lon = (i / 1024) * 360 - 180;
-          if (isLand(lat, lon)) {
-            const isPop = (
-              (lat > 22 && lat < 55 && lon > -125 && lon < -68) ||
-              (lat > 35 && lat < 60 && lon > -10 && lon < 45) ||
-              (lat > 15 && lat < 45 && lon > 70 && lon < 142) ||
-              (lat > -35 && lat < -10 && lon > -60 && lon < -35)
-            );
-            if (Math.random() < (isPop ? 0.38 : 0.05)) {
-              ctx.fillRect(i, j, Math.random() < 0.25 ? 2 : 1.1, 1.1);
-            }
-          }
-        }
-      }
-      return tex(c);
-    })();
-
-    // Ocean Specular Texture
-    const specTex = (() => {
-      const c = mkc(512, 256), ctx = c.getContext('2d')!;
-      const img = ctx.createImageData(512, 256), d = img.data;
-      for (let j = 0; j < 256; j++) {
-        const lat = 90 - (j / 256) * 180;
-        for (let i = 0; i < 512; i++) {
-          const lon = (i / 512) * 360 - 180;
-          const idx = (j * 512 + i) * 4;
-          const val = isLand(lat, lon) ? 0 : 255;
-          d[idx] = d[idx + 1] = d[idx + 2] = val;
-          d[idx + 3] = 255;
-        }
-      }
-      ctx.putImageData(img, 0, 0);
-      return tex(c);
-    })();
-
-    // Cloud Texture
-    const cloudTex = (() => {
-      const c = mkc(512, 256), ctx = c.getContext('2d')!;
-      ctx.fillStyle = 'rgba(0,0,0,0)';
-      ctx.fillRect(0, 0, 512, 256);
-      for (let k = 0; k < 90; k++) {
-        const x = Math.random() * 512, y = 30 + Math.random() * 196;
-        const rx = 18 + Math.random() * 45, ry = 6 + Math.random() * 14;
-        const g = ctx.createRadialGradient(x, y, 0, x, y, rx);
-        g.addColorStop(0, 'rgba(255,255,255,0.42)');
-        g.addColorStop(0.5, 'rgba(255,255,255,0.16)');
-        g.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.ellipse(x, y, rx, ry, Math.random() * 0.3 - 0.15, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      return tex(c);
-    })();
-
     const masterGlobe = new THREE.Group();
     scene.add(masterGlobe);
 
     const spinGroup = new THREE.Group();
     masterGlobe.add(spinGroup);
 
-    // Reduced globe radius (reduced by 10% to 0.74 for optimal hero proportions and label clearance)
+    // Globe radius (0.74 gives ideal proportion to hero banner and leaves clearance for labels)
     const GLOBE_R = 0.74;
 
-    // Earth Shader with clean natural limb lighting on sphere surface
-    // Full daylight wrap & soft sky ambient fill — NO pitch-black hemisphere or dark rims!
-    const earthMat = new THREE.ShaderMaterial({
-      uniforms: {
-        dayT: { value: dayTex },
-        nightT: { value: nightTex },
-        specT: { value: specTex },
-        sun: { value: sunDir }
-      },
-      vertexShader: `
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        varying vec3 vPos;
-        void main() {
-          vUv = uv;
-          vNormal = normalize((modelMatrix * vec4(normal, 0.0)).xyz);
-          vec4 wPos = modelMatrix * vec4(position, 1.0);
-          vPos = wPos.xyz;
-          gl_Position = projectionMatrix * viewMatrix * wPos;
-        }
-      `,
-      fragmentShader: `
-        uniform sampler2D dayT;
-        uniform sampler2D nightT;
-        uniform sampler2D specT;
-        uniform vec3 sun;
-        varying vec2 vUv;
-        varying vec3 vNormal;
-        varying vec3 vPos;
-        void main() {
-          vec3 N = normalize(vNormal);
-          vec3 V = normalize(cameraPosition - vPos);
-          float nd = dot(N, sun);
+    // Load original globe.webp texture with maximum anisotropy
+    const textureLoader = new THREE.TextureLoader();
+    const globeTexture = textureLoader.load('/globe.webp');
+    globeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
 
-          // Full daylight wrap illumination: ambient baseline is 0.58 so the shaded side is NEVER black!
-          // Seamlessly blends with the mountain background image
-          float ambient = 0.58 + 0.12 * max(0.0, dot(N, vec3(0.0, 1.0, 0.0)));
-          float direct = 0.55 * max(0.0, nd);
-          float daylight = ambient + direct;
-
-          vec3 skyTint = vec3(0.78, 0.88, 1.0); // Ambient mountain sky illumination
-          vec3 sunTint = vec3(1.0, 0.98, 0.92);  // Direct sunlight
-          vec3 light = mix(skyTint, sunTint, smoothstep(-0.1, 0.4, nd));
-
-          vec3 day = texture2D(dayT, vUv).rgb;
-          vec3 night = texture2D(nightT, vUv).rgb;
-          float spec = texture2D(specT, vUv).r;
-
-          vec3 col = day * daylight * light;
-
-          // Soft golden research city lights visible on shaded hemisphere
-          col += night * (1.0 - smoothstep(-0.15, 0.25, nd)) * 0.95;
-
-          // Ocean Specular Glint
-          vec3 H = normalize(sun + V);
-          col += vec3(1.0, 0.98, 0.94) * pow(max(dot(N, H), 0.0), 140.0) * spec * 0.60 * step(-0.05, nd);
-
-          // Soft atmospheric Fresnel rim that blends seamlessly with the background sky & clouds
-          float fresnel = pow(1.0 - max(dot(N, V), 0.0), 2.6);
-          col += vec3(0.38, 0.72, 1.0) * fresnel * 0.55;
-
-          gl_FragColor = vec4(col, 1.0);
-        }
-      `
-    });
-
-    const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R, 72, 56), earthMat);
+    // Primary Earth Sphere with original globe.webp
+    const earthMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_R, 96, 96),
+      new THREE.MeshBasicMaterial({ map: globeTexture })
+    );
     spinGroup.add(earthMesh);
 
-    // Natural Clouds Layer
-    const cloudsMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_R * 1.012, 72, 56),
-      new THREE.MeshLambertMaterial({
-        map: cloudTex,
+    // Atmospheric Shell Shader Generator from original knowledge_globe.html
+    const createShell = (sc: number, side: THREE.Side, pw: number, col: number, mul: number) => {
+      return new THREE.Mesh(
+        new THREE.SphereGeometry(GLOBE_R * sc, 64, 64),
+        new THREE.ShaderMaterial({
+          uniforms: { c: { value: new THREE.Color(col) } },
+          side,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          vertexShader: `
+            varying vec3 vNormal;
+            void main() {
+              vNormal = normalize(normalMatrix * normal);
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `,
+          fragmentShader: `
+            varying vec3 vNormal;
+            uniform vec3 c;
+            void main() {
+              float i = ${
+                side === THREE.BackSide
+                  ? `pow(max(0.72 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0), ${pw.toFixed(1)})`
+                  : `pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), ${pw.toFixed(1)})`
+              } * ${mul.toFixed(2)};
+              gl_FragColor = vec4(c * i, i);
+            }
+          `
+        })
+      );
+    };
+
+    // Inner rim glow shell (FrontSide)
+    const rimGlow = createShell(1.004, THREE.FrontSide, 2.6, 0x5ee7ff, 1.15);
+    rimGlow.renderOrder = 6;
+    spinGroup.add(rimGlow);
+
+    // Outer atmospheric glow shell (BackSide)
+    const outerAtmo = createShell(1.22, THREE.BackSide, 2.0, 0x2a9cff, 2.0);
+    masterGlobe.add(outerAtmo);
+
+    // Subtle equatorial scanning radar ring
+    const scanRing = new THREE.Mesh(
+      new THREE.TorusGeometry(GLOBE_R * 1.008, 0.005, 6, 120),
+      new THREE.MeshBasicMaterial({
+        color: 0x7ff0ff,
         transparent: true,
         opacity: 0.35,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false
+        blending: THREE.AdditiveBlending
       })
     );
-    spinGroup.add(cloudsMesh);
+    scanRing.rotation.x = Math.PI / 2;
+    spinGroup.add(scanRing);
 
-    // ── CYBER TOUCH: Global Research Node Network & Citation Arcs ──
+    // ── Global Hub Beacons & Dynamic Citation Arcs ──
     const D2R = Math.PI / 180;
     const llToV3 = (lat: number, lon: number, r: number) => {
       const phi = (90 - lat) * D2R;
@@ -494,7 +361,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       spinGroup.add(new THREE.Line(arcGeo, arcMat));
 
       const bead = new THREE.Mesh(
-        new THREE.SphereGeometry(0.018, 6, 6),
+        new THREE.SphereGeometry(0.016, 6, 6),
         new THREE.MeshBasicMaterial({ color: 0xffffff })
       );
       spinGroup.add(bead);
@@ -502,7 +369,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     });
 
     // ─────────────────────────────────────────────────────────────
-    // 2. REPLICATED HIGH-FIDELITY BIRD FROM LANDING PAGE
+    // 2. REPLICATED HIGH-FIDELITY BIRD WITH ENHANCED VISUAL EFFECTS
     // ─────────────────────────────────────────────────────────────
     const featherTex = (base: string, tip: string, frac: number) => {
       const c = mkc(64, 256), x = c.getContext('2d')!;
@@ -660,186 +527,56 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     birdRoot.scale.setScalar(0.12);
     scene.add(birdRoot);
 
-    // ─────────────────────────────────────────────────────────────
-    // 3. REPLICATED HIGH-FIDELITY UFO FROM LANDING PAGE
-    // ─────────────────────────────────────────────────────────────
-    const PT = (() => {
-      const c = mkc(512, 64), x = c.getContext('2d')!;
-      x.fillStyle = '#808080'; x.fillRect(0, 0, 512, 64);
-      x.strokeStyle = '#303030'; x.lineWidth = 2;
-      for (let i = 0; i <= 16; i++) {
-        x.beginPath(); x.moveTo(i * 32, 0); x.lineTo(i * 32, 64); x.stroke();
-      }
-      const t = tex(c);
-      t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      t.repeat.set(3, 2);
-      return t;
-    })();
-
-    const HT = (() => {
-      const c = mkc(512, 128), x = c.getContext('2d')!;
-      const g = x.createLinearGradient(0, 0, 0, 128);
-      g.addColorStop(0, '#8e9bb4'); g.addColorStop(0.5, '#c3ccdc'); g.addColorStop(1, '#7f8aa2');
-      x.fillStyle = g; x.fillRect(0, 0, 512, 128);
-      for (let i = 0; i < 16; i++) {
-        if (i % 3 === 0) { x.fillStyle = 'rgba(40,60,100,0.18)'; x.fillRect(i * 32, 0, 32, 128); }
-        x.fillStyle = 'rgba(20,30,50,0.5)'; x.fillRect(i * 32, 0, 1.5, 128);
-      }
-      const t = tex(c);
-      t.wrapS = t.wrapT = THREE.RepeatWrapping;
-      return t;
-    })();
-
-    const WT = (() => {
-      const c = mkc(512, 32), x = c.getContext('2d')!;
-      x.fillStyle = '#000'; x.fillRect(0, 0, 512, 32);
-      for (let i = 0; i < 32; i++) {
-        x.fillStyle = i % 5 === 0 ? '#ffc86a' : '#8fe8ff';
-        x.fillRect(i * 16 + 3, 10, 10, 12);
-      }
-      const t = tex(c);
-      t.wrapS = THREE.RepeatWrapping;
-      return t;
-    })();
-
-    const ufoRoot = new THREE.Group();
-    const ufoModel = new THREE.Group();
-    ufoRoot.add(ufoModel);
-
-    const hullMat = new THREE.MeshStandardMaterial({
-      map: HT, color: 0xe6ecf6, metalness: 0.72, roughness: 0.3, bumpMap: PT, bumpScale: 0.5, side: THREE.DoubleSide
-    });
-    const darkMat = new THREE.MeshStandardMaterial({ color: 0x2a3042, metalness: 0.9, roughness: 0.4 });
-    const gmMat = (c: number) => new THREE.MeshBasicMaterial({ color: c, side: THREE.DoubleSide });
-
-    const ufoHullGeo = new THREE.LatheGeometry([
-      [0, -0.45], [0.34, -0.43], [0.5, -0.37], [0.9, -0.3], [1.3, -0.19],
-      [1.55, -0.09], [1.66, 0], [1.55, 0.08], [1.3, 0.15], [0.95, 0.22],
-      [0.7, 0.29], [0.52, 0.33], [0, 0.34]
-    ].map(q => new THREE.Vector2(q[0], q[1])), 96);
-    ufoModel.add(new THREE.Mesh(ufoHullGeo, hullMat));
-
-    const ufoBand = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.67, 1.67, 0.13, 64, 1, true),
-      new THREE.MeshStandardMaterial({
-        color: 0x10151f, emissive: 0xffffff, emissiveMap: WT, emissiveIntensity: 1.6, metalness: 0.6, roughness: 0.4, side: THREE.DoubleSide
-      })
-    );
-    ufoModel.add(ufoBand);
-
-    const ufoCollar = new THREE.Mesh(new THREE.TorusGeometry(0.68, 0.045, 12, 64), darkMat);
-    ufoCollar.rotation.x = Math.PI / 2;
-    ufoCollar.position.y = 0.3;
-    ufoModel.add(ufoCollar);
-
-    const ufoAcc = new THREE.Mesh(new THREE.TorusGeometry(1.64, 0.018, 8, 128), gmMat(0x66e8ff));
-    ufoAcc.rotation.x = Math.PI / 2;
-    ufoAcc.position.y = 0.075;
-    ufoModel.add(ufoAcc);
-
-    for (let i = 0; i < 10; i++) {
-      const a = (i / 10) * Math.PI * 2;
-      const v = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.03, 0.07), darkMat);
-      const s = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.025), gmMat(0x66e8ff));
-      v.position.set(Math.cos(a) * 1.12, 0.2, Math.sin(a) * 1.12);
-      v.rotation.y = -a;
-      s.position.set(Math.cos(a) * 1.12, 0.218, Math.sin(a) * 1.12);
-      s.rotation.y = -a;
-      ufoModel.add(v, s);
+    // ── Visual Effect Enhancement: Aerodynamic Wind Wisp Particle Trail ──
+    const TRAIL_LEN = 20;
+    const trailPositions = new Float32Array(TRAIL_LEN * 3);
+    const trailAlphas = new Float32Array(TRAIL_LEN);
+    for (let i = 0; i < TRAIL_LEN; i++) {
+      trailAlphas[i] = (1.0 - i / TRAIL_LEN) * 0.45;
     }
-
-    const ufoDome = new THREE.Mesh(
-      new THREE.SphereGeometry(0.64, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x9fd8ff, metalness: 0, roughness: 0.03, transparent: true, opacity: 0.45, clearcoat: 1, emissive: 0x0a3a66, emissiveIntensity: 0.5, side: THREE.DoubleSide
-      })
-    );
-    ufoDome.position.y = 0.3;
-    ufoDome.scale.y = 0.85;
-    ufoModel.add(ufoDome);
-
-    const alienMat = new THREE.MeshStandardMaterial({ color: 0x6f8a78, roughness: 0.6 });
-    const alienHead = new THREE.Mesh(new THREE.SphereGeometry(0.075, 16, 12), alienMat);
-    alienHead.scale.set(1, 1.35, 1);
-    alienHead.position.set(0, 0.62, 0);
-    ufoModel.add(alienHead);
-
-    const alienBody = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.26, 12), alienMat);
-    alienBody.position.set(0, 0.42, 0);
-    ufoModel.add(alienBody);
-
-    [-1, 1].forEach(s => {
-      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.02, 8, 6), gmMat(0x000000));
-      eye.position.set(s * 0.035, 0.64, 0.06);
-      ufoModel.add(eye);
-    });
-
-    const consoleMesh = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.3, 0.34, 0.04, 24),
-      new THREE.MeshStandardMaterial({ color: 0x1a3a5a, emissive: 0x2a8acf, emissiveIntensity: 0.5 })
-    );
-    consoleMesh.position.y = 0.34;
-    ufoModel.add(consoleMesh);
-
-    const an = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.02, 0.4, 8), darkMat);
-    an.position.y = 1.04;
-    ufoModel.add(an);
-    const ufoTip = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff5a5a }));
-    ufoTip.position.y = 1.24;
-    ufoModel.add(ufoTip);
-
-    const ufoEm = new THREE.Mesh(new THREE.CircleGeometry(0.34, 40), gmMat(0x7ff0ff));
-    ufoEm.rotation.x = Math.PI / 2;
-    ufoEm.position.y = -0.455;
-    ufoModel.add(ufoEm);
-
-    const ufoEg = spr(glowT, 0x44ddff, 2.6, 0.6, ufoModel);
-    ufoEg.position.y = -0.55;
-
-    const ufoLr = new THREE.Group();
-    for (let i = 0; i < 14; i++) {
-      const a = (i / 14) * Math.PI * 2;
-      const l = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 8), gmMat(i % 2 ? 0xffc86a : 0x66f0ff));
-      l.position.set(Math.cos(a) * 1.1, -0.36, Math.sin(a) * 1.1);
-      ufoLr.add(l);
-    }
-    ufoModel.add(ufoLr);
-
-    const ufoLr2 = new THREE.Group();
-    for (let i = 0; i < 10; i++) {
-      const a = (i / 10) * Math.PI * 2;
-      const l = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 8), gmMat(i % 2 ? 0xff9a5a : 0x9fe8ff));
-      l.position.set(Math.cos(a) * 1.3, 0.17, Math.sin(a) * 1.3);
-      ufoLr2.add(l);
-    }
-    ufoModel.add(ufoLr2);
-
-    const tractorMat = new THREE.MeshBasicMaterial({
-      color: 0x38bdf8,
+    const trailGeo = new THREE.BufferGeometry();
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(trailPositions, 3));
+    trailGeo.setAttribute('alpha', new THREE.BufferAttribute(trailAlphas, 1));
+    const trailMat = new THREE.ShaderMaterial({
+      uniforms: { color: { value: new THREE.Color(0xa5f3fc) } },
       transparent: true,
-      opacity: 0,
       blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-      depthWrite: false
+      depthWrite: false,
+      vertexShader: `
+        attribute float alpha;
+        varying float vAlpha;
+        void main() {
+          vAlpha = alpha;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = (1.2 + alpha * 2.8) * (20.0 / -mv.z);
+          gl_Position = projectionMatrix * mv;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 color;
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5)) * 2.0;
+          if (d > 1.0) discard;
+          float strength = pow(1.0 - d, 2.0);
+          gl_FragColor = vec4(color, strength * vAlpha);
+        }
+      `
     });
-    const tractorBeam = new THREE.Mesh(new THREE.ConeGeometry(0.55, 1.4, 24, 1, true), tractorMat);
-    tractorBeam.rotation.x = Math.PI;
-    tractorBeam.position.y = -0.85;
-    ufoModel.add(tractorBeam);
+    const birdTrailPoints = new THREE.Points(trailGeo, trailMat);
+    scene.add(birdTrailPoints);
 
-    // Miniature UFO scale (sleek, perfectly proportioned scout ship)
-    ufoRoot.scale.setScalar(0.11);
-    scene.add(ufoRoot);
+    const trailHistory: THREE.Vector3[] = [];
 
     // ─────────────────────────────────────────────────────────────
-    // 4. FLOATING PAPER & DELIVERY REACTION
+    // 3. ELEGANT MICRO RESEARCH PAPER & PARABOLIC THROWING EFFECT
     // ─────────────────────────────────────────────────────────────
-    // High-resolution canvas texture for micro research paper (prevents raw white blocks)
+    // Micro research folio texture (crisp scholarly miniature layout)
     const miniPaperTex = (() => {
       const c = mkc(128, 170), ctx = c.getContext('2d')!;
       ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 128, 170);
-      ctx.fillStyle = '#1e293b';
+      ctx.fillStyle = '#0f172a';
       ctx.font = 'bold 9px serif';
       ctx.fillText('Research Paper', 10, 18);
       ctx.fillStyle = '#64748b';
@@ -862,10 +599,12 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       transparent: true,
       opacity: 0
     });
-    const activePaper = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 0.24), paperMat);
+    // Sleek micro folio dimensions (reduced from 0.18x0.24 to 0.065x0.088)
+    const activePaper = new THREE.Mesh(new THREE.PlaneGeometry(0.065, 0.088), paperMat);
     activePaper.visible = false;
     scene.add(activePaper);
 
+    // Glowing impact ripple on Earth surface
     const rippleMat = new THREE.MeshBasicMaterial({
       color: 0x67e8f9,
       side: THREE.DoubleSide,
@@ -873,11 +612,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       opacity: 0,
       blending: THREE.AdditiveBlending
     });
-    const rippleMesh = new THREE.Mesh(new THREE.RingGeometry(0.03, 0.08, 32), rippleMat);
+    const rippleMesh = new THREE.Mesh(new THREE.RingGeometry(0.02, 0.05, 32), rippleMat);
     scene.add(rippleMesh);
 
     // ─────────────────────────────────────────────────────────────
-    // 5. ORGANIC 3D ROAMING AUTONOMOUS AGENTS (ACROSS ENTIRE HERO BANNER)
+    // 4. BIRD AUTONOMOUS 3D ROAMING (PEACEFUL, 30% SLOWER SPEED)
     // ─────────────────────────────────────────────────────────────
     const rnd = (min: number, max: number) => min + Math.random() * (max - min);
 
@@ -891,24 +630,21 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
     };
 
-    // Cross-Banner Waypoint Generator: Ensures agents soar across the ENTIRE hero section
-    // Moves across: Left (search form & alpine sky) <-> Center (cloud pass) <-> Right (Earth globe)
-    // Never loops or circles strictly around the globe
-    const getNextWaypoint = (isBird: boolean) => {
+    // Cross-Banner Waypoint Generator: Ensures bird soars across the ENTIRE hero section
+    const getNextWaypoint = () => {
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
 
-      const curX = isBird ? birdState.pos.x : ufoState.pos.x;
+      const curX = birdState.pos.x;
       let zone: 'left' | 'center' | 'right';
 
       if (curX > 0.15 * vw) {
-        // Currently on right side (near globe) -> traverse back across mountains and valley to left/center
+        // Near globe -> glide back across mountains to center/left
         zone = Math.random() < 0.6 ? 'left' : 'center';
       } else if (curX < -0.20 * vw) {
-        // Currently on far-left side (above search form) -> traverse across to center or right
+        // Far-left above search -> cruise toward center or globe
         zone = Math.random() < 0.6 ? 'right' : 'center';
       } else {
-        // In central pass -> pick left or right
         zone = Math.random() < 0.5 ? 'left' : 'right';
       }
 
@@ -918,73 +654,58 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
 
       if (W >= 900) {
         if (zone === 'left') {
-          // Zone 1: Far-left alpine peaks and open sky above search section
           targetX = rnd(-vw * 0.82, -vw * 0.32);
-          targetY = isBird ? rnd(-0.25, vh * 0.70) : rnd(-0.15, vh * 0.72);
-          targetZ = rnd(1.1, 2.3);
+          targetY = rnd(-0.20, vh * 0.65);
+          targetZ = rnd(1.1, 2.2);
         } else if (zone === 'center') {
-          // Zone 2: Central cloud ridge and alpine valley between left and globe
           targetX = rnd(-vw * 0.22, vw * 0.16);
-          targetY = isBird ? rnd(-0.20, vh * 0.68) : rnd(0.0, vh * 0.72);
-          targetZ = rnd(1.0, 2.1);
+          targetY = rnd(-0.15, vh * 0.65);
+          targetZ = rnd(1.0, 2.0);
         } else {
-          // Zone 3: Right sector cruising past the Earth globe
           const gX = masterGlobe.position.x || (0.42 * vw);
           const side = Math.random() < 0.5 ? 1 : -1;
-          targetX = gX + side * rnd(GLOBE_R * 1.35, GLOBE_R * 2.4);
-          targetY = rnd(-vh * 0.40, vh * 0.68);
-          targetZ = rnd(1.1, 2.2);
+          targetX = gX + side * rnd(GLOBE_R * 1.35, GLOBE_R * 2.2);
+          targetY = rnd(-vh * 0.35, vh * 0.65);
+          targetZ = rnd(1.1, 2.1);
         }
       } else {
-        // Mobile layout: roaming throughout full canvas bounds
         targetX = rnd(-vw * 0.75, vw * 0.75);
-        targetY = rnd(-vh * 0.60, vh * 0.60);
-        targetZ = rnd(1.1, 2.3);
+        targetY = rnd(-vh * 0.55, vh * 0.55);
+        targetZ = rnd(1.1, 2.2);
       }
 
       targetX = THREE.MathUtils.clamp(targetX, -vw * 0.86, vw * 0.86);
-      targetY = THREE.MathUtils.clamp(targetY, -vh * 0.68, vh * 0.72);
-      targetZ = THREE.MathUtils.clamp(targetZ, 0.9, 2.4);
+      targetY = THREE.MathUtils.clamp(targetY, -vh * 0.65, vh * 0.68);
+      targetZ = THREE.MathUtils.clamp(targetZ, 0.9, 2.3);
 
       return new THREE.Vector3(targetX, targetY, targetZ);
     };
 
-    // Bird Flight State: Realistic aerodynamic steering, banking, and flapping bursts
+    // Bird Flight State: Tuned 30% slower for graceful, non-distracting hero ambiance
     const birdState = {
       pos: new THREE.Vector3(-2.2, 0.8, 1.4),
-      vel: new THREE.Vector3(0, 0, 0),
       target: new THREE.Vector3(-1.0, 0.4, 1.2),
       yaw: 0,
       pitch: 0,
       bank: 0,
       yawRate: 0,
-      speed: 2.2,
+      speed: 1.45, // Reduced by 30% from 2.2
       isGliding: false,
       glideTimer: 0,
       flapPhase: 0,
       waypointTimer: 0
     };
 
-    // UFO Flight State: Anti-gravity thruster acceleration, inertia, hovering wobble
-    const ufoState = {
-      pos: new THREE.Vector3(1.8, 0.6, 1.3),
-      vel: new THREE.Vector3(0, 0, 0),
-      target: new THREE.Vector3(0.5, 0.7, 1.0),
-      rx: 0.15,
-      rz: 0.0,
-      wobbleSeed: rnd(0, 10),
-      waypointTimer: 0
-    };
-
+    // Courier State for Micro-Paper Delivery
     let courierTimer = 0;
-    let courierPhase = 0; // 0=roaming, 1=paper pickup, 2=fly into globe, 3=ripple
+    let courierPhase = 0; // 0=roaming, 1=carrying, 2=parabolic toss, 3=absorption ripple
     let courierProgress = 0;
-    let courierType: 'bird' | 'ufo' = 'bird';
-    const courierDest = new THREE.Vector3();
+    const throwStartPos = new THREE.Vector3();
+    const throwDestPos = new THREE.Vector3();
     let rippleProg = 1.0;
 
     // ─────────────────────────────────────────────────────────────
-    // 6. DRAG TO ROTATE (CLUSTERS DIRECTLY OVER EARTH GLOBE)
+    // 5. DRAG TO ROTATE (DIRECTLY OVER EARTH GLOBE)
     // ─────────────────────────────────────────────────────────────
     let isDragging = false;
     let prevX = 0;
@@ -1062,51 +783,44 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const dt = clock.getDelta();
       const elapsed = clock.getElapsedTime();
 
-      // 1. Globe Levitation & Panoramic Screen Placement
+      // 1. Globe Panoramic Positioning & Soft Levitation
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
         masterGlobe.position.x = 0.42 * vw;
-        masterGlobe.position.y = Math.sin(elapsed * 1.1) * 0.035;
+        masterGlobe.position.y = Math.sin(elapsed * 0.9) * 0.03;
       } else {
         masterGlobe.position.x = 0;
-        masterGlobe.position.y = -vh * 0.28 + Math.sin(elapsed * 1.1) * 0.035;
+        masterGlobe.position.y = -vh * 0.28 + Math.sin(elapsed * 0.9) * 0.03;
       }
 
-      // 2. Drag Rotation
+      // 2. Drag & Natural Earth Rotation
       if (!isDragging) {
         rotVelY *= 0.94;
         targetRotY += rotVelY;
       }
       spinGroup.rotation.y += (targetRotY - spinGroup.rotation.y) * 0.08;
 
-      // 3. Slow Earth Spin
-      earthMesh.rotation.y += 0.0028;
-      cloudsMesh.rotation.y += 0.0036;
+      // Slow continuous rotation of the Earth model
+      earthMesh.rotation.y += 0.0024;
+      scanRing.rotation.z = elapsed * 0.5;
 
-      // 4. Citation Photon Pulses
+      // 3. Citation Arc Photon Pulses
       photonBeads.forEach((bead, i) => {
         const curve = arcCurves[i];
         if (curve) {
-          const t = (elapsed * 0.4 + i * 0.18) % 1.0;
+          const t = (elapsed * 0.35 + i * 0.18) % 1.0;
           bead.position.copy(curve.getPoint(t));
         }
       });
 
-      // 5. UFO Hardware Kinematics
-      ufoBand.rotation.y = elapsed * 0.8;
-      ufoLr.rotation.y = -elapsed * 1.6;
-      ufoLr2.rotation.y = elapsed * 1.1;
-      ufoTip.material.color.setHex(Math.sin(elapsed * 6) > 0 ? 0xff5a5a : 0x501818);
-      ufoEg.scale.setScalar(2.6 + 0.3 * Math.sin(elapsed * 8));
-
       // ─────────────────────────────────────────────────────────
-      // 6. REALISTIC BIRD AERODYNAMICS (ORGANIC 3D ROAMING)
+      // 4. BIRD AERODYNAMICS (PEACEFUL & SOARING, -30% SPEED)
       // ─────────────────────────────────────────────────────────
       birdState.waypointTimer += dt;
       const bDist = birdState.pos.distanceTo(birdState.target);
-      if (bDist < 0.45 || birdState.waypointTimer > 5.5) {
-        birdState.target = getNextWaypoint(true);
+      if (bDist < 0.45 || birdState.waypointTimer > 7.0) {
+        birdState.target = getNextWaypoint();
         birdState.waypointTimer = 0;
       }
 
@@ -1116,24 +830,24 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const bDz = birdState.target.z - birdState.pos.z;
       const bTotalDist = Math.hypot(bDx, bDy, bDz) || 1;
 
-      // Target yaw and pitch angles
-      let desiredYaw = Math.atan2(bDx, bDz);
+      // Desired yaw and pitch
+      const desiredYaw = Math.atan2(bDx, bDz);
       let diffYaw = desiredYaw - birdState.yaw;
       diffYaw = Math.atan2(Math.sin(diffYaw), Math.cos(diffYaw));
 
-      const maxTurn = bDist < 1.0 ? 3.2 : 2.0;
-      birdState.yawRate += (THREE.MathUtils.clamp(diffYaw * 2.5, -maxTurn, maxTurn) - birdState.yawRate) * Math.min(1, dt * 4.5);
+      const maxTurn = bDist < 1.0 ? 2.2 : 1.4;
+      birdState.yawRate += (THREE.MathUtils.clamp(diffYaw * 1.8, -maxTurn, maxTurn) - birdState.yawRate) * Math.min(1, dt * 3.5);
       birdState.yaw += birdState.yawRate * dt;
 
-      const desiredPitch = THREE.MathUtils.clamp(Math.asin(THREE.MathUtils.clamp(bDy / bTotalDist, -0.65, 0.65)), -0.6, 0.6);
-      birdState.pitch += (desiredPitch - birdState.pitch) * Math.min(1, dt * 2.8);
+      const desiredPitch = THREE.MathUtils.clamp(Math.asin(THREE.MathUtils.clamp(bDy / bTotalDist, -0.5, 0.5)), -0.45, 0.45);
+      birdState.pitch += (desiredPitch - birdState.pitch) * Math.min(1, dt * 2.2);
 
-      // Roll/bank realistically into turns
-      birdState.bank += (THREE.MathUtils.clamp(-birdState.yawRate * 0.65, -0.75, 0.75) - birdState.bank) * Math.min(1, dt * 4.0);
+      // Roll realistically into turns
+      birdState.bank += (THREE.MathUtils.clamp(-birdState.yawRate * 0.55, -0.65, 0.65) - birdState.bank) * Math.min(1, dt * 3.2);
 
-      // Speed modulation: faster when pitching down, slower in steep climbs
-      const targetSpeed = 2.4 - birdState.pitch * 1.2;
-      birdState.speed = THREE.MathUtils.clamp(birdState.speed + (targetSpeed - birdState.speed) * dt * 2.0, 1.8, 3.6);
+      // Speed modulation: 30% slower than before (cruises ~1.4, clamped 1.1 to 2.2)
+      const targetSpeed = 1.45 - birdState.pitch * 0.7;
+      birdState.speed = THREE.MathUtils.clamp(birdState.speed + (targetSpeed - birdState.speed) * dt * 1.8, 1.1, 2.2);
 
       // Forward flight translation
       const bFw = new THREE.Vector3(
@@ -1147,26 +861,24 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       // Gliding vs Flapping state transitions
       birdState.glideTimer -= dt;
       if (birdState.glideTimer <= 0) {
-        birdState.isGliding = !birdState.isGliding && Math.abs(diffYaw) < 0.4 && birdState.pitch < 0.15;
-        birdState.glideTimer = birdState.isGliding ? rnd(1.4, 2.6) : rnd(1.8, 3.2);
+        birdState.isGliding = !birdState.isGliding && Math.abs(diffYaw) < 0.35 && birdState.pitch < 0.15;
+        birdState.glideTimer = birdState.isGliding ? rnd(1.8, 3.2) : rnd(1.6, 2.8);
       }
 
-      birdState.flapPhase += dt * (birdState.isGliding ? 0.8 : 12.0);
+      birdState.flapPhase += dt * (birdState.isGliding ? 0.6 : 8.5);
 
       // Wing kinematics
       if (birdState.isGliding) {
-        // Soaring wings held flat and steady with gentle breeze tilt
-        const soarSh = 0.16 + 0.04 * Math.sin(elapsed * 1.5);
-        const soarHand = -0.06;
+        const soarSh = 0.16 + 0.03 * Math.sin(elapsed * 1.2);
+        const soarHand = -0.05;
         wl.sh.rotation.z = soarSh;
         wr.sh.rotation.z = -soarSh;
         wl.hand.rotation.z = soarHand;
         wr.hand.rotation.z = -soarHand;
       } else {
-        // Active flapping cycle
         const flap = Math.sin(birdState.flapPhase);
-        const shAngle = 0.12 + 0.72 * flap;
-        const handAngle = 0.48 * Math.sin(birdState.flapPhase - 1.15);
+        const shAngle = 0.10 + 0.65 * flap;
+        const handAngle = 0.42 * Math.sin(birdState.flapPhase - 1.15);
         wl.sh.rotation.z = shAngle;
         wr.sh.rotation.z = -shAngle;
         wl.hand.rotation.z = handAngle;
@@ -1176,93 +888,76 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       birdRoot.position.copy(birdState.pos);
       birdRoot.rotation.set(-birdState.pitch, birdState.yaw, birdState.bank);
 
-      // ─────────────────────────────────────────────────────────
-      // 7. REALISTIC UFO ANTI-GRAVITY KINEMATICS (3D ROAMING)
-      // ─────────────────────────────────────────────────────────
-      ufoState.waypointTimer += dt;
-      const uDist = ufoState.pos.distanceTo(ufoState.target);
-      if (uDist < 0.5 || ufoState.waypointTimer > 6.0) {
-        ufoState.target = getNextWaypoint(false);
-        ufoState.waypointTimer = 0;
-      }
-
-      // Anti-gravity smooth acceleration towards target
-      const uAx = THREE.MathUtils.clamp((ufoState.target.x - ufoState.pos.x) * 3.8 - ufoState.vel.x * 2.4, -7.0, 7.0);
-      const uAy = THREE.MathUtils.clamp((ufoState.target.y - ufoState.pos.y) * 3.8 - ufoState.vel.y * 2.4, -7.0, 7.0);
-      const uAz = THREE.MathUtils.clamp((ufoState.target.z - ufoState.pos.z) * 3.8 - ufoState.vel.z * 2.4, -7.0, 7.0);
-
-      ufoState.vel.x += uAx * dt;
-      ufoState.vel.y += uAy * dt;
-      ufoState.vel.z += uAz * dt;
-
-      // Speed cap for smooth graceful roaming
-      if (ufoState.vel.length() > 3.2) {
-        ufoState.vel.setLength(3.2);
-      }
-
-      ufoState.pos.addScaledVector(ufoState.vel, dt);
-      ufoState.pos.y += Math.sin(elapsed * 2.2 + ufoState.wobbleSeed) * 0.12 * dt;
-      keepOut(ufoState.pos, GLOBE_R * 1.28);
-
-      // Bank realistically based on velocity & lateral acceleration
-      ufoState.rx += (0.18 + THREE.MathUtils.clamp(ufoState.vel.z * 0.05 - uAy * 0.015, -0.35, 0.35) - ufoState.rx) * Math.min(1, dt * 5.0);
-      ufoState.rz += (-THREE.MathUtils.clamp(ufoState.vel.x * 0.06 + uAx * 0.015, -0.45, 0.45) - ufoState.rz) * Math.min(1, dt * 5.0);
-
-      ufoRoot.position.copy(ufoState.pos);
-      ufoRoot.rotation.set(
-        ufoState.rx + 0.02 * Math.sin(elapsed * 2.1),
-        0.0,
-        ufoState.rz + 0.02 * Math.sin(elapsed * 1.7 + 1.0)
+      // ── Update Aerodynamic Trail History ──
+      const tailPos = birdRoot.position.clone().add(
+        new THREE.Vector3(0, -0.01, -0.06).applyEuler(birdRoot.rotation)
       );
+      trailHistory.unshift(tailPos);
+      if (trailHistory.length > TRAIL_LEN) trailHistory.pop();
+      for (let i = 0; i < trailHistory.length; i++) {
+        trailPositions[i * 3] = trailHistory[i].x;
+        trailPositions[i * 3 + 1] = trailHistory[i].y;
+        trailPositions[i * 3 + 2] = trailHistory[i].z;
+      }
+      trailGeo.attributes.position.needsUpdate = true;
 
       // ─────────────────────────────────────────────────────────
-      // 8. OCCASIONAL PAPER COURIER DELIVERY (CLEAN & SUBTLE)
+      // 5. MICRO-PAPER COURIER & REFINED PARABOLIC THROW
       // ─────────────────────────────────────────────────────────
       courierTimer += dt;
-      if (courierPhase === 0 && courierTimer > 12.0) {
+      if (courierPhase === 0 && courierTimer > 15.0) {
         courierTimer = 0;
         courierPhase = 1;
         courierProgress = 0;
-        courierType = Math.random() < 0.5 ? 'bird' : 'ufo';
         activePaper.visible = true;
+        paperMat.opacity = 0;
       }
 
       if (courierPhase === 1) {
-        courierProgress += dt * 1.4;
-        paperMat.opacity = Math.min(1, courierProgress * 1.5);
-        const carrier = courierType === 'bird' ? birdRoot : ufoRoot;
-        activePaper.position.copy(carrier.position).add(
-          new THREE.Vector3(0, courierType === 'bird' ? -0.08 : -0.20, 0.06)
+        // Phase 1: Bird carrying the small paper
+        courierProgress += dt * 0.75;
+        paperMat.opacity = Math.min(1.0, courierProgress * 2.0);
+        activePaper.position.copy(birdRoot.position).add(
+          new THREE.Vector3(0, -0.045, 0.02).applyEuler(birdRoot.rotation)
         );
-        if (courierType === 'ufo') tractorMat.opacity = Math.min(0.65, courierProgress * 0.65);
+        activePaper.rotation.copy(birdRoot.rotation);
 
         if (courierProgress >= 1.0) {
-          courierPhase = 2;
+          courierPhase = 2; // RELEASE & THROW!
           courierProgress = 0;
-          courierDest.set(
-            masterGlobe.position.x + (Math.random() - 0.5) * 0.30,
-            masterGlobe.position.y + (Math.random() - 0.5) * 0.20,
+          throwStartPos.copy(activePaper.position);
+          const randAngle = rnd(-0.6, 0.6);
+          throwDestPos.set(
+            masterGlobe.position.x + Math.sin(randAngle) * GLOBE_R * 0.82,
+            masterGlobe.position.y + rnd(-GLOBE_R * 0.35, GLOBE_R * 0.35),
             GLOBE_R * 0.98
           );
         }
       } else if (courierPhase === 2) {
-        courierProgress += dt * 0.75;
+        // Phase 2: Parabolic toss arc toward the Earth
+        courierProgress += dt * 1.1;
         const t = Math.min(1.0, courierProgress);
-        const carrier = courierType === 'bird' ? birdRoot : ufoRoot;
-        activePaper.position.lerpVectors(carrier.position, courierDest, t);
-        paperMat.opacity = 1.0 - t * 0.2;
+        const arcY = Math.sin(t * Math.PI) * 0.16;
+        activePaper.position.lerpVectors(throwStartPos, throwDestPos, t);
+        activePaper.position.y += arcY;
+
+        // Realistic aerodynamic paper tumble in flight
+        activePaper.rotation.x += dt * 4.2;
+        activePaper.rotation.y += dt * 2.6;
+        activePaper.rotation.z += dt * 1.4;
 
         if (courierProgress >= 1.0) {
           courierPhase = 3;
           courierProgress = 0;
           rippleProg = 0;
-          rippleMesh.position.copy(activePaper.position);
+          rippleMesh.position.copy(throwDestPos);
           rippleMesh.quaternion.copy(camera.quaternion);
-          tractorMat.opacity = 0;
           activePaper.visible = false;
+          paperMat.opacity = 0;
         }
       } else if (courierPhase === 3) {
-        courierProgress += dt * 2.2;
+        // Phase 3: Absorption ripple on Earth surface
+        courierProgress += dt * 2.0;
         if (courierProgress >= 1.0) {
           courierPhase = 0;
           courierTimer = 0;
@@ -1270,60 +965,70 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
 
       if (rippleProg < 1.0) {
-        rippleProg += dt * 1.5;
-        rippleMesh.scale.setScalar(0.2 + rippleProg * 1.6);
-        rippleMat.opacity = (1.0 - rippleProg) * 0.8;
+        rippleProg += dt * 1.6;
+        rippleMesh.scale.setScalar(0.25 + rippleProg * 1.4);
+        rippleMat.opacity = (1.0 - rippleProg) * 0.85;
       } else {
         rippleMat.opacity = 0;
       }
 
       // ─────────────────────────────────────────────────────────
-      // 9. PROJECTED HUD PILL POSITIONS (DEDICATED ZONES)
+      // 6. DECLUTTERED, BALANCED HUD PILL POSITIONS & CLEAN LEADER LINES
       // ─────────────────────────────────────────────────────────
-      spinGroup.updateMatrixWorld(true);
-      const newPos: Record<string, { x: number; y: number; ax: number; ay: number }> = {};
+      const newPos: Record<
+        string,
+        { x: number; y: number; startX: number; startY: number; ax: number; ay: number }
+      > = {};
+
       const globeScreen = projectToScreen(masterGlobe.position);
       const G_X = globeScreen.x;
       const G_Y = globeScreen.y;
       const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
-      const pillGap = Math.max(68, Math.min(95, W * 0.065));
+      const pillGap = Math.max(72, Math.min(98, W * 0.07));
 
       pillDefs.forEach(p => {
-        const worldAp = p.ap.clone().applyMatrix4(spinGroup.matrixWorld).add(masterGlobe.position);
-        const screenAp = projectToScreen(worldAp);
-
         let px = 0;
-        let py = G_Y + p.slotYOffset * screenGlobeR * 0.88;
+        let py = G_Y + p.slotYOffset * screenGlobeR * 0.85;
+        let startX = 0;
+        const startY = py;
+        let ax = 0;
+        let ay = 0;
 
         if (p.side === 'left') {
           px = G_X - screenGlobeR - pillGap;
+          startX = px + 54; // Right edge of left pill
+          // Connects strictly to the left rim of the Earth (NEVER crosses over or behind)
+          ax = G_X - screenGlobeR * Math.cos(p.rimAngle);
+          ay = G_Y + screenGlobeR * Math.sin(p.rimAngle);
         } else if (p.side === 'right') {
           px = G_X + screenGlobeR + pillGap;
+          startX = px - 54; // Left edge of right pill
+          // Connects strictly to the right rim of the Earth
+          ax = G_X + screenGlobeR * Math.cos(p.rimAngle);
+          ay = G_Y + screenGlobeR * Math.sin(p.rimAngle);
         } else {
+          // Bottom center pill
           px = G_X;
-          py = G_Y + screenGlobeR + 25;
+          py = G_Y + screenGlobeR + 28;
+          startX = px;
+          ax = G_X;
+          ay = G_Y + screenGlobeR * 0.98;
         }
 
-        px = THREE.MathUtils.clamp(px, 60, W - 60);
+        px = THREE.MathUtils.clamp(px, 55, W - 55);
         py = THREE.MathUtils.clamp(py, 22, H - 22);
 
         newPos[p.id] = {
           x: px,
           y: py,
-          ax: screenAp.x,
-          ay: screenAp.y
+          startX,
+          startY,
+          ax,
+          ay
         };
       });
 
       setPillPositions(newPos);
-
-      // Track UFO on screen for RECON SURVEYOR badge (smoothly clamped within hero banner)
-      const ufoWorld = ufoRoot.position.clone();
-      const ufoScreen = projectToScreen(ufoWorld);
-      setUfoScreenPos({
-        x: THREE.MathUtils.clamp(ufoScreen.x, 60, W - 60),
-        y: THREE.MathUtils.clamp(ufoScreen.y, 25, H - 25)
-      });
 
       renderer.render(scene, camera);
     };
@@ -1346,15 +1051,15 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       ref={containerRef}
       className="relative w-full h-full min-h-[420px] lg:min-h-[446px] select-none flex items-center justify-center overflow-visible"
     >
-      {/* 3D WebGL Canvas — Transparent alpha, blends cleanly into background image across full hero banner */}
+      {/* 3D WebGL Canvas — Transparent alpha, blends cleanly into mountain background image */}
       <canvas
         ref={canvasRef}
         className="w-full h-full cursor-default active:cursor-grabbing block focus:outline-none pointer-events-auto"
         style={{ background: 'transparent' }}
-        aria-label="3D Knowledge Earth with roaming bird and UFO"
+        aria-label="3D Knowledge Earth with soaring research courier bird"
       />
 
-      {/* SVG Connector Lines from HUD Pills to 3D Earth Anchor Dots */}
+      {/* SVG Connector Lines from HUD Pills to 3D Earth Rim Anchors (Clean, Non-Overlapping) */}
       <svg
         ref={svgRef}
         className="absolute inset-0 w-full h-full pointer-events-none z-10 overflow-visible"
@@ -1373,9 +1078,10 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           if (!pos) return null;
           return (
             <g key={p.id}>
+              {/* Clean, short connector line from pill edge directly to its local globe rim anchor */}
               <line
-                x1={pos.x}
-                y1={pos.y}
+                x1={pos.startX}
+                y1={pos.startY}
                 x2={pos.ax}
                 y2={pos.ay}
                 stroke={p.color}
@@ -1383,20 +1089,20 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
                 strokeDasharray="4 3"
                 opacity="0.65"
               />
+              {/* Subtle glowing anchor beacon dot on the globe rim */}
               <circle
                 cx={pos.ax}
                 cy={pos.ay}
-                r="3.2"
+                r="2.8"
                 fill={p.color}
                 filter="url(#coreGlow)"
-                className="animate-pulse"
               />
             </g>
           );
         })}
       </svg>
 
-      {/* 7 Re-arranged Non-Overlapping Interactive HUD Pills */}
+      {/* 7 Neatly Arranged Non-Overlapping Interactive HUD Pills */}
       {pillDefs.map(p => {
         const pos = pillPositions[p.id];
         if (!pos) return null;
@@ -1425,19 +1131,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
           </button>
         );
       })}
-
-      {/* RECON SURVEYOR • 02% Badge Tracking the Miniature UFO */}
-      {ufoScreenPos && (
-        <div
-          style={{
-            transform: `translate(${ufoScreenPos.x + 28}px, ${ufoScreenPos.y - 22}px) translate(-50%, -50%)`
-          }}
-          className="absolute left-0 top-0 z-20 pointer-events-none flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#07132b]/85 border border-sky-400/60 text-[9px] font-mono text-sky-200 shadow-[0_0_10px_rgba(56,189,248,0.45)] backdrop-blur-sm whitespace-nowrap"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping flex-shrink-0" />
-          <span>RECON SURVEYOR • 02%</span>
-        </div>
-      )}
 
       {/* Drag hint at bottom right */}
       <div className="absolute bottom-2 right-3 flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900/60 dark:bg-black/60 border border-white/10 text-[9.5px] text-cyan-200/80 pointer-events-none backdrop-blur-sm z-10">
