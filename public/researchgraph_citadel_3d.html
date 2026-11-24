@@ -534,7 +534,7 @@ function updateKbPos(){
   const TARGET_Z = -10.4;
   const b=bnd(TARGET_Z);
   if(wide){
-    kbGroup.position.set(b.w*.14, b.h*.18, TARGET_Z);
+    kbGroup.position.set(-b.w*.34, -b.h*.18, TARGET_Z);
     kbGroup.scale.setScalar(.82);
   }else if(innerWidth>=601){
     // On tablets, keep the compact pocket in a dedicated right-hand lane.
