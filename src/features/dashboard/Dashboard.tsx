@@ -96,7 +96,7 @@ export const Dashboard: React.FC = () => {
           style={{
             backgroundImage: theme === 'dark'
               ? `
-                linear-gradient(90deg, rgba(8, 14, 26, 0.94) 0%, rgba(11, 20, 38, 0.88) 36%, rgba(15, 23, 42, 0.65) 60%, rgba(8, 14, 26, 0.85) 100%),
+                linear-gradient(90deg, rgba(8, 14, 26, 0.30) 0%, rgba(11, 20, 38, 0.18) 36%, rgba(15, 23, 42, 0.06) 60%, rgba(8, 14, 26, 0.12) 100%),
                 url(/hero_academic_bg.jpg)
               `
               : `
