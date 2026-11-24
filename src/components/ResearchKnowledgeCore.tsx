@@ -37,20 +37,15 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     }
   }, [onNavigate, setSearchQuery, setActivePage]);
 
-  // 7 HUD Navigation Pills — arranged symmetrically around the 3D Earth Globe
-  // Left column (3), Right column (3), Bottom center (1)
+  // 7 HUD Navigation Pills — arranged strictly on the RIGHT side of the 3D Earth Globe
   const pillDefs = [
-    // LEFT COLUMN (top to bottom)
     {
       id: 'papers',
       name: 'Research Papers',
       tag: '204M+',
       color: '#38bdf8',
       icon: FileText,
-      action: () => handleAction('search'),
-      side: 'left' as const,
-      slotYOffset: -0.58,
-      rimAngle: -0.42
+      action: () => handleAction('search')
     },
     {
       id: 'authors',
@@ -58,34 +53,15 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       tag: '12.4M+',
       color: '#14b8a6',
       icon: Users,
-      action: () => handleSearch('Research authors'),
-      side: 'left' as const,
-      slotYOffset: 0.0,
-      rimAngle: 0.0
+      action: () => handleSearch('Research authors')
     },
-    {
-      id: 'datasets',
-      name: 'Datasets',
-      tag: '85K+',
-      color: '#f59e0b',
-      icon: Database,
-      action: () => handleSearch('Empirical datasets'),
-      side: 'left' as const,
-      slotYOffset: 0.58,
-      rimAngle: 0.42
-    },
-
-    // RIGHT COLUMN (top to bottom)
     {
       id: 'graph',
       name: 'Knowledge Graph',
       tag: 'AI-Core',
       color: '#10b981',
       icon: Network,
-      action: () => handleAction('graph'),
-      side: 'right' as const,
-      slotYOffset: -0.58,
-      rimAngle: -0.42
+      action: () => handleAction('graph')
     },
     {
       id: 'insights',
@@ -93,10 +69,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       tag: 'Consensus',
       color: '#a855f7',
       icon: Sparkles,
-      action: () => handleAction('chat'),
-      side: 'right' as const,
-      slotYOffset: 0.0,
-      rimAngle: 0.0
+      action: () => handleAction('chat')
     },
     {
       id: 'concepts',
@@ -104,23 +77,23 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       tag: '1.8M+',
       color: '#818cf8',
       icon: Layers,
-      action: () => handleSearch('Ontological concepts'),
-      side: 'right' as const,
-      slotYOffset: 0.58,
-      rimAngle: 0.42
+      action: () => handleSearch('Ontological concepts')
     },
-
-    // BOTTOM CENTER
+    {
+      id: 'datasets',
+      name: 'Datasets',
+      tag: '85K+',
+      color: '#f59e0b',
+      icon: Database,
+      action: () => handleSearch('Empirical datasets')
+    },
     {
       id: 'citations',
       name: 'Citations',
       tag: '1.24B+',
       color: '#ec4899',
       icon: Link2,
-      action: () => handleAction('graph'),
-      side: 'center' as const,
-      slotYOffset: 1.0,
-      rimAngle: Math.PI / 2
+      action: () => handleAction('graph')
     }
   ];
 
@@ -866,7 +839,48 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     activePaper.visible = false;
     scene.add(activePaper);
 
-    // Glowing impact ripple on Earth surface
+    // Stardust Sparkle Particle Trail for Long-Distance Paper Flight
+    const PAPER_TRAIL_LEN = 18;
+    const paperTrailPositions = new Float32Array(PAPER_TRAIL_LEN * 3);
+    const paperTrailAlphas = new Float32Array(PAPER_TRAIL_LEN);
+    for (let i = 0; i < PAPER_TRAIL_LEN; i++) {
+      paperTrailAlphas[i] = (1.0 - i / PAPER_TRAIL_LEN) * 0.75;
+    }
+    const paperTrailGeo = new THREE.BufferGeometry();
+    paperTrailGeo.setAttribute('position', new THREE.BufferAttribute(paperTrailPositions, 3));
+    paperTrailGeo.setAttribute('alpha', new THREE.BufferAttribute(paperTrailAlphas, 1));
+    const paperTrailMat = new THREE.ShaderMaterial({
+      uniforms: { color: { value: new THREE.Color(0x38bdf8) } },
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      vertexShader: `
+        attribute float alpha;
+        varying float vAlpha;
+        void main() {
+          vAlpha = alpha;
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = (1.2 + alpha * 2.8) * (20.0 / -mv.z);
+          gl_Position = projectionMatrix * mv;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 color;
+        varying float vAlpha;
+        void main() {
+          float d = length(gl_PointCoord - vec2(0.5)) * 2.0;
+          if (d > 1.0) discard;
+          float s = pow(1.0 - d, 2.0);
+          gl_FragColor = vec4(mix(color, vec3(1.0, 0.96, 0.82), s), s * vAlpha);
+        }
+      `
+    });
+    const paperTrailPoints = new THREE.Points(paperTrailGeo, paperTrailMat);
+    paperTrailPoints.visible = false;
+    scene.add(paperTrailPoints);
+    const paperTrailHistory: THREE.Vector3[] = [];
+
+    // Glowing impact ripple on Earth surface (Dual Concentric Waves)
     const rippleMat = new THREE.MeshBasicMaterial({
       color: 0x67e8f9,
       side: THREE.DoubleSide,
@@ -876,6 +890,49 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     });
     const rippleMesh = new THREE.Mesh(new THREE.RingGeometry(0.02, 0.05, 32), rippleMat);
     scene.add(rippleMesh);
+
+    const rippleMat2 = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending
+    });
+    const rippleMesh2 = new THREE.Mesh(new THREE.RingGeometry(0.012, 0.035, 32), rippleMat2);
+    scene.add(rippleMesh2);
+
+    // ── Dynamic Real-Time Connection Building Arcs ──
+    const dynamicConnectionCount = 3;
+    const dynamicLines: THREE.Line[] = [];
+    const dynamicBeads: THREE.Mesh[] = [];
+    const dynamicGeos: THREE.BufferGeometry[] = [];
+    const dynamicCurves: THREE.QuadraticBezierCurve3[] = [];
+
+    for (let k = 0; k < dynamicConnectionCount; k++) {
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(32 * 3), 3));
+      dynamicGeos.push(geo);
+
+      const mat = new THREE.LineBasicMaterial({
+        color: k === 0 ? 0x38bdf8 : k === 1 ? 0x10b981 : 0xa855f7,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending
+      });
+      const line = new THREE.Line(geo, mat);
+      dynamicLines.push(line);
+      spinGroup.add(line);
+
+      const bead = new THREE.Mesh(
+        new THREE.SphereGeometry(0.02, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xffffff })
+      );
+      bead.visible = false;
+      dynamicBeads.push(bead);
+      spinGroup.add(bead);
+    }
+
+    const impactBeacon = spr(glowT, 0x38bdf8, 0.08, 0, spinGroup);
 
     // ─────────────────────────────────────────────────────────────
     // 4. BIRD AUTONOMOUS 3D ROAMING (CONTINUOUSLY VISIBLE, -30% SPEED)
@@ -918,20 +975,20 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       let targetZ = 0;
 
       if (W >= 900) {
-        const gX = masterGlobe.position.x || (0.52 * vw);
+        const gX = masterGlobe.position.x || (0.42 * vw);
         if (zone === 'left') {
-          targetX = rnd(-vw * 0.46, -vw * 0.10);
-          targetY = rnd(-vh * 0.15, vh * 0.42);
+          targetX = rnd(-vw * 0.46, -vw * 0.16);
+          targetY = rnd(-vh * 0.10, vh * 0.42);
           targetZ = rnd(1.15, 1.65);
         } else if (zone === 'center') {
-          targetX = rnd(-vw * 0.10, vw * 0.24);
+          targetX = rnd(-vw * 0.16, vw * 0.16);
           targetY = rnd(-vh * 0.12, vh * 0.38);
           targetZ = rnd(1.10, 1.55);
         } else {
           // Around and in front of the Earth
-          targetX = gX + rnd(-0.62, 0.48);
-          targetY = rnd(-vh * 0.20, vh * 0.38);
-          targetZ = rnd(1.15, 1.70);
+          targetX = gX + rnd(-0.65, 0.15);
+          targetY = rnd(-vh * 0.18, vh * 0.35);
+          targetZ = rnd(1.15, 1.65);
         }
       } else {
         targetX = rnd(-vw * 0.55, vw * 0.55);
@@ -962,9 +1019,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       waypointTimer: 0
     };
 
-    // Courier State for Micro-Paper Delivery
+    // Courier State for Long-Distance Paper Delivery & Dynamic Connection Building
     let courierTimer = 0;
-    let courierPhase = 0; // 0=roaming, 1=carrying, 2=parabolic toss, 3=absorption ripple
+    let courierPhase = 0; // 0=roaming, 1=flying to launch vantage point, 2=long-distance parabolic toss, 3=connection building, 4=integration fade
     let courierProgress = 0;
     const throwStartPos = new THREE.Vector3();
     const throwDestPos = new THREE.Vector3();
@@ -1024,7 +1081,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
-        masterGlobe.position.x = 0.52 * vw; // Shifted right by 10%
+        masterGlobe.position.x = 0.42 * vw; // Balanced position with all 7 labels on the right
       } else {
         masterGlobe.position.x = 0;
       }
@@ -1049,11 +1106,11 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const dt = clock.getDelta();
       const elapsed = clock.getElapsedTime();
 
-      // 1. Globe Panoramic Positioning (10% shifted to the right) & Soft Levitation
+      // 1. Globe Panoramic Positioning & Soft Levitation
       const vh = 5.2 * Math.tan(THREE.MathUtils.degToRad(19));
       const vw = vh * (W / H);
       if (W >= 900) {
-        masterGlobe.position.x = 0.52 * vw;
+        masterGlobe.position.x = 0.42 * vw;
         masterGlobe.position.y = Math.sin(elapsed * 0.9) * 0.03;
       } else {
         masterGlobe.position.x = 0;
@@ -1181,78 +1238,173 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       trailGeo.attributes.position.needsUpdate = true;
 
       // ─────────────────────────────────────────────────────────
-      // 5. MICRO-PAPER COURIER & REFINED PARABOLIC THROW
+      // 5. DRAMATIC LONG-DISTANCE PAPER TOSS & CONNECTION BUILDING
       // ─────────────────────────────────────────────────────────
       courierTimer += dt;
-      if (courierPhase === 0 && courierTimer > 10.0) {
+      if (courierPhase === 0 && courierTimer > 8.5) {
         courierTimer = 0;
         courierPhase = 1;
         courierProgress = 0;
         activePaper.visible = true;
         paperMat.opacity = 0;
+        // Direct bird toward high long-distance launch zone over far-left mountains
+        birdState.target.set(-vw * 0.38, vh * 0.35, 1.45);
       }
 
       if (courierPhase === 1) {
-        // Phase 1: Bird carrying the small paper
-        courierProgress += dt * 0.85;
-        paperMat.opacity = Math.min(1.0, courierProgress * 2.0);
+        // Phase 1: Bird carrying paper toward distant mountain launch vantage point
+        courierProgress += dt * 0.65;
+        paperMat.opacity = Math.min(1.0, courierProgress * 2.2);
         activePaper.position.copy(birdRoot.position).add(
           new THREE.Vector3(0, -0.045, 0.02).applyEuler(birdRoot.rotation)
         );
         activePaper.rotation.copy(birdRoot.rotation);
 
         if (courierProgress >= 1.0) {
-          courierPhase = 2; // RELEASE & THROW!
+          // LONG-DISTANCE RELEASE & LAUNCH!
+          courierPhase = 2;
           courierProgress = 0;
           throwStartPos.copy(activePaper.position);
-          const randAngle = rnd(-0.6, 0.6);
+          // Target landing spot on front surface of the Earth
+          const randLon = rnd(-0.55, 0.55);
+          const randLat = rnd(-0.35, 0.35);
           throwDestPos.set(
-            masterGlobe.position.x + Math.sin(randAngle) * GLOBE_R * 0.82,
-            masterGlobe.position.y + rnd(-GLOBE_R * 0.35, GLOBE_R * 0.35),
+            masterGlobe.position.x + Math.sin(randLon) * GLOBE_R * 0.82,
+            masterGlobe.position.y + Math.sin(randLat) * GLOBE_R * 0.82,
             GLOBE_R * 0.98
           );
+          paperTrailPoints.visible = true;
+          paperTrailHistory.length = 0;
         }
       } else if (courierPhase === 2) {
-        // Phase 2: Parabolic toss arc toward the Earth
-        courierProgress += dt * 1.25;
+        // Phase 2: Dramatic Parabolic Toss Across the Sky (long-distance trajectory)
+        courierProgress += dt * 0.38; // ~2.6 seconds dramatic flight time
         const t = Math.min(1.0, courierProgress);
-        const arcY = Math.sin(t * Math.PI) * 0.16;
+        const arcY = Math.sin(t * Math.PI) * 0.40; // High majestic arch
         activePaper.position.lerpVectors(throwStartPos, throwDestPos, t);
         activePaper.position.y += arcY;
 
-        // Realistic aerodynamic paper tumble in flight
-        activePaper.rotation.x += dt * 4.2;
-        activePaper.rotation.y += dt * 2.6;
-        activePaper.rotation.z += dt * 1.4;
+        // Aerodynamic paper tumble
+        activePaper.rotation.x += dt * 4.8;
+        activePaper.rotation.y += dt * 3.0;
+        activePaper.rotation.z += dt * 1.5;
+
+        // Update sparkling stardust trail following the paper
+        paperTrailHistory.unshift(activePaper.position.clone());
+        if (paperTrailHistory.length > PAPER_TRAIL_LEN) paperTrailHistory.pop();
+        for (let i = 0; i < paperTrailHistory.length; i++) {
+          paperTrailPositions[i * 3] = paperTrailHistory[i].x;
+          paperTrailPositions[i * 3 + 1] = paperTrailHistory[i].y;
+          paperTrailPositions[i * 3 + 2] = paperTrailHistory[i].z;
+        }
+        paperTrailGeo.attributes.position.needsUpdate = true;
 
         if (courierProgress >= 1.0) {
+          // Paper impacts Earth! INITIATE REAL-TIME CONNECTION BUILDING ANIMATION!
           courierPhase = 3;
           courierProgress = 0;
+          activePaper.visible = false;
+          paperTrailPoints.visible = false;
+          paperMat.opacity = 0;
+
+          // Trigger dual shockwave ripples
           rippleProg = 0;
           rippleMesh.position.copy(throwDestPos);
+          rippleMesh2.position.copy(throwDestPos);
           rippleMesh.quaternion.copy(camera.quaternion);
-          activePaper.visible = false;
-          paperMat.opacity = 0;
+          rippleMesh2.quaternion.copy(camera.quaternion);
+
+          // Position impact beacon in local globe space
+          const localImpact = spinGroup.worldToLocal(throwDestPos.clone()).normalize().multiplyScalar(GLOBE_R);
+          impactBeacon.position.copy(localImpact).multiplyScalar(1.015);
+          (impactBeacon.material as THREE.SpriteMaterial).opacity = 1.0;
+          impactBeacon.scale.setScalar(0.09);
+
+          // Find the 3 nearest global research nodes to forge new citation connections
+          const sortedHubs = researchNodes
+            .map((nodePos, idx) => ({ pos: nodePos, idx, dist: nodePos.distanceTo(localImpact) }))
+            .sort((a, b) => a.dist - b.dist)
+            .slice(0, 3);
+
+          dynamicCurves.length = 0;
+          sortedHubs.forEach((hub, k) => {
+            const mid = new THREE.Vector3().addVectors(localImpact, hub.pos).multiplyScalar(0.5);
+            const dist = localImpact.distanceTo(hub.pos);
+            mid.normalize().multiplyScalar(GLOBE_R * (1.08 + dist * 0.16));
+            const curve = new THREE.QuadraticBezierCurve3(localImpact, mid, hub.pos);
+            dynamicCurves.push(curve);
+
+            (dynamicLines[k].material as THREE.LineBasicMaterial).opacity = 0.95;
+            dynamicBeads[k].visible = true;
+          });
         }
       } else if (courierPhase === 3) {
-        // Phase 3: Absorption ripple on Earth surface
-        courierProgress += dt * 2.0;
+        // Phase 3: Connection Building Animation (Arcs actively sprout and draw in real-time)
+        courierProgress += dt * 0.55; // ~1.8s connection building duration
+        const connT = Math.min(1.0, courierProgress);
+
+        dynamicCurves.forEach((curve, k) => {
+          const geo = dynamicGeos[k];
+          const pos = geo.attributes.position as THREE.BufferAttribute;
+          const numSteps = 30;
+
+          for (let s = 0; s <= numSteps; s++) {
+            const tFrac = Math.min(s / numSteps, connT);
+            const pt = curve.getPoint(tFrac);
+            pos.setXYZ(s, pt.x, pt.y, pt.z);
+          }
+          pos.needsUpdate = true;
+
+          // Leading edge photon bead rides the tip of the growing line
+          const bead = dynamicBeads[k];
+          const headPt = curve.getPoint(connT);
+          bead.position.copy(headPt).multiplyScalar(1.01);
+          bead.scale.setScalar(0.85 + 0.35 * Math.sin(elapsed * 12));
+        });
+
+        // Pulse the impact beacon
+        (impactBeacon.material as THREE.SpriteMaterial).opacity = 1.0 - connT * 0.35;
+        impactBeacon.scale.setScalar(0.09 + 0.03 * Math.sin(elapsed * 8));
+
+        if (courierProgress >= 1.0) {
+          // Connection forged! Transition to gentle integration fade
+          courierPhase = 4;
+          courierProgress = 0;
+        }
+      } else if (courierPhase === 4) {
+        // Phase 4: Gentle fade & integration into active network
+        courierProgress += dt * 0.30;
+        const fade = 1.0 - courierProgress;
+        dynamicLines.forEach(l => {
+          (l.material as THREE.LineBasicMaterial).opacity = fade * 0.8;
+        });
+        dynamicBeads.forEach(b => {
+          b.visible = fade > 0.15;
+        });
+        (impactBeacon.material as THREE.SpriteMaterial).opacity = fade * 0.5;
+
         if (courierProgress >= 1.0) {
           courierPhase = 0;
           courierTimer = 0;
+          dynamicLines.forEach(l => { (l.material as THREE.LineBasicMaterial).opacity = 0; });
+          dynamicBeads.forEach(b => { b.visible = false; });
         }
       }
 
+      // Dual shockwave ripples expanding across Earth surface
       if (rippleProg < 1.0) {
-        rippleProg += dt * 1.6;
-        rippleMesh.scale.setScalar(0.25 + rippleProg * 1.4);
-        rippleMat.opacity = (1.0 - rippleProg) * 0.85;
+        rippleProg += dt * 1.5;
+        rippleMesh.scale.setScalar(0.2 + rippleProg * 1.6);
+        rippleMat.opacity = (1.0 - rippleProg) * 0.9;
+        rippleMesh2.scale.setScalar(0.12 + rippleProg * 1.3);
+        rippleMat2.opacity = (1.0 - rippleProg) * 0.7;
       } else {
         rippleMat.opacity = 0;
+        rippleMat2.opacity = 0;
       }
 
       // ─────────────────────────────────────────────────────────
-      // 6. DECLUTTERED, BALANCED HUD PILL POSITIONS & CLEAN LEADER LINES
+      // 6. ALL 7 HUD PILLS ORGANIZED STRICTLY ON THE RIGHT SIDE
       // ─────────────────────────────────────────────────────────
       const newPos: Record<
         string,
@@ -1263,41 +1415,35 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       const G_X = globeScreen.x;
       const G_Y = globeScreen.y;
       const screenGlobeR = (GLOBE_R / 5.2) * (H / (2 * Math.tan(THREE.MathUtils.degToRad(19))));
-      const pillGap = Math.max(56, Math.min(76, W * 0.055));
+      const pillGap = Math.max(46, Math.min(64, W * 0.052));
 
-      pillDefs.forEach(p => {
-        let px = 0;
-        let py = G_Y + p.slotYOffset * screenGlobeR * 0.88;
-        let startX = 0;
-        let startY = py;
-        let ax = 0;
-        let ay = 0;
+      const totalPills = pillDefs.length;
 
-        if (p.side === 'left') {
-          px = G_X - screenGlobeR - pillGap;
-          px = Math.max(px, 74);
-          startX = px + 62; // Starts from right edge of left pill
-          // Connects strictly to the left rim of the Earth
-          ax = G_X - screenGlobeR * Math.cos(p.rimAngle);
-          ay = G_Y + screenGlobeR * Math.sin(p.rimAngle);
-        } else if (p.side === 'right') {
-          px = G_X + screenGlobeR + pillGap;
-          px = Math.min(px, W - 78);
-          startX = px - 62; // Starts from left edge of right pill
-          // Connects strictly to the right rim of the Earth
-          ax = G_X + screenGlobeR * Math.cos(p.rimAngle);
-          ay = G_Y + screenGlobeR * Math.sin(p.rimAngle);
-        } else {
-          // Bottom center pill
-          px = G_X;
-          py = G_Y + screenGlobeR + 32;
-          startX = px;
-          startY = py - 14;
-          ax = G_X;
-          ay = G_Y + screenGlobeR;
-        }
+      pillDefs.forEach((p, index) => {
+        // Vertical slot normalized between -1.0 (top) and +1.0 (bottom)
+        const tSlot = (index - (totalPills - 1) / 2) / ((totalPills - 1) / 2);
+
+        // Vertical distribution across the right side of the globe
+        const verticalSpan = Math.min(H * 0.38, screenGlobeR * 1.48);
+        let py = G_Y + tSlot * verticalSpan;
+
+        // Rim anchor angle on the right hemisphere of the Earth (-56 deg to +56 deg)
+        const rimAngle = tSlot * (Math.PI * 0.31);
+
+        // Exact anchor coordinate on the right rim of the Earth
+        const ax = G_X + screenGlobeR * Math.cos(rimAngle);
+        const ay = G_Y + screenGlobeR * Math.sin(rimAngle);
+
+        // Horizontal position of the pill on the right side
+        // Soft curve that follows the globe contour
+        let px = G_X + screenGlobeR + pillGap + (1 - Math.cos(rimAngle)) * 16;
+        px = Math.min(px, W - 78);
 
         py = THREE.MathUtils.clamp(py, 22, H - 24);
+
+        // Left edge of the right-side pill where the connector line begins
+        const startX = px - 62;
+        const startY = py;
 
         newPos[p.id] = {
           x: px,
