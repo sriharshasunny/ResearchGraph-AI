@@ -149,81 +149,71 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
   }
   @media(prefers-reduced-motion:reduce){.btn,.toast{transition:none!important}}
 </style>
-<style id="rg-hero-heading-pocket-tune">
-  /* Desktop hero: top-align the headline just beneath navigation,
-     enlarge it slightly, and keep the paper station as a compact side accent. */
+<style id="rg-vertical-left-hero-pocket">
+  /* Fill the left side vertically. Keep the main scene and world animation intact. */
   @media (min-width:901px){
     .hero{
       align-items:flex-start;
       min-height:100svh;
-      padding:clamp(78px,9vh,104px) 0 56px;
+      padding:clamp(104px,11vh,128px) 0 44px;
     }
     .L{
-      width:min(540px,39vw);
-      margin-left:clamp(32px,4.3vw,76px);
+      width:min(560px,40vw);
+      margin-left:clamp(38px,5.1vw,88px);
+      min-height:calc(100svh - clamp(104px,11vh,128px) - 44px);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
     }
     h1{
+      width:100%;
       max-width:540px;
-      font-size:clamp(46px,3.2vw,54px);
-      line-height:1.08;
-      letter-spacing:-.038em;
+      font-size:clamp(50px,4.5vw,72px);
+      line-height:1.02;
+      letter-spacing:-.04em;
+      margin:0;
     }
-    .tag{margin-bottom:16px}
-    .lead{max-width:490px;margin:15px 0 20px;font-size:15.2px;line-height:1.62}
-    .cta{gap:11px;margin-bottom:17px}
-    .feat{margin-bottom:16px}
-    .ask{max-width:540px}
-    .live{margin-top:14px}
+    .tag{margin-bottom:18px;flex:none}
+    .lead{max-width:470px;margin:18px 0 22px;font-size:15.5px;line-height:1.65}
+    .cta{gap:11px;margin-bottom:19px}
+    .feat{width:100%;gap:9px;margin-bottom:18px}
+    .feat div{padding:11px 12px}
+    .feat b{font-size:16px}
+    .ask{width:100%;max-width:100%;min-height:62px}
+    .live{margin-top:auto;max-width:100%;font-size:10px}
     .paper-station-tag{
       padding:4px 9px;
       border-radius:999px;
-      font-size:8.5px;
+      font-size:8px;
       letter-spacing:.055em;
-      background:rgba(8,13,35,.9);
-      box-shadow:0 5px 18px rgba(5,8,25,.35),0 0 14px rgba(139,92,246,.14);
+      background:rgba(8,13,35,.92);
+      box-shadow:0 5px 18px rgba(5,8,25,.35),0 0 14px rgba(139,92,250,.13);
     }
   }
-</style>
-<style id="rg-wide-hero-orbit-stage">
-  @media (min-width:1101px){
-    .hero{position:relative;align-items:flex-start;min-height:100svh;padding:clamp(88px,10vh,118px) 0 52px}
-    .L{width:min(770px,52vw);margin-left:clamp(42px,5.2vw,92px)}
-    h1{max-width:770px;font-size:clamp(54px,4.25vw,68px);line-height:1.035;letter-spacing:-.042em}
-    .tag{margin-bottom:18px}
-    .lead{max-width:700px;font-size:16px;line-height:1.65;margin:17px 0 22px}
-    .cta{margin-bottom:20px}
-    .feat{max-width:720px;gap:11px;margin-bottom:18px}
-    .feat div{padding:12px 14px}
-    .feat b{font-size:17px}
-    .feat span{font-size:12px}
-    .ask{max-width:720px;min-height:64px}
-    .ask input{font-size:15px}
-    .live{margin-top:16px}
-    .hero-orbit-decor{display:block}
-  }
-  @media (min-width:601px) and (max-width:1100px){
-    .hero{position:relative;align-items:flex-start;min-height:100svh;padding:clamp(106px,12vh,132px) 0 70px}
-    .L{width:min(68vw,690px);margin-left:clamp(28px,5.2vw,62px)}
-    h1{max-width:100%;font-size:clamp(42px,5.55vw,58px);line-height:1.045;letter-spacing:-.04em}
+  @media (min-width:601px) and (max-width:900px){
+    .hero{align-items:flex-start;min-height:100svh;padding:110px 0 56px}
+    .L{
+      width:min(62vw,480px);
+      margin-left:5vw;
+      min-height:calc(100svh - 166px);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    h1{font-size:clamp(42px,6.5vw,56px);line-height:1.04;letter-spacing:-.04em}
     .tag{margin-bottom:16px}
-    .lead{max-width:100%;font-size:15px}
-    .cta{margin-bottom:18px}
-    .feat{grid-template-columns:repeat(3,minmax(0,1fr));max-width:100%;gap:8px}
-    .feat div{padding:10px 11px}
-    .ask{max-width:100%;min-height:60px}
-    .live{max-width:100%}
-    .hero-orbit-decor{display:block;right:3vw;bottom:clamp(125px,17vh,190px);width:clamp(126px,18vw,190px)}
+    .lead{max-width:100%;font-size:14.5px;margin:15px 0 18px}
+    .feat{grid-template-columns:repeat(3,minmax(0,1fr));width:100%;gap:7px}
+    .feat div{padding:9px 8px}
+    .feat b{font-size:14px}
+    .feat span{font-size:9.5px}
+    .ask{width:100%;max-width:100%}
+    .live{margin-top:auto;font-size:9px}
   }
-  .hero-orbit-decor{display:none;position:absolute;right:clamp(28px,6vw,104px);bottom:clamp(150px,19vh,220px);width:clamp(150px,15vw,218px);aspect-ratio:1;z-index:2;pointer-events:none;opacity:.78;filter:drop-shadow(0 0 24px rgba(56,189,248,.12))}
-  .hero-orbit-decor .orbit-a,.hero-orbit-decor .orbit-b{position:absolute;inset:8%;border:1px solid rgba(91,190,255,.24);border-radius:50%;transform:rotate(-28deg) scaleY(.43);animation:rgOrbitSpin 24s linear infinite}
-  .hero-orbit-decor .orbit-b{inset:18%;border-color:rgba(173,139,250,.28);border-style:dashed;transform:rotate(48deg) scaleY(.52);animation-duration:32s;animation-direction:reverse}
-  .hero-orbit-decor .orbit-core{position:absolute;left:42%;top:39%;width:16%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 32% 28%,#e0f2fe,#38bdf8 34%,#164e86 72%,#07172e);box-shadow:0 0 18px rgba(56,189,248,.6),0 0 44px rgba(56,189,248,.18)}
-  .hero-orbit-decor .orbit-satellite{position:absolute;left:13%;top:37%;width:7px;height:7px;border-radius:50%;background:#b9a5ff;box-shadow:0 0 12px #a78bfa,0 0 28px rgba(167,139,250,.5);animation:rgOrbitPulse 2.8s ease-in-out infinite}
-  .hero-orbit-decor .orbit-caption{position:absolute;left:50%;bottom:0;transform:translateX(-50%);white-space:nowrap;color:rgba(178,218,255,.7);font:700 8px ui-monospace,monospace;letter-spacing:.16em;text-shadow:0 0 10px #06142b}
-  @keyframes rgOrbitSpin{to{rotate:332deg}}
-  @keyframes rgOrbitPulse{50%{opacity:.35;transform:scale(.65)}}
-  @media (min-width:601px){.hero-orbit-decor{display:block}}
-  @media (max-width:560px){.hero-orbit-decor{display:none!important}}
+  @media (max-width:560px){
+    h1{line-height:1.03}
+    .hero{padding-top:104px;padding-bottom:230px}
+  }
 </style>
 </head><body>
 <canvas id="c" aria-hidden="true"></canvas><div id="ui"></div><div id="feed"></div>
@@ -232,7 +222,7 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
 <div class="hr"><a class="btn" href="#">Log in</a><a class="btn c" href="#">Launch Cockpit →</a></div></header>
 <section class="hero" id="top"><div class="L">
 <span class="tag"><span>⬡</span> HYPER-DIMENSIONAL GRAPH RAG · REAL-TIME ARXIV</span>
-<h1>The Quantum Graph for<br><span>Autonomous Research.</span></h1>
+<h1>The Quantum<br>Graph for<br><span>Autonomous<br>Research.</span></h1>
 <p class="lead">Connect research papers, build knowledge graphs, and get reliable AI insights.</p>
 <div class="cta"><a class="btn p" href="#"><span>⌬</span> Launch Neural Graph →</a><a class="btn" href="#features">System Telemetry</a></div>
 <div class="feat">
@@ -246,12 +236,7 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
 <a class="btn c" href="#">Ask AI →</a>
 </div>
 <div class="live"><i></i><span><b id="cnt">0</b> new papers merged into the graph · arXiv &amp; PubMed</span></div>
-</div>
-<div class="hero-orbit-decor" aria-hidden="true">
-  <i class="orbit-a"></i><i class="orbit-b"></i><i class="orbit-core"></i><i class="orbit-satellite"></i>
-  <span class="orbit-caption">DEEP SPACE RELAY · SIGNAL ACTIVE</span>
-</div>
-</section>
+</div></section>
 <div class="mq" id="sources"><div><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM DL</span><span>OpenAlex</span><span>Crossref</span><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM DL</span><span>OpenAlex</span><span>Crossref</span></div></div>
 <section class="sec" id="how"><div class="W">
 <span class="eyebrow">AUTONOMOUS RAG PIPELINE</span>
@@ -428,8 +413,8 @@ const pulses=Array.from({length:22},()=>({s:spr(glowT,0xffffff,.035,0,spin),a:ar
 /* ---------- depth: parallax stars, bright stars, drifting dust ---------- */
 const layers=[[1400,1.0,.004],[900,1.5,.01],[500,2.2,.02]].map(([n,sz,k],li)=>{const p=[],c=[];for(let i=0;i<n;i++){p.push(rnd(-620,620),rnd(-380,380),rnd(-460,-70));const w=Math.random(),t=w<.2?[1,.8,.62]:w<.55?[.72,.82,1]:[1,1,1],b=rnd(.45,1);c.push(t[0]*b,t[1]*b,t[2]*b)}
 const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(p,3));g.setAttribute('color',new T.Float32BufferAttribute(c,3));const pt=new T.Points(g,new T.PointsMaterial({size:sz,sizeAttenuation:false,vertexColors:true,transparent:true,opacity:.9,depthWrite:false}));const gr=new T.Group();gr.add(pt);gr.userData.k=k;S.add(gr);return gr});
-const bright=Array.from({length:34},()=>{const s=new T.Sprite(new T.SpriteMaterial({map:starT,color:[0xffffff,0xbcd4ff,0xffd9b0][(Math.random()*3)|0],transparent:true,opacity:.8,depthWrite:false,blending:T.AdditiveBlending}));s.position.set(rnd(-420,420),rnd(-250,250),-300);s.scale.setScalar(rnd(5,12));s.userData.p=rnd(0,9);S.add(s);return s});
-const DN=260,dust=(()=>{const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(DN*3),3));const p=new T.Points(g,new T.PointsMaterial({size:1.8,sizeAttenuation:false,color:0x9fc8ff,transparent:true,opacity:.28,depthWrite:false,blending:T.AdditiveBlending}));p.frustumCulled=false;S.add(p);return p})();
+const bright=Array.from({length:22},()=>{const s=new T.Sprite(new T.SpriteMaterial({map:starT,color:[0xffffff,0xbcd4ff,0xffd9b0][(Math.random()*3)|0],transparent:true,opacity:.8,depthWrite:false,blending:T.AdditiveBlending}));s.position.set(rnd(-420,420),rnd(-250,250),-300);s.scale.setScalar(rnd(5,12));s.userData.p=rnd(0,9);S.add(s);return s});
+const DN=160,dust=(()=>{const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(DN*3),3));const p=new T.Points(g,new T.PointsMaterial({size:1.8,sizeAttenuation:false,color:0x9fc8ff,transparent:true,opacity:.28,depthWrite:false,blending:T.AdditiveBlending}));p.frustumCulled=false;S.add(p);return p})();
 const dv=Array.from({length:DN},()=>({x:rnd(-1,1),y:rnd(-1,1),z:rnd(-10,16),s:rnd(.2,.8)}));
 /* ---------- deep space: nebula clouds, spiral galaxy, shooting stars ---------- */
 function nebTex(c1,c2,seed){const W=256,c=mkc(W,W),x=c.getContext('2d'),im=x.createImageData(W,W),d=im.data;for(let j=0;j<W;j++)for(let i=0;i<W;i++){const u=i/W-.5,v=j/W-.5,fall=Math.max(0,1-Math.hypot(u,v)*2),q=fbm(u*3+seed,v*3,seed*2,4),w=fbm(u*3+q*2,v*3+q*2,seed,5),al=sm(.35,.8,w)*fall*fall,m=fbm(u*2,v*2,seed+3,3),p=(j*W+i)*4;d[p]=lerp(c1[0],c2[0],m)*255*al;d[p+1]=lerp(c1[1],c2[1],m)*255*al;d[p+2]=lerp(c1[2],c2[2],m)*255*al;d[p+3]=255}x.putImageData(im,0,0);return tex(c)}
@@ -437,7 +422,7 @@ function nebTex(c1,c2,seed){const W=256,c=mkc(W,W),x=c.getContext('2d'),im=x.cre
 const galT=(()=>{const W=256,c=mkc(W,W),x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,W,W);x.globalCompositeOperation='lighter';const g=x.createRadialGradient(128,128,0,128,128,40);g.addColorStop(0,'rgba(255,230,190,.9)');g.addColorStop(1,'rgba(255,230,190,0)');x.fillStyle=g;x.fillRect(0,0,W,W);
 for(let i=0;i<2600;i++){const arm=i%2,t=Math.pow(Math.random(),.7)*3.2,an=t*1.7+arm*Math.PI+rnd(-.25,.25)*(.4+t*.2),r=8+t*34;x.fillStyle=`rgba(${arm?170:220},200,255,${rnd(.15,.7)*(1-t/3.4)})`;x.fillRect(128+Math.cos(an)*r+rnd(-4,4),128+Math.sin(an)*r*.98+rnd(-4,4),rnd(.6,1.6),rnd(.6,1.6))}return tex(c)})();
 {const gm=new T.Mesh(new T.PlaneGeometry(170,170),new T.MeshBasicMaterial({map:galT,transparent:true,blending:T.AdditiveBlending,depthWrite:false,opacity:.75}));gm.position.set(230,80,-560);gm.rotation.set(-1,0,.5);S.add(gm)}
-const shoot=Array.from({length:5},()=>{const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(6),3));const l=new T.Line(g,new T.LineBasicMaterial({color:0xcfe4ff,transparent:true,opacity:0,blending:T.AdditiveBlending,depthWrite:false}));l.frustumCulled=false;S.add(l);return{l,t:1,v:V(0,0,0),p:V(0,0,0),nx:rnd(2,6)}});
+const shoot=Array.from({length:3},()=>{const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(6),3));const l=new T.Line(g,new T.LineBasicMaterial({color:0xcfe4ff,transparent:true,opacity:0,blending:T.AdditiveBlending,depthWrite:false}));l.frustumCulled=false;S.add(l);return{l,t:1,v:V(0,0,0),p:V(0,0,0),nx:rnd(2,6)}});
 function shootUpd(dt){shoot.forEach(s=>{if(s.t<1){s.t+=dt/.9;s.p.addScaledVector(s.v,dt);const a=s.l.geometry.attributes.position;a.setXYZ(0,s.p.x,s.p.y,s.p.z);a.setXYZ(1,s.p.x-s.v.x*.12,s.p.y-s.v.y*.12,s.p.z);a.needsUpdate=true;s.l.material.opacity=Math.sin(Math.PI*Math.min(1,s.t))}else{s.nx-=dt;s.l.material.opacity=0;if(s.nx<=0){s.t=0;s.nx=rnd(4,9);s.p.set(C.position.x+rnd(-60,60),C.position.y+rnd(25,70),C.position.z-240);s.v.set(-rnd(90,150),-rnd(30,60),0)}}})}
 /* ---------- distant planets (Earth is the hero; the rest stay faint) ---------- */
 const crater=(x,px,py,r)=>{const g=x.createRadialGradient(px,py,r*.15,px,py,r);g.addColorStop(0,'rgba(0,0,0,.28)');g.addColorStop(.8,'rgba(0,0,0,.12)');g.addColorStop(.92,'rgba(255,255,255,.2)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill()};
@@ -549,11 +534,16 @@ function updateKbPos(){
   const TARGET_Z = -10.4;
   const b=bnd(TARGET_Z);
   if(wide){
-    kbGroup.position.set(-b.w*.32, b.h*.25, TARGET_Z);
-    kbGroup.scale.setScalar(.96);
+    kbGroup.position.set(b.w*.14, b.h*.18, TARGET_Z);
+    kbGroup.scale.setScalar(.82);
+  }else if(innerWidth>=601){
+    // On tablets, keep the compact pocket in a dedicated right-hand lane.
+    kbGroup.position.set(b.w*.54, b.h*.18, -8.2);
+    kbGroup.scale.setScalar(.74);
   }else{
-    kbGroup.position.set(0, b.h*.35, -8.2);
-    kbGroup.scale.setScalar(.98);
+    // Keep the mobile heading clear; let the pocket sit at the far right edge.
+    kbGroup.position.set(b.w*.82, b.h*.20, -8.2);
+    kbGroup.scale.setScalar(.62);
   }
 }
 /* ---------- papers ---------- */
@@ -576,11 +566,7 @@ x.fillStyle='#d9d4c4';x.beginPath();x.moveTo(W,0);x.lineTo(W-34,0);x.lineTo(W,34
 const vg=x.createLinearGradient(0,0,W,0);vg.addColorStop(0,'rgba(0,0,0,.07)');vg.addColorStop(.06,'rgba(0,0,0,0)');vg.addColorStop(.94,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.09)');x.fillStyle=vg;x.fillRect(0,0,W,H);return tex(c)}
 const paperGeo=()=>{const g=new T.PlaneGeometry(.57,.76,4,6),p=g.attributes.position;for(let k=0;k<p.count;k++)p.setZ(k,.035*Math.sin(p.getX(k)*5)*(p.getY(k)+.4)-.02*p.getY(k)*p.getY(k));g.computeVertexNormals();return g};
 const papers=[];for(let i=0;i<10;i++){const title=TITLES[i%TITLES.length],tx=paperTex(title),m=new T.Mesh(paperGeo(),new T.MeshStandardMaterial({map:tx,color:0xa8a8a8,envMapIntensity:.2,emissive:0xffffff,emissiveMap:tx,emissiveIntensity:.04,side:T.DoubleSide,roughness:.92,metalness:0,transparent:true,opacity:0}));
-const gl=spr(glowT,0x5fd8ff,1.3,0),rg=spr(ringT,0x9fe8ff,.3,0);
-const arcGeo=new T.BufferGeometry();arcGeo.setAttribute('position',new T.BufferAttribute(new Float32Array(41*3),3));arcGeo.setDrawRange(0,0);
-const arc=new T.Line(arcGeo,new T.LineBasicMaterial({color:0x8be8ff,transparent:true,opacity:0,blending:T.AdditiveBlending,depthWrite:false}));S.add(m,arc);
-const launchRing=spr(ringT,0x8be8ff,.42,0);
-papers.push({m,gl,rg,arc,arcGeo,launchRing,burstT:1,pos:V(0,0,0),home:V(0,0,0),slot:i,st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})}
+const gl=spr(glowT,0x5fd8ff,1.3,0),rg=spr(ringT,0x9fe8ff,.3,0);S.add(m);papers.push({m,gl,rg,pos:V(0,0,0),home:V(0,0,0),slot:i,st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})}
 const rz=front=>front?rnd(RG+1.2,RG+4.5):rnd(-RG-13,-RG-8);
 function paperHome(p){
   const fanX=(p.slot-1)*.34;
@@ -596,7 +582,7 @@ function paperHome(p){
   p.vis=0;
   p.st='free';
   p.sc=1;
-  p.sp=1;p.arc.geometry.setDrawRange(0,0);p.arc.material.opacity=0;p.launchRing.material.opacity=0;p.burstT=1;
+  p.sp=1;
   const s=SRCS[(Math.random()*SRCS.length)|0];
   p.src=s=='arXiv'?'arXiv:2611.'+(10000+((Math.random()*89999)|0)):s=='PubMed'?'PubMed · PMID '+(39000000+((Math.random()*999999)|0)):s+' · '+(Math.random().toString(16).slice(2,10));
 }
@@ -668,20 +654,20 @@ const beam=new T.Mesh(new T.CylinderGeometry(.05,.5,1,40,1,true),new T.ShaderMat
 vertexShader:'varying vec2 u;varying vec3 n,v;void main(){u=uv;n=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);v=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
 fragmentShader:'uniform float t,o;varying vec2 u;varying vec3 n,v;void main(){float e=pow(abs(dot(n,v)),1.4),b=.55+.45*sin(u.y*26.-t*7.),a=(.2+.8*u.y)*e*b*o;gl_FragColor=vec4(.45,.9,1.,a*.55);}'}));beam.visible=false;S.add(beam);
 const beamHit=spr(glowT,0x88eeff,1.4,0),flare=spr(glowT,0xbff4ff,3,0);flare.userData.l=0;
-const agentWake=Array.from({length:64},(_,i)=>({s:spr(glowT,i%2?0x8be8ff:0xa99bff,.14,0),life:0,size:.12}));
+const agentWake=Array.from({length:42},(_,i)=>({s:spr(glowT,i%2?0x8be8ff:0xa99bff,.12,0),life:0,size:.1}));
 let wakeIndex=0;
 function wakeAt(pos,col,size){
   const q=agentWake[wakeIndex++%agentWake.length];
-  q.s.position.copy(pos);q.s.material.color.setHex(col);q.life=.48;q.size=size;
+  q.s.position.copy(pos);q.s.material.color.setHex(col);q.life=.38;q.size=size;
   q.s.scale.setScalar(size);q.s.material.opacity=.5;
 }
 function wakeUpdate(dt){
   agentWake.forEach(q=>{
     if(q.life>0){
       q.life=Math.max(0,q.life-dt);
-      const k=q.life/.48;
-      q.s.material.opacity=k*.56;
-      q.s.scale.setScalar(q.size*(.72+(1-k)*2.0));
+      const k=q.life/.38;
+      q.s.material.opacity=k*.48;
+      q.s.scale.setScalar(q.size*(.65+(1-k)*1.8));
     }else q.s.material.opacity=0;
   });
 }
@@ -700,20 +686,15 @@ function delivery(){const x=rnd(-.65,.2),y=rnd(-.45,.45),z=Math.sqrt(Math.max(.0
 function throwPaper(p,from,to,col){
   p.st='fly';p.t=0;p.from.copy(from);p.to.copy(to);
   const dist=from.distanceTo(to);
-  // A cinematic transfer: a readable high arc, a brief launch pulse and a
-  // luminous guide that reveals the whole courier route as the page travels.
-  p.dur=cl(dist/7.8,1.35,2.55);
+  // A longer, arcing transfer makes the hand-off readable across the scene.
+  p.dur=cl(dist/8.2,1.25,2.35);
   p.ctrl.copy(from).add(to).multiplyScalar(.5);
   const lateral=V(-(to.y-from.y),to.x-from.x,0).normalize();
-  p.ctrl.addScaledVector(lateral,rnd(-1,1)*Math.min(1.55,dist*.085));
-  p.ctrl.y+=cl(dist*.25,.7,2.7);
-  p.ctrl.z+=rnd(.5,1.05);
-  p.flightWobble=rnd(.9,1.45);p.flightRoll=rnd(-.34,.34);p.flightSpin=rnd(3.2,5.2);
+  p.ctrl.addScaledVector(lateral,rnd(-1,1)*Math.min(1.35,dist*.075));
+  p.ctrl.y+=cl(dist*.23,.55,2.35);
+  p.ctrl.z+=rnd(.45,.95);
+  p.flightWobble=rnd(.85,1.3);p.flightRoll=rnd(-.28,.28);p.flightSpin=rnd(2.8,4.6);
   p.tc=0;p.col=col;p.beam=0;
-  const a=p.arc.geometry.attributes.position;
-  for(let i=0;i<=40;i++){const u=i/40,v=1-u;a.setXYZ(i,v*v*from.x+2*v*u*p.ctrl.x+u*u*to.x,v*v*from.y+2*v*u*p.ctrl.y+u*u*to.y,v*v*from.z+2*v*u*p.ctrl.z+u*u*to.z)}
-  a.needsUpdate=true;p.arc.geometry.setDrawRange(0,2);p.arc.material.color.setHex(col);p.arc.material.opacity=.62;
-  p.launchRing.position.copy(from);p.launchRing.scale.setScalar(.28);p.launchRing.material.color.setHex(col);p.launchRing.material.opacity=.82;p.burstT=0;
 }
 const TRN=64,trs=Array.from({length:TRN},()=>({s:spr(glowT,0x9fe8ff,.3,0),l:0}));let tri=0;
 function trailAt(p,col){const q=trs[tri++%TRN];q.s.position.copy(p);q.s.material.color.setHex(col);q.l=1}
@@ -726,15 +707,15 @@ if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if
 else if(a.st===2){if(!a.dl)a.dl=delivery();a.tg.copy(a.dl.tp)}
 const dx=a.tg.x-a.p.x,dy=a.tg.y-a.p.y,dz=a.tg.z-a.p.z,dist=Math.hypot(dx,dy,dz)||1;
 let ey=Math.atan2(dx,dz)+(dist>5?Math.sin(t*.9+a.wob)*.1:0)-a.yaw;ey=Math.atan2(Math.sin(ey),Math.cos(ey));
-const mw=dist<4?3.5:2.35;a.yr+=(cl(ey*2.95,-mw,mw)-a.yr)*Math.min(1,dt*5.2);a.yaw+=a.yr*dt;
-a.pitch+=cl((cl(Math.asin(cl(dy/dist,-.78,.78)),-.78,.78)-a.pitch)*2.35,-1.15,1.15)*dt;
-const ts=a.st===0&&a.pp&&dist<5?lerp(4.2,8.0,sm(.8,5,dist)):a.st===2?7.2:8.2;a.spd=cl(a.spd+((ts-a.spd)*1.85-a.pitch*2.35)*dt,3.2,10.2);
-a.bank+=(cl(-a.yr*.9,-1.18,1.18)-a.bank)*Math.min(1,dt*4.8);
+const mw=dist<4?3.15:2.05;a.yr+=(cl(ey*2.75,-mw,mw)-a.yr)*Math.min(1,dt*4.8);a.yaw+=a.yr*dt;
+a.pitch+=cl((cl(Math.asin(cl(dy/dist,-1,1)),-.72,.72)-a.pitch)*2.15,-1.05,1.05)*dt;
+const ts=a.st===0&&a.pp&&dist<5?lerp(3.8,7.2,sm(.8,5,dist)):a.st===2?6.6:7.4;a.spd=cl(a.spd+((ts-a.spd)*1.65-a.pitch*2.2)*dt,3.0,9.4);
+a.bank+=(cl(-a.yr*.82,-1.05,1.05)-a.bank)*Math.min(1,dt*4.5);
 const fw=V(Math.cos(a.pitch)*Math.sin(a.yaw),Math.sin(a.pitch),Math.cos(a.pitch)*Math.cos(a.yaw));a.p.addScaledVector(fw,a.spd*dt);keepOut(a.p,1.12);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
 a.mt-=dt;if(a.mt<=0){a.glide=a.glide?0:(dist>6&&Math.abs(ey)<.35&&a.spd>5.2&&a.pitch<.1?1:0);a.mt=a.glide?rnd(.9,1.8):rnd(1.2,2.4)}
 if(a.pitch>.2||Math.abs(a.yr)>1||dist<5)a.glide=0;a.gl+=((a.glide?1:0)-a.gl)*Math.min(1,dt*3);
-a.ph+=dt*(3.75+Math.max(0,.6-a.spd/10)*4.5+Math.max(0,a.pitch)*3.5)*6.283*(1-a.gl*.78);
-const ph=a.ph,g=a.gl,s1=Math.sin(ph),s2=Math.sin(ph-1.15),sh=lerp(.16+.96*s1,.2+.05*Math.sin(t*.7),g),wr=lerp(.62*s2-.1,-.42,g),swp=lerp(.2*(1-Math.cos(ph))/2,.08,g),spr_=lerp(.16+.12*Math.cos(ph),.1,g);
+a.ph+=dt*(3.25+Math.max(0,.6-a.spd/10)*4.2+Math.max(0,a.pitch)*3.2)*6.283*(1-a.gl*.82);
+const ph=a.ph,g=a.gl,s1=Math.sin(ph),s2=Math.sin(ph-1.15),sh=lerp(.14+.88*s1,.2+.05*Math.sin(t*.7),g),wr=lerp(.58*s2-.1,-.4,g),swp=lerp(.18*(1-Math.cos(ph))/2,.08,g),spr_=lerp(.15+.11*Math.cos(ph),.1,g);
 bird.wings.forEach(w=>{w.sh.rotation.z=w.s*sh;w.hand.rotation.set(0,swp,wr);w.fan.forEach(f=>{f.pv.rotation.y=f.psi-spr_*f.k;f.pv.rotation.z=-.18*f.k*Math.sin(ph-1.6)*(1-g)})});
 bird.bg.position.y=-.05*s1*(1-g);bird.g.position.copy(a.p);bird.g.rotation.set(-(a.pitch+.06*s1*(1-g)),a.yaw,a.bank);bird.g.updateMatrixWorld(true);
 a.wakeT-=dt;if(a.wakeT<=0){wakeAt(bird.g.localToWorld(V(0,0,-.62)),0x8be8ff,.105);a.wakeT=.055}
@@ -742,16 +723,16 @@ const bp=BEAK.clone().applyMatrix4(bird.g.matrixWorld);
 if(a.st===0&&a.pp&&a.pp.st==='taken'){const d=a.p.distanceTo(a.pp.pos);if(d<1.5){a.pp.st='held';a.st=1;a.tm=0}}
 else if(a.st===1){const p=a.pp;p.pos.lerp(bp,Math.min(1,dt*10));if(a.tm>.3){a.st=2;a.tm=0;a.dl=null}}
 else if(a.st===2){const p=a.pp;p.pos.copy(bp);p.m.quaternion.copy(bird.g.quaternion).multiply(qq.setFromEuler(ee.set(.2,Math.PI/2,.3*Math.sin(t*14))));
-if(a.dl&&(a.p.distanceTo(a.tg)<1.8||a.tm>12)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=1.35;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
+if(a.dl&&(a.p.distanceTo(a.tg)<1.8||a.tm>12)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
 }
 function ufoUpdate(dt,t){const a=U;a.tm+=dt;let hov=false;
 if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.1*(kbGroup.scale.y||1),a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>24&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
 else if(a.st===2&&!a.dl)a.dl=delivery();
 if(a.st===2)a.tg.copy(a.dl.tp);
-const swayX=Math.sin(t*1.05+a.wob)*.95+Math.sin(t*.38+a.wob*2)*.85,swayY=Math.cos(t*.82+a.wob)*.58+Math.sin(t*.55+a.wob)*.22;
-const ax=cl(((a.tg.x+swayX)-a.p.x)*6.45-a.v.x*2.85,-34,34),ay=cl(((a.tg.y+swayY)-a.p.y)*6.45-a.v.y*2.85,-34,34),az=cl((a.tg.z-a.p.z)*6.45-a.v.z*2.85,-34,34);
-a.v.x+=ax*dt;a.v.y+=ay*dt;a.v.z+=az*dt;if(a.v.length()>15.2)a.v.setLength(15.2);a.p.addScaledVector(a.v,dt);a.p.y+=Math.sin(t*1.7+a.wob)*.24*dt;keepOut(a.p,1.15);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
-a.rx+=((.25+cl(a.v.z*.048-ay*.006,-.48,.48))-a.rx)*Math.min(1,dt*5.8);a.rz+=(-cl(a.v.x*.055+ax*.006,-.62,.62)-a.rz)*Math.min(1,dt*5.8);
+const swayX=Math.sin(t*1.05+a.wob)*.65,swayY=Math.cos(t*.82+a.wob)*.42;
+const ax=cl(((a.tg.x+swayX)-a.p.x)*5.9-a.v.x*3.0,-30,30),ay=cl(((a.tg.y+swayY)-a.p.y)*5.9-a.v.y*3.0,-30,30),az=cl((a.tg.z-a.p.z)*5.9-a.v.z*3.0,-30,30);
+a.v.x+=ax*dt;a.v.y+=ay*dt;a.v.z+=az*dt;if(a.v.length()>13.2)a.v.setLength(13.2);a.p.addScaledVector(a.v,dt);a.p.y+=Math.sin(t*1.7+a.wob)*.18*dt;keepOut(a.p,1.15);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
+a.rx+=((.25+cl(a.v.z*.04-ay*.005,-.38,.38))-a.rx)*Math.min(1,dt*5.5);a.rz+=(-cl(a.v.x*.045+ax*.005,-.52,.52)-a.rz)*Math.min(1,dt*5.5);
 ufo.g.position.copy(a.p);ufo.g.rotation.set(a.rx+.035*Math.sin(t*2.1),Math.atan2(a.v.x,a.v.z),a.rz+.04*Math.sin(t*1.7+1));ufo.band.rotation.y=t*.95;ufo.lr.rotation.y=-t*1.9;ufo.lr2.rotation.y=t*1.35;ufo.tip.material.color.setHex(Math.sin(t*5)>0?0xff5a5a:0x501818);ufo.eg.scale.setScalar(2.6+.36*Math.sin(t*6));ufo.g.updateMatrixWorld(true);
 a.wakeT-=dt;if(a.wakeT<=0){wakeAt(ufo.g.localToWorld(V(0,-.04,-1.72)),0xa99bff,.12);a.wakeT=.07}
 const under=V(0,-.55,0).applyMatrix4(ufo.g.matrixWorld);beam.visible=false;beamHit.material.opacity=0;
@@ -765,13 +746,11 @@ if(p.st==='free'||p.st==='taken'){
 p.vis+=(1-p.vis)*Math.min(1,dt*2.5);if(p.sp===1&&p.vis<.05){p.sp=2;p.t=0}
 if(p.st==='free'){p.pos.set(p.home.x,p.home.y+Math.sin(t*1.4+p.ph)*.06,p.home.z);p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}else p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}
 else if(p.st==='fly'){p.t+=dt/p.dur;const k=Math.min(1,p.t),e=k*k*(3-2*k),u=1-e;p.pos.set(u*u*p.from.x+2*u*e*p.ctrl.x+e*e*p.to.x,u*u*p.from.y+2*u*e*p.ctrl.y+e*e*p.to.y,u*u*p.from.z+2*u*e*p.ctrl.z+e*e*p.to.z);const flutter=Math.sin(t*17*p.flightWobble+p.ph)*.13*Math.sin(Math.PI*k),drift=Math.cos(t*13*p.flightWobble+p.ph)*.07*Math.sin(Math.PI*k);p.pos.y+=flutter;p.pos.x+=drift;p.sc=1-.32*sm(.82,1,k);p.m.rotation.set(.35+flutter*.9,p.flightSpin*k,p.flightRoll+drift*2);p.tc-=dt;if(p.tc<=0){trailAt(p.pos,p.col);p.tc=.018}
-p.arc.geometry.setDrawRange(0,Math.max(2,Math.floor(k*41)));p.arc.material.opacity=.62*(1-.22*k);
-if(p.t>=1){merge(p.to.clone(),p);p.arc.geometry.setDrawRange(0,0);p.arc.material.opacity=0;p.st='gone';p.t=0;p.vis=0;p.m.material.opacity=0}}
-else if(p.st==='gone'){p.arc.geometry.setDrawRange(0,0);p.arc.material.opacity=0;p.t+=dt;const hasActive=papers.some(q=>q.st==='free'||(q.st==='taken'&&q.pos.distanceTo(kbGroup.position)<2.5*(kbGroup.scale.y||1)));if(!hasActive&&p.t>1.8){paperHome(p);p.sp=1}}
-if(p.burstT<1){p.burstT=Math.min(1,p.burstT+dt/.68);const f=p.burstT;p.launchRing.scale.setScalar(.28+f*1.55);p.launchRing.material.opacity=(1-f)*.72}else p.launchRing.material.opacity=0;
-if(p.st==='gone'){p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;p.arc.material.opacity=0;return}
+if(p.t>=1){merge(p.to.clone(),p);p.st='gone';p.t=0;p.vis=0;p.m.material.opacity=0}}
+else if(p.st==='gone'){p.t+=dt;const hasActive=papers.some(q=>q.st==='free'||(q.st==='taken'&&q.pos.distanceTo(kbGroup.position)<2.5*(kbGroup.scale.y||1)));if(!hasActive&&p.t>1.8){paperHome(p);p.sp=1}}
+if(p.st==='gone'){p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;return}
 p.m.visible=true;p.m.position.copy(p.pos);p.m.scale.setScalar(Math.max(.01,p.sc)*1.0);p.m.material.opacity=p.st==='fly'?1:p.vis;
-p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.48:p.vis*.22);p.gl.scale.setScalar(1.75*p.sc);
+p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.35:p.vis*.22);p.gl.scale.setScalar(1.5*p.sc);
 if(p.sp===2){p.t+=dt;const k=p.t/.9;p.rg.position.copy(p.pos);p.rg.scale.setScalar(.3+k*2.2);p.rg.material.opacity=Math.max(0,.8*(1-k));if(k>=1){p.sp=0;p.t=0}}else p.rg.material.opacity=0})}
 papers.forEach((p,i)=>{if(i<3){paperHome(p);p.sp=1;p.vis=1;p.st='free';}else{p.st='gone';p.vis=0;p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;}});
 /* ---------- interaction + loop ---------- */
@@ -937,7 +916,7 @@ function loop(){
     tagUpd(tgs[0],ufo.g.position,'UFO · '+LB.u[U.st],22);
     tagUpd(tgs[1],bird.g.position,'BIRD · '+LB.b[B.st],24);
     tagUpd(synTag,ufo.g.position.clone().add(V(0,1.35,0)),'SYNTHESIZER · MULTI-AGENT RAG',12);
-    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.48*(kbGroup.scale.y||1),0)),'PAPER POCKET · LIVE INGEST',14);
+    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.48*(kbGroup.scale.y||1),0)),'PAPER POCKET',14);
   }else{
     if(wide)tgs.forEach(el=>el.style.transform='translate3d(-9999px,-9999px,0)');
     synTag.style.transform='translate3d(-9999px,-9999px,0)';
