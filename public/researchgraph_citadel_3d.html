@@ -549,6 +549,7 @@ function updateKbPos(){
     const b=bnd(targetZ);
     kbGroup.position.set(wide?-b.w*.34:b.w*.54,wide?-b.h*.18:b.h*.18,targetZ);
   }
+  if(pocketStockReady)syncPocketInventory();
 }
 /* ---------- papers ---------- */
 const TITLES=['Attention Is All You Need','Deep Residual Learning for Image Recognition','BERT: Pre-training of Deep Bidirectional Transformers','Highly accurate protein structure prediction with AlphaFold','Semi-Supervised Classification with Graph Convolutional Networks','Language Models are Few-Shot Learners','Denoising Diffusion Probabilistic Models','A Programmable Dual-RNA-Guided DNA Endonuclease','Retrieval-Augmented Generation for Knowledge-Intensive NLP','An Image is Worth 16x16 Words','Graph Attention Networks','Mastering the Game of Go with Deep Neural Networks','Topological Codes for Fault-Tolerant Quantum Computation','Multimodal Learning for Oncology Biomarker Discovery','Chain-of-Thought Prompting Elicits Reasoning in LLMs','Constitutional AI: Harmlessness from AI Feedback'];
@@ -579,11 +580,18 @@ const papers=[];for(let i=0;i<10;i++){
   papers.push({m,gl,rg,arc,launch,burstT:1,pos:V(0,0,0),home:V(0,0,0),slot:i,st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})
 }
 const rz=front=>front?rnd(RG+1.2,RG+4.5):rnd(-RG-13,-RG-8);
-function paperHome(p){
+function positionPaperInPocket(p){
+  const scale=kbGroup.scale.y||1;
   const fanX=(p.slot-1)*.34;
-  const fanY=p.slot===1?.08:(p.slot===0?-.025:-.025);
-  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET.clone().multiplyScalar(kbGroup.scale.y||1)).add(V(fanX,fanY,Math.abs(p.slot-1)*.035));
-  p.pos.copy(p.home);
+  const fanY=p.slot===1?.08:-.025;
+  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET.clone().multiplyScalar(scale)).add(V(fanX,fanY,Math.abs(p.slot-1)*.035));
+  p.pos.copy(p.home);p.m.position.copy(p.pos);
+}
+function syncPocketInventory(){
+  papers.forEach(p=>{if(p.st==='free')positionPaperInPocket(p);});
+}
+function paperHome(p){
+  positionPaperInPocket(p);
   p.title=TITLES[(Math.random()*TITLES.length)|0];
   if(p.m.material.map)p.m.material.map.dispose();
   const tx=paperTex(p.title);
@@ -692,22 +700,24 @@ function wakeUpdate(dt){
 function setBeam(top,bot,r){const d=top.clone().sub(bot),L=d.length();beam.position.copy(top).add(bot).multiplyScalar(.5);beam.scale.set(r/.5,L,r/.5);beam.quaternion.setFromUnitVectors(V(0,1,0),d.divideScalar(L||1));beamHit.position.copy(bot)}
 /* ---------- agents ---------- */
 const tmp=V(0,0,0),qq=new T.Quaternion(),ee=new T.Euler();
-const free=()=>papers.filter(p=>p.st==='free'&&p.vis>.7);
-function wander(a){a.tg.copy(wpt());a.wt=rnd(2.5,4.5)}
-function wpt(){
-  // Agents patrol deep-space lanes between the far side of Earth and the
-  // paper station, instead of staying close to the camera.
-  const z=rz(Math.random()<.26),b=bnd(z);
-  return V(rnd(-.78,.78)*b.w,rnd(-.70,.74)*b.h,z);
+const free=()=>papers.filter(p=>
+  p.st==='free'&&p.vis>.7&&p.home.distanceTo(kbGroup.position)<2.25*(kbGroup.scale.y||1)
+);
+function pocketWaitPoint(side){
+  const scale=kbGroup.scale.y||1;
+  return kbGroup.position.clone().add(V(side*2.25*scale,1.65*scale,0));
 }
-function delivery(){
-  const x=rnd(-.65,.2),y=rnd(-.45,.45),z=Math.sqrt(Math.max(.08,1-x*x-y*y)),d=V(x,y,z+.2).normalize();
+function delivery(side){
+  // Bird and UFO use opposite visible shoulders of Earth. The couriers
+  // stop outside the atmosphere; only the page continues inward.
+  const x=(side<0?-1:1)*rnd(.48,.62),y=rnd(-.20,.20);
+  const z=Math.sqrt(Math.max(.08,1-x*x-y*y));
+  const d=V(x,y,z).normalize();
   const pW=Gp.clone().addScaledVector(d,RG);
-  // Couriers release papers from a distant relay point, giving the page a
-  // visibly long approach before it merges into the globe.
-  const tp=pW.clone().add(d.clone().multiplyScalar(rnd(6.5,9.0))).add(V(rnd(-1.0,-.25),rnd(-.5,.5),rnd(.35,.9)));
-  const b=bnd(tp.z);tp.x=cl(tp.x,-b.w*.9,b.w*.9);tp.y=cl(tp.y,-b.h*.86,b.h*.82);
-  return{d,pW,tp}
+  const tp=pW.clone().addScaledVector(d,rnd(3.8,4.8));
+  const b=bnd(tp.z);
+  tp.x=cl(tp.x,-b.w*.9,b.w*.9);tp.y=cl(tp.y,-b.h*.86,b.h*.82);
+  return{d,pW,tp};
 }
 function throwPaper(p,from,to,col){
   p.st='fly';p.t=0;p.from.copy(from);p.to.copy(to);
@@ -734,21 +744,33 @@ function throwPaper(p,from,to,col){
   p.launch.material.color.setHex(col);p.launch.material.opacity=.82;p.burstT=0;
 }
 const TRN=64,trs=Array.from({length:TRN},()=>({s:spr(glowT,0x9fe8ff,.3,0),l:0}));let tri=0;
+let pocketStockReady=false;
 function trailAt(p,col){const q=trs[tri++%TRN];q.s.position.copy(p);q.s.material.color.setHex(col);q.l=1}
 function keepOut(p,pad){const d=p.clone().sub(Gp),l=d.length();if(l<RG*pad)p.copy(Gp).addScaledVector(d.divideScalar(l||1),RG*pad)}
 const B={p:V(1,1,RG+3),yaw:0,pitch:0,bank:0,spd:5,tg:V(0,0,0),st:0,tm:0,pp:null,ph:0,glide:0,gl:0,mt:1,wob:rnd(0,9),yr:0,wt:0,dl:null,wakeT:0};
 const U={p:V(-6,3,RG+3),v:V(0,0,0),tg:V(0,0,0),st:0,tm:0,pp:null,wt:0,dl:null,wob:rnd(0,9),rx:.25,rz:0,wakeT:0};
 const BEAK=V(0,-.04,.74);
 function birdUpdate(dt,t){const a=B;a.tm+=dt;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.copy(a.pp.pos);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1.5)wander(a)}if(a.tm>24&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
-else if(a.st===2){if(!a.dl)a.dl=delivery();a.tg.copy(a.dl.tp)}
+if(a.st===0){
+  if(!a.pp){
+    const f=free();
+    if(f.length){a.pp=f[0];a.pp.st='taken';a.tm=0;}
+    else{a.tg.copy(pocketWaitPoint(-1));a.tm=0;}
+  }
+  if(a.pp)a.tg.copy(a.pp.pos);
+  if(a.pp&&a.tm>24){a.pp.st='free';a.pp.pos.copy(a.pp.home);a.pp=null;a.tm=0;}
+}
+else if(a.st===2){
+  if(!a.dl)a.dl=delivery(-1);
+  a.tg.copy(a.dl.tp);
+}
 const dx=a.tg.x-a.p.x,dy=a.tg.y-a.p.y,dz=a.tg.z-a.p.z,dist=Math.hypot(dx,dy,dz)||1;
 let ey=Math.atan2(dx,dz)+(dist>5?Math.sin(t*.9+a.wob)*.1:0)-a.yaw;ey=Math.atan2(Math.sin(ey),Math.cos(ey));
 const mw=dist<4?3.15:2.05;a.yr+=(cl(ey*2.75,-mw,mw)-a.yr)*Math.min(1,dt*4.8);a.yaw+=a.yr*dt;
 a.pitch+=cl((cl(Math.asin(cl(dy/dist,-1,1)),-.72,.72)-a.pitch)*2.15,-1.05,1.05)*dt;
 const ts=a.st===0&&a.pp&&dist<5?lerp(3.8,7.2,sm(.8,5,dist)):a.st===2?6.6:7.4;a.spd=cl(a.spd+((ts-a.spd)*1.65-a.pitch*2.2)*dt,3.0,9.4);
 a.bank+=(cl(-a.yr*.82,-1.05,1.05)-a.bank)*Math.min(1,dt*4.5);
-const fw=V(Math.cos(a.pitch)*Math.sin(a.yaw),Math.sin(a.pitch),Math.cos(a.pitch)*Math.cos(a.yaw));a.p.addScaledVector(fw,a.spd*dt);keepOut(a.p,1.12);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
+const fw=V(Math.cos(a.pitch)*Math.sin(a.yaw),Math.sin(a.pitch),Math.cos(a.pitch)*Math.cos(a.yaw));a.p.addScaledVector(fw,a.spd*dt);keepOut(a.p,1.18);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
 a.mt-=dt;if(a.mt<=0){a.glide=a.glide?0:(dist>6&&Math.abs(ey)<.35&&a.spd>5.2&&a.pitch<.1?1:0);a.mt=a.glide?rnd(.9,1.8):rnd(1.2,2.4)}
 if(a.pitch>.2||Math.abs(a.yr)>1||dist<5)a.glide=0;a.gl+=((a.glide?1:0)-a.gl)*Math.min(1,dt*3);
 a.ph+=dt*(3.25+Math.max(0,.6-a.spd/10)*4.2+Math.max(0,a.pitch)*3.2)*6.283*(1-a.gl*.82);
@@ -762,22 +784,30 @@ const bp=BEAK.clone().applyMatrix4(bird.g.matrixWorld);
 if(a.st===0&&a.pp&&a.pp.st==='taken'){const d=a.p.distanceTo(a.pp.pos);if(d<1.5){a.pp.st='held';a.st=1;a.tm=0}}
 else if(a.st===1){const p=a.pp;p.pos.lerp(bp,Math.min(1,dt*10));if(a.tm>.3){a.st=2;a.tm=0;a.dl=null}}
 else if(a.st===2){const p=a.pp;p.pos.copy(bp);p.m.quaternion.copy(bird.g.quaternion).multiply(qq.setFromEuler(ee.set(.2,Math.PI/2,.3*Math.sin(t*14))));
-if(a.dl&&(a.p.distanceTo(a.tg)<1.8||a.tm>12)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
+if(a.dl&&a.p.distanceTo(a.tg)<.85){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
 }
 function ufoUpdate(dt,t){const a=U;a.tm+=dt;let hov=false;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.1*(kbGroup.scale.y||1),a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>24&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
-else if(a.st===2&&!a.dl)a.dl=delivery();
+if(a.st===0){
+  if(!a.pp){
+    const f=free();
+    if(f.length){a.pp=f[0];a.pp.st='taken';a.tm=0;}
+    else{a.tg.copy(pocketWaitPoint(1));a.tm=0;}
+  }
+  if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.1*(kbGroup.scale.y||1),a.pp.pos.z);
+  if(a.pp&&a.tm>24){a.pp.st='free';a.pp.pos.copy(a.pp.home);a.pp=null;a.tm=0;}
+}
+else if(a.st===2&&!a.dl)a.dl=delivery(1);
 if(a.st===2)a.tg.copy(a.dl.tp);
 const swayX=Math.sin(t*1.05+a.wob)*.65,swayY=Math.cos(t*.82+a.wob)*.42;
 const ax=cl(((a.tg.x+swayX)-a.p.x)*5.9-a.v.x*3.0,-30,30),ay=cl(((a.tg.y+swayY)-a.p.y)*5.9-a.v.y*3.0,-30,30),az=cl((a.tg.z-a.p.z)*5.9-a.v.z*3.0,-30,30);
-a.v.x+=ax*dt;a.v.y+=ay*dt;a.v.z+=az*dt;if(a.v.length()>13.2)a.v.setLength(13.2);a.p.addScaledVector(a.v,dt);a.p.y+=Math.sin(t*1.7+a.wob)*.18*dt;keepOut(a.p,1.15);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
+a.v.x+=ax*dt;a.v.y+=ay*dt;a.v.z+=az*dt;if(a.v.length()>13.2)a.v.setLength(13.2);a.p.addScaledVector(a.v,dt);a.p.y+=Math.sin(t*1.7+a.wob)*.18*dt;keepOut(a.p,1.18);{a.p.z=cl(a.p.z,-RG-15,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
 a.rx+=((.25+cl(a.v.z*.04-ay*.005,-.38,.38))-a.rx)*Math.min(1,dt*5.5);a.rz+=(-cl(a.v.x*.045+ax*.005,-.52,.52)-a.rz)*Math.min(1,dt*5.5);
 ufo.g.position.copy(a.p);ufo.g.rotation.set(a.rx+.035*Math.sin(t*2.1),Math.atan2(a.v.x,a.v.z),a.rz+.04*Math.sin(t*1.7+1));ufo.band.rotation.y=t*.95;ufo.lr.rotation.y=-t*1.9;ufo.lr2.rotation.y=t*1.35;ufo.track.rotation.z=t*.42;ufo.aura.material.opacity=.12+.07*(.5+.5*Math.sin(t*4.2));ufo.pl.intensity=1.2+.55*(.5+.5*Math.sin(t*5.1));ufo.tip.material.color.setHex(Math.sin(t*5)>0?0xff5a5a:0x501818);ufo.eg.scale.setScalar(2.6+.4*Math.sin(t*6));ufo.g.updateMatrixWorld(true);
 a.wakeT-=dt;if(a.wakeT<=0){wakeAt(ufo.g.localToWorld(V(0,-.04,-1.72)),0xa99bff,.12);a.wakeT=.07}
 const under=V(0,-.55,0).applyMatrix4(ufo.g.matrixWorld);beam.visible=false;beamHit.material.opacity=0;
 if(a.st===0&&a.pp&&a.pp.st==='taken'&&a.p.distanceTo(a.tg)<.8*(kbGroup.scale.y||1)&&a.v.length()<4){a.pp.st='held';a.st=1;a.tm=0}
 else if(a.st===1){const p=a.pp;beam.visible=true;beam.material.uniforms.o.value=sm(0,.3,a.tm)*(.88+.12*Math.sin(t*18));setBeam(under,p.pos,.56);beamHit.material.opacity=.62+.2*Math.sin(t*16);p.pos.lerp(under.clone().add(V(0,-.25,0)),Math.min(1,dt*(1+a.tm*2.8)));p.m.rotation.y+=dt*3.6;if(a.tm>1.55){a.st=2;a.tm=0;a.dl=null}}
-else if(a.st===2){const p=a.pp;p.pos.copy(under).add(V(0,-.3,0));if(a.dl&&(a.p.distanceTo(a.tg)<1.2||a.tm>12)){a.st=3;a.tm=0;throwPaper(p,p.pos,a.dl.pW,0x9fe8ff);a.v.addScaledVector(a.dl.d,-3.8);flare.position.copy(under);flare.userData.l=1}}
+else if(a.st===2){const p=a.pp;p.pos.copy(under).add(V(0,-.3,0));if(a.dl&&a.p.distanceTo(a.tg)<.85){a.st=3;a.tm=0;throwPaper(p,p.pos,a.dl.pW,0x9fe8ff);a.v.addScaledVector(a.dl.d,3.8);flare.position.copy(under);flare.userData.l=1}}
 else if(a.st===3){if(a.tm>.7){a.st=0;a.tm=0;a.pp=null;a.dl=null}}
 beam.material.uniforms.t.value=t;if(flare.userData.l>0){flare.userData.l-=dt*2.5;flare.material.opacity=Math.max(0,flare.userData.l)*.9;flare.scale.setScalar(2+(1-flare.userData.l)*3)}else flare.material.opacity=0}
 function paperUpdate(dt,t){papers.forEach((p,i)=>{
@@ -806,6 +836,7 @@ p.m.visible=true;p.m.position.copy(p.pos);p.m.scale.setScalar(Math.max(.01,p.sc)
 p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.5:p.vis*.22);p.gl.scale.setScalar(1.8*p.sc);
 if(p.sp===2){p.t+=dt;const k=p.t/.9;p.rg.position.copy(p.pos);p.rg.scale.setScalar(.3+k*2.2);p.rg.material.opacity=Math.max(0,.8*(1-k));if(k>=1){p.sp=0;p.t=0}}else p.rg.material.opacity=0})}
 papers.forEach((p,i)=>{if(i<3){paperHome(p);p.sp=1;p.vis=1;p.st='free';}else{p.st='gone';p.vis=0;p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;}});
+pocketStockReady=true;
 /* ---------- interaction + loop ---------- */
 let mx=0,my=0,drag=false,lx=0,sv=0;const cv_=$('c');
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;if(drag){const d=(e.clientX-lx)*.006;spin.rotation.y+=d;sv=d*60;lx=e.clientX}});
