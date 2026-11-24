@@ -91,12 +91,12 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
   header{padding-inline:clamp(20px,3vw,42px);background:linear-gradient(180deg,rgba(2,7,20,.76),rgba(2,7,20,.24))}
   header.sc{background:rgba(3,7,20,.9);backdrop-filter:blur(14px)}
   nav a{padding:8px 14px;font-size:13px}
-  .L{width:min(520px,41vw);margin-left:clamp(30px,4.6vw,78px)}
-  .hero{padding:112px 0 60px;min-height:100svh}
-  .tag{font-size:10.5px;padding:7px 12px;margin-bottom:17px;letter-spacing:.105em}
-  h1{font-size:clamp(42px,4.1vw,64px);line-height:.97;letter-spacing:-.05em}
+  .L{width:min(460px,38vw);margin-left:clamp(24px,4.5vw,72px)}
+  .hero{padding:120px 0 60px;min-height:100svh}
+  .tag{font-size:10px;padding:4px 12px;margin-bottom:14px;letter-spacing:.09em}
+  h1{font-size:clamp(28px,3.2vw,44px);line-height:1.14;letter-spacing:-.03em;font-weight:700}
   h1 span{background:linear-gradient(110deg,#22c9ef 5%,#4e8cff 52%,#a65bf2 100%);-webkit-background-clip:text;background-clip:text}
-  .lead{max-width:475px;margin:16px 0 20px;font-size:clamp(15px,1.06vw,17px);line-height:1.48;color:#c5d2e8}
+  .lead{max-width:440px;margin:12px 0 18px;font-size:14.5px;line-height:1.6;color:#a9b8d1}
   .cta{gap:10px;margin-bottom:18px}
   .btn{padding:11px 18px;font-size:14px}
   .btn.p{background:linear-gradient(105deg,#924eff,#3f6cff);border-color:rgba(173,139,255,.8);box-shadow:0 7px 24px rgba(99,75,255,.2)}
@@ -116,8 +116,8 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
   .synthesizer-tag{padding:5px 10px;border-radius:8px;font-size:9px;letter-spacing:.055em;background:rgba(5,18,39,.92);backdrop-filter:blur(8px)}
   .paper-station-tag{color:#c4b5fd;border-color:rgba(167,139,250,.48);box-shadow:0 0 14px rgba(139,92,246,.14)}
   @media(max-width:1100px){
-    .L{width:min(500px,44vw);margin-left:28px}
-    h1{font-size:clamp(38px,4.3vw,52px)}
+    .L{width:min(440px,42vw);margin-left:24px}
+    h1{font-size:clamp(26px,3.2vw,38px)}
     #feed{width:270px}
   }
   @media(max-width:900px){
@@ -125,7 +125,7 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
     nav{display:none}
     .hero{align-items:flex-start;padding-top:118px;padding-bottom:250px}
     .L{width:min(620px,calc(100% - 40px));margin-left:20px}
-    h1{font-size:clamp(40px,8vw,58px)}
+    h1{font-size:clamp(28px,6vw,40px)}
     .lead{max-width:520px}
     .feat{grid-template-columns:repeat(3,minmax(0,1fr))}
     #feed{left:12px;right:12px;bottom:12px;width:auto;max-width:320px}
@@ -135,9 +135,9 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
   @media(max-width:560px){
     .hero{padding-top:104px;padding-bottom:230px}
     .L{width:calc(100% - 32px);margin-left:16px}
-    h1{font-size:clamp(38px,10.4vw,50px)}
+    h1{font-size:clamp(24px,7.5vw,34px)}
     .tag{font-size:9px;letter-spacing:.07em}
-    .lead{font-size:14px}
+    .lead{font-size:13.5px}
     .feat div{padding:9px 8px}
     .feat b{font-size:13px}
     .feat span{font-size:9px}
@@ -156,7 +156,7 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
 <div class="hr"><a class="btn" href="#">Log in</a><a class="btn c" href="#">Launch Cockpit →</a></div></header>
 <section class="hero" id="top"><div class="L">
 <span class="tag"><span>⬡</span> HYPER-DIMENSIONAL GRAPH RAG · REAL-TIME ARXIV</span>
-<h1>The Quantum<br>Graph for<br><span>Autonomous</span><br><span>Research.</span></h1>
+<h1>The Quantum Graph for<br><span>Autonomous Research.</span></h1>
 <p class="lead">Connect research papers, build knowledge graphs, and get reliable AI insights.</p>
 <div class="cta"><a class="btn p" href="#"><span>⌬</span> Launch Neural Graph →</a><a class="btn" href="#features">System Telemetry</a></div>
 <div class="feat">
@@ -438,15 +438,16 @@ const kbLaserBeam=new T.Mesh(new T.CylinderGeometry(.015,.06,1.8,16,1,true),new 
 kbLaserBeam.position.y=1.1;kbGroup.add(kbLaserBeam);
 const kbGlow=spr(glowT,0x38bdf8,2.8,.65,kbGroup);kbGlow.position.y=.45;
 const kbBeaconSprite=spr(ringT,0x67e8f9,1.1,.75,kbGroup);kbBeaconSprite.position.y=1.15;
-const KB_SPAWN_OFFSET=V(0,.95,0);
+const KB_SPAWN_OFFSET=V(0,1.0,0);
 function updateKbPos(){
-  const b=bnd(3.2);
+  const TARGET_Z = -7.0;
+  const b=bnd(TARGET_Z);
   if(wide){
-    kbGroup.position.set(-b.w*.04,-b.h*.08,3.2);
-    kbGroup.scale.setScalar(1.25);
+    kbGroup.position.set(-b.w*.38, b.h*.38, TARGET_Z);
+    kbGroup.scale.setScalar(1.5);
   }else{
-    kbGroup.position.set(0,-b.h*.22,3.2);
-    kbGroup.scale.setScalar(1.0);
+    kbGroup.position.set(0, b.h*.36, -5.0);
+    kbGroup.scale.setScalar(1.1);
   }
 }
 /* ---------- papers ---------- */
@@ -474,7 +475,7 @@ const rz=front=>front?rnd(RG+.8,RG+4):rnd(-RG-6,-RG-2);
 function paperHome(p){
   const fanX=(p.slot-1)*.34;
   const fanY=p.slot===1?.08:(p.slot===0?-.025:-.025);
-  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET).add(V(fanX,fanY,Math.abs(p.slot-1)*.035));
+  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET.clone().multiplyScalar(kbGroup.scale.y||1)).add(V(fanX,fanY,Math.abs(p.slot-1)*.035));
   p.pos.copy(p.home);
   p.title=TITLES[(Math.random()*TITLES.length)|0];
   if(p.m.material.map)p.m.material.map.dispose();
@@ -594,7 +595,7 @@ else if(a.st===2){const p=a.pp;p.pos.copy(bp);p.m.quaternion.copy(bird.g.quatern
 if(a.dl&&(a.p.distanceTo(a.tg)<1.8||a.tm>6)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
 }
 function ufoUpdate(dt,t){const a=U;a.tm+=dt;let hov=false;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.2,a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
+if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.1*(kbGroup.scale.y||1),a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
 else if(a.st===2&&!a.dl)a.dl=delivery();
 if(a.st===2)a.tg.copy(a.dl.tp);
 const ax=cl((a.tg.x-a.p.x)*5.5-a.v.x*3.2,-26,26),ay=cl((a.tg.y-a.p.y)*5.5-a.v.y*3.2,-26,26),az=cl((a.tg.z-a.p.z)*5.5-a.v.z*3.2,-26,26);
@@ -602,7 +603,7 @@ a.v.x+=ax*dt;a.v.y+=ay*dt;a.v.z+=az*dt;if(a.v.length()>11)a.v.setLength(11);a.p.
 a.rx+=((.25+cl(a.v.z*.03-ay*.004,-.3,.3))-a.rx)*Math.min(1,dt*5);a.rz+=(-cl(a.v.x*.035+ax*.004,-.4,.4)-a.rz)*Math.min(1,dt*5);
 ufo.g.position.copy(a.p);ufo.g.rotation.set(a.rx+.03*Math.sin(t*2.1),0,a.rz+.03*Math.sin(t*1.7+1));ufo.band.rotation.y=t*.8;ufo.lr.rotation.y=-t*1.6;ufo.lr2.rotation.y=t*1.1;ufo.tip.material.color.setHex(Math.sin(t*5)>0?0xff5a5a:0x501818);ufo.eg.scale.setScalar(2.6+.3*Math.sin(t*6));ufo.g.updateMatrixWorld(true);
 const under=V(0,-.55,0).applyMatrix4(ufo.g.matrixWorld);beam.visible=false;beamHit.material.opacity=0;
-if(a.st===0&&a.pp&&a.pp.st==='taken'&&a.p.distanceTo(a.tg)<.6&&a.v.length()<3){a.pp.st='held';a.st=1;a.tm=0}
+if(a.st===0&&a.pp&&a.pp.st==='taken'&&a.p.distanceTo(a.tg)<.8*(kbGroup.scale.y||1)&&a.v.length()<4){a.pp.st='held';a.st=1;a.tm=0}
 else if(a.st===1){const p=a.pp;beam.visible=true;beam.material.uniforms.o.value=sm(0,.3,a.tm);setBeam(under,p.pos,.5);beamHit.material.opacity=.7;p.pos.lerp(under.clone().add(V(0,-.25,0)),Math.min(1,dt*(1+a.tm*2.5)));p.m.rotation.y+=dt*3;if(a.tm>1.7){a.st=2;a.tm=0;a.dl=null}}
 else if(a.st===2){const p=a.pp;p.pos.copy(under).add(V(0,-.3,0));if(a.dl&&(a.p.distanceTo(a.tg)<1.2||a.tm>6)){a.st=3;a.tm=0;throwPaper(p,p.pos,a.dl.pW,0x9fe8ff);a.v.addScaledVector(a.dl.d,-3);flare.position.copy(under);flare.userData.l=1}}
 else if(a.st===3){if(a.tm>.7){a.st=0;a.tm=0;a.pp=null;a.dl=null}}
@@ -613,7 +614,7 @@ p.vis+=(1-p.vis)*Math.min(1,dt*2.5);if(p.sp===1&&p.vis<.05){p.sp=2;p.t=0}
 if(p.st==='free'){p.pos.set(p.home.x,p.home.y+Math.sin(t*1.4+p.ph)*.06,p.home.z);p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}else p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}
 else if(p.st==='fly'){p.t+=dt/p.dur;const k=Math.min(1,p.t),e=1-Math.pow(1-k,1.5),u=1-e;p.pos.set(u*u*p.from.x+2*u*e*p.ctrl.x+e*e*p.to.x,u*u*p.from.y+2*u*e*p.ctrl.y+e*e*p.to.y,u*u*p.from.z+2*u*e*p.ctrl.z+e*e*p.to.z);p.sc=1-.7*sm(.8,1,k);p.m.rotation.x+=dt*7;p.m.rotation.y+=dt*5;p.m.rotation.z+=dt*9;p.tc-=dt;if(p.tc<=0){trailAt(p.pos,p.col);p.tc=.025}
 if(p.t>=1){merge(p.to.clone(),p);p.st='gone';p.t=0;p.vis=0;p.m.material.opacity=0}}
-else if(p.st==='gone'){p.t+=dt;const hasActive=papers.some(q=>q.st==='free'||(q.st==='taken'&&q.pos.distanceTo(kbGroup.position)<2.0));if(!hasActive&&p.t>1.8){paperHome(p);p.sp=1}}
+else if(p.st==='gone'){p.t+=dt;const hasActive=papers.some(q=>q.st==='free'||(q.st==='taken'&&q.pos.distanceTo(kbGroup.position)<2.5*(kbGroup.scale.y||1)));if(!hasActive&&p.t>1.8){paperHome(p);p.sp=1}}
 if(p.st==='gone'){p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;return}
 p.m.visible=true;p.m.position.copy(p.pos);p.m.scale.setScalar(Math.max(.01,p.sc)*1.0);p.m.material.opacity=p.st==='fly'?1:p.vis;
 p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.35:p.vis*.22);p.gl.scale.setScalar(1.5*p.sc);
@@ -776,7 +777,7 @@ function loop(){
     tagUpd(tgs[0],ufo.g.position,'UFO · '+LB.u[U.st],22);
     tagUpd(tgs[1],bird.g.position,'BIRD · '+LB.b[B.st],24);
     tagUpd(synTag,ufo.g.position.clone().add(V(0,1.35,0)),'SYNTHESIZER · MULTI-AGENT RAG',12);
-    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.42,0)),'PAPER COLLECTION',14);
+    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.45*(kbGroup.scale.y||1),0)),'SYNTHESIZER · ACTIVE',14);
   }else{
     if(wide)tgs.forEach(el=>el.style.transform='translate3d(-9999px,-9999px,0)');
     synTag.style.transform='translate3d(-9999px,-9999px,0)';
