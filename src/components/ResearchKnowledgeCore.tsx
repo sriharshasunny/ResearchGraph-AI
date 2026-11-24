@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import * as THREE from 'three';
 import { useApp } from '../context/AppContext';
+import { GLOBE_RAW_BASE64 } from './researchGraphGlobeRaw';
 import type { PageType } from '../types';
 import {
   Network,
@@ -135,7 +136,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     let W = container.clientWidth || 640;
     let H = container.clientHeight || 450;
 
-    // ── WebGL Renderer: Full Alpha Transparency (zero black box or dark halos) ──
+    // ── WebGL Renderer: Full Alpha Transparency ──
     let renderer: THREE.WebGLRenderer;
     try {
       renderer = new THREE.WebGLRenderer({
@@ -161,16 +162,16 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     camera.position.set(0, 0.08, 5.2);
     camera.lookAt(0, 0, 0);
 
-    // ── Lighting ──
-    const sunDir = new THREE.Vector3(-0.65, 0.48, 0.60).normalize();
-    const sunLight = new THREE.DirectionalLight(0xfff8ee, 1.6);
+    // ── Lighting (Natural Sun & Soft Sky Fill) ──
+    const sunDir = new THREE.Vector3(-0.62, 0.38, 0.69).normalize();
+    const sunLight = new THREE.DirectionalLight(0xfff5e6, 1.6);
     sunLight.position.copy(sunDir).multiplyScalar(20);
     scene.add(sunLight);
 
-    const ambientLight = new THREE.AmbientLight(0xd4e4ff, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xdde8ff, 0.65);
     scene.add(ambientLight);
 
-    const spaceBackLight = new THREE.DirectionalLight(0x38bdf8, 0.4);
+    const spaceBackLight = new THREE.DirectionalLight(0x38bdf8, 0.45);
     spaceBackLight.position.set(4, -2, -6);
     scene.add(spaceBackLight);
 
@@ -214,86 +215,347 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     };
 
     // ─────────────────────────────────────────────────────────────
-    // 1. RESTORED PREVIOUS GLOBE MODEL (globe.webp + Atmospheric Shells)
+    // 1. NATURAL, PHOTOREALISTIC EARTH GLOBE FROM LANDING PAGE
     // ─────────────────────────────────────────────────────────────
+    const D2R = Math.PI / 180;
+    const rnd = (a: number, b: number) => a + Math.random() * (b - a);
+    const cl = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const sm = (a: number, b: number, x: number) => {
+      x = cl((x - a) / (b - a), 0, 1);
+      return x * x * (3 - 2 * x);
+    };
+
+    // 3D Noise helpers for natural continental biomes and clouds
+    const hs = (x: number, y: number, z: number) => {
+      let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(z, 1274126177);
+      h = Math.imul(h ^ (h >>> 13), 1274126177);
+      return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+    };
+
+    const vn = (x: number, y: number, z: number) => {
+      const ix = Math.floor(x), iy = Math.floor(y), iz = Math.floor(z);
+      const fx = x - ix, fy = y - iy, fz = z - iz;
+      const ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy), uz = fz * fz * (3 - 2 * fz);
+      const a = lerp(lerp(hs(ix, iy, iz), hs(ix + 1, iy, iz), ux), lerp(hs(ix, iy + 1, iz), hs(ix + 1, iy + 1, iz), ux), uy);
+      const b = lerp(lerp(hs(ix, iy, iz + 1), hs(ix + 1, iy, iz + 1), ux), lerp(hs(ix, iy + 1, iz + 1), hs(ix + 1, iy + 1, iz + 1), ux), uy);
+      return lerp(a, b, uz);
+    };
+
+    const fbm = (x: number, y: number, z: number, oct: number) => {
+      let s = 0, a = 0.5;
+      for (let i = 0; i < oct; i++) {
+        s += a * vn(x, y, z);
+        x *= 2.02; y *= 2.02; z *= 2.02;
+        a *= 0.5;
+      }
+      return s;
+    };
+
+    // Decode raster landmask from the high-resolution dataset
+    const MW = 1440, MH = 720;
+    const raw = atob(GLOBE_RAW_BASE64);
+    const land = new Uint8Array(MW * MH);
+    for (let i = 0; i < MW * MH; i++) {
+      land[i] = (raw.charCodeAt(i >> 3) >> (7 - (i & 7))) & 1;
+    }
+
+    const landAt = (u: number, v: number) => {
+      const x = u * MW - 0.5, y = cl(v * MH - 0.5, 0, MH - 1);
+      const x0 = Math.floor(x), y0 = Math.floor(y);
+      const fx = x - x0, fy = y - y0;
+      const X0 = ((x0 % MW) + MW) % MW, X1 = (X0 + 1) % MW, Y1 = Math.min(MH - 1, y0 + 1);
+      return lerp(lerp(land[y0 * MW + X0], land[y0 * MW + X1], fx), lerp(land[Y1 * MW + X0], land[Y1 * MW + X1], fx), fy);
+    };
+
+    // Coastal bathymetry blur
+    const blur = (a: Float32Array, w: number, h: number, r: number) => {
+      const t = new Float32Array(a.length);
+      for (let y = 0; y < h; y++) {
+        let s = 0;
+        for (let k = -r; k <= r; k++) s += a[y * w + ((k + w) % w)];
+        for (let x = 0; x < w; x++) {
+          t[y * w + x] = s / (2 * r + 1);
+          s += a[y * w + ((x + r + 1) % w)] - a[y * w + ((x - r + w) % w)];
+        }
+      }
+      const o = new Float32Array(a.length);
+      for (let x = 0; x < w; x++) {
+        let s = 0;
+        for (let k = -r; k <= r; k++) s += t[Math.min(h - 1, Math.max(0, k)) * w + x];
+        for (let y = 0; y < h; y++) {
+          o[y * w + x] = s / (2 * r + 1);
+          s += t[Math.min(h - 1, y + r + 1) * w + x] - t[Math.max(0, y - r) * w + x];
+        }
+      }
+      return o;
+    };
+
+    const BW = 360, BH = 180;
+    let bl = new Float32Array(BW * BH);
+    for (let j = 0; j < BH; j++) {
+      for (let i = 0; i < BW; i++) bl[j * BW + i] = landAt((i + 0.5) / BW, (j + 0.5) / BH);
+    }
+    bl = blur(bl, BW, BH, 3);
+
+    const samp = (a: Float32Array, w: number, h: number, u: number, v: number) => {
+      const x = u * w - 0.5, y = cl(v * h - 0.5, 0, h - 1);
+      const x0 = Math.floor(x), y0 = Math.floor(y);
+      const fx = x - x0, fy = y - y0;
+      const X0 = ((x0 % w) + w) % w, X1 = (X0 + 1) % w, Y1 = Math.min(h - 1, y0 + 1);
+      return lerp(lerp(a[y0 * w + X0], a[y0 * w + X1], fx), lerp(a[Y1 * w + X0], a[Y1 * w + X1], fx), fy);
+    };
+
+    // Major global research hubs and metropolitan centers
+    const CITIES = [
+      [40, -74], [34, -118], [19, -99], [-23, -46], [-34, -58],
+      [51, 0], [48, 2], [52, 13], [30, 31], [19, 73], [28, 77],
+      [31, 121], [35, 139], [37, 127], [-34, 151], [6, 3], [-26, 28],
+      [55, 37], [41, 29], [23, 113], [1, 104], [-12, -77], [4, -74],
+      [45, -73], [41, -87], [29, -95], [25, -80], [60, 10], [35, 51],
+      [9, -79], [-33, -70], [49, -123], [38, -122], [43, -79], [-1, 36],
+      [39, 116], [13, 100], [22, 114], [-6, 106], [14, 121]
+    ];
+
+    // Landing Page Realistic Procedural Earth Generator
+    const mkLandingEarth = () => {
+      const W = 1024, H = 512;
+      const c = mkc(W, H), x = c.getContext('2d')!;
+      const im = x.createImageData(W, H), d = im.data;
+      const cs = mkc(512, 256), xs = cs.getContext('2d')!;
+      const is = xs.createImageData(512, 256), ds = is.data;
+
+      for (let j = 0; j < H; j++) {
+        const v = (j + 0.5) / H, lat = (0.5 - v) * Math.PI;
+        const cla = Math.cos(lat), sla = Math.sin(lat);
+        const la = Math.abs(lat) / D2R;
+
+        for (let i = 0; i < W; i++) {
+          const u = (i + 0.5) / W, lon = (u - 0.5) * 2 * Math.PI;
+          const px = Math.cos(lon) * cla, pz = -Math.sin(lon) * cla;
+          const a = sm(0.35, 0.65, landAt(u, v));
+          const n1 = fbm(px * 5 + 3, sla * 5, pz * 5, 4);
+          const n3 = fbm(px * 2.2, sla * 2.2, pz * 2.2 + 9, 3);
+          let r: number, g: number, b: number;
+
+          const sh = sm(0, 0.55, samp(bl, BW, BH, u, v));
+          const ob = 0.8 + 0.4 * fbm(px * 8, sla * 8, pz * 8, 2);
+          const oi = sm(72, 82, la + (n1 - 0.5) * 10) * 0.9;
+
+          let orr = lerp(6, 24, sh) * ob;
+          let og = lerp(26, 96, sh) * ob;
+          let obb = lerp(62, 130, sh) * ob;
+          orr = lerp(orr, 235, oi);
+          og = lerp(og, 240, oi);
+          obb = lerp(obb, 248, oi);
+
+          if (a > 0.01) {
+            const n2 = fbm(px * 12, sla * 12 + 7, pz * 12, 3);
+            const ice = sm(58, 70, la + (n1 - 0.5) * 16);
+            const des = Math.exp(-Math.pow((la - 24) / 10, 2)) * sm(0.38, 0.58, n3) * (1 - ice);
+            const mt = sm(0.58, 0.72, n2) * 0.7;
+            const trop = sm(30, 5, la);
+            const bor = sm(45, 62, la);
+            const k = 0.8 + 0.4 * n1;
+
+            r = lerp(lerp(78, 34, trop), 52, bor) * k;
+            g = lerp(lerp(104, 86, trop), 82, bor) * k;
+            b = lerp(lerp(58, 40, trop), 64, bor) * k;
+
+            r = lerp(r, 198, des);
+            g = lerp(g, 166, des);
+            b = lerp(b, 112, des);
+            r = lerp(r, 118, mt);
+            g = lerp(g, 104, mt);
+            b = lerp(b, 92, mt);
+            r = lerp(r, 236, ice);
+            g = lerp(g, 242, ice);
+            b = lerp(b, 250, ice);
+
+            r = lerp(orr, r, a);
+            g = lerp(og, g, a);
+            b = lerp(obb, b, a);
+          } else {
+            r = orr; g = og; b = obb;
+          }
+
+          const p = (j * W + i) * 4;
+          d[p] = r; d[p + 1] = g; d[p + 2] = b; d[p + 3] = 255;
+        }
+      }
+      x.putImageData(im, 0, 0);
+
+      // Ocean Specular Map
+      for (let j = 0; j < 256; j++) {
+        for (let i = 0; i < 512; i++) {
+          const p = (j * 512 + i) * 4;
+          const o = landAt((i + 0.5) / 512, (j + 0.5) / 256) > 0.5 ? 0 : 255;
+          ds[p] = ds[p + 1] = ds[p + 2] = o;
+          ds[p + 3] = 255;
+        }
+      }
+      xs.putImageData(is, 0, 0);
+
+      // Golden Research City Lights on Night Side
+      const cn = mkc(1024, 512), xn = cn.getContext('2d')!;
+      xn.fillStyle = '#000';
+      xn.fillRect(0, 0, 1024, 512);
+      xn.globalCompositeOperation = 'lighter';
+      const cen = CITIES.map(q => [q[0], q[1], 90]);
+      let tr = 0;
+      while (cen.length < 150 && tr++ < 3000) {
+        const la = Math.asin(rnd(-1, 1)) / D2R, lo = rnd(-180, 180);
+        if (Math.abs(la) < 62 && landAt((lo + 180) / 360, (90 - la) / 180) > 0.5) {
+          cen.push([la, lo, 40]);
+        }
+      }
+      cen.forEach(q => {
+        for (let k = 0; k < q[2]; k++) {
+          const la = q[0] + (Math.random() + Math.random() + Math.random() - 1.5) * 3.2;
+          const lo = q[1] + (Math.random() + Math.random() + Math.random() - 1.5) * 4.2;
+          if (landAt((lo + 180) / 360, (90 - la) / 180) < 0.5) continue;
+          xn.fillStyle = `rgba(255, ${190 + (rnd(0, 50) | 0)}, ${110 + (rnd(0, 60) | 0)}, ${rnd(0.35, 0.9)})`;
+          const s = rnd(1, 2.2);
+          xn.fillRect(((lo + 180) / 360) * 1024, ((90 - la) / 180) * 512, s, s);
+        }
+      });
+
+      // Natural Atmospheric Swirling Clouds
+      const cc = mkc(1024, 512), xc = cc.getContext('2d')!;
+      const ic = xc.createImageData(1024, 512), dc = ic.data;
+      for (let j = 0; j < 512; j++) {
+        const lat = (0.5 - (j + 0.5) / 512) * Math.PI;
+        const cla = Math.cos(lat), sla = Math.sin(lat);
+        for (let i = 0; i < 1024; i++) {
+          const lon = ((i + 0.5) / 1024 - 0.5) * 2 * Math.PI;
+          const px = Math.cos(lon) * cla, pz = -Math.sin(lon) * cla;
+          const n = fbm(px * 3 + 1.7, sla * 3.4, pz * 3, 5);
+          const w = fbm(px * 9, sla * 9, pz * 9, 3);
+          const al = sm(0.5, 0.74, n + (w - 0.5) * 0.25);
+          const p = (j * 1024 + i) * 4;
+          dc[p] = dc[p + 1] = dc[p + 2] = 255;
+          dc[p + 3] = al * 215;
+        }
+      }
+      xc.putImageData(ic, 0, 0);
+
+      return { day: tex(c), spec: tex(cs), night: tex(cn), cloud: tex(cc) };
+    };
+
+    const E = mkLandingEarth();
+
     const masterGlobe = new THREE.Group();
     scene.add(masterGlobe);
 
     const spinGroup = new THREE.Group();
     masterGlobe.add(spinGroup);
 
-    // Globe radius (0.74 gives ideal proportion to hero banner and leaves clearance for labels)
+    // Globe radius (0.74 proportion blends with hero banner)
     const GLOBE_R = 0.74;
 
-    // Load original globe.webp texture with maximum anisotropy
-    const textureLoader = new THREE.TextureLoader();
-    const globeTexture = textureLoader.load('/globe.webp');
-    globeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    // Photorealistic Earth Shader identical to landing page
+    const earthMat = new THREE.ShaderMaterial({
+      uniforms: {
+        dayT: { value: E.day },
+        nightT: { value: E.night },
+        specT: { value: E.spec },
+        sun: { value: sunDir }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        varying vec3 vN, vP;
+        void main() {
+          vUv = uv;
+          vN = normalize(mat3(modelMatrix) * normal);
+          vec4 w = modelMatrix * vec4(position, 1.0);
+          vP = w.xyz;
+          gl_Position = projectionMatrix * viewMatrix * w;
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D dayT, nightT, specT;
+        uniform vec3 sun;
+        varying vec2 vUv;
+        varying vec3 vN, vP;
+        void main() {
+          vec3 N = normalize(vN);
+          vec3 Vv = normalize(cameraPosition - vP);
+          float nd = dot(N, sun);
 
-    // Primary Earth Sphere with original globe.webp
-    const earthMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(GLOBE_R, 96, 96),
-      new THREE.MeshBasicMaterial({ map: globeTexture })
-    );
+          // Ambient daylight baseline so the shaded side is softly lit by alpine mountain sky:
+          float lit = smoothstep(-0.25, 0.4, nd);
+          float dif = max(nd, 0.0);
+          float ambient = 0.56 + 0.14 * max(0.0, dot(N, vec3(0.0, 1.0, 0.0)));
+
+          vec3 day = texture2D(dayT, vUv).rgb;
+          vec3 nl = texture2D(nightT, vUv).rgb;
+          float sp = texture2D(specT, vUv).r;
+
+          vec3 lightColor = mix(vec3(0.75, 0.85, 1.0), vec3(1.0, 0.96, 0.9), lit);
+          vec3 col = day * (ambient + 0.85 * dif) * lightColor;
+
+          // Soft golden research city lights visible on the shaded hemisphere:
+          col += nl * (1.0 - lit) * 1.15;
+
+          // Ocean specular glint
+          vec3 H = normalize(sun + Vv);
+          col += vec3(0.9, 0.95, 1.0) * pow(max(dot(N, H), 0.0), 160.0) * sp * 0.55 * step(-0.05, nd);
+
+          // Natural atmospheric limb Fresnel:
+          float f = pow(1.0 - max(dot(N, Vv), 0.0), 2.8);
+          col += vec3(0.25, 0.55, 1.0) * f * (0.25 + 0.75 * smoothstep(-0.3, 0.6, nd));
+
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `
+    });
+
+    const earthMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R, 96, 64), earthMat);
     spinGroup.add(earthMesh);
 
-    // Atmospheric Shell Shader Generator from original knowledge_globe.html
-    const createShell = (sc: number, side: THREE.Side, pw: number, col: number, mul: number) => {
-      return new THREE.Mesh(
-        new THREE.SphereGeometry(GLOBE_R * sc, 64, 64),
-        new THREE.ShaderMaterial({
-          uniforms: { c: { value: new THREE.Color(col) } },
-          side,
-          transparent: true,
-          blending: THREE.AdditiveBlending,
-          depthWrite: false,
-          vertexShader: `
-            varying vec3 vNormal;
-            void main() {
-              vNormal = normalize(normalMatrix * normal);
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            varying vec3 vNormal;
-            uniform vec3 c;
-            void main() {
-              float i = ${
-                side === THREE.BackSide
-                  ? `pow(max(0.72 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0), ${pw.toFixed(1)})`
-                  : `pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), ${pw.toFixed(1)})`
-              } * ${mul.toFixed(2)};
-              gl_FragColor = vec4(c * i, i);
-            }
-          `
-        })
-      );
-    };
-
-    // Inner rim glow shell (FrontSide)
-    const rimGlow = createShell(1.004, THREE.FrontSide, 2.6, 0x5ee7ff, 1.15);
-    rimGlow.renderOrder = 6;
-    spinGroup.add(rimGlow);
-
-    // Outer atmospheric glow shell (BackSide)
-    const outerAtmo = createShell(1.22, THREE.BackSide, 2.0, 0x2a9cff, 2.0);
-    masterGlobe.add(outerAtmo);
-
-    // Subtle equatorial scanning radar ring
-    const scanRing = new THREE.Mesh(
-      new THREE.TorusGeometry(GLOBE_R * 1.008, 0.005, 6, 120),
-      new THREE.MeshBasicMaterial({
-        color: 0x7ff0ff,
+    // Natural Clouds Layer from landing page
+    const cloudsMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(GLOBE_R * 1.012, 64, 48),
+      new THREE.MeshLambertMaterial({
+        map: E.cloud,
         transparent: true,
-        opacity: 0.35,
+        depthWrite: false,
+        opacity: 0.68,
         blending: THREE.AdditiveBlending
       })
     );
-    scanRing.rotation.x = Math.PI / 2;
-    spinGroup.add(scanRing);
+    spinGroup.add(cloudsMesh);
+
+    // Soft Atmosphere Glow from landing page (BackSide blend)
+    const atmoMat = new THREE.ShaderMaterial({
+      transparent: true,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      uniforms: { sun: { value: sunDir }, k: { value: 0.75 } },
+      vertexShader: `
+        varying vec3 vn, wn;
+        void main() {
+          vn = normalize(normalMatrix * normal);
+          wn = normalize(mat3(modelMatrix) * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 sun;
+        uniform float k;
+        varying vec3 vn, wn;
+        void main() {
+          float d = clamp(-vn.z / 0.5, 0.0, 1.0);
+          float i = pow(d, 2.4);
+          gl_FragColor = vec4(vec3(0.25, 0.58, 1.0) * i * (0.35 + 1.1 * smoothstep(-0.4, 0.5, dot(wn, sun))) * k, 1.0);
+        }
+      `
+    });
+    const atmoMesh = new THREE.Mesh(new THREE.SphereGeometry(GLOBE_R * 1.12, 64, 48), atmoMat);
+    masterGlobe.add(atmoMesh);
 
     // ── Global Hub Beacons & Dynamic Citation Arcs ──
-    const D2R = Math.PI / 180;
     const llToV3 = (lat: number, lon: number, r: number) => {
       const phi = (90 - lat) * D2R;
       const th = (lon + 180) * D2R;
@@ -304,7 +566,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       );
     };
 
-    const CITIES = [
+    const RESEARCH_CITIES = [
       [42.36, -71.09], // Boston (MIT/Harvard)
       [37.42, -122.17], // Stanford/SF
       [51.50, -0.12],  // London
@@ -322,7 +584,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       [22.31, 114.16]  // Hong Kong
     ];
 
-    const researchNodes: THREE.Vector3[] = CITIES.map(c => llToV3(c[0], c[1], GLOBE_R));
+    const researchNodes: THREE.Vector3[] = RESEARCH_CITIES.map(c => llToV3(c[0], c[1], GLOBE_R));
 
     // Research Hub Beacons on Earth
     researchNodes.forEach((pos, i) => {
@@ -599,7 +861,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       transparent: true,
       opacity: 0
     });
-    // Sleek micro folio dimensions (reduced from 0.18x0.24 to 0.065x0.088)
+    // Sleek micro folio dimensions (0.065 x 0.088)
     const activePaper = new THREE.Mesh(new THREE.PlaneGeometry(0.065, 0.088), paperMat);
     activePaper.visible = false;
     scene.add(activePaper);
@@ -618,8 +880,6 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
     // ─────────────────────────────────────────────────────────────
     // 4. BIRD AUTONOMOUS 3D ROAMING (PEACEFUL, 30% SLOWER SPEED)
     // ─────────────────────────────────────────────────────────────
-    const rnd = (min: number, max: number) => min + Math.random() * (max - min);
-
     // Collision avoidance buffer with Earth globe in world space
     const keepOut = (p: THREE.Vector3, minDist: number) => {
       const rel = p.clone().sub(masterGlobe.position);
@@ -801,9 +1061,9 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
       }
       spinGroup.rotation.y += (targetRotY - spinGroup.rotation.y) * 0.08;
 
-      // Slow continuous rotation of the Earth model
-      earthMesh.rotation.y += 0.0024;
-      scanRing.rotation.z = elapsed * 0.5;
+      // Slow continuous rotation of the natural Earth and clouds
+      earthMesh.rotation.y += 0.0022;
+      cloudsMesh.rotation.y += 0.0030;
 
       // 3. Citation Arc Photon Pulses
       photonBeads.forEach((bead, i) => {
@@ -1056,7 +1316,7 @@ export const ResearchKnowledgeCore: React.FC<ResearchKnowledgeCoreProps> = ({ on
         ref={canvasRef}
         className="w-full h-full cursor-default active:cursor-grabbing block focus:outline-none pointer-events-auto"
         style={{ background: 'transparent' }}
-        aria-label="3D Knowledge Earth with soaring research courier bird"
+        aria-label="3D Natural Knowledge Earth with soaring research courier bird"
       />
 
       {/* SVG Connector Lines from HUD Pills to 3D Earth Rim Anchors (Clean, Non-Overlapping) */}
