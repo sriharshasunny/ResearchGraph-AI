@@ -12,46 +12,73 @@ body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;back
 body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(2,4,14,.55),rgba(2,4,14,.24) 38%,transparent 62%);opacity:calc(1 - var(--e,0)*1.6)}
 h1,h2,h3,.logo{font-family:"Space Grotesk",Inter,sans-serif;text-wrap:balance}a{color:inherit;text-decoration:none}
 #c{position:fixed;inset:0;width:100%;height:100%;z-index:0;display:block;touch-action:pan-y;transform:translateZ(0);backface-visibility:hidden;will-change:transform}
-#ui,#feed{position:fixed;z-index:8;pointer-events:none}#ui{left:0;top:0}
-header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) 32px 14px;transition:.3s}
+#ui,#feed{position:fixed;z-index:8;pointer-events:none}#ui{left:0;top:0;width:100%;height:100%}
+#leader-svg{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:7}
+header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) 36px 14px;transition:.3s}
 header.sc{background:rgba(3,5,18,.92);border-bottom:1px solid var(--bd);backdrop-filter:blur(14px)}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.02em}
-.logo em{font-style:normal;background:linear-gradient(90deg,#38bdf8,#a855f7);-webkit-background-clip:text;background-clip:text;color:transparent}
-.mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#7a5cff,#0ea5e9);display:grid;place-items:center;box-shadow:0 0 24px rgba(56,189,248,.5)}
+.logo em{font-style:normal;color:#c084fc;margin-left:2px}
+.mark-atom{width:36px;height:36px;border-radius:11px;background:rgba(14,165,233,.12);border:1px solid rgba(56,189,248,.35);display:grid;place-items:center;color:#38bdf8;box-shadow:0 0 20px rgba(56,189,248,.25)}
 nav{display:flex;gap:2px;padding:4px;border-radius:99px;background:rgba(8,16,42,.75);border:1px solid var(--bd);backdrop-filter:blur(10px)}
-nav a{padding:8px 16px;border-radius:99px;font-size:14px;font-weight:500;color:#cbd5e1;transition:.2s}nav a:hover{background:rgba(56,189,248,.18);color:#fff}
-.hr{display:flex;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:12px;font-weight:600;font-size:15px;border:1px solid var(--bd);background:rgba(15,23,42,.65);color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s}
-.btn:hover{transform:translateY(-2px)}.btn.p{background:linear-gradient(135deg,#0ea5e9,#6366f1);border-color:#38bdf8;box-shadow:0 0 26px rgba(14,165,233,.45)}
-.btn.c{background:linear-gradient(135deg,#06b6d4,#2563eb);border-color:#67e8f9;box-shadow:0 0 22px rgba(6,182,212,.4);padding:10px 18px}
+nav a{padding:8px 18px;border-radius:99px;font-size:14px;font-weight:500;color:#cbd5e1;transition:.2s}nav a:hover{background:rgba(56,189,248,.18);color:#fff}
+.hr{display:flex;gap:14px;align-items:center}
+.btn-text{font-size:14.5px;font-weight:500;color:#cbd5e1;padding:8px 14px;transition:color .2s}.btn-text:hover{color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:99px;font-weight:600;font-size:14.5px;border:1px solid var(--bd);background:rgba(15,23,42,.65);color:#fff;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px)}.btn.p{background:linear-gradient(135deg,#7c3aed,#6366f1);border-color:#a855f7;box-shadow:0 0 26px rgba(124,58,237,.45)}
+.btn.sec{background:rgba(12,20,44,.85);border-color:rgba(56,189,248,.28);color:#e2e8f0;box-shadow:0 0 16px rgba(0,0,0,.4)}
+.btn.sec:hover{border-color:rgba(56,189,248,.6);color:#fff}
+.btn.c{background:linear-gradient(135deg,#06b6d4,#0284c7);border-color:#38bdf8;box-shadow:0 0 22px rgba(6,182,212,.4);padding:10px 20px}
 .L{width:min(530px,42vw);margin-left:clamp(20px,5.2vw,92px);position:relative;z-index:5}
-.hero{min-height:100svh;display:flex;align-items:center;padding:calc(110px + env(safe-area-inset-top,0px)) 0 70px;pointer-events:none}.hero .L>*{pointer-events:auto}
-.tag{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:99px;border:1px solid rgba(56,189,248,.4);background:rgba(8,20,50,.65);color:#7dd3fc;font:700 11.5px ui-monospace,monospace;letter-spacing:.12em;margin-bottom:20px;backdrop-filter:blur(8px)}
-.tag::before,.live i{content:"";width:8px;height:8px;border-radius:50%;background:#00f0ff;animation:pu 2s infinite}@keyframes pu{0%{box-shadow:0 0 0 0 rgba(0,240,255,.7)}70%,100%{box-shadow:0 0 0 10px transparent}}
-h1{margin:0;font-size:clamp(42px,5.2vw,72px);line-height:1.02;letter-spacing:-.045em}
-h1 span,h2 span{background:linear-gradient(135deg,#38bdf8 20%,#a855f7 70%,#ec4899 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{font-size:clamp(15px,1.2vw,17.5px);color:#cbd5e1;margin:18px 0 24px;max-width:510px;line-height:1.65}
-.cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
-.feat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px}
-.feat div{padding:10px 12px;border-radius:12px;background:rgba(8,16,42,.85);border:1px solid rgba(56,189,248,.18);font-size:12px;color:var(--mu)}
-.feat small{display:block;font:700 8.5px ui-monospace,monospace;letter-spacing:.1em;color:#38bdf8;margin-bottom:3px}
-.feat b{display:block;color:#fff;font:700 16px "Space Grotesk";line-height:1.1}
-.feat span{font-size:11px;color:#94a3b8}
-.ask{display:flex;align-items:center;gap:10px;padding:6px 6px 6px 14px;border-radius:16px;background:rgba(6,12,32,.9);border:1px solid rgba(56,189,248,.35);box-shadow:0 0 24px rgba(56,189,248,.12);max-width:530px}
+.hero{min-height:100svh;display:flex;align-items:center;padding:calc(100px + env(safe-area-inset-top,0px)) 0 60px;pointer-events:none}.hero .L>*{pointer-events:auto}
+.tag{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:99px;border:1px solid rgba(56,189,248,.35);background:rgba(8,18,44,.75);color:#7dd3fc;font:700 11px ui-monospace,monospace;letter-spacing:.1em;margin-bottom:18px;backdrop-filter:blur(8px)}
+.tag i{color:#00f0ff;font-style:normal;font-size:10px;animation:pu 2s infinite}
+@keyframes pu{0%{text-shadow:0 0 0 rgba(0,240,255,.9)}70%,100%{text-shadow:0 0 12px transparent}}
+h1{margin:0;font-size:clamp(40px,4.8vw,68px);line-height:1.06;letter-spacing:-.04em}
+.hl-cyan{color:#38bdf8}
+.hl-purple{color:#c084fc}
+.lead{font-size:15px;color:#cbd5e1;margin:16px 0 22px;max-width:480px;line-height:1.6}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.hero-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.h-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(8,16,42,.85);border:1px solid rgba(56,189,248,.18);backdrop-filter:blur(10px)}
+.h-ic{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;flex-shrink:0}
+.h-ic.cyan{background:rgba(56,189,248,.15);color:#38bdf8;border:1px solid rgba(56,189,248,.3)}
+.h-ic.purple{background:rgba(168,85,247,.15);color:#c084fc;border:1px solid rgba(168,85,247,.3)}
+.h-ic.blue{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3)}
+.h-txt small{display:block;font:600 10.5px Inter,sans-serif;color:#94a3b8;line-height:1.15;margin-bottom:2px}
+.h-txt b{display:block;font:700 16px "Space Grotesk",sans-serif;color:#fff;line-height:1.1}
+.ask{display:flex;align-items:center;gap:10px;padding:5px 6px 5px 14px;border-radius:99px;background:rgba(6,12,32,.92);border:1px solid rgba(56,189,248,.35);box-shadow:0 0 24px rgba(56,189,248,.12);max-width:530px}
 .ask:focus-within{border-color:var(--cy);box-shadow:0 0 30px rgba(56,189,248,.25)}
-.ask-prefix{display:flex;align-items:center;gap:6px;font:700 9px ui-monospace,monospace;color:#38bdf8;background:rgba(56,189,248,.12);padding:4px 8px;border-radius:6px;border:1px solid rgba(56,189,248,.25)}
-.ask-prefix i{font-style:normal;font-size:11px}
-.ask input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:inherit;font-size:14.5px}.ask input::placeholder{color:#94a3b8}
-.live{display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:7px 15px;border-radius:99px;background:rgba(8,18,46,.82);border:1px solid rgba(56,189,248,.28);font:600 11.5px ui-monospace,monospace;color:#7dd3fc;letter-spacing:.04em}.live i{content:none}.live b{color:#fff}
-.chip{position:fixed;left:0;top:0;display:none;padding:4px 10px;border-radius:99px;font:500 11.5px Inter,sans-serif;color:#cfe0ff;background:rgba(5,10,30,.72);border:1px solid color-mix(in srgb,var(--c) 50%,transparent);white-space:nowrap}
-.chip b{color:#fff;font-weight:600}.chip i{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:middle;box-shadow:0 0 8px var(--c)}
-.chip::before{content:"";position:absolute;right:100%;top:50%;width:16px;height:1px;background:var(--c);opacity:.7}
-.tg{position:fixed;left:0;top:0;font:700 9.5px ui-monospace,monospace;letter-spacing:.1em;color:#bfe9ff;text-shadow:0 0 8px #000;white-space:nowrap;opacity:.88}
-.synthesizer-tag{position:fixed;left:0;top:0;display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:6px;background:rgba(8,16,42,.88);border:1px solid rgba(56,189,248,.45);font:600 9.5px ui-monospace,monospace;letter-spacing:.08em;color:#38bdf8;text-shadow:0 0 10px rgba(56,189,248,.6);pointer-events:none;white-space:nowrap;box-shadow:0 0 16px rgba(56,189,248,.25);transform:translate3d(-9999px,-9999px,0);}
-#feed{right:24px;bottom:24px;width:310px;display:flex;flex-direction:column;gap:8px}
-.toast{display:flex;gap:10px;padding:10px 14px;border-radius:14px;background:rgba(6,14,36,.88);border:1px solid #2a6a5a;opacity:0;transform:translateY(12px);transition:.4s}.toast.in{opacity:1;transform:none}
-.toast i{width:22px;height:22px;border-radius:50%;background:#19e6c4;color:#02121a;display:grid;place-items:center;font:700 13px sans-serif;flex:none;font-style:normal}
-.toast small{display:block;font:600 9.5px ui-monospace,monospace;letter-spacing:.1em;color:#19e6c4}.toast b{display:block;font:600 13px/1.3 Inter;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}.toast span{font-size:11.5px;color:var(--mu)}
+.ask i{color:#94a3b8;font-style:normal;font-size:16px}
+.ask input{flex:1;min-width:0;background:none;border:0;outline:0;color:#fff;font:inherit;font-size:14px}.ask input::placeholder{color:#94a3b8}
+.live{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font:500 12px ui-monospace,monospace;color:#94a3b8;letter-spacing:.02em}
+.live i{color:#00f0ff;font-style:normal;font-size:9px}
+.live b{color:#e2e8f0;font-weight:600}
+
+/* Station & Spacecraft HUD Badges */
+.station-badge{position:fixed;display:inline-flex;align-items:center;padding:4px 10px;border-radius:99px;background:rgba(8,16,42,.88);border:1px solid rgba(56,189,248,.45);font:600 11px Inter,sans-serif;color:#e0f2fe;box-shadow:0 0 16px rgba(56,189,248,.25);transform:translate(-50%,-100%);pointer-events:none;white-space:nowrap;z-index:9}
+.craft-badge{position:fixed;display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:99px;background:rgba(8,16,42,.9);border:1px solid rgba(56,189,248,.5);font:700 10.5px ui-monospace,monospace;letter-spacing:.06em;color:#e0f2fe;box-shadow:0 0 20px rgba(56,189,248,.35);transform:translate(-50%,-100%);pointer-events:none;white-space:nowrap;z-index:9}
+.craft-badge i{color:#38bdf8;font-style:normal;font-size:13px}
+.craft-badge small{font:500 9.5px Inter,sans-serif;color:#94a3b8;border-left:1px solid rgba(255,255,255,.2);padding-left:6px;margin-left:2px}
+
+/* Globe Labels (Right side) */
+.globe-label{position:fixed;display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;background:rgba(8,16,40,.85);border:1px solid rgba(56,189,248,.25);backdrop-filter:blur(10px);font:500 12px Inter,sans-serif;color:#cbd5e1;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;pointer-events:none;z-index:9;transition:transform .2s}
+.globe-label .gl-ic{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font-style:normal;font-size:11px}
+.globe-label b{font-weight:700;font-size:12.5px;color:#fff}
+.gl-papers .gl-ic{background:rgba(56,189,248,.2);color:#38bdf8}
+.gl-authors .gl-ic{background:rgba(16,185,129,.2);color:#10b981}
+.gl-concepts .gl-ic{background:rgba(168,85,247,.2);color:#c084fc}
+.gl-datasets .gl-ic{background:rgba(245,158,11,.2);color:#f59e0b}
+.gl-citations .gl-ic{background:rgba(236,72,153,.2);color:#ec4899}
+
+/* Bottom-Right Toasts */
+#feed{right:28px;bottom:28px;width:320px;display:flex;flex-direction:column;gap:10px}
+.toast-card{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:14px;background:rgba(4,12,28,.88);border:1px solid rgba(16,185,129,.35);box-shadow:0 10px 30px rgba(0,0,0,.5);backdrop-filter:blur(14px);opacity:0;transform:translateY(12px);transition:.4s ease}
+.toast-card.in{opacity:1;transform:none}
+.toast-check{width:22px;height:22px;border-radius:50%;background:#10b981;color:#02121a;display:grid;place-items:center;font:700 13px sans-serif;flex-shrink:0}
+.toast-info{flex:1;min-width:0}
+.toast-head{display:block;font:600 10.5px Inter,sans-serif;color:#e2e8f0;line-height:1.2}
+.toast-title{display:block;font:500 12px/1.3 Inter,sans-serif;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 .mq{position:relative;z-index:5;width:100%;overflow:hidden;padding:16px 0;border-block:1px solid var(--bd);mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);background:rgba(4,8,22,.45)}
 .mq div{display:flex;gap:48px;width:max-content;animation:mq 30s linear infinite}.mq span{font:700 16px "Space Grotesk";color:#7dd3fc;white-space:nowrap}@keyframes mq{to{transform:translateX(-50%)}}
 .sec{position:relative;z-index:5;padding:88px 0;pointer-events:none}.sec .W>*{pointer-events:auto}.W{width:min(1140px,calc(100% - 64px));margin:0 auto;position:relative;z-index:5}
@@ -81,29 +108,88 @@ h1 span,h2 span{background:linear-gradient(135deg,#38bdf8 20%,#a855f7 70%,#ec489
 .cta-telemetry{margin-top:22px;font:600 11px ui-monospace,monospace;color:#94a3b8;letter-spacing:.08em}.cta-telemetry span{color:#38bdf8}
 .rv{opacity:0;transform:translateY(22px);transition:opacity .6s cubic-bezier(0.16,1,0.3,1),transform .6s cubic-bezier(0.16,1,0.3,1);will-change:opacity,transform;contain:content}.rv.in{opacity:1;transform:none}
 footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26px + env(safe-area-inset-bottom,0px));color:#7783b8;font-size:14px;border-top:1px solid var(--bd);text-align:center}
-@media(max-width:900px){nav,.hr .btn:not(.c){display:none}header{padding-inline:18px}body::before{background:linear-gradient(rgba(2,4,14,.2),rgba(2,4,14,.8) 45%)}.L,.W{width:auto;margin:0 18px}.hero{align-items:flex-start;padding-top:calc(46svh + 10px)}.feat,.g3{grid-template-columns:1fr}.sec{padding:56px 0;background:linear-gradient(transparent,rgba(2,4,14,.82) 14%)}#feed{left:12px;right:12px;bottom:12px;width:auto}.stats{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){nav,.hr .btn-text{display:none}header{padding-inline:18px}body::before{background:linear-gradient(rgba(2,4,14,.2),rgba(2,4,14,.8) 45%)}.L,.W{width:auto;margin:0 18px}.hero{align-items:flex-start;padding-top:calc(46svh + 10px)}.feat,.hero-metrics,.g3{grid-template-columns:1fr}.sec{padding:56px 0;background:linear-gradient(transparent,rgba(2,4,14,.82) 14%)}#feed{left:12px;right:12px;bottom:12px;width:auto}.stats{grid-template-columns:1fr 1fr}#leader-svg,.globe-label{display:none}}
 </style></head><body>
-<canvas id="c" aria-hidden="true"></canvas><div id="ui"></div><div id="feed"></div>
-<header><a class="logo" href="#top"><span class="mark">⚛</span>ResearchGraph <em>AI</em></a>
-<nav><a href="#top">Cockpit</a><a href="#how">RAG Pipeline</a><a href="#features">Capabilities</a><a href="#sources">Data Sources</a></nav>
-<div class="hr"><a class="btn" href="#">Log in</a><a class="btn c" href="#">Launch Cockpit →</a></div></header>
-<section class="hero" id="top"><div class="L">
-<span class="tag"><span>⬡</span> HYPER-DIMENSIONAL GRAPH RAG · REAL-TIME ARX-V2</span>
-<h1>The Quantum Graph<br>for <span>Autonomous Research.</span></h1>
-<p class="lead">Connect 204M+ peer-reviewed papers across arXiv, PubMed, and IEEE with multi-agent reasoning. Language models deconstruct methodologies, neural graphs map citation topologies, and every insight arrives with verifiable lineage.</p>
-<div class="cta"><a class="btn p" href="#how"><span>⌬</span> Launch Neural Graph →</a><a class="btn" href="#features">System Telemetry</a></div>
-<div class="feat">
-<div><small>CORPUS INDEX</small><b>204M+</b><span>Global Papers</span></div>
-<div><small>GRAPH TOPOLOGY</small><b>1.24B+</b><span>Neural Synapses</span></div>
-<div><small>VERIFIABILITY</small><b>99.8%</b><span>DOI-Grounded</span></div>
-</div>
-<div class="ask">
-<div class="ask-prefix"><i>⌕</i><span>PROMPT</span></div>
-<input id="askInput" aria-label="Ask an academic question" placeholder="Investigate cross-attention convergence in Graph Transformers...">
-<a class="btn c" href="#">Ask AI →</a>
-</div>
-<div class="live"><i></i><span><b id="cnt">0</b> PAPERS INGESTED &amp; SYNTHESIZED · AUTONOMOUS AGENT FLEET ACTIVE</span></div>
-</div></section>
+<canvas id="c" aria-hidden="true"></canvas>
+<svg id="leader-svg"></svg>
+<div id="ui"></div>
+<div id="feed"></div>
+
+<header>
+  <a class="logo" href="#top">
+    <div class="mark-atom">
+      <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="1.8">
+        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+        <ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(30 12 12)"/>
+        <ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(90 12 12)"/>
+        <ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(150 12 12)"/>
+      </svg>
+    </div>
+    ResearchGraph <em>AI</em>
+  </a>
+  <nav>
+    <a href="#top">Cockpit</a>
+    <a href="#how">RAG Pipeline</a>
+    <a href="#features">Knowledge Graph</a>
+    <a href="#sources">Data Sources</a>
+  </nav>
+  <div class="hr">
+    <a class="btn-text" href="#">Log in</a>
+    <a class="btn c" href="#">Launch Cockpit →</a>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="L">
+    <div class="tag"><i>●</i> HYPER-DIMENSIONAL GRAPH RAG · REAL-TIME ARXIV</div>
+    <h1>
+      The Quantum<br>
+      Graph for<br>
+      <span class="hl-cyan">Autonomous</span><br>
+      <span class="hl-purple">Research.</span>
+    </h1>
+    <p class="lead">Connect papers, build knowledge graphs, and get reliable AI insights.</p>
+    <div class="cta">
+      <a class="btn p" href="#how">Launch Neural Graph →</a>
+      <a class="btn sec" href="#features">System Telemetry</a>
+    </div>
+    <div class="hero-metrics">
+      <div class="h-card">
+        <div class="h-ic cyan">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><path d="M4 6c0-1.66 3.58-3 8-3s8 1.34 8 3v12c0 1.66-3.58 3-8 3s-8-1.34-8-3V6z"/><path d="M4 12c0 1.66 3.58 3 8 3s8-1.34 8-3"/><path d="M4 18c0 1.66 3.58 3 8 3s8-1.34 8-3"/></svg>
+        </div>
+        <div class="h-txt">
+          <small>Corpus Index</small>
+          <b>204M+</b>
+        </div>
+      </div>
+      <div class="h-card">
+        <div class="h-ic purple">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        </div>
+        <div class="h-txt">
+          <small>Graph Topology</small>
+          <b>1.24B+</b>
+        </div>
+      </div>
+      <div class="h-card">
+        <div class="h-ic blue">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        </div>
+        <div class="h-txt">
+          <small>Verifiability</small>
+          <b>99.8%</b>
+        </div>
+      </div>
+    </div>
+    <div class="ask">
+      <i>⌕</i>
+      <input id="askInput" aria-label="Ask an academic question" placeholder="Ask anything about academic papers...">
+      <a class="btn c" href="#">Ask AI →</a>
+    </div>
+    <div class="live"><i>●</i> <span><b id="cnt">16</b> new papers merged into the graph · arXiv &amp; PubMed</span></div>
+  </div>
+</section>
 <div class="mq" id="sources"><div><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM DL</span><span>OpenAlex</span><span>Crossref</span><span>arXiv</span><span>PubMed</span><span>IEEE Xplore</span><span>Semantic Scholar</span><span>Nature</span><span>Springer</span><span>ACM DL</span><span>OpenAlex</span><span>Crossref</span></div></div>
 <section class="sec" id="how"><div class="W">
 <span class="eyebrow">AUTONOMOUS RAG PIPELINE</span>
@@ -318,17 +404,75 @@ const P={grp,m,mats:[mat],am,hero,far,pA:V(0,0,0),pB:V(0,0,0),rot:rnd(.01,.03),m
 if(o.ring){const g=new T.RingGeometry(1.35,2.3,128),p=g.attributes.position,uv=g.attributes.uv,v=new T.Vector3();for(let i=0;i<p.count;i++){v.fromBufferAttribute(p,i);uv.setXY(i,(v.length()-1.35)/.95,.5)}const rm=new T.MeshLambertMaterial({map:ringTex(),color:0xffffff,emissive:0x8a7a5a,transparent:true,side:T.DoubleSide,depthWrite:false}),rmesh=new T.Mesh(g,rm);rmesh.rotation.x=Math.PI/2-.62;rmesh.rotation.y=.2;m.add(rmesh);P.ring=rm}
 (o.moons||[]).forEach(q=>{const mm=new T.MeshStandardMaterial({map:rockTex(q[3]),roughness:1}),mesh=new T.Mesh(new T.SphereGeometry(1,24,16),mm);mesh.scale.setScalar(r*q[0]);grp.add(mesh);P.mats.push(mm);P.moons.push({m:mesh,a:rnd(0,6.28),r:r*q[1],sp:q[2]})});
 planets.push(P)}
-addPlanet('sat',[-.08,.8,300],[-.62,.52,460],14,0xf0d8a0,{ring:1,moons:[[.12,2.9,.4,'#8a8078'],[.08,3.6,.27,'#b8aa90'],[.18,4.6,.15,'#7a7a84']]});
-addPlanet('mars',[-.58,-.82,220],[.3,-.55,360],7,0xff9a70,{bump:.6,moons:[[.16,1.9,.9,'#6a5a50'],[.1,2.5,.5,'#74665c']]});
-addPlanet('ice',[.94,-.8,280],[-.88,-.42,530],13,0x70b0ff,{moons:[[.15,2.4,.3,'#c9a8a8']]});
-addPlanet('venus',[.12,-.88,200],[.9,-.15,300],5,0xffe0b0);
-addPlanet('vio',[.95,.8,350],[.2,.62,620],9,0xb090ff,{ring:1,moons:[[.2,2.8,.35,'#8c88a0']]});
+// Distant planets positioned to match reference image composition
+addPlanet('sat',[-.15,.62,330],[-.62,.52,460],13,0xf0d8a0,{ring:1,moons:[[.12,2.9,.4,'#8a8078'],[.08,3.6,.27,'#b8aa90']]});
+addPlanet('mars',[.10,-.66,250],[.3,-.55,360],7.2,0xc28256,{bump:.6,moons:[[.16,1.9,.9,'#6a5a50']]});
+addPlanet('vio',[.86,.68,380],[.2,.62,620],8.5,0xb090ff,{ring:1,moons:[[.2,2.8,.35,'#8c88a0']]});
+
+/* ---------- Hanging Citadel Platform beneath Earth ---------- */
+const plat=new T.Group();
+plat.position.set(0,-1.24,0);
+G.add(plat);
+
+// Level forward-facing landing deck
+const platHull=new T.Mesh(new T.CylinderGeometry(.74,.70,.09,48),new T.MeshStandardMaterial({color:0x0f1c34,metalness:.88,roughness:.28}));
+plat.add(platHull);
+
+// Concentric metallic blue & cyan glowing rings on deck
+const platRings=[
+  {r:.65,col:0x06b6d4,w:.012,y:.048},
+  {r:.49,col:0x38bdf8,w:.010,y:.051},
+  {r:.33,col:0x00f0ff,w:.008,y:.053},
+  {r:.17,col:0xa5f3fc,w:.006,y:.055}
+].map(s=>{
+  const m=new T.Mesh(new T.TorusGeometry(s.r,s.w,12,64),new T.MeshBasicMaterial({color:s.col}));
+  m.rotation.x=Math.PI/2;m.position.y=s.y;plat.add(m);return m;
+});
+
+const coreDisc=new T.Mesh(new T.CircleGeometry(.18,32),new T.MeshBasicMaterial({color:0x00f0ff,transparent:true,opacity:.95,side:T.DoubleSide}));
+coreDisc.rotation.x=-Math.PI/2;coreDisc.position.y=.058;plat.add(coreDisc);
+
+// Upward projecting holographic light beam into Earth
+const holoBeam=new T.Mesh(new T.CylinderGeometry(.34,.20,.36,32,1,true),new T.MeshBasicMaterial({color:0x38bdf8,transparent:true,opacity:.38,blending:T.AdditiveBlending,side:T.DoubleSide}));
+holoBeam.position.y=.22;plat.add(holoBeam);
+
+const holoInner=new T.Mesh(new T.CylinderGeometry(.16,.08,.38,24,1,true),new T.MeshBasicMaterial({color:0xa5f3fc,transparent:true,opacity:.6,blending:T.AdditiveBlending,side:T.DoubleSide}));
+holoInner.position.y=.23;plat.add(holoInner);
+
+// 4 perimeter docking pylons with cyan beacons
+for(let i=0;i<4;i++){
+  const ang=(i*Math.PI*2)/4,px=Math.cos(ang)*.64,pz=Math.sin(ang)*.64;
+  const pylon=new T.Mesh(new T.BoxGeometry(.06,.14,.06),new T.MeshStandardMaterial({color:0x1e293b,metalness:.9,roughness:.2}));
+  pylon.position.set(px,.09,pz);
+  const cap=new T.Mesh(new T.BoxGeometry(.04,.02,.04),new T.MeshBasicMaterial({color:0x00f0ff}));
+  cap.position.set(px,.165,pz);
+  const pad=new T.Mesh(new T.BoxGeometry(.11,.02,.08),new T.MeshStandardMaterial({color:0x0ea5e9,metalness:.8}));
+  pad.position.set(px*1.12,.02,pz*1.12);pad.rotation.y=-ang;
+  plat.add(pylon,cap,pad);
+}
+
+// Tapered inverted conical underside spire with 6 illuminated cyan heat-sink / thruster ribs
+const keel=new T.Mesh(new T.CylinderGeometry(.68,.06,.55,32,4),new T.MeshStandardMaterial({color:0x0a1428,metalness:.92,roughness:.35}));
+keel.position.y=-.30;plat.add(keel);
+
+for(let i=0;i<6;i++){
+  const ang=(i*Math.PI*2)/6,rx=Math.cos(ang),rz=Math.sin(ang);
+  const rib=new T.Mesh(new T.BoxGeometry(.015,.46,.12),new T.MeshBasicMaterial({color:0x00f0ff}));
+  rib.position.set(rx*.32,-.28,rz*.32);
+  rib.rotation.y=-ang;
+  rib.rotation.z=.42*(ang>Math.PI?1:-1);
+  plat.add(rib);
+}
+
+// Downward repulsor plasma cone at the apex tip
+const thrusterCone=new T.Mesh(new T.ConeGeometry(.12,.52,16,1,true),new T.MeshBasicMaterial({color:0x00f0ff,transparent:true,opacity:.7,blending:T.AdditiveBlending,side:T.DoubleSide}));
+thrusterCone.rotation.x=Math.PI;thrusterCone.position.y=-.78;plat.add(thrusterCone);
+const platGlow=spr(glowT,0x00f0ff,1.3,.55,plat);platGlow.position.y=-.6;
+
 /* ---------- layout (hero: globe right; scroll: whole world recedes into depth) ---------- */
-const RG=5;let D=22,AS=1.6,GPX={x:0,y:0,r:200},comp=null,wide=true,L0={nx:.36,ny:0,px:200},GW=V(0,0,0),CF=V(0,0,40);
+const RG=4.1;let D=22,AS=1.6,GPX={x:0,y:0,r:200},comp=null,wide=true,L0={nx:.36,ny:0,px:200},GW=V(0,0,0),CF=V(0,0,40);
 const bnd=z=>{const h=(D-z)*TH;return{h,w:h*AS}};
-const chipsD=[['Papers','204M+','#3fb4ff',-.64],['Authors','12.4M+','#19e6c4',-.32],['Concepts','1.8M+','#a05cff',0],['Datasets','85K+','#ffc43a',.32],['Citations','1.24B+','#d05cff',.64]];
-const ui=$('ui'),chips=chipsD.map(c=>{const e=document.createElement('div');e.className='chip';e.style.setProperty('--c',c[2]);e.innerHTML='<i></i>'+c[0]+' <b>'+c[1]+'</b>';ui.appendChild(e);return e});
-const synTag=document.createElement('div');synTag.className='synthesizer-tag';synTag.innerHTML='<i>⬡</i> QUANTUM SYNTHESIZER <b>ACTIVE</b>';ui.appendChild(synTag);
+
 const camAt=(p)=>{
   const p1=sm(0,0.22,p),p2=sm(0.18,0.62,p),p3=sm(0.55,1.0,p);
   const targetZ=D*(1.0 + 2.2*p1 + 1.6*p2 + 2.2*p3);
@@ -339,231 +483,344 @@ const camAt=(p)=>{
 function placePlanets(){const c0=camAt(0),c1=camAt(1),f=(c,q,o)=>o.set(c.x+q[0]*q[2]*TH*AS,c.y+q[1]*q[2]*TH,c.z-q[2]);planets.forEach(p=>{f(c0,p.hero,p.pA);f(c1,p.far,p.pB)})}
 let cachedScrollHeight=Math.max(1,document.documentElement.scrollHeight-innerHeight);
 function updateScrollBounds(){cachedScrollHeight=Math.max(1,document.documentElement.scrollHeight-innerHeight);}
-function layout(){const w=innerWidth,h=innerHeight;wide=w>=900;updateScrollBounds();R.setSize(w,h,false);if(comp)comp.setSize(w,h);AS=w/h;C.aspect=AS;C.updateProjectionMatrix();
-let px,cx,cy;if(wide){px=Math.min(h*.236,w*.131);cx=w*.69;cy=h*.52}else{px=Math.min(w*.245,h*.122);cx=w*.5;cy=h*.25}
-D=h*RG/(2*TH*px);C.rotation.set(0,0,0);G.position.set((cx/w*2-1)*D*TH*AS,(1-cy/h*2)*D*TH,0);G.scale.setScalar(RG);GPX={x:cx,y:cy,r:px};GW.copy(G.position);L0={nx:cx/w*2-1,ny:1-cy/h*2,px};placePlanets();updateKbPos();
-chips.forEach((e,i)=>{const dy=chipsD[i][3]*px,ex=cx+Math.sqrt(px*px-dy*dy)+16;e.style.display=w>=1100?'block':'none';e.style.transform=`translate(${ex}px,${cy+dy-e.offsetHeight/2}px)`})}
-/* ---------- 3D Quantum Knowledge Synthesizer ---------- */
-const kbGroup=new T.Group();S.add(kbGroup);
-const kbBase=new T.Mesh(new T.CylinderGeometry(.95,1.25,.28,6),new T.MeshStandardMaterial({color:0x0f1c3a,metalness:.88,roughness:.25,emissive:0x081326,emissiveIntensity:.8}));
-kbBase.position.y=-.45;kbGroup.add(kbBase);
-for(let i=0;i<6;i++){
-  const ang=i*Math.PI/3,px=Math.cos(ang)*1.1,pz=Math.sin(ang)*1.1;
-  const pylon=new T.Mesh(new T.CylinderGeometry(.04,.05,.38,8),new T.MeshStandardMaterial({color:0x1e293b,metalness:.9,roughness:.2}));
-  pylon.position.set(px,-.28,pz);
-  const pylonCap=new T.Mesh(new T.SphereGeometry(.045,8,8),new T.MeshBasicMaterial({color:0x38bdf8}));
-  pylonCap.position.set(px,-.08,pz);
-  kbGroup.add(pylon,pylonCap);
+
+/* ---------- Globe Labels (5 Neatly Aligned on Right of Earth) ---------- */
+const ui=$('ui'),leaderSvg=$('leader-svg');
+const labelSpecs=[
+  {id:'papers',cls:'gl-papers',ic:'📄',name:'Papers',val:'204M+',col:'#38bdf8',dy:-0.66},
+  {id:'authors',cls:'gl-authors',ic:'👥',name:'Authors',val:'12.4M+',col:'#10b981',dy:-0.33},
+  {id:'concepts',cls:'gl-concepts',ic:'🔀',name:'Concepts',val:'1.8M+',col:'#a855f7',dy:0},
+  {id:'datasets',cls:'gl-datasets',ic:'🗄️',name:'Datasets',val:'85K+',col:'#f59e0b',dy:0.33},
+  {id:'citations',cls:'gl-citations',ic:'❝',name:'Citations',val:'1.24B+',col:'#ec4899',dy:0.66}
+];
+
+const globeLabelEls=labelSpecs.map(s=>{
+  const el=document.createElement('div');
+  el.className='globe-label '+s.cls;
+  el.innerHTML=`<span class="gl-ic">${s.ic}</span><span>${s.name}</span><b>${s.val}</b>`;
+  ui.appendChild(el);
+  return{el,spec:s};
+});
+
+/* HUD Badges for Station and Synthesizer Spacecraft */
+const stationBadge=document.createElement('div');
+stationBadge.className='station-badge';
+stationBadge.textContent='Paper Collection';
+ui.appendChild(stationBadge);
+
+const craftBadge=document.createElement('div');
+craftBadge.className='craft-badge';
+craftBadge.innerHTML='<i>⚛</i> SYNTHESIZER <small>Multi-Agent RAG</small>';
+ui.appendChild(craftBadge);
+
+function layout(){
+  const w=innerWidth,h=innerHeight;wide=w>=900;updateScrollBounds();
+  R.setSize(w,h,false);if(comp)comp.setSize(w,h);AS=w/h;C.aspect=AS;C.updateProjectionMatrix();
+  let px,cx,cy;
+  if(wide){px=Math.min(h*.225,w*.125);cx=w*.68;cy=h*.48;}
+  else{px=Math.min(w*.235,h*.12);cx=w*.5;cy=h*.24;}
+  D=h*RG/(2*TH*px);C.rotation.set(0,0,0);
+  G.position.set((cx/w*2-1)*D*TH*AS,(1-cy/h*2)*D*TH,0);
+  G.scale.setScalar(RG);GPX={x:cx,y:cy,r:px};GW.copy(G.position);
+  L0={nx:cx/w*2-1,ny:1-cy/h*2,px};placePlanets();
+  updateStationPos();
 }
-const kbRing1=new T.Mesh(new T.TorusGeometry(1.02,.022,12,64),new T.MeshBasicMaterial({color:0x38bdf8}));
-kbRing1.rotation.x=Math.PI/2+.12;kbRing1.position.y=-.18;kbGroup.add(kbRing1);
-const kbRing2=new T.Mesh(new T.TorusGeometry(.85,.018,12,64),new T.MeshBasicMaterial({color:0xa855f7}));
-kbRing2.rotation.x=Math.PI/2-.15;kbRing2.position.y=-.08;kbGroup.add(kbRing2);
-const kbChamberGeo=new T.CylinderGeometry(.55,.55,.85,6,1,true);
-const kbChamber=new T.Mesh(kbChamberGeo,new T.MeshPhysicalMaterial({color:0x0284c7,metalness:.1,roughness:.05,transparent:true,opacity:.26,side:T.DoubleSide,transmission:.4}));
-kbChamber.position.y=.32;kbGroup.add(kbChamber);
-const kbEdges=new T.LineSegments(new T.EdgesGeometry(kbChamberGeo),new T.LineBasicMaterial({color:0x67e8f9,transparent:true,opacity:.9}));
-kbEdges.position.y=.32;kbGroup.add(kbEdges);
-const kbCrystal=new T.Mesh(new T.OctahedronGeometry(.32,0),new T.MeshStandardMaterial({color:0x38bdf8,emissive:0x0ea5e9,emissiveIntensity:1.2,metalness:.4,roughness:.1}));
-kbCrystal.position.y=.32;kbGroup.add(kbCrystal);
-const kbLaserBeam=new T.Mesh(new T.CylinderGeometry(.015,.06,1.8,16,1,true),new T.MeshBasicMaterial({color:0x38bdf8,transparent:true,opacity:.55,blending:T.AdditiveBlending,side:T.DoubleSide}));
-kbLaserBeam.position.y=1.1;kbGroup.add(kbLaserBeam);
-const kbGlow=spr(glowT,0x38bdf8,2.8,.65,kbGroup);kbGlow.position.y=.45;
-const kbBeaconSprite=spr(ringT,0x67e8f9,1.1,.75,kbGroup);kbBeaconSprite.position.y=1.15;
-const KB_SPAWN_OFFSET=V(0,.95,0);
-function updateKbPos(){
-  const b=bnd(3.2);
-  if(wide){
-    kbGroup.position.set(-b.w*.04,-b.h*.08,3.2);
-    kbGroup.scale.setScalar(1.25);
-  }else{
-    kbGroup.position.set(0,-b.h*.22,3.2);
-    kbGroup.scale.setScalar(1.0);
-  }
-}
-/* ---------- papers ---------- */
-const TITLES=['Attention Is All You Need','Deep Residual Learning for Image Recognition','BERT: Pre-training of Deep Bidirectional Transformers','Highly accurate protein structure prediction with AlphaFold','Semi-Supervised Classification with Graph Convolutional Networks','Language Models are Few-Shot Learners','Denoising Diffusion Probabilistic Models','A Programmable Dual-RNA-Guided DNA Endonuclease','Retrieval-Augmented Generation for Knowledge-Intensive NLP','An Image is Worth 16x16 Words','Graph Attention Networks','Mastering the Game of Go with Deep Neural Networks','Topological Codes for Fault-Tolerant Quantum Computation','Multimodal Learning for Oncology Biomarker Discovery','Chain-of-Thought Prompting Elicits Reasoning in LLMs','Constitutional AI: Harmlessness from AI Feedback'];
-const SRCS=['arXiv','PubMed','OpenAlex','Semantic Scholar','IEEE Xplore','Crossref'];
+
+/* ---------- Paper Textures & Geometry ---------- */
+const TITLES=['Attention Is All You Need','Highly accurate protein structure prediction with AlphaFold','Mastering the Game of Go with Deep Neural Networks','Deep Residual Learning for Image Recognition','BERT: Pre-training of Deep Bidirectional Transformers','Language Models are Few-Shot Learners','Retrieval-Augmented Generation for NLP','Graph Attention Networks'];
+const SRCS=['arXiv','PubMed','IEEE Xplore','Nature','Semantic Scholar'];
 function wrapT(x,s,px,py,mw,lh,max){const w=s.split(' ');let l='',n=0;for(const k of w){const t=l?l+' '+k:k;if(x.measureText(t).width>mw&&l){x.fillText(l,px,py+n*lh);l=k;n++;if(n>=max)return}else l=t}x.fillText(l,px,py+n*lh)}
 const WORDS='the of and in to a is that for with as by on we this are from be an model data graph method results show using each between learning network training paper proposed performance across analysis however figure table shown semantic retrieval citation embedding accuracy baseline evaluation significant approach'.split(' '),ln=n=>{let s='';for(let i=0;i<n;i++)s+=WORDS[(Math.random()*WORDS.length)|0]+' ';return s};
-function paperTex(title){const W=384,H=512,c=mkc(W,H),x=c.getContext('2d');x.fillStyle='#f3efe4';x.fillRect(0,0,W,H);
-for(let i=0;i<900;i++){x.fillStyle=`rgba(${120+rnd(0,40)|0},${110+rnd(0,40)|0},${90+rnd(0,40)|0},${rnd(.02,.06)})`;x.fillRect(rnd(0,W),rnd(0,H),rnd(1,3),rnd(1,3))}
-x.fillStyle='#1d2b6b';x.font='bold 11px Georgia,serif';x.fillText('Journal of Machine Intelligence · Vol. 42',24,28);x.fillStyle='#6b6a66';x.font='9px sans-serif';x.fillText('arXiv preprint · cs.AI · 2026',24,42);x.fillStyle='#1d2b6b';x.fillRect(24,50,W-48,1.5);
-x.fillStyle='#14161f';x.font='bold 22px Georgia,serif';wrapT(x,title,24,82,W-48,26,3);
-x.fillStyle='#3a3f55';x.font='italic 12px Georgia,serif';x.fillText('A. Researcher, B. Scholar, C. Author',24,170);x.fillStyle='#7a7a78';x.font='9px sans-serif';x.fillText('Department of Computer Science · University',24,184);
-x.fillStyle='#14161f';x.font='bold 10px Georgia,serif';x.fillText('Abstract',24,208);x.font='8.5px Georgia,serif';x.fillStyle='#2c2f3d';for(let i=0;i<6;i++)x.fillText(ln(14),24,222+i*11,W-48);
-x.font='8px Georgia,serif';x.fillStyle='#34384a';for(let col=0;col<2;col++)for(let i=0;i<20;i++)x.fillText(ln(7),24+col*174,300+i*10.4,160);
-x.fillStyle='rgba(255,226,90,.55)';x.fillRect(24,300+4*10.4-7,150,9);
-x.fillStyle='#fff';x.fillRect(198,384,162,86);x.strokeStyle='#8a90a8';x.lineWidth=1;x.strokeRect(198,384,162,86);x.strokeStyle='#cdd2e0';for(let k=1;k<4;k++){x.beginPath();x.moveTo(198,384+k*21.5);x.lineTo(360,384+k*21.5);x.stroke()}
-x.lineWidth=1.6;[['#2b5bd8',.6,50],['#d8412f',.9,36]].forEach(q=>{x.strokeStyle=q[0];x.beginPath();for(let k=0;k<=20;k++){const px=206+k*7,py=462-Math.pow(k/20,q[1])*q[2]+Math.sin(k)*2;k?x.lineTo(px,py):x.moveTo(px,py)}x.stroke()});
-x.fillStyle='#555';x.font='7px sans-serif';x.fillText('Fig. 1  Performance vs. graph size',198,481);x.font='9px sans-serif';x.fillStyle='#777';x.fillText('1',W/2,H-14);
-x.fillStyle='#d9d4c4';x.beginPath();x.moveTo(W,0);x.lineTo(W-34,0);x.lineTo(W,34);x.fill();
-const vg=x.createLinearGradient(0,0,W,0);vg.addColorStop(0,'rgba(0,0,0,.07)');vg.addColorStop(.06,'rgba(0,0,0,0)');vg.addColorStop(.94,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.09)');x.fillStyle=vg;x.fillRect(0,0,W,H);return tex(c)}
-const paperGeo=()=>{const g=new T.PlaneGeometry(.57,.76,4,6),p=g.attributes.position;for(let k=0;k<p.count;k++)p.setZ(k,.035*Math.sin(p.getX(k)*5)*(p.getY(k)+.4)-.02*p.getY(k)*p.getY(k));g.computeVertexNormals();return g};
-const papers=[];for(let i=0;i<10;i++){const title=TITLES[i%TITLES.length],tx=paperTex(title),m=new T.Mesh(paperGeo(),new T.MeshStandardMaterial({map:tx,color:0xa8a8a8,envMapIntensity:.2,emissive:0xffffff,emissiveMap:tx,emissiveIntensity:.04,side:T.DoubleSide,roughness:.92,metalness:0,transparent:true,opacity:0}));
-const gl=spr(glowT,0x5fd8ff,1.3,0),rg=spr(ringT,0x9fe8ff,.3,0);S.add(m);papers.push({m,gl,rg,pos:V(0,0,0),home:V(0,0,0),st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})}
-const rz=front=>front?rnd(RG+.8,RG+4):rnd(-RG-6,-RG-2);
-function paperHome(p){
-  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET);
-  p.pos.copy(p.home);
-  p.title=TITLES[(Math.random()*TITLES.length)|0];
-  if(p.m.material.map)p.m.material.map.dispose();
-  const tx=paperTex(p.title);
-  p.m.material.map=tx;
-  p.m.material.emissiveMap=tx;
-  p.m.material.needsUpdate=true;
-  p.vis=0;
-  p.st='free';
-  p.sc=1;
-  p.sp=1;
-  const s=SRCS[(Math.random()*SRCS.length)|0];
-  p.src=s=='arXiv'?'arXiv:2611.'+(10000+((Math.random()*89999)|0)):s=='PubMed'?'PubMed · PMID '+(39000000+((Math.random()*999999)|0)):s+' · '+(Math.random().toString(16).slice(2,10));
+
+function paperTex(title){
+  const W=384,H=512,c=mkc(W,H),x=c.getContext('2d');x.fillStyle='#f8fafc';x.fillRect(0,0,W,H);
+  for(let i=0;i<600;i++){x.fillStyle=`rgba(${180+rnd(0,40)|0},${190+rnd(0,40)|0},${210+rnd(0,40)|0},${rnd(.02,.05)})`;x.fillRect(rnd(0,W),rnd(0,H),rnd(1,3),rnd(1,3))}
+  x.fillStyle='#0369a1';x.font='bold 11px Inter,sans-serif';x.fillText('ACADEMIC PREPRINT · RESEARCHGRAPH RAG',24,28);
+  x.fillStyle='#0284c7';x.fillRect(24,36,W-48,1.5);
+  x.fillStyle='#0f172a';x.font='bold 21px Georgia,serif';wrapT(x,title,24,68,W-48,25,3);
+  x.fillStyle='#475569';x.font='italic 11px Georgia,serif';x.fillText('A. Researcher, B. Scientist, C. Scholar · 2026',24,152);
+  x.fillStyle='#0f172a';x.font='bold 10.5px Inter,sans-serif';x.fillText('ABSTRACT',24,178);
+  x.font='8.5px Inter,sans-serif';x.fillStyle='#334155';for(let i=0;i<5;i++)x.fillText(ln(13),24,194+i*11,W-48);
+  for(let col=0;col<2;col++)for(let i=0;i<18;i++)x.fillText(ln(7),24+col*174,265+i*10.5,160);
+  x.fillStyle='#f1f5f9';x.fillRect(198,380,162,90);x.strokeStyle='#cbd5e1';x.strokeRect(198,380,162,90);
+  x.strokeStyle='#0284c7';x.lineWidth=1.5;x.beginPath();
+  for(let k=0;k<=15;k++){const px=208+k*9.5,py=455-Math.pow(k/15,.8)*50+Math.sin(k*1.5)*3;k?x.lineTo(px,py):x.moveTo(px,py)}x.stroke();
+  return tex(c);
 }
-/* ---------- merge effects ---------- */
-const feed=$('feed'),cntE=$('cnt');let merged=0,flash=0;
-const ripples=Array.from({length:6},()=>{const m=new T.Mesh(new T.RingGeometry(.88,1,64),new T.MeshBasicMaterial({color:0xffd36a,transparent:true,opacity:0,side:T.DoubleSide,blending:T.AdditiveBlending,depthWrite:false}));spin.add(m);return{m,t:1}});let ri=0;
+
+const paperGeo=()=>{const g=new T.PlaneGeometry(.54,.74,4,6),p=g.attributes.position;for(let k=0;k<p.count;k++)p.setZ(k,.025*Math.sin(p.getX(k)*6)*(p.getY(k)+.4)-.015*p.getY(k)*p.getY(k));g.computeVertexNormals();return g};
+
+/* ---------- Paper Collection Station ---------- */
+const stationGroup=new T.Group();S.add(stationGroup);
+
+// Holographic pad base with concentric cyan rings
+[0.85,0.62,0.38].forEach((r,idx)=>{
+  const m=new T.Mesh(new T.TorusGeometry(r,.014,12,48),new T.MeshBasicMaterial({color:idx===0?0x00f0ff:0x38bdf8,transparent:true,opacity:.85}));
+  m.rotation.x=Math.PI/2;stationGroup.add(m);
+});
+const padDisc=new T.Mesh(new T.CircleGeometry(.85,32),new T.MeshBasicMaterial({color:0x0284c7,transparent:true,opacity:.18,blending:T.AdditiveBlending,side:T.DoubleSide}));
+padDisc.rotation.x=-Math.PI/2;stationGroup.add(padDisc);
+const padGlow=spr(glowT,0x00f0ff,2.2,.45,stationGroup);padGlow.position.y=.05;
+
+// 4 neatly clustered upright research paper models
+const paperConfigs=[
+  {x:-.22,y:.22,z:-.06,ry:-.25,rz:.06,title:TITLES[0]},
+  {x:-.07,y:.28,z:.04,ry:-.08,rz:.02,title:TITLES[1]},
+  {x:.09,y:.26,z:.02,ry:.12,rz:-.04,title:TITLES[2]},
+  {x:.24,y:.20,z:-.05,ry:.28,rz:-.08,title:TITLES[3]}
+];
+const stationPapers=paperConfigs.map(cfg=>{
+  const tx=paperTex(cfg.title);
+  const mesh=new T.Mesh(paperGeo(),new T.MeshStandardMaterial({map:tx,color:0xffffff,roughness:.8,metalness:.1,side:T.DoubleSide}));
+  mesh.position.set(cfg.x,cfg.y,cfg.z);
+  mesh.rotation.set(.1,cfg.ry,cfg.rz);
+  mesh.scale.setScalar(.72);
+  stationGroup.add(mesh);
+  return{mesh,cfg,title:cfg.title,vis:1};
+});
+
+function updateStationPos(){
+  const b=bnd(3.2);
+  if(wide){
+    stationGroup.position.set(-b.w * 0.16, -b.h * 0.05, 3.2);
+    stationGroup.scale.setScalar(1.0);
+  }else{
+    stationGroup.position.set(0, -b.h * 0.32, 3.2);
+    stationGroup.scale.setScalar(0.85);
+  }
+}
+
+/* ---------- Synthesizer Spacecraft (Aerospace Shuttle) ---------- */
+const craft=(()=>{
+  const g=new T.Group();
+  
+  // Clean white delta fuselage
+  const bodyGeo=new T.ConeGeometry(.28,1.35,16);
+  bodyGeo.rotateX(Math.PI/2);bodyGeo.scale(1.2,.46,1);
+  const bodyMat=new T.MeshStandardMaterial({color:0xf8fafc,metalness:.85,roughness:.22});
+  const body=new T.Mesh(bodyGeo,bodyMat);body.position.z=.12;g.add(body);
+
+  // Dark underside keel armor
+  const under=new T.Mesh(new T.BoxGeometry(.52,.07,1.05),new T.MeshStandardMaterial({color:0x0f172a,metalness:.9,roughness:.3}));
+  under.position.set(0,-.08,.08);g.add(under);
+
+  // Electric cyan canopy glass
+  const canopyGeo=new T.SphereGeometry(.16,16,12);
+  canopyGeo.scale(.82,.52,1.55);
+  const canopy=new T.Mesh(canopyGeo,new T.MeshPhysicalMaterial({color:0x38bdf8,metalness:.1,roughness:.05,transmission:.7,transparent:true,opacity:.88,emissive:0x0284c7,emissiveIntensity:.8}));
+  canopy.position.set(0,.10,.30);g.add(canopy);
+
+  // Swept delta wings
+  const wingShape=new T.Shape();
+  wingShape.moveTo(0,.35);wingShape.lineTo(.85,-.35);wingShape.lineTo(.80,-.48);wingShape.lineTo(0,-.32);wingShape.closePath();
+  const wingGeo=new T.ExtrudeGeometry(wingShape,{depth:.025,bevelEnabled:true,bevelSegments:2,steps:1,bevelSize:.012,bevelThickness:.012});
+  wingGeo.rotateX(Math.PI/2);
+  const wingMat=new T.MeshStandardMaterial({color:0xe2e8f0,metalness:.8,roughness:.25});
+
+  const wingR=new T.Mesh(wingGeo,wingMat);wingR.position.set(.10,-.02,.12);g.add(wingR);
+  const wingL=wingR.clone();wingL.scale.x=-1;wingL.position.set(-.10,-.02,.12);g.add(wingL);
+
+  // Winglet vertical stabilizers with cyan tip lights
+  [-.86,.86].forEach(wx=>{
+    const wlet=new T.Mesh(new T.BoxGeometry(.022,.16,.25),bodyMat);wlet.position.set(wx,.06,-.28);
+    const wletLight=new T.Mesh(new T.SphereGeometry(.018,6,6),new T.MeshBasicMaterial({color:0x00f0ff}));
+    wletLight.position.set(wx,.14,-.28);g.add(wlet,wletLight);
+  });
+
+  // Vertical Center Tail Fin
+  const tail=new T.Mesh(new T.BoxGeometry(.026,.32,.38),bodyMat);tail.position.set(0,.18,-.32);tail.rotation.x=-.32;g.add(tail);
+
+  // Twin Jet Engines with Cyan Glowing Nozzles
+  const engineMat=new T.MeshStandardMaterial({color:0x1e293b,metalness:.9,roughness:.2});
+  [-.16,.16].forEach(ex=>{
+    const engGeo=new T.CylinderGeometry(.08,.08,.40,16);engGeo.rotateX(Math.PI/2);
+    const eng=new T.Mesh(engGeo,engineMat);eng.position.set(ex,-.02,-.38);
+
+    const rim=new T.Mesh(new T.TorusGeometry(.078,.012,8,24),new T.MeshBasicMaterial({color:0x00f0ff}));
+    rim.position.set(ex,-.02,-.58);
+
+    const plume=new T.Mesh(new T.ConeGeometry(.07,.48,12,1,true),new T.MeshBasicMaterial({color:0x00f0ff,transparent:true,opacity:.85,blending:T.AdditiveBlending,side:T.DoubleSide}));
+    plume.rotateX(-Math.PI/2);plume.position.set(ex,-.02,-.82);
+    g.add(eng,rim,plume);
+  });
+
+  const craftGlow=spr(glowT,0x00f0ff,1.4,.65,g);craftGlow.position.set(0,-.02,-.75);
+  g.scale.setScalar(.70);S.add(g);
+  return{g,craftGlow};
+})();
+
+/* Carried Paper Model (Attached Underneath Spacecraft during Transit) */
+const carriedPaperMesh=new T.Mesh(paperGeo(),new T.MeshStandardMaterial({color:0xffffff,roughness:.8,side:T.DoubleSide,transparent:true,opacity:0}));
+carriedPaperMesh.scale.setScalar(.72);
+S.add(carriedPaperMesh);
+
+/* Curved Cyan Trajectory Line */
+const trajGeo=new T.BufferGeometry();
+const trajMat=new T.LineDashedMaterial({color:0x38bdf8,dashSize:.22,gapSize:.14,transparent:true,opacity:.75,blending:T.AdditiveBlending});
+const trajLine=new T.Line(trajGeo,trajMat);
+S.add(trajLine);
+
+/* Thruster Trail Particles */
+const TRN=36,trs=Array.from({length:TRN},()=>({s:spr(glowT,0x38bdf8,.3,0),l:0}));let tri=0;
+function trailAt(p,col){const q=trs[tri++%TRN];q.s.position.copy(p);q.s.material.color.setHex(col);q.l=1}
+
+/* Merge Ripple & Spark Effects on Earth */
+const feed=$('feed'),cntE=$('cnt');let merged=16,flash=0;
+const ripples=Array.from({length:6},()=>{const m=new T.Mesh(new T.RingGeometry(.88,1,64),new T.MeshBasicMaterial({color:0x00f0ff,transparent:true,opacity:0,side:T.DoubleSide,blending:T.AdditiveBlending,depthWrite:false}));spin.add(m);return{m,t:1}});let ri=0;
 const extras=[],grow=[];
 const SPN=64,sparkG=new T.BufferGeometry(),sparkP=new Float32Array(SPN*3).fill(0);sparkG.setAttribute('position',new T.BufferAttribute(sparkP,3));
-const sparks=new T.Points(sparkG,new T.PointsMaterial({size:.55,map:glowT,color:0xffd88a,transparent:true,blending:T.AdditiveBlending,depthWrite:false}));sparks.frustumCulled=false;S.add(sparks);
+const sparks=new T.Points(sparkG,new T.PointsMaterial({size:.55,map:glowT,color:0x38bdf8,transparent:true,blending:T.AdditiveBlending,depthWrite:false}));sparks.frustumCulled=false;S.add(sparks);
 const sp=Array.from({length:SPN},()=>({a:V(0,0,0),b:V(0,0,0),t:1,l:1}));let si=0;
-function toast(p,links){const e=document.createElement('div');e.className='toast';e.innerHTML='<i>✓</i><div><small>NEW PAPER MERGED INTO RESEARCH GRAPH</small><b></b><span></span></div>';e.querySelector('b').textContent=p.title;e.querySelector('span').textContent=p.src+' · +'+links+' citation links';feed.prepend(e);requestAnimationFrame(()=>e.classList.add('in'));setTimeout(()=>{e.classList.remove('in');setTimeout(()=>e.remove(),500)},4600);while(feed.children.length>2)feed.lastChild.remove()}
-function merge(pW,p){G.updateMatrixWorld(true);const loc=spin.worldToLocal(pW.clone()).normalize(),n=pW.clone().sub(Gp).normalize();
-const s=spr(glowT,0xffd36a,.01,1,spin);s.position.copy(loc).multiplyScalar(1.013);s.userData.t=0;extras.push({s,L:[]});const me=extras[extras.length-1];
-const near=allN.map((q,i)=>({i,d:q.angleTo(loc)})).sort((a,b)=>a.d-b.d).slice(0,3);
-near.forEach(o=>{const pts=arcPts(loc.clone().multiplyScalar(1),allN[o.i],14),g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(15*3),3));pts.forEach((q,k)=>g.attributes.position.setXYZ(k,q.x,q.y,q.z));g.setDrawRange(0,0);
-const l=new T.Line(g,new T.LineBasicMaterial({color:0xffd36a,transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false}));spin.add(l);me.L.push(l);grow.push({l,t:0})});
-allN.push(loc);
-if(extras.length>45){const o=extras.shift();spin.remove(o.s);o.L.forEach(l=>{spin.remove(l);l.geometry.dispose()})}
-const r=ripples[ri++%6];r.m.position.copy(loc).multiplyScalar(1.006);r.m.quaternion.setFromUnitVectors(V(0,0,1),loc);r.t=0;
-const u=n.clone().cross(V(0,1,0)).normalize(),w=n.clone().cross(u);for(let k=0;k<26;k++){const q=sp[si++%SPN],a=rnd(0,6.28),rad=rnd(.7,1.7);q.a.copy(pW).addScaledVector(u,Math.cos(a)*rad).addScaledVector(w,Math.sin(a)*rad).addScaledVector(n,rnd(.1,.8));q.b.copy(pW).addScaledVector(n,.05);q.t=0;q.l=rnd(.5,.85)}
-flash=1;cntE.textContent=(++merged).toLocaleString();toast(p,near.length)}
-/* ---------- bird (feathered wings, two-joint flap) ---------- */
-function featherTex(base,tip,frac){const c=mkc(64,256),x=c.getContext('2d');x.beginPath();x.moveTo(30,256);x.bezierCurveTo(2,200,4,60,32,2);x.bezierCurveTo(60,60,62,200,34,256);x.closePath();const g=x.createLinearGradient(0,0,0,256);g.addColorStop(0,tip);g.addColorStop(frac,tip);g.addColorStop(Math.min(1,frac+.04),base);g.addColorStop(1,base);x.fillStyle=g;x.fill();x.save();x.clip();x.strokeStyle='rgba(20,30,50,.3)';x.lineWidth=1;for(let i=0;i<72;i++){const y=4+i*3.6;x.beginPath();x.moveTo(32,y);x.lineTo(2,y-24);x.moveTo(32,y);x.lineTo(62,y-24);x.stroke()}x.restore();x.strokeStyle='rgba(255,255,255,.5)';x.lineWidth=2;x.beginPath();x.moveTo(32,256);x.lineTo(32,6);x.stroke();return tex(c)}
-const fmat=t=>new T.MeshStandardMaterial({map:t,color:0xd8dce4,alphaTest:.4,side:T.DoubleSide,roughness:.85,metalness:0}),mPrim=fmat(featherTex('#262c3d','#f4f6fa',.12)),mSec=fmat(featherTex('#a9b4c6','#f0f3f8',.07)),mCov=fmat(featherTex('#c4cdda','#e4e9f0',.05)),mWht=fmat(featherTex('#f6f8fb','#ffffff',.02));
-function fGeo(w,L,cam){const g=new T.PlaneGeometry(w,L,1,4);g.translate(0,L/2,0);const p=g.attributes.position;for(let i=0;i<p.count;i++){const t=p.getY(i)/L;p.setZ(i,-cam*t*t)}g.rotateZ(-Math.PI/2);g.rotateX(-Math.PI/2);g.computeVertexNormals();return g}
-function addF(par,mat,w,L,cam,x,y,z,psi,flex){const pv=new T.Group();pv.position.set(x,y,z);pv.rotation.set(0,psi,flex);pv.add(new T.Mesh(fGeo(w,L,cam),mat));par.add(pv);return pv}
-function mkWing(s){const sh=new T.Group(),mir=new T.Group(),hand=new T.Group();mir.scale.x=s;sh.add(mir);hand.position.set(.5,0,0);mir.add(hand);
-const arm=new T.Mesh(new T.SphereGeometry(1,12,8),mCov);arm.scale.set(.30,.04,.11);arm.position.set(.26,.012,.03);mir.add(arm);const fan=[];
-for(let i=0;i<10;i++){const x=.46-i*.047;addF(mir,mSec,.08,.5-.012*i,.04,x,0,-.02,1.28+i*.012,0);addF(mir,mCov,.075,.22,.03,x+.01,.007,.05,1.24+i*.012,0)}
-for(let i=0;i<3;i++)addF(mir,mWht,.08,.34-.02*i,.03,.03+i*.03,.004,-.01,1.4,0);for(let i=0;i<8;i++)addF(mir,mCov,.06,.13,.02,.06+i*.05,.012,.085,1.15+i*.015,0);for(let i=0;i<3;i++)addF(mir,mSec,.07,.28,.03,.015+i*.025,.008,.03,1.45,0);
-for(let i=0;i<10;i++){const psi=lerp(1.0,.12,i/9);fan.push({pv:addF(hand,i<3?mSec:mPrim,.06,.44+.025*i,.03,i*.01,-.002,0,psi,0),psi,k:i/9});if(i<7)fan.push({pv:addF(hand,mCov,.06,.2,.03,i*.012,.007,.03,lerp(1.0,.12,(i+2)/9),0),psi:lerp(1.0,.12,(i+2)/9),k:(i+2)/9})}
-addF(hand,mPrim,.03,.11,.01,0,.006,.05,.02,.2);return{sh,hand,s,fan}}
-const bird=(()=>{const g=new T.Group(),bg=new T.Group();g.rotation.order='YXZ';g.add(bg);
-const prof=[[0,-.62],[.03,-.58],[.08,-.45],[.13,-.25],[.16,-.02],[.155,.15],[.125,.30],[.08,.38],[0,.40]].map(q=>new T.Vector2(q[0],q[1])),bgm=new T.LatheGeometry(prof,28);bgm.scale(1,1,.92);bgm.rotateX(Math.PI/2);
-const nr=bgm.attributes.normal,cols=[];for(let i=0;i<nr.count;i++){const k=sm(.1,.7,nr.getY(i));cols.push(lerp(.9,.5,k),lerp(.92,.56,k),lerp(.96,.66,k))}bgm.setAttribute('color',new T.Float32BufferAttribute(cols,3));
-bg.add(new T.Mesh(bgm,new T.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0})));
-const hd=new T.Mesh(new T.SphereGeometry(.09,24,16),new T.MeshStandardMaterial({color:0xdde2ea,roughness:.8}));hd.scale.set(1,1,1.25);hd.position.set(0,.04,.47);bg.add(hd);
-const mB=new T.MeshStandardMaterial({color:0xf0b020,roughness:.5,emissive:0x503000,emissiveIntensity:.4}),bk=new T.Mesh(new T.ConeGeometry(.034,.2,14).rotateX(Math.PI/2),mB);bk.position.set(0,.01,.66);bg.add(bk);
-const rs=new T.Mesh(new T.SphereGeometry(.012,8,8),new T.MeshBasicMaterial({color:0xd02a2a}));rs.position.set(0,-.02,.70);bg.add(rs);{const lm2=new T.Mesh(new T.ConeGeometry(.026,.17,12).rotateX(Math.PI/2),mB);lm2.position.set(0,-.012,.64);bg.add(lm2);[-1,1].forEach(s=>{const n=new T.Mesh(new T.SphereGeometry(.007,6,6),new T.MeshBasicMaterial({color:0x5a3a00}));n.position.set(s*.016,.014,.62);bg.add(n)})}
-[-1,1].forEach(s=>{const ring=new T.Mesh(new T.SphereGeometry(.026,10,8),new T.MeshStandardMaterial({color:0xf08a20}));ring.position.set(s*.075,.065,.52);bg.add(ring);const ey=new T.Mesh(new T.SphereGeometry(.018,10,8),new T.MeshStandardMaterial({color:0x080808,roughness:.2}));ey.position.set(s*.085,.067,.525);bg.add(ey);const hl=new T.Mesh(new T.SphereGeometry(.005,6,6),new T.MeshBasicMaterial({color:0xffffff}));hl.position.set(s*.098,.074,.532);bg.add(hl)});
-for(let k=-5;k<=5;k++)addF(bg,mWht,.085,.42-Math.abs(k)*.012,.02,0,0,-.55,Math.PI/2+k*.075,k%2?.05:-.02);
-const lm=new T.MeshStandardMaterial({color:0xf09a30,roughness:.6});[-1,1].forEach(s=>{const l=new T.Mesh(new T.CylinderGeometry(.011,.011,.24,6).rotateX(Math.PI/2),lm);l.position.set(s*.05,-.12,-.3);l.rotation.y=s*.08;bg.add(l);const f=new T.Mesh(new T.CircleGeometry(.06,3).rotateX(-Math.PI/2),new T.MeshStandardMaterial({color:0xf09a30,side:T.DoubleSide}));f.position.set(s*.055,-.125,-.45);bg.add(f)});
-const wl=mkWing(1),wr=mkWing(-1);wl.sh.position.set(.13,.075,.12);wr.sh.position.set(-.13,.075,.12);bg.add(wl.sh,wr.sh);g.scale.setScalar(.5);S.add(g);return{g,bg,wings:[wl,wr]}})();
-/* ---------- UFO (lathe hull, panels, emissive window band, glass dome, pilot, pods) ---------- */
-const PT=(()=>{const c=mkc(512,64),x=c.getContext('2d');x.fillStyle='#808080';x.fillRect(0,0,512,64);x.strokeStyle='#303030';x.lineWidth=2;for(let i=0;i<=16;i++){x.beginPath();x.moveTo(i*32,0);x.lineTo(i*32,64);x.stroke()}for(let j=0;j<=2;j++){x.beginPath();x.moveTo(0,j*32);x.lineTo(512,j*32);x.stroke()}for(let k=0;k<50;k++){const v=Math.random()<.5?100:170;x.fillStyle=`rgba(${v},${v},${v},.5)`;x.fillRect(rnd(0,500),rnd(0,56),rnd(8,26),rnd(5,14))}for(let i=0;i<16;i++)for(let j=0;j<3;j++){x.fillStyle='#202020';x.fillRect(i*32+4,j*32+4,2,2);x.fillRect(i*32+26,j*32+4,2,2)}const t=tex(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(3,2);return t})();
-const HT=(()=>{const c=mkc(512,128),x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,128);g.addColorStop(0,'#8e9bb4');g.addColorStop(.5,'#c3ccdc');g.addColorStop(1,'#7f8aa2');x.fillStyle=g;x.fillRect(0,0,512,128);for(let i=0;i<700;i++){const k=Math.random()>.5?255:0;x.fillStyle=`rgba(${k},${k},${k},${rnd(.02,.08)})`;x.fillRect(rnd(0,512),rnd(0,128),rnd(20,120),1)}for(let i=0;i<16;i++){if(i%3==0){x.fillStyle='rgba(40,60,100,.18)';x.fillRect(i*32,0,32,128)}x.fillStyle='rgba(20,30,50,.5)';x.fillRect(i*32,0,1.5,128)}const t=tex(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t})();
-const WT=(()=>{const c=mkc(512,32),x=c.getContext('2d');x.fillStyle='#000';x.fillRect(0,0,512,32);for(let i=0;i<32;i++){x.fillStyle=i%5==0?'#ffc86a':'#8fe8ff';x.fillRect(i*16+3,10,10,12)}const t=tex(c);t.wrapS=T.RepeatWrapping;return t})();
-const ufo=(()=>{const g=new T.Group(),m=new T.Group();g.add(m);
-const hull=new T.MeshStandardMaterial({map:HT,color:0xe6ecf6,metalness:.72,roughness:.3,bumpMap:PT,bumpScale:.5,side:T.DoubleSide}),dark=new T.MeshStandardMaterial({color:0x2a3042,metalness:.9,roughness:.4}),gm=c=>new T.MeshBasicMaterial({color:c,side:T.DoubleSide});
-m.add(new T.Mesh(new T.LatheGeometry([[0,-.45],[.34,-.43],[.5,-.37],[.9,-.3],[1.3,-.19],[1.55,-.09],[1.66,0],[1.55,.08],[1.3,.15],[.95,.22],[.7,.29],[.52,.33],[0,.34]].map(q=>new T.Vector2(q[0],q[1])),96),hull));
-const band=new T.Mesh(new T.CylinderGeometry(1.67,1.67,.13,64,1,true),new T.MeshStandardMaterial({color:0x10151f,emissive:0xffffff,emissiveMap:WT,emissiveIntensity:1.6,metalness:.6,roughness:.4,side:T.DoubleSide}));m.add(band);
-const collar=new T.Mesh(new T.TorusGeometry(.68,.045,12,64),dark);collar.rotation.x=Math.PI/2;collar.position.y=.3;m.add(collar);
-const acc=new T.Mesh(new T.TorusGeometry(1.64,.018,8,128),gm(0x66e8ff));acc.rotation.x=Math.PI/2;acc.position.y=.075;m.add(acc);
-for(let i=0;i<10;i++){const a=i/10*6.283,v=new T.Mesh(new T.BoxGeometry(.2,.03,.07),dark),s=new T.Mesh(new T.BoxGeometry(.16,.012,.025),gm(0x66e8ff));v.position.set(Math.cos(a)*1.12,.2,Math.sin(a)*1.12);v.rotation.y=-a;s.position.set(Math.cos(a)*1.12,.218,Math.sin(a)*1.12);s.rotation.y=-a;m.add(v,s)}
-const dome=new T.Mesh(new T.SphereGeometry(.64,48,24,0,6.283,0,1.5708),new T.MeshPhysicalMaterial({color:0x9fd8ff,metalness:0,roughness:.03,transparent:true,opacity:.38,clearcoat:1,envMapIntensity:2.2,emissive:0x0a3a66,emissiveIntensity:.5,side:T.DoubleSide}));dome.position.y=.3;dome.scale.y=.85;m.add(dome);
-const alien=new T.MeshStandardMaterial({color:0x6f8a78,roughness:.6}),hd=new T.Mesh(new T.SphereGeometry(.075,16,12),alien);hd.scale.set(1,1.35,1);hd.position.set(0,.62,0);m.add(hd);
-const bd=new T.Mesh(new T.ConeGeometry(.1,.26,12),alien);bd.position.set(0,.42,0);m.add(bd);
-[-1,1].forEach(s=>{const e=new T.Mesh(new T.SphereGeometry(.02,8,6),gm(0x000000));e.position.set(s*.035,.64,.06);m.add(e)});
-const cons=new T.Mesh(new T.CylinderGeometry(.3,.34,.04,24),new T.MeshStandardMaterial({color:0x1a3a5a,emissive:0x2a8acf,emissiveIntensity:.5}));cons.position.y=.34;m.add(cons);spr(glowT,0x66e8ff,1.4,.5,m).position.y=.4;
-const an=new T.Mesh(new T.CylinderGeometry(.012,.02,.4,8),dark);an.position.y=1.04;m.add(an);const tip=new T.Mesh(new T.SphereGeometry(.04,10,8),new T.MeshBasicMaterial({color:0xff5a5a}));tip.position.y=1.24;m.add(tip);
-const em=new T.Mesh(new T.CircleGeometry(.34,40),gm(0x7ff0ff));em.rotation.x=Math.PI/2;em.position.y=-.455;m.add(em);const eg=spr(glowT,0x44ddff,2.6,.55,m);eg.position.y=-.55;
-[.5,.7].forEach(r=>{const t=new T.Mesh(new T.TorusGeometry(r+.1,.012,8,64),gm(0x66e8ff));t.rotation.x=Math.PI/2;t.position.y=-.4;m.add(t)});
-for(let i=0;i<6;i++){const a=i/6*6.283,l=new T.Mesh(new T.CircleGeometry(.07,16),gm(0xaaf4ff));l.rotation.x=Math.PI/2;l.position.set(Math.cos(a)*.95,-.33,Math.sin(a)*.95);m.add(l)}
-const lr=new T.Group();for(let i=0;i<14;i++){const a=i/14*6.283,l=new T.Mesh(new T.SphereGeometry(.045,8,8),gm(i%2?0xffc86a:0x66f0ff));l.position.set(Math.cos(a)*1.1,-.36,Math.sin(a)*1.1);lr.add(l)}m.add(lr);
-const lr2=new T.Group();for(let i=0;i<10;i++){const a=i/10*6.283,l=new T.Mesh(new T.SphereGeometry(.03,8,8),gm(i%2?0xff9a5a:0x9fe8ff));l.position.set(Math.cos(a)*1.3,.17,Math.sin(a)*1.3);lr2.add(l)}m.add(lr2);
-for(let i=0;i<3;i++){const a=i/3*6.283+.5,x=Math.cos(a)*.85,z=Math.sin(a)*.85,st=new T.Mesh(new T.CylinderGeometry(.025,.035,.3,8),hull);st.position.set(x,-.5,z);m.add(st);const p=new T.Mesh(new T.SphereGeometry(.085,16,12),hull);p.position.set(x,-.66,z);m.add(p)}
-const pl=new T.PointLight(0x66ddff,1.4,7);pl.position.y=-.7;m.add(pl);g.scale.setScalar(.34);S.add(g);return{g,m,band,lr,lr2,tip,eg}})();
-const beam=new T.Mesh(new T.CylinderGeometry(.05,.5,1,40,1,true),new T.ShaderMaterial({transparent:true,side:T.DoubleSide,blending:T.AdditiveBlending,depthWrite:false,uniforms:{t:{value:0},o:{value:0}},
-vertexShader:'varying vec2 u;varying vec3 n,v;void main(){u=uv;n=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);v=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
-fragmentShader:'uniform float t,o;varying vec2 u;varying vec3 n,v;void main(){float e=pow(abs(dot(n,v)),1.4),b=.55+.45*sin(u.y*26.-t*7.),a=(.2+.8*u.y)*e*b*o;gl_FragColor=vec4(.45,.9,1.,a*.55);}'}));beam.visible=false;S.add(beam);
-const beamHit=spr(glowT,0x88eeff,1.4,0),flare=spr(glowT,0xbff4ff,3,0);flare.userData.l=0;
-function setBeam(top,bot,r){const d=top.clone().sub(bot),L=d.length();beam.position.copy(top).add(bot).multiplyScalar(.5);beam.scale.set(r/.5,L,r/.5);beam.quaternion.setFromUnitVectors(V(0,1,0),d.divideScalar(L||1));beamHit.position.copy(bot)}
-/* ---------- agents ---------- */
-const tmp=V(0,0,0),qq=new T.Quaternion(),ee=new T.Euler();
-const free=()=>papers.filter(p=>p.st==='free'&&p.vis>.7);
-function wander(a){a.tg.copy(wpt());a.wt=rnd(2.5,4.5)}
-function wpt(){const z=rz(Math.random()<.78),b=bnd(z);return V(rnd(-.86,.86)*b.w,rnd(-.8,.76)*b.h,z)}
-function delivery(){const x=rnd(-.65,.2),y=rnd(-.45,.45),z=Math.sqrt(Math.max(.08,1-x*x-y*y)),d=V(x,y,z+.2).normalize(),pW=Gp.clone().addScaledVector(d,RG),tp=pW.clone().add(d.clone().multiplyScalar(rnd(1.8,2.6))).add(V(rnd(-0.6,-0.1),rnd(-0.3,0.3),rnd(0.2,0.5))),b=bnd(tp.z);tp.x=cl(tp.x,-b.w*.92,b.w*.92);tp.y=cl(tp.y,-b.h*.88,b.h*.84);return{d,pW,tp}}
-function throwPaper(p,from,to,col){p.st='fly';p.t=0;p.from.copy(from);p.to.copy(to);const dist=from.distanceTo(to);p.dur=cl(dist/7.5,.42,.72);p.ctrl.copy(from).add(to).multiplyScalar(.5);p.ctrl.y+=dist*.12;p.ctrl.z+=rnd(.2,.5);p.tc=0;p.col=col;p.beam=0}
-const TRN=40,trs=Array.from({length:TRN},()=>({s:spr(glowT,0x9fe8ff,.3,0),l:0}));let tri=0;
-function trailAt(p,col){const q=trs[tri++%TRN];q.s.position.copy(p);q.s.material.color.setHex(col);q.l=1}
-function keepOut(p,pad){const d=p.clone().sub(Gp),l=d.length();if(l<RG*pad)p.copy(Gp).addScaledVector(d.divideScalar(l||1),RG*pad)}
-const B={p:V(1,1,RG+3),yaw:0,pitch:0,bank:0,spd:5,tg:V(0,0,0),st:0,tm:0,pp:null,ph:0,glide:0,gl:0,mt:1,wob:rnd(0,9),yr:0,wt:0,dl:null};
-const U={p:V(-6,3,RG+3),v:V(0,0,0),tg:V(0,0,0),st:0,tm:0,pp:null,wt:0,dl:null,wob:rnd(0,9),rx:.25,rz:0};
-const BEAK=V(0,-.04,.74);
-function birdUpdate(dt,t){const a=B;a.tm+=dt;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.copy(a.pp.pos);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1.5)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
-else if(a.st===2){if(!a.dl)a.dl=delivery();a.tg.copy(a.dl.tp)}
-const dx=a.tg.x-a.p.x,dy=a.tg.y-a.p.y,dz=a.tg.z-a.p.z,dist=Math.hypot(dx,dy,dz)||1;
-let ey=Math.atan2(dx,dz)+(dist>5?Math.sin(t*.9+a.wob)*.1:0)-a.yaw;ey=Math.atan2(Math.sin(ey),Math.cos(ey));
-const mw=dist<4?2.7:1.6;a.yr+=(cl(ey*2.4,-mw,mw)-a.yr)*Math.min(1,dt*4);a.yaw+=a.yr*dt;
-a.pitch+=cl((cl(Math.asin(cl(dy/dist,-1,1)),-.65,.65)-a.pitch)*1.8,-.9,.9)*dt;
-const ts=a.st===0&&a.pp&&dist<5?lerp(3.2,6.6,sm(.8,5,dist)):a.st===2?5.6:6.6;a.spd=cl(a.spd+((ts-a.spd)*1.2-a.pitch*2.5)*dt,2.6,8.5);
-a.bank+=(cl(-a.yr*.62,-.85,.85)-a.bank)*Math.min(1,dt*3.5);
-const fw=V(Math.cos(a.pitch)*Math.sin(a.yaw),Math.sin(a.pitch),Math.cos(a.pitch)*Math.cos(a.yaw));a.p.addScaledVector(fw,a.spd*dt);keepOut(a.p,1.12);{a.p.z=cl(a.p.z,-RG-7,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
-a.mt-=dt;if(a.mt<=0){a.glide=a.glide?0:(dist>6&&Math.abs(ey)<.35&&a.spd>5.2&&a.pitch<.1?1:0);a.mt=a.glide?rnd(.9,1.8):rnd(1.2,2.4)}
-if(a.pitch>.2||Math.abs(a.yr)>1||dist<5)a.glide=0;a.gl+=((a.glide?1:0)-a.gl)*Math.min(1,dt*3);
-a.ph+=dt*(3.1+Math.max(0,.6-a.spd/10)*4+Math.max(0,a.pitch)*3)*6.283*(1-a.gl*.85);
-const ph=a.ph,g=a.gl,s1=Math.sin(ph),s2=Math.sin(ph-1.15),sh=lerp(.12+.78*s1,.2+.05*Math.sin(t*.7),g),wr=lerp(.5*s2-.1,-.38,g),swp=lerp(.16*(1-Math.cos(ph))/2,.08,g),spr_=lerp(.14+.1*Math.cos(ph),.1,g);
-bird.wings.forEach(w=>{w.sh.rotation.z=w.s*sh;w.hand.rotation.set(0,swp,wr);w.fan.forEach(f=>{f.pv.rotation.y=f.psi-spr_*f.k;f.pv.rotation.z=-.18*f.k*Math.sin(ph-1.6)*(1-g)})});
-bird.bg.position.y=-.035*s1*(1-g);bird.g.position.copy(a.p);bird.g.rotation.set(-(a.pitch+.05*s1*(1-g)),a.yaw,a.bank);bird.g.updateMatrixWorld(true);
-const bp=BEAK.clone().applyMatrix4(bird.g.matrixWorld);
-if(a.st===0&&a.pp&&a.pp.st==='taken'){const d=a.p.distanceTo(a.pp.pos);if(d<1.5){a.pp.st='held';a.st=1;a.tm=0}}
-else if(a.st===1){const p=a.pp;p.pos.lerp(bp,Math.min(1,dt*10));if(a.tm>.3){a.st=2;a.tm=0;a.dl=null}}
-else if(a.st===2){const p=a.pp;p.pos.copy(bp);p.m.quaternion.copy(bird.g.quaternion).multiply(qq.setFromEuler(ee.set(.2,Math.PI/2,.3*Math.sin(t*14))));
-if(a.dl&&(a.p.distanceTo(a.tg)<1.8||a.tm>6)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
+
+function toast(title){
+  const el=document.createElement('div');
+  el.className='toast-card';
+  el.innerHTML=`<div class="toast-check">✓</div><div class="toast-info"><span class="toast-head">New paper merged</span><b class="toast-title">${title}</b></div>`;
+  feed.prepend(el);
+  requestAnimationFrame(()=>el.classList.add('in'));
+  setTimeout(()=>{el.classList.remove('in');setTimeout(()=>el.remove(),400)},5200);
+  while(feed.children.length>2)feed.lastChild.remove();
 }
-function ufoUpdate(dt,t){const a=U;a.tm+=dt;let hov=false;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.2,a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
-else if(a.st===2&&!a.dl)a.dl=delivery();
-if(a.st===2)a.tg.copy(a.dl.tp);
-const ax=cl((a.tg.x-a.p.x)*5.5-a.v.x*3.2,-26,26),ay=cl((a.tg.y-a.p.y)*5.5-a.v.y*3.2,-26,26),az=cl((a.tg.z-a.p.z)*5.5-a.v.z*3.2,-26,26);
-a.v.x+=ax*dt;a.v.y+=ay*dt;a.v.z+=az*dt;if(a.v.length()>11)a.v.setLength(11);a.p.addScaledVector(a.v,dt);a.p.y+=Math.sin(t*1.7+a.wob)*.25*dt;keepOut(a.p,1.15);{a.p.z=cl(a.p.z,-RG-7,RG+5.2);const b=bnd(a.p.z);a.p.x=cl(a.p.x,-b.w*.94,b.w*.94);a.p.y=cl(a.p.y,-b.h*.9,b.h*.86)}
-a.rx+=((.25+cl(a.v.z*.03-ay*.004,-.3,.3))-a.rx)*Math.min(1,dt*5);a.rz+=(-cl(a.v.x*.035+ax*.004,-.4,.4)-a.rz)*Math.min(1,dt*5);
-ufo.g.position.copy(a.p);ufo.g.rotation.set(a.rx+.03*Math.sin(t*2.1),0,a.rz+.03*Math.sin(t*1.7+1));ufo.band.rotation.y=t*.8;ufo.lr.rotation.y=-t*1.6;ufo.lr2.rotation.y=t*1.1;ufo.tip.material.color.setHex(Math.sin(t*5)>0?0xff5a5a:0x501818);ufo.eg.scale.setScalar(2.6+.3*Math.sin(t*6));ufo.g.updateMatrixWorld(true);
-const under=V(0,-.55,0).applyMatrix4(ufo.g.matrixWorld);beam.visible=false;beamHit.material.opacity=0;
-if(a.st===0&&a.pp&&a.pp.st==='taken'&&a.p.distanceTo(a.tg)<.6&&a.v.length()<3){a.pp.st='held';a.st=1;a.tm=0}
-else if(a.st===1){const p=a.pp;beam.visible=true;beam.material.uniforms.o.value=sm(0,.3,a.tm);setBeam(under,p.pos,.5);beamHit.material.opacity=.7;p.pos.lerp(under.clone().add(V(0,-.25,0)),Math.min(1,dt*(1+a.tm*2.5)));p.m.rotation.y+=dt*3;if(a.tm>1.7){a.st=2;a.tm=0;a.dl=null}}
-else if(a.st===2){const p=a.pp;p.pos.copy(under).add(V(0,-.3,0));if(a.dl&&(a.p.distanceTo(a.tg)<1.2||a.tm>6)){a.st=3;a.tm=0;throwPaper(p,p.pos,a.dl.pW,0x9fe8ff);a.v.addScaledVector(a.dl.d,-3);flare.position.copy(under);flare.userData.l=1}}
-else if(a.st===3){if(a.tm>.7){a.st=0;a.tm=0;a.pp=null;a.dl=null}}
-beam.material.uniforms.t.value=t;if(flare.userData.l>0){flare.userData.l-=dt*2.5;flare.material.opacity=Math.max(0,flare.userData.l)*.9;flare.scale.setScalar(2+(1-flare.userData.l)*3)}else flare.material.opacity=0}
-function paperUpdate(dt,t){papers.forEach((p,i)=>{
-if(p.st==='free'||p.st==='taken'){
-p.vis+=(1-p.vis)*Math.min(1,dt*2.5);if(p.sp===1&&p.vis<.05){p.sp=2;p.t=0}
-if(p.st==='free'){p.pos.set(p.home.x,p.home.y+Math.sin(t*1.4+p.ph)*.06,p.home.z);p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}else p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}
-else if(p.st==='fly'){p.t+=dt/p.dur;const k=Math.min(1,p.t),e=1-Math.pow(1-k,1.5),u=1-e;p.pos.set(u*u*p.from.x+2*u*e*p.ctrl.x+e*e*p.to.x,u*u*p.from.y+2*u*e*p.ctrl.y+e*e*p.to.y,u*u*p.from.z+2*u*e*p.ctrl.z+e*e*p.to.z);p.sc=1-.7*sm(.8,1,k);p.m.rotation.x+=dt*7;p.m.rotation.y+=dt*5;p.m.rotation.z+=dt*9;p.tc-=dt;if(p.tc<=0){trailAt(p.pos,p.col);p.tc=.025}
-if(p.t>=1){merge(p.to.clone(),p);p.st='gone';p.t=0;p.vis=0;p.m.material.opacity=0}}
-else if(p.st==='gone'){p.t+=dt;const hasActive=papers.some(q=>q.st==='free'||(q.st==='taken'&&q.pos.distanceTo(kbGroup.position)<2.0));if(!hasActive&&p.t>1.8){paperHome(p);p.sp=1}}
-if(p.st==='gone'){p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;return}
-p.m.visible=true;p.m.position.copy(p.pos);p.m.scale.setScalar(Math.max(.01,p.sc)*1.0);p.m.material.opacity=p.st==='fly'?1:p.vis;
-p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.35:p.vis*.22);p.gl.scale.setScalar(1.5*p.sc);
-if(p.sp===2){p.t+=dt;const k=p.t/.9;p.rg.position.copy(p.pos);p.rg.scale.setScalar(.3+k*2.2);p.rg.material.opacity=Math.max(0,.8*(1-k));if(k>=1){p.sp=0;p.t=0}}else p.rg.material.opacity=0})}
-papers.forEach((p,i)=>{if(i===0){paperHome(p);p.sp=1;p.vis=1;p.st='free';}else{p.st='gone';p.vis=0;p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;}});
+
+// Initial toasts matching reference image
+window.addEventListener('DOMContentLoaded',()=>{
+  toast('Mastering the Game of Go with Deep Neural Networks');
+  toast('Highly accurate protein structure prediction with AlphaFold');
+});
+
+function merge(pW,title){
+  G.updateMatrixWorld(true);const loc=spin.worldToLocal(pW.clone()).normalize(),n=pW.clone().sub(Gp).normalize();
+  const s=spr(glowT,0x00f0ff,.01,1,spin);s.position.copy(loc).multiplyScalar(1.013);s.userData.t=0;extras.push({s,L:[]});const me=extras[extras.length-1];
+  const near=allN.map((q,i)=>({i,d:q.angleTo(loc)})).sort((a,b)=>a.d-b.d).slice(0,3);
+  near.forEach(o=>{
+    const pts=arcPts(loc.clone().multiplyScalar(1),allN[o.i],14),g=new T.BufferGeometry();
+    g.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(15*3),3));
+    pts.forEach((q,k)=>g.attributes.position.setXYZ(k,q.x,q.y,q.z));g.setDrawRange(0,0);
+    const l=new T.Line(g,new T.LineBasicMaterial({color:0x38bdf8,transparent:true,opacity:.95,blending:T.AdditiveBlending,depthWrite:false}));
+    spin.add(l);me.L.push(l);grow.push({l,t:0});
+  });
+  allN.push(loc);
+  if(extras.length>45){const o=extras.shift();spin.remove(o.s);o.L.forEach(l=>{spin.remove(l);l.geometry.dispose()})}
+  const r=ripples[ri++%6];r.m.position.copy(loc).multiplyScalar(1.006);r.m.quaternion.setFromUnitVectors(V(0,0,1),loc);r.t=0;
+  const u=n.clone().cross(V(0,1,0)).normalize(),w=n.clone().cross(u);
+  for(let k=0;k<26;k++){
+    const q=sp[si++%SPN],a=rnd(0,6.28),rad=rnd(.7,1.7);
+    q.a.copy(pW).addScaledVector(u,Math.cos(a)*rad).addScaledVector(w,Math.sin(a)*rad).addScaledVector(n,rnd(.1,.8));
+    q.b.copy(pW).addScaledVector(n,.05);q.t=0;q.l=rnd(.5,.85);
+  }
+  flash=1;cntE.textContent=(++merged).toString();
+  toast(title);
+}
+
+/* ---------- Spacecraft Flight Cycle & Animation ---------- */
+let flightT=0,activePaperIdx=0,currentCurve=null;
+const CYCLE_DUR=9.2; // Smooth 9.2 second cycle
+let lastCurveCalcTime=-1;
+
+function updateTrajectory(){
+  const startP=stationGroup.position.clone().add(V(0,0.5,0));
+  const endP=G.position.clone().add(V(-RG*0.72,-RG*0.12,RG*0.35));
+  const mid1=startP.clone().lerp(endP,0.32).add(V(0,0.65,0.4));
+  const mid2=startP.clone().lerp(endP,0.68).add(V(0,0.35,0.2));
+  currentCurve=new T.CatmullRomCurve3([startP,mid1,mid2,endP]);
+  const pts=currentCurve.getPoints(54);
+  trajGeo.setFromPoints(pts);
+  trajLine.computeLineDistances();
+}
+
+function craftUpdate(dt,t){
+  flightT+=dt;
+  const prog=(flightT%CYCLE_DUR)/CYCLE_DUR;
+  if(!currentCurve||flightT-lastCurveCalcTime>0.5){updateTrajectory();lastCurveCalcTime=flightT;}
+
+  const startP=stationGroup.position.clone().add(V(0,0.5,0));
+  const endP=G.position.clone().add(V(-RG*0.72,-RG*0.12,RG*0.35));
+
+  // Active paper at station
+  const curPaper=stationPapers[activePaperIdx%stationPapers.length];
+
+  if(prog<0.46){
+    // Transit from Paper Collection Station towards Earth
+    const k=prog/0.46,ease=k*k*(3-2*k);
+    const pos=currentCurve.getPointAt(ease);
+    const tangent=currentCurve.getTangentAt(ease).normalize();
+    craft.g.position.copy(pos);
+    craft.g.quaternion.setFromUnitVectors(V(0,0,1),tangent);
+    craft.g.rotation.z+=Math.sin(t*2)*0.08-tangent.x*0.4;
+
+    // Attach carried paper under craft
+    carriedPaperMesh.visible=true;
+    carriedPaperMesh.position.copy(pos).add(V(0,-0.12,0));
+    carriedPaperMesh.quaternion.copy(craft.g.quaternion);
+    carriedPaperMesh.material.opacity=sm(0,0.1,k);
+
+    curPaper.mesh.visible=false;
+
+    // Emit engine trail
+    if(Math.random()<0.65){
+      const engPos=pos.clone().addScaledVector(tangent,-0.45);
+      trailAt(engPos,0x00f0ff);
+    }
+  }else if(prog<0.54){
+    // Paper releases and merges into Earth
+    const k=(prog-0.46)/0.08;
+    const impactP=endP.clone();
+    carriedPaperMesh.position.lerpVectors(craft.g.position,impactP,k);
+    carriedPaperMesh.material.opacity=1-k;
+    carriedPaperMesh.scale.setScalar(0.72*(1-k*0.5));
+
+    if(k>0.92&&!curPaper.merged){
+      curPaper.merged=true;
+      merge(impactP,curPaper.title);
+    }
+
+    // Spacecraft banks away over Earth
+    craft.g.position.lerp(G.position.clone().add(V(-RG*0.4,RG*0.5,-1)),dt*3);
+    craft.g.rotation.y+=dt*1.5;
+  }else{
+    // Return flight to Paper Collection Station in background arc
+    carriedPaperMesh.visible=false;
+    const k=(prog-0.54)/0.46,ease=k*k*(3-2*k);
+    const returnP=V(
+      lerp(G.position.x-RG*0.4,startP.x,ease),
+      lerp(G.position.y+RG*0.5,startP.y,ease)+Math.sin(ease*Math.PI)*0.6,
+      lerp(G.position.z-2.5,startP.z,ease)
+    );
+    craft.g.position.copy(returnP);
+    const fwd=startP.clone().sub(returnP).normalize();
+    craft.g.quaternion.setFromUnitVectors(V(0,0,1),fwd);
+    craft.g.rotation.z+=0.2*Math.sin(ease*Math.PI);
+
+    // Respawn paper at station
+    if(k>0.85){
+      curPaper.mesh.visible=true;
+      curPaper.merged=false;
+    }
+    if(k>0.98&&curPaper.active){
+      curPaper.active=false;
+      activePaperIdx=(activePaperIdx+1)%stationPapers.length;
+    }
+  }
+
+  craft.g.updateMatrixWorld(true);
+}
+
 /* ---------- interaction + loop ---------- */
 let mx=0,my=0,drag=false,lx=0,sv=0;const cv_=$('c');
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;if(drag){const d=(e.clientX-lx)*.006;spin.rotation.y+=d;sv=d*60;lx=e.clientX}});
 cv_.addEventListener('pointerdown',e=>{if(Math.hypot(e.clientX-GPX.x,e.clientY-GPX.y)<GPX.r*1.1){drag=true;lx=e.clientX;sv=0;cv_.setPointerCapture(e.pointerId)}});
 const up=()=>{drag=false};addEventListener('pointerup',up);addEventListener('pointercancel',up);
-const tgs=['u','b'].map(k=>{const e=document.createElement('div');e.className='tg';ui.appendChild(e);return e}),LB={u:['SCANNING','COLLECTING','UPLOADING','THROWING'],b:['SCOUTING','GRABBING','DELIVERING']};
+
 function tagUpd(e,v,txt,off){
   tmp.copy(v).project(C);
   e.style.transform=`translate3d(${(tmp.x+1)/2*innerWidth}px,${(1-tmp.y)/2*innerHeight-off}px,0) translate(-50%,-100%)`;
-  if(e._t!==txt){e.textContent=txt;e._t=txt}
+  if(txt&&e._t!==txt){e.textContent=txt;e._t=txt}
 }
+
 let last=performance.now()/1000,tt=0;
 let targetScroll=window.scrollY||0,ss=targetScroll;
 let lastE=-1,lastUiOp=-1,lastFeedOp=-1,wasSparkActive=false;
-const cGold=new T.Color(0xffd36a),cCy=new T.Color(0x6fd8ff);
+const cGold=new T.Color(0xffd36a),cCy=new T.Color(0x00f0ff);
 
 window.addEventListener('scroll',()=>{targetScroll=window.scrollY||0;},{passive:true});
 
@@ -574,13 +831,13 @@ function loop(){
 
   if(!drag){sv*=Math.pow(0.92,dt*60);spin.rotation.y+=(0.045+sv*0.5)*dt;}
   clouds.rotation.y=spin.rotation.y*1.06+t*0.01;
-  kbCrystal.rotation.y+=dt*1.6;kbCrystal.rotation.x+=dt*0.9;
-  kbRing1.rotation.z+=dt*1.2;kbRing2.rotation.z-=dt*1.5;
-  kbLaserBeam.rotation.y+=dt*2.0;
-  kbChamber.position.y=.32+Math.sin(t*1.8)*.035;kbEdges.position.y=kbChamber.position.y;
-  kbCrystal.position.y=.32+Math.sin(t*1.8)*.045;kbGlow.material.opacity=.45+.18*Math.sin(t*2.5);
 
-  // Critically damped, ultra-responsive scroll easing without lag or overshoot
+  // Citadel platform subtle hover pulse
+  plat.position.y=-1.24+Math.sin(t*1.6)*0.015;
+  holoBeam.material.opacity=0.35+0.12*Math.sin(t*2.8);
+  thrusterCone.material.opacity=0.65+0.2*Math.sin(t*4.5);
+
+  // Critically damped scroll easing
   const scrollDelta=targetScroll-ss;
   const absDelta=Math.abs(scrollDelta);
   if(absDelta>0.05){
@@ -600,13 +857,11 @@ function loop(){
   GPX.x=(cm.nx+1)/2*innerWidth;GPX.y=(1-cm.ny)/2*innerHeight;GPX.r=L0.px*D/cm.z;
   if(window.__dbg)window.__dbg(C);
 
-  // Throttled custom property set prevents DOM-wide style invalidation on every frame
   if(Math.abs(e-lastE)>0.003){
     lastE=e;
     document.documentElement.style.setProperty('--e',e.toFixed(3));
   }
 
-  // Only mutate DOM style opacity on value change
   const newUiOp=cl(1-e*5,0,1);
   if(Math.abs(newUiOp-lastUiOp)>0.005){
     ui.style.opacity=lastUiOp=newUiOp;
@@ -616,6 +871,7 @@ function loop(){
     feed.style.opacity=lastFeedOp=newFeedOp;
   }
 
+  // Planets drift & orbit
   {
     const pv=0.25+0.55*scrollProg;
     planets.forEach(p=>{
@@ -632,6 +888,7 @@ function loop(){
     dust.material.opacity=0.28*(1-e);
   }
 
+  // Arcs & pulse nodes
   pulses.forEach(q=>{
     q.t+=dt*q.sp;
     if(q.t>1){q.t=0;q.a=arcs[(Math.random()*arcs.length)|0];}
@@ -687,28 +944,46 @@ function loop(){
   atmoMat.uniforms.k.value=1+flash*0.7;
   flash*=0.95;
 
-  paperUpdate(dt,t);
-  birdUpdate(dt,t);
-  ufoUpdate(dt,t);
+  // Update Spacecraft Flight & Delivery
+  craftUpdate(dt,t);
   shootUpd(dt);
 
   trs.forEach(q=>{
     if(q.l>0){
       q.l-=dt*2.2;
-      q.s.material.opacity=Math.max(0,q.l)*0.7;
+      q.s.material.opacity=Math.max(0,q.l)*0.75;
       q.s.scale.setScalar(0.12+0.35*q.l);
     }else{
       q.s.material.opacity=0;
     }
   });
 
+  // Update HUD Badges & 5 Globe Labels + SVG Leader Lines
   if(wide&&newFeedOp>0.01){
-    tagUpd(tgs[0],ufo.g.position,'UFO · '+LB.u[U.st],34);
-    tagUpd(tgs[1],bird.g.position,'BIRD · '+LB.b[B.st],30);
-    tagUpd(synTag,kbGroup.position.clone().add(V(0,1.4,0)),'SYNTHESIZER · ACTIVE',16);
+    tagUpd(stationBadge,stationGroup.position.clone().add(V(0,0.68,0)),null,18);
+    tagUpd(craftBadge,craft.g.position.clone().add(V(0,0.55,0)),null,18);
+
+    // Update Globe Labels and SVG Leader Curves
+    let svgPaths='';
+    const cx=GPX.x,cy=GPX.y,r=GPX.r;
+    globeLabelEls.forEach(item=>{
+      const dy=item.spec.dy*r*0.92;
+      const lx=cx+Math.sqrt(Math.max(0,r*r-dy*dy))+r*0.42;
+      const ly=cy+dy;
+      item.el.style.transform=`translate3d(${lx}px,${ly - item.el.offsetHeight/2}px,0)`;
+
+      // Anchor point on Earth rim
+      const ax=cx+Math.sqrt(Math.max(0,r*r-dy*dy))*0.98;
+      const ay=ly;
+      const c1x=ax+(lx-ax)*0.45;
+      svgPaths+=`<path d="M ${ax} ${ay} C ${c1x} ${ay}, ${c1x} ${ly}, ${lx} ${ly}" stroke="${item.spec.col}" stroke-width="1.2" stroke-dasharray="3 3" fill="none" opacity="0.75"/><circle cx="${ax}" cy="${ay}" r="3.2" fill="${item.spec.col}"/>`;
+    });
+    leaderSvg.innerHTML=svgPaths;
   }else{
-    if(wide)tgs.forEach(el=>el.style.transform='translate3d(-9999px,-9999px,0)');
-    synTag.style.transform='translate3d(-9999px,-9999px,0)';
+    stationBadge.style.transform='translate3d(-9999px,-9999px,0)';
+    craftBadge.style.transform='translate3d(-9999px,-9999px,0)';
+    globeLabelEls.forEach(item=>item.el.style.transform='translate3d(-9999px,-9999px,0)');
+    leaderSvg.innerHTML='';
   }
 
   layers.forEach(g=>g.position.y=sy*g.userData.k*0.4);
@@ -753,7 +1028,7 @@ S.traverse(o=>{
   const m=o.material;
   if(m&&m.isMeshStandardMaterial&&m.envMapIntensity===1)m.envMapIntensity=0.7;
 });
-window.__rg={S,C,B,U,papers,planets,bird,ufo,G,V,get merged(){return merged;},loop,step:loop};
+window.__rg={S,C,craft,stationGroup,plat,planets,G,V,get merged(){return merged;},loop,step:loop};
 loop();
 })();
 </script>
