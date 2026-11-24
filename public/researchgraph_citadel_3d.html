@@ -149,6 +149,41 @@ footer{position:relative;z-index:6;background:#02040f;padding:36px 32px calc(26p
   }
   @media(prefers-reduced-motion:reduce){.btn,.toast{transition:none!important}}
 </style>
+<style id="rg-hero-heading-pocket-tune">
+  /* Desktop hero: top-align the headline just beneath navigation,
+     enlarge it slightly, and keep the paper station as a compact side accent. */
+  @media (min-width:901px){
+    .hero{
+      align-items:flex-start;
+      min-height:100svh;
+      padding:clamp(78px,9vh,104px) 0 56px;
+    }
+    .L{
+      width:min(540px,39vw);
+      margin-left:clamp(32px,4.3vw,76px);
+    }
+    h1{
+      max-width:540px;
+      font-size:clamp(46px,3.2vw,54px);
+      line-height:1.08;
+      letter-spacing:-.038em;
+    }
+    .tag{margin-bottom:16px}
+    .lead{max-width:490px;margin:15px 0 20px;font-size:15.2px;line-height:1.62}
+    .cta{gap:11px;margin-bottom:17px}
+    .feat{margin-bottom:16px}
+    .ask{max-width:540px}
+    .live{margin-top:14px}
+    .paper-station-tag{
+      padding:4px 9px;
+      border-radius:999px;
+      font-size:8.5px;
+      letter-spacing:.055em;
+      background:rgba(8,13,35,.9);
+      box-shadow:0 5px 18px rgba(5,8,25,.35),0 0 14px rgba(139,92,246,.14);
+    }
+  }
+</style>
 </head><body>
 <canvas id="c" aria-hidden="true"></canvas><div id="ui"></div><div id="feed"></div>
 <header><a class="logo" href="#top"><span class="mark">⚛</span>ResearchGraph <em>AI</em></a>
@@ -396,7 +431,7 @@ const bnd=z=>{const h=(D-z)*TH;return{h,w:h*AS}};
 const chipsD=[['Papers','204M+','#3fb4ff',-.64],['Authors','12.4M+','#19e6c4',-.32],['Concepts','1.8M+','#a05cff',0],['Datasets','85K+','#ffc43a',.32],['Citations','1.24B+','#d05cff',.64]];
 const ui=$('ui'),chips=chipsD.map(c=>{const e=document.createElement('div');e.className='chip';e.style.setProperty('--c',c[2]);e.innerHTML='<i></i>'+c[0]+' <b>'+c[1]+'</b>';ui.appendChild(e);return e});
 const synTag=document.createElement('div');synTag.className='synthesizer-tag';synTag.innerHTML='SYNTHESIZER · MULTI-AGENT RAG';ui.appendChild(synTag);
-const stationTag=document.createElement('div');stationTag.className='synthesizer-tag paper-station-tag';stationTag.textContent='PAPER COLLECTION';ui.appendChild(stationTag);
+const stationTag=document.createElement('div');stationTag.className='synthesizer-tag paper-station-tag';stationTag.textContent='PAPER POCKET';ui.appendChild(stationTag);
 const camAt=(p)=>{
   const p1=sm(0,0.22,p),p2=sm(0.18,0.62,p),p3=sm(0.55,1.0,p);
   const targetZ=D*(1.0 + 2.2*p1 + 1.6*p2 + 2.2*p3);
@@ -468,8 +503,8 @@ function updateKbPos(){
   const TARGET_Z = -10.4;
   const b=bnd(TARGET_Z);
   if(wide){
-    kbGroup.position.set(-b.w*.42, b.h*.40, TARGET_Z);
-    kbGroup.scale.setScalar(1.38);
+    kbGroup.position.set(-b.w*.26, b.h*.25, TARGET_Z);
+    kbGroup.scale.setScalar(.96);
   }else{
     kbGroup.position.set(0, b.h*.35, -8.2);
     kbGroup.scale.setScalar(.98);
@@ -822,7 +857,7 @@ function loop(){
     tagUpd(tgs[0],ufo.g.position,'UFO · '+LB.u[U.st],22);
     tagUpd(tgs[1],bird.g.position,'BIRD · '+LB.b[B.st],24);
     tagUpd(synTag,ufo.g.position.clone().add(V(0,1.35,0)),'SYNTHESIZER · MULTI-AGENT RAG',12);
-    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.48*(kbGroup.scale.y||1),0)),'DEEP-SPACE PAPER COLLECTION',14);
+    tagUpd(stationTag,kbGroup.position.clone().add(V(0,1.48*(kbGroup.scale.y||1),0)),'PAPER POCKET · LIVE INGEST',14);
   }else{
     if(wide)tgs.forEach(el=>el.style.transform='translate3d(-9999px,-9999px,0)');
     synTag.style.transform='translate3d(-9999px,-9999px,0)';
