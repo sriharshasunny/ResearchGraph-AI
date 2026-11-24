@@ -669,7 +669,7 @@ const wl=mkWing(1),wr=mkWing(-1);wl.sh.position.set(.13,.075,.12);wr.sh.position
 const tipL=spr(glowT,0x42dcff,.34,.22,wl.sh),tipR=spr(glowT,0x42dcff,.34,.22,wr.sh);
 tipL.position.set(.48,.045,-.025);tipR.position.set(.48,.045,-.025);
 const tailGlow=spr(glowT,0x65cfff,.52,.18,bg);tailGlow.position.set(0,-.035,-.78);
-g.scale.setScalar(.535);S.add(g);return{g,bg,wings:[wl,wr],tips:[tipL,tipR],tailGlow}})();
+g.scale.setScalar(.57245);S.add(g);return{g,bg,wings:[wl,wr],tips:[tipL,tipR],tailGlow}})();
 /* ---------- UFO (lathe hull, panels, emissive window band, glass dome, pilot, pods) ---------- */
 const PT=(()=>{const c=mkc(512,64),x=c.getContext('2d');x.fillStyle='#808080';x.fillRect(0,0,512,64);x.strokeStyle='#303030';x.lineWidth=2;for(let i=0;i<=16;i++){x.beginPath();x.moveTo(i*32,0);x.lineTo(i*32,64);x.stroke()}for(let j=0;j<=2;j++){x.beginPath();x.moveTo(0,j*32);x.lineTo(512,j*32);x.stroke()}for(let k=0;k<50;k++){const v=Math.random()<.5?100:170;x.fillStyle=`rgba(${v},${v},${v},.5)`;x.fillRect(rnd(0,500),rnd(0,56),rnd(8,26),rnd(5,14))}for(let i=0;i<16;i++)for(let j=0;j<3;j++){x.fillStyle='#202020';x.fillRect(i*32+4,j*32+4,2,2);x.fillRect(i*32+26,j*32+4,2,2)}const t=tex(c);t.wrapS=t.wrapT=T.RepeatWrapping;t.repeat.set(3,2);return t})();
 const HT=(()=>{const c=mkc(512,128),x=c.getContext('2d'),g=x.createLinearGradient(0,0,0,128);g.addColorStop(0,'#8e9bb4');g.addColorStop(.5,'#c3ccdc');g.addColorStop(1,'#7f8aa2');x.fillStyle=g;x.fillRect(0,0,512,128);for(let i=0;i<700;i++){const k=Math.random()>.5?255:0;x.fillStyle=`rgba(${k},${k},${k},${rnd(.02,.08)})`;x.fillRect(rnd(0,512),rnd(0,128),rnd(20,120),1)}for(let i=0;i<16;i++){if(i%3==0){x.fillStyle='rgba(40,60,100,.18)';x.fillRect(i*32,0,32,128)}x.fillStyle='rgba(20,30,50,.5)';x.fillRect(i*32,0,1.5,128)}const t=tex(c);t.wrapS=t.wrapT=T.RepeatWrapping;return t})();
@@ -728,16 +728,20 @@ function pocketWaitPoint(side){
   const scale=kbGroup.scale.y||1;
   return kbGroup.position.clone().add(V(side*2.25*scale,1.65*scale,0));
 }
-function delivery(side){
-  // Bird and UFO use opposite visible shoulders of Earth. The couriers
-  // stop outside the atmosphere; only the page continues inward.
-  const x=(side<0?-1:1)*rnd(.48,.62),y=rnd(-.20,.20);
-  const z=Math.sqrt(Math.max(.08,1-x*x-y*y));
-  const d=V(x,y,z).normalize();
+function delivery(){
+  // Pick a fresh launch direction for every delivery across the camera-facing
+  // hemisphere: front-left, front-right, upper/lower limbs and near the rim.
+  // The courier stages outside the atmosphere; the paper alone flies inward.
+  const azimuth=rnd(0,Math.PI*2);
+  const facing=rnd(.16,.96);
+  const radial=Math.sqrt(Math.max(0,1-facing*facing));
+  const d=V(Math.cos(azimuth)*radial,Math.sin(azimuth)*radial,facing).normalize();
   const pW=Gp.clone().addScaledVector(d,RG);
-  const tp=pW.clone().addScaledVector(d,rnd(3.8,4.8));
+  const clearance=rnd(4.6,7.4);
+  const tp=pW.clone().addScaledVector(d,clearance);
   const b=bnd(tp.z);
-  tp.x=cl(tp.x,-b.w*.9,b.w*.9);tp.y=cl(tp.y,-b.h*.86,b.h*.82);
+  tp.x=cl(tp.x,-b.w*.9,b.w*.9);
+  tp.y=cl(tp.y,-b.h*.86,b.h*.82);
   return{d,pW,tp};
 }
 function throwPaper(p,from,to,col){
