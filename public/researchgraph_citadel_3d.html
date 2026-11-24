@@ -234,9 +234,33 @@ function placePlanets(){const c0=camAt(0,0),c1=camAt(1,0),f=(c,q,o)=>o.set(c.x+q
 let cachedScrollHeight=Math.max(1,document.documentElement.scrollHeight-innerHeight);
 function updateScrollBounds(){cachedScrollHeight=Math.max(1,document.documentElement.scrollHeight-innerHeight);}
 function layout(){const w=innerWidth,h=innerHeight;wide=w>=900;updateScrollBounds();R.setSize(w,h,false);if(comp)comp.setSize(w,h);AS=w/h;C.aspect=AS;C.updateProjectionMatrix();
-let px,cx,cy;if(wide){px=Math.min(h*.27,w*.15);cx=w*.69;cy=h*.52}else{px=Math.min(w*.28,h*.14);cx=w*.5;cy=h*.25}
-D=h*RG/(2*TH*px);C.rotation.set(0,0,0);G.position.set((cx/w*2-1)*D*TH*AS,(1-cy/h*2)*D*TH,0);G.scale.setScalar(RG);GPX={x:cx,y:cy,r:px};GW.copy(G.position);L0={nx:cx/w*2-1,ny:1-cy/h*2,px};placePlanets();
+let px,cx,cy;if(wide){px=Math.min(h*.236,w*.131);cx=w*.69;cy=h*.52}else{px=Math.min(w*.245,h*.122);cx=w*.5;cy=h*.25}
+D=h*RG/(2*TH*px);C.rotation.set(0,0,0);G.position.set((cx/w*2-1)*D*TH*AS,(1-cy/h*2)*D*TH,0);G.scale.setScalar(RG);GPX={x:cx,y:cy,r:px};GW.copy(G.position);L0={nx:cx/w*2-1,ny:1-cy/h*2,px};placePlanets();updateKbPos();
 chips.forEach((e,i)=>{const dy=chipsD[i][3]*px,ex=cx+Math.sqrt(px*px-dy*dy)+16;e.style.display=w>=1100?'block':'none';e.style.transform=`translate(${ex}px,${cy+dy-e.offsetHeight/2}px)`})}
+/* ---------- 3D Knowledge Box (Repository Terminal) ---------- */
+const kbGroup=new T.Group();S.add(kbGroup);
+const kbBase=new T.Mesh(new T.CylinderGeometry(.85,1.05,.22,8),new T.MeshStandardMaterial({color:0x0f1c3a,metalness:.85,roughness:.25,emissive:0x0a162d,emissiveIntensity:.7}));
+kbBase.position.y=-.45;kbGroup.add(kbBase);
+const kbRingMesh=new T.Mesh(new T.TorusGeometry(.95,.022,12,48),new T.MeshBasicMaterial({color:0x38bdf8}));
+kbRingMesh.rotation.x=Math.PI/2;kbRingMesh.position.y=-.34;kbGroup.add(kbRingMesh);
+const kbEmitter=new T.Mesh(new T.TorusGeometry(.74,.016,8,36),new T.MeshBasicMaterial({color:0x818cf8,transparent:true,opacity:.85}));
+kbEmitter.rotation.x=Math.PI/2;kbEmitter.position.y=-.15;kbGroup.add(kbEmitter);
+const kbChamberGeo=new T.BoxGeometry(.76,.76,.76);
+const kbChamber=new T.Mesh(kbChamberGeo,new T.MeshPhysicalMaterial({color:0x0284c7,metalness:.1,roughness:.1,transparent:true,opacity:.22,side:T.DoubleSide}));
+kbChamber.position.y=.25;kbGroup.add(kbChamber);
+const kbEdgeGeo=new T.EdgesGeometry(kbChamberGeo);
+const kbEdges=new T.LineSegments(kbEdgeGeo,new T.LineBasicMaterial({color:0x67e8f9,transparent:true,opacity:.8}));
+kbEdges.position.y=.25;kbGroup.add(kbEdges);
+const kbCrystal=new T.Mesh(new T.OctahedronGeometry(.24,0),new T.MeshStandardMaterial({color:0x38bdf8,emissive:0x38bdf8,emissiveIntensity:.95,metalness:.3,roughness:.2}));
+kbCrystal.position.y=.25;kbGroup.add(kbCrystal);
+const kbGlow=spr(glowT,0x38bdf8,2.2,.55,kbGroup);kbGlow.position.y=.45;
+const kbBeaconSprite=spr(ringT,0x67e8f9,.8,.7,kbGroup);kbBeaconSprite.position.y=.92;
+const KB_SPAWN_OFFSET=V(0,.88,0);
+function updateKbPos(){
+  const b=bnd(3.2);
+  if(wide){kbGroup.position.set(-b.w*.54,-b.h*.30,3.2);}
+  else{kbGroup.position.set(-b.w*.30,-b.h*.65,3.2);}
+}
 /* ---------- papers ---------- */
 const TITLES=['Attention Is All You Need','Deep Residual Learning for Image Recognition','BERT: Pre-training of Deep Bidirectional Transformers','Highly accurate protein structure prediction with AlphaFold','Semi-Supervised Classification with Graph Convolutional Networks','Language Models are Few-Shot Learners','Denoising Diffusion Probabilistic Models','A Programmable Dual-RNA-Guided DNA Endonuclease','Retrieval-Augmented Generation for Knowledge-Intensive NLP','An Image is Worth 16x16 Words','Graph Attention Networks','Mastering the Game of Go with Deep Neural Networks','Topological Codes for Fault-Tolerant Quantum Computation','Multimodal Learning for Oncology Biomarker Discovery','Chain-of-Thought Prompting Elicits Reasoning in LLMs','Constitutional AI: Harmlessness from AI Feedback'];
 const SRCS=['arXiv','PubMed','OpenAlex','Semantic Scholar','IEEE Xplore','Crossref'];
@@ -259,8 +283,22 @@ const paperGeo=()=>{const g=new T.PlaneGeometry(.57,.76,4,6),p=g.attributes.posi
 const papers=[];for(let i=0;i<10;i++){const title=TITLES[i%TITLES.length],tx=paperTex(title),m=new T.Mesh(paperGeo(),new T.MeshStandardMaterial({map:tx,color:0xa8a8a8,envMapIntensity:.2,emissive:0xffffff,emissiveMap:tx,emissiveIntensity:.04,side:T.DoubleSide,roughness:.92,metalness:0,transparent:true,opacity:0}));
 const gl=spr(glowT,0x5fd8ff,1.3,0),rg=spr(ringT,0x9fe8ff,.3,0);S.add(m);papers.push({m,gl,rg,pos:V(0,0,0),home:V(0,0,0),st:'free',vis:0,sc:1,ph:rnd(0,9),rs:rnd(0,2),title,src:'',t:0,from:V(0,0,0),to:V(0,0,0),ctrl:V(0,0,0),dur:1,tc:0,col:0x9fe8ff,sp:0,beam:0})}
 const rz=front=>front?rnd(RG+.8,RG+4):rnd(-RG-6,-RG-2);
-function paperHome(p){let k=0;do{const z=rz(true),b=bnd(z),r=Math.random();let x,y;if(!wide){x=rnd(-.85,.85);y=rnd(-.75,.7)}else if(r<.34){x=rnd(-.92,-.1);y=rnd(.74,.9)}else if(r<.56){x=rnd(-.92,-.1);y=rnd(-.9,-.84)}else{x=rnd(-.05,.3);y=rnd(-.75,.75)}p.home.set(x*b.w,y*b.h,z);k++}while(k<30&&Math.hypot(p.home.x-Gp.x,p.home.y-Gp.y)<RG*1.1&&p.home.z>0);
-p.pos.copy(p.home);p.title=TITLES[(Math.random()*TITLES.length)|0];if(p.m.material.map)p.m.material.map.dispose();const tx=paperTex(p.title);p.m.material.map=tx;p.m.material.emissiveMap=tx;p.m.material.needsUpdate=true;p.vis=0;p.st='free';p.sc=1;p.sp=1;const s=SRCS[(Math.random()*SRCS.length)|0];p.src=s=='arXiv'?'arXiv:2611.'+(10000+((Math.random()*89999)|0)):s=='PubMed'?'PubMed · PMID '+(39000000+((Math.random()*999999)|0)):s+' · '+(Math.random().toString(16).slice(2,10))}
+function paperHome(p){
+  p.home.copy(kbGroup.position).add(KB_SPAWN_OFFSET);
+  p.pos.copy(p.home);
+  p.title=TITLES[(Math.random()*TITLES.length)|0];
+  if(p.m.material.map)p.m.material.map.dispose();
+  const tx=paperTex(p.title);
+  p.m.material.map=tx;
+  p.m.material.emissiveMap=tx;
+  p.m.material.needsUpdate=true;
+  p.vis=0;
+  p.st='free';
+  p.sc=1;
+  p.sp=1;
+  const s=SRCS[(Math.random()*SRCS.length)|0];
+  p.src=s=='arXiv'?'arXiv:2611.'+(10000+((Math.random()*89999)|0)):s=='PubMed'?'PubMed · PMID '+(39000000+((Math.random()*999999)|0)):s+' · '+(Math.random().toString(16).slice(2,10));
+}
 /* ---------- merge effects ---------- */
 const feed=$('feed'),cntE=$('cnt');let merged=0,flash=0;
 const ripples=Array.from({length:6},()=>{const m=new T.Mesh(new T.RingGeometry(.88,1,64),new T.MeshBasicMaterial({color:0xffd36a,transparent:true,opacity:0,side:T.DoubleSide,blending:T.AdditiveBlending,depthWrite:false}));spin.add(m);return{m,t:1}});let ri=0;
@@ -335,8 +373,8 @@ const tmp=V(0,0,0),qq=new T.Quaternion(),ee=new T.Euler();
 const free=()=>papers.filter(p=>p.st==='free'&&p.vis>.7);
 function wander(a){a.tg.copy(wpt());a.wt=rnd(2.5,4.5)}
 function wpt(){const z=rz(Math.random()<.78),b=bnd(z);return V(rnd(-.86,.86)*b.w,rnd(-.8,.76)*b.h,z)}
-function delivery(){const x=rnd(-.55,.3),y=rnd(-.5,.5),z=Math.sqrt(Math.max(.05,1-x*x-y*y)),d=V(x,y,z+.25).normalize(),pW=Gp.clone().addScaledVector(d,RG),tp=Gp.clone().add(V(rnd(-11,-6),rnd(-5,5),rnd(RG+.5,RG+3.5))),b=bnd(tp.z);tp.x=cl(tp.x,-b.w*.9,b.w*.9);tp.y=cl(tp.y,-b.h*.85,b.h*.8);return{d,pW,tp}}
-function throwPaper(p,from,to,col){p.st='fly';p.t=0;p.from.copy(from);p.to.copy(to);const dist=from.distanceTo(to);p.dur=cl(dist/13,.9,1.7);p.ctrl.copy(from).add(to).multiplyScalar(.5);p.ctrl.y+=dist*.14;p.ctrl.z+=rnd(.3,1.2);p.tc=0;p.col=col;p.beam=0}
+function delivery(){const x=rnd(-.65,.2),y=rnd(-.45,.45),z=Math.sqrt(Math.max(.08,1-x*x-y*y)),d=V(x,y,z+.2).normalize(),pW=Gp.clone().addScaledVector(d,RG),tp=pW.clone().add(d.clone().multiplyScalar(rnd(1.8,2.6))).add(V(rnd(-0.6,-0.1),rnd(-0.3,0.3),rnd(0.2,0.5))),b=bnd(tp.z);tp.x=cl(tp.x,-b.w*.92,b.w*.92);tp.y=cl(tp.y,-b.h*.88,b.h*.84);return{d,pW,tp}}
+function throwPaper(p,from,to,col){p.st='fly';p.t=0;p.from.copy(from);p.to.copy(to);const dist=from.distanceTo(to);p.dur=cl(dist/7.5,.42,.72);p.ctrl.copy(from).add(to).multiplyScalar(.5);p.ctrl.y+=dist*.12;p.ctrl.z+=rnd(.2,.5);p.tc=0;p.col=col;p.beam=0}
 const TRN=40,trs=Array.from({length:TRN},()=>({s:spr(glowT,0x9fe8ff,.3,0),l:0}));let tri=0;
 function trailAt(p,col){const q=trs[tri++%TRN];q.s.position.copy(p);q.s.material.color.setHex(col);q.l=1}
 function keepOut(p,pad){const d=p.clone().sub(Gp),l=d.length();if(l<RG*pad)p.copy(Gp).addScaledVector(d.divideScalar(l||1),RG*pad)}
@@ -344,7 +382,7 @@ const B={p:V(1,1,RG+3),yaw:0,pitch:0,bank:0,spd:5,tg:V(0,0,0),st:0,tm:0,pp:null,
 const U={p:V(-6,3,RG+3),v:V(0,0,0),tg:V(0,0,0),st:0,tm:0,pp:null,wt:0,dl:null,wob:rnd(0,9),rx:.25,rz:0};
 const BEAK=V(0,-.04,.74);
 function birdUpdate(dt,t){const a=B;a.tm+=dt;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[(Math.random()*f.length)|0];a.pp.st='taken'}}if(a.pp)a.tg.copy(a.pp.pos);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1.5)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
+if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.copy(a.pp.pos);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1.5)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
 else if(a.st===2){if(!a.dl)a.dl=delivery();a.tg.copy(a.dl.tp)}
 const dx=a.tg.x-a.p.x,dy=a.tg.y-a.p.y,dz=a.tg.z-a.p.z,dist=Math.hypot(dx,dy,dz)||1;
 let ey=Math.atan2(dx,dz)+(dist>5?Math.sin(t*.9+a.wob)*.1:0)-a.yaw;ey=Math.atan2(Math.sin(ey),Math.cos(ey));
@@ -363,10 +401,10 @@ const bp=BEAK.clone().applyMatrix4(bird.g.matrixWorld);
 if(a.st===0&&a.pp&&a.pp.st==='taken'){const d=a.p.distanceTo(a.pp.pos);if(d<1.5){a.pp.st='held';a.st=1;a.tm=0}}
 else if(a.st===1){const p=a.pp;p.pos.lerp(bp,Math.min(1,dt*10));if(a.tm>.3){a.st=2;a.tm=0;a.dl=null}}
 else if(a.st===2){const p=a.pp;p.pos.copy(bp);p.m.quaternion.copy(bird.g.quaternion).multiply(qq.setFromEuler(ee.set(.2,Math.PI/2,.3*Math.sin(t*14))));
-if(a.dl&&(a.p.distanceTo(a.tg)<2.8||a.tm>7)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
+if(a.dl&&(a.p.distanceTo(a.tg)<1.8||a.tm>6)){throwPaper(p,bp,a.dl.pW,0xffd88a);a.spd+=.8;a.pp=null;a.dl=null;a.st=0;a.tm=0}}
 }
 function ufoUpdate(dt,t){const a=U;a.tm+=dt;let hov=false;
-if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[(Math.random()*f.length)|0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.5,a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
+if(a.st===0){if(!a.pp){const f=free();if(f.length){a.pp=f[0];a.pp.st='taken'}}if(a.pp)a.tg.set(a.pp.pos.x,a.pp.pos.y+1.2,a.pp.pos.z);else{a.wt-=dt;if(a.wt<=0||a.p.distanceTo(a.tg)<1)wander(a)}if(a.tm>12&&a.pp){a.pp.st='free';a.pp=null;a.tm=0}}
 else if(a.st===2&&!a.dl)a.dl=delivery();
 if(a.st===2)a.tg.copy(a.dl.tp);
 const ax=cl((a.tg.x-a.p.x)*5.5-a.v.x*3.2,-26,26),ay=cl((a.tg.y-a.p.y)*5.5-a.v.y*3.2,-26,26),az=cl((a.tg.z-a.p.z)*5.5-a.v.z*3.2,-26,26);
@@ -376,21 +414,21 @@ ufo.g.position.copy(a.p);ufo.g.rotation.set(a.rx+.03*Math.sin(t*2.1),0,a.rz+.03*
 const under=V(0,-.55,0).applyMatrix4(ufo.g.matrixWorld);beam.visible=false;beamHit.material.opacity=0;
 if(a.st===0&&a.pp&&a.pp.st==='taken'&&a.p.distanceTo(a.tg)<.6&&a.v.length()<3){a.pp.st='held';a.st=1;a.tm=0}
 else if(a.st===1){const p=a.pp;beam.visible=true;beam.material.uniforms.o.value=sm(0,.3,a.tm);setBeam(under,p.pos,.5);beamHit.material.opacity=.7;p.pos.lerp(under.clone().add(V(0,-.25,0)),Math.min(1,dt*(1+a.tm*2.5)));p.m.rotation.y+=dt*3;if(a.tm>1.7){a.st=2;a.tm=0;a.dl=null}}
-else if(a.st===2){const p=a.pp;p.pos.copy(under).add(V(0,-.3,0));if(a.dl&&a.p.distanceTo(a.tg)<.9&&a.v.length()<5){a.st=3;a.tm=0;throwPaper(p,p.pos,a.dl.pW,0x9fe8ff);a.v.addScaledVector(a.dl.d,-3);flare.position.copy(under);flare.userData.l=1}}
+else if(a.st===2){const p=a.pp;p.pos.copy(under).add(V(0,-.3,0));if(a.dl&&(a.p.distanceTo(a.tg)<1.2||a.tm>6)){a.st=3;a.tm=0;throwPaper(p,p.pos,a.dl.pW,0x9fe8ff);a.v.addScaledVector(a.dl.d,-3);flare.position.copy(under);flare.userData.l=1}}
 else if(a.st===3){if(a.tm>.7){a.st=0;a.tm=0;a.pp=null;a.dl=null}}
 beam.material.uniforms.t.value=t;if(flare.userData.l>0){flare.userData.l-=dt*2.5;flare.material.opacity=Math.max(0,flare.userData.l)*.9;flare.scale.setScalar(2+(1-flare.userData.l)*3)}else flare.material.opacity=0}
 function paperUpdate(dt,t){papers.forEach((p,i)=>{
-if(p.st==='free'||p.st==='taken'){if(p.st==='free'){p.rs-=dt;if(p.rs<=0&&p.vis<.01&&p.sp===0){}}
+if(p.st==='free'||p.st==='taken'){
 p.vis+=(1-p.vis)*Math.min(1,dt*2.5);if(p.sp===1&&p.vis<.05){p.sp=2;p.t=0}
-if(p.st==='free'){p.pos.set(p.home.x,p.home.y+Math.sin(t*1.1+p.ph)*.12,p.home.z);p.m.rotation.set(.18*Math.sin(t*.7+p.ph),.55*Math.sin(t*.5+p.ph*1.3),.12*Math.sin(t*.9+p.ph))}else p.m.rotation.set(.18*Math.sin(t*.7+p.ph),.55*Math.sin(t*.5+p.ph*1.3),.12*Math.sin(t*.9+p.ph))}
+if(p.st==='free'){p.pos.set(p.home.x,p.home.y+Math.sin(t*1.4+p.ph)*.06,p.home.z);p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}else p.m.rotation.set(.12*Math.sin(t*.7+p.ph),.35*Math.sin(t*.5+p.ph*1.3),.08*Math.sin(t*.9+p.ph))}
 else if(p.st==='fly'){p.t+=dt/p.dur;const k=Math.min(1,p.t),e=1-Math.pow(1-k,1.5),u=1-e;p.pos.set(u*u*p.from.x+2*u*e*p.ctrl.x+e*e*p.to.x,u*u*p.from.y+2*u*e*p.ctrl.y+e*e*p.to.y,u*u*p.from.z+2*u*e*p.ctrl.z+e*e*p.to.z);p.sc=1-.7*sm(.8,1,k);p.m.rotation.x+=dt*7;p.m.rotation.y+=dt*5;p.m.rotation.z+=dt*9;p.tc-=dt;if(p.tc<=0){trailAt(p.pos,p.col);p.tc=.025}
 if(p.t>=1){merge(p.to.clone(),p);p.st='gone';p.t=0;p.vis=0;p.m.material.opacity=0}}
-else if(p.st==='gone'){p.t+=dt;if(p.t>2.2){paperHome(p);p.sp=1}}
+else if(p.st==='gone'){p.t+=dt;const hasActive=papers.some(q=>q.st==='free'||(q.st==='taken'&&q.pos.distanceTo(kbGroup.position)<2.0));if(!hasActive&&p.t>1.8){paperHome(p);p.sp=1}}
 if(p.st==='gone'){p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;return}
 p.m.visible=true;p.m.position.copy(p.pos);p.m.scale.setScalar(Math.max(.01,p.sc)*1.0);p.m.material.opacity=p.st==='fly'?1:p.vis;
 p.gl.position.copy(p.pos);p.gl.position.z-=.15;p.gl.material.opacity=(p.st==='fly'?.35:p.vis*.22);p.gl.scale.setScalar(1.5*p.sc);
 if(p.sp===2){p.t+=dt;const k=p.t/.9;p.rg.position.copy(p.pos);p.rg.scale.setScalar(.3+k*2.2);p.rg.material.opacity=Math.max(0,.8*(1-k));if(k>=1){p.sp=0;p.t=0}}else p.rg.material.opacity=0})}
-papers.forEach(p=>{paperHome(p);p.sp=1;p.vis=0;p.st='free'});
+papers.forEach((p,i)=>{if(i===0){paperHome(p);p.sp=1;p.vis=1;p.st='free';}else{p.st='gone';p.vis=0;p.m.visible=false;p.gl.material.opacity=0;p.rg.material.opacity=0;}});
 /* ---------- interaction + loop ---------- */
 let mx=0,my=0,drag=false,lx=0,sv=0;const cv_=$('c');
 addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5;if(drag){const d=(e.clientX-lx)*.006;spin.rotation.y+=d;sv=d*60;lx=e.clientX}});
@@ -416,6 +454,9 @@ function loop(){
 
   if(!drag){sv*=Math.pow(0.92,dt*60);spin.rotation.y+=(0.045+sv*0.5)*dt;}
   clouds.rotation.y=spin.rotation.y*1.06+t*0.01;
+  kbCrystal.rotation.y+=dt*1.5;kbCrystal.rotation.x+=dt*0.9;kbEmitter.rotation.z+=dt*1.1;
+  kbChamber.position.y=.25+Math.sin(t*1.8)*.03;kbEdges.position.y=kbChamber.position.y;
+  kbCrystal.position.y=.25+Math.sin(t*1.8)*.04;kbGlow.material.opacity=.45+.15*Math.sin(t*2.5);
 
   // Critically damped, ultra-responsive scroll easing without lag or overshoot
   const scrollDelta=targetScroll-ss;
