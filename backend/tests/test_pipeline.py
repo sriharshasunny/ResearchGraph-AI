@@ -177,7 +177,7 @@ def test_graph_failure_keeps_vector_stage_as_a_reported_partial_result(monkeypat
     monkeypatch.setattr(pipeline, "_download_pdf", lambda _url: tmp_path / "temporary.pdf")
     monkeypatch.setattr(pipeline, "_extract_pdf", lambda _path: [{"page": 1, "section": "Test", "text": "Synthetic test passage about a supported method. " * 3}])
     monkeypatch.setattr(pipeline, "_chunks", lambda *_args: [{"id": "synthetic-chunk", "text": "Synthetic test passage about a supported method.", "metadata": {"paper_id": metadata["id"]}}])
-    monkeypatch.setattr(pipeline, "_index_chunks", lambda _chunks: None)
+    monkeypatch.setattr(pipeline, "_index_chunks", lambda *_args: None)
     monkeypatch.setattr(pipeline, "_extract_graph", lambda *_args: ([], []))
     monkeypatch.setattr(pipeline, "_write_graph", lambda *_args: (_ for _ in ()).throw(pipeline.PipelineError("synthetic graph failure")))
 
