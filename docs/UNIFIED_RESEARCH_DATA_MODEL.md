@@ -1,7 +1,7 @@
 # Unified Research Data Model
 
 Status: Step 1 implementation contract  
-Migration: \`supabase/migrations/20261125224000_unified_research_data_model.sql\`
+Migration: `supabase/migrations/20261125224000_unified_research_data_model.sql`
 
 ## 1. Architecture decision
 
@@ -20,21 +20,21 @@ A paper may belong to several workspaces. Combining workspaces means taking the 
 
 One row per user-owned research workspace.
 
-- \`id\`: internal UUID primary key.
-- \`owner_id\`: Supabase Auth user UUID.
-- \`name\`, \`description\`: user-visible workspace fields.
-- \`archived_at\`: optional archive marker. Archiving does not delete papers.
+- `id`: internal UUID primary key.
+- `owner_id`: Supabase Auth user UUID.
+- `name`, `description`: user-visible workspace fields.
+- `archived_at`: optional archive marker. Archiving does not delete papers.
 
 ### papers
 
 One canonical paper record per user.
 
-- \`id\`: internal UUID. This is the permanent ResearchGraph AI paper ID.
-- \`owner_id\`: owner from the verified Supabase identity.
-- \`title\`, \`abstract\`, \`publication_year\`, \`venue\`: bibliographic data.
-- \`source_provider\`: openalex, arxiv, crossref, manual_upload, or other.
-- \`source_url\`, \`pdf_url\`, \`open_access\`, \`access_type\`: source/access metadata.
-- \`metadata\`: provider-specific JSON object.
+- `id`: internal UUID. This is the permanent ResearchGraph AI paper ID.
+- `owner_id`: owner from the verified Supabase identity.
+- `title`, `abstract`, `publication_year`, `venue`: bibliographic data.
+- `source_provider`: openalex, arxiv, crossref, manual_upload, or other.
+- `source_url`, `pdf_url`, `open_access`, `access_type`: source/access metadata.
+- `metadata`: provider-specific JSON object.
 
 Do not use an OpenAlex ID, arXiv ID, DOI, title, or URL as the internal primary key.
 
@@ -43,15 +43,15 @@ Do not use an OpenAlex ID, arXiv ID, DOI, title, or URL as the internal primary 
 External identifiers are aliases for a canonical paper record.
 
 - Supported initial types: doi, openalex, arxiv, pmid, pmcid, isbn, other.
-- \`normalized_value\` is used for matching and is unique per owner and identifier type.
-- Keep \`original_value\` for the exact source representation.
+- `normalized_value` is used for matching and is unique per owner and identifier type.
+- Keep `original_value` for the exact source representation.
 
 When an identifier already belongs to a paper owned by the user, reuse that paper row and add a workspace membership. Do not create a duplicate paper or duplicate vector index merely because the same paper was discovered through another provider.
 
 Suggested normalization:
-- DOI: lowercase, trim whitespace, remove a leading \`https://doi.org/\` or \`doi:\`.
+- DOI: lowercase, trim whitespace, remove a leading `https://doi.org/` or `doi:`.
 - OpenAlex: store the canonical OpenAlex work ID in a consistent lowercase form.
-- arXiv: remove an optional \`arxiv:\` prefix and normalize the version policy consistently. Preserve the original source value.
+- arXiv: remove an optional `arxiv:` prefix and normalize the version policy consistently. Preserve the original source value.
 
 Normalization and identifier resolution must be implemented and tested in the ingestion service; the database stores the normalized value supplied by that service.
 
@@ -59,9 +59,9 @@ Normalization and identifier resolution must be implemented and tested in the in
 
 Many-to-many mapping between papers and workspaces.
 
-The composite foreign keys include \`owner_id\` on both sides. This prevents a row from connecting a workspace belonging to one user to a paper belonging to another user.
+The composite foreign keys include `owner_id` on both sides. This prevents a row from connecting a workspace belonging to one user to a paper belonging to another user.
 
-The primary key \`(workspace_id, paper_id)\` prevents duplicate membership.
+The primary key `(workspace_id, paper_id)` prevents duplicate membership.
 
 ### paper_assets
 
@@ -76,8 +76,8 @@ One durable current status snapshot per owner and paper. It replaces the current
 ## 3. Ownership and security rules
 
 1. Supabase Auth identifies the user. The backend must verify the incoming access token.
-2. The backend derives \`owner_id\` from the verified JWT. Never trust a client-supplied owner/user ID.
-3. RLS is enabled on all six tables. Authenticated users can access only rows where \`owner_id = auth.uid()\`.
+2. The backend derives `owner_id` from the verified JWT. Never trust a client-supplied owner/user ID.
+3. RLS is enabled on all six tables. Authenticated users can access only rows where `owner_id = auth.uid()`.
 4. Composite foreign keys ensure that workspace membership, identifiers, assets, and ingestion status cannot cross owners.
 5. Backend routes must still validate workspace ownership and paper membership. RLS is not a substitute for API authorization.
 6. Never query ChromaDB or Neo4j with an unrestricted fallback when a workspace selection is empty.
@@ -99,22 +99,22 @@ Each indexed chunk uses a stable chunk ID and scalar metadata:
 | access_type | open_access_pdf, abstract_only, metadata_only, private_upload, or unknown |
 | doi | DOI string when available |
 
-Do not put \`workspace_id\` or a mutable array of workspace IDs in Chroma metadata. The same paper can be in multiple workspaces, and membership can change without re-embedding.
+Do not put `workspace_id` or a mutable array of workspace IDs in Chroma metadata. The same paper can be in multiple workspaces, and membership can change without re-embedding.
 
 At retrieval time:
 1. Verify the selected workspace IDs belong to the authenticated user.
-2. Resolve the distinct paper UUIDs from \`workspace_papers\`.
+2. Resolve the distinct paper UUIDs from `workspace_papers`.
 3. If the allowed paper list is empty, return no evidence without querying Chroma.
 4. Query with both an owner filter and the allowed paper IDs. Chroma filter shape:
 
-\`\`\`python
+```python
 where = {
     "$and": [
         {"user_id": authenticated_user_id},
         {"paper_id": {"$in": allowed_paper_ids}},
     ]
 }
-\`\`\`
+```
 
 Validate this filter against the deployed Chroma version during the retrieval implementation.
 
@@ -124,17 +124,17 @@ Use one logical graph, with owner-aware keys. A user's canonical entities can be
 
 ### Nodes
 
-- \`ResearchPaper\`: \`paper_id\`, \`owner_id\`, title, DOI/source metadata.
-- \`ResearchEntity\`: \`entity_id\`, \`owner_id\`, canonical_name, entity_type, aliases, external_id (when available).
-- \`ResearchClaim\`: \`claim_id\`, \`owner_id\`, \`paper_id\`, \`chunk_id\`, predicate, evidence_text, page, section, confidence, validation_status, polarity, attribution, extraction_version.
+- `ResearchPaper`: `paper_id`, `owner_id`, title, DOI/source metadata.
+- `ResearchEntity`: `entity_id`, `owner_id`, canonical_name, entity_type, aliases, external_id (when available).
+- `ResearchClaim`: `claim_id`, `owner_id`, `paper_id`, `chunk_id`, predicate, evidence_text, page, section, confidence, validation_status, polarity, attribution, extraction_version.
 
 ### Relationships
 
-\`\`\`text
+```text
 (ResearchPaper)-[:HAS_CLAIM]->(ResearchClaim)
 (ResearchClaim)-[:SUBJECT]->(ResearchEntity)
 (ResearchClaim)-[:OBJECT]->(ResearchEntity)
-\`\`\`
+```
 
 The predicate is a property on ResearchClaim, not a dynamically interpolated Cypher relationship type. This keeps predicates and evidence separate and avoids unsafe dynamic relationship names.
 
@@ -157,7 +157,7 @@ Construct entity keys within an owner namespace, for example by hashing owner UU
 The current backend has legacy behavior that must not be mistaken for the new contract:
 
 - Current paper IDs are provider IDs such as OpenAlex work IDs or arXiv IDs.
-- The Chroma collection currently defaults to \`researchgraph_public\`; existing chunk metadata has \`paper_id\` but does not yet consistently have \`user_id\`.
+- The Chroma collection currently defaults to `researchgraph_public`; existing chunk metadata has `paper_id` but does not yet consistently have `user_id`.
 - Neo4j currently stores direct Paper-to-entity relationships and uses globally unique entity keys.
 - Ingestion status currently lives in a local SQLite file.
 - The frontend currently saves selected/saved paper state in localStorage.
