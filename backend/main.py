@@ -224,9 +224,19 @@ def graph_for_paper(paper_id: str, user: dict = Depends(require_current_user)):
 
 
 @app.get("/api/graph/search")
-def graph_search(q: str = Query(..., min_length=1, max_length=200), limit: int = Query(20, ge=1, le=100), user: dict = Depends(require_current_user)):
+def graph_search(
+    q: str = Query(..., min_length=1, max_length=200),
+    workspace_ids: list[UUID] = Query(..., min_length=1, max_length=20),
+    limit: int = Query(20, ge=1, le=100),
+    user: dict = Depends(require_current_user),
+):
     try:
-        return {"results": get_graph_search(q, limit, user["id"])}
+        paper_ids = resolve_workspace_paper_ids(
+            user["id"], user["access_token"], [str(workspace_id) for workspace_id in workspace_ids]
+        )
+        return {"results": get_graph_search(q, limit, user["id"], paper_ids)}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
     except PipelineError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
