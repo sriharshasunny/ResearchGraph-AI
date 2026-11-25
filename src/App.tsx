@@ -16,6 +16,7 @@ import { ComparePage } from './features/compare/ComparePage';
 import { LiteratureReviewPage } from './features/literature/LiteratureReviewPage';
 import { ResearchGapsPage } from './features/gaps/ResearchGapsPage';
 import { HistoryPage } from './features/history/HistoryPage';
+import { WorkspacesPage } from './features/workspaces/WorkspacesPage';
 
 const MainAppLayout = () => {
   const { activePage, theme } = useApp();
@@ -54,6 +55,7 @@ const MainAppLayout = () => {
             {activePage === 'literature' && <LiteratureReviewPage />}
             {activePage === 'gaps'       && <ResearchGapsPage />}
             {activePage === 'history'    && <HistoryPage />}
+            {activePage === 'workspaces' && <WorkspacesPage />}
           </main>
         </div>
       </div>
