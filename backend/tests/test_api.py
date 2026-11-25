@@ -1,4 +1,5 @@
 """FastAPI contract checks; backend responses are mocked where services are external."""
+import pytest
 from fastapi.testclient import TestClient
 
 from backend import auth, main, pipeline
