@@ -440,7 +440,7 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]], user_
         key = hashlib.sha256(f"{user_id}|Author|{author.get('id') or name.casefold()}".encode()).hexdigest()
         entities[("Author", key)] = {"type": "Author", "key": key, "name": name}
         relations.append({
-            "source_type": "Paper", "source_key": paper_id, "target_type": "Author", "target_key": key,
+            "source_type": "Paper", "source_key": _paper_entity_key(user_id, paper_id), "target_type": "Author", "target_key": key,
             "type": "AUTHORED_BY", "evidence": "Structured author metadata supplied by " + metadata["source"],
             "paper_id": paper_id, "chunk_id": None, "page": None, "section": "Metadata",
             "method": "source_metadata", "attribution": "metadata", "polarity": "affirmative",
@@ -454,7 +454,7 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]], user_
         key = _entity_key("Concept", name, user_id)
         entities[("Concept", key)] = {"type": "Concept", "key": key, "name": name}
         relations.append({
-            "source_type": "Paper", "source_key": paper_id, "target_type": "Concept", "target_key": key,
+            "source_type": "Paper", "source_key": _paper_entity_key(user_id, paper_id), "target_type": "Concept", "target_key": key,
             "type": "HAS_TOPIC", "evidence": "Structured topic metadata supplied by " + metadata["source"],
             "paper_id": paper_id, "chunk_id": None, "page": None, "section": "Metadata",
             "method": "source_metadata", "attribution": "metadata", "polarity": "affirmative",
