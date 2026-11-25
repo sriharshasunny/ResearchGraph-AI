@@ -8,7 +8,7 @@ import {
   Pin, Edit2, RotateCcw, X, GitCompare, Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { askResearchQuestion } from '../../services/api';
+import { askResearchQuestion, askResearchQuestionInWorkspaces } from '../../services/api';
 
 interface SessionItem {
   id: string;
@@ -29,7 +29,8 @@ export const ChatPage: React.FC = () => {
     allPapers,
     selectedPaperId,
     comparisonPaperIds,
-    toggleComparisonPaper
+    toggleComparisonPaper,
+    selectedWorkspaceIds,
   } = useApp();
 
   const [prompt, setPrompt] = useState('');
@@ -84,7 +85,7 @@ export const ChatPage: React.FC = () => {
     const content = textToSend || prompt;
     if (!content.trim() || isStreaming) return;
 
-    if (contextPaperIds.length === 0) {
+    if (selectedWorkspaceIds.length === 0 && contextPaperIds.length === 0) {
       setPrompt('');
       addChatMessage({
         id: `scope-required-${Date.now()}`,
@@ -109,7 +110,9 @@ export const ChatPage: React.FC = () => {
     const controller = new AbortController();
     requestControllerRef.current = controller;
     try {
-      const response = await askResearchQuestion(content.trim(), contextPaperIds, controller.signal);
+      const response = selectedWorkspaceIds.length > 0
+        ? await askResearchQuestionInWorkspaces(content.trim(), selectedWorkspaceIds, controller.signal)
+        : await askResearchQuestion(content.trim(), contextPaperIds, controller.signal);
       addChatMessage({
         id: `ai-${Date.now()}`,
         sender: 'assistant',
@@ -141,7 +144,7 @@ export const ChatPage: React.FC = () => {
       setIsTyping(false);
       setIsStreaming(false);
     }
-  }, [addChatMessage, contextPaperIds, isStreaming, prompt]);
+  }, [addChatMessage, contextPaperIds, isStreaming, prompt, selectedWorkspaceIds]);
 
   // Handle incoming query from other pages.
   useEffect(() => {
