@@ -856,15 +856,19 @@ def get_graph_for_paper(paper_id: str, user_id: str = "legacy") -> dict[str, Any
         driver.close()
 
 
-def get_graph(limit: int = 500, user_id: str = "legacy") -> dict[str, Any]:
+def get_graph(limit: int = 500, user_id: str = "legacy", paper_ids: list[str] | None = None) -> dict[str, Any]:
+    allowed_ids = list(dict.fromkeys(item.strip() for item in (paper_ids or []) if isinstance(item, str) and item.strip()))
+    if not allowed_ids:
+        return {"nodes": [], "edges": [], "indexed": False}
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             records = session.run(
                 "MATCH (a:ResearchEntity)-[r]->(b:ResearchEntity) "
-                "WHERE r.user_id=$user_id AND r.paper_id IS NOT NULL AND r.validation_status IN ['verified','source_metadata'] "
+                "WHERE r.user_id=$user_id AND r.paper_id IN $paper_ids "
+                "AND r.validation_status IN ['verified','source_metadata'] "
                 "RETURN a,r,b LIMIT $limit",
-                limit=limit, user_id=user_id,
+                limit=limit, user_id=user_id, paper_ids=allowed_ids,
             )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
