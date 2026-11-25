@@ -7,12 +7,13 @@ import {
 import { ThreeNeuralCore } from '../../components/ThreeNeuralCore';
 import { InteractiveSpaceBackground } from '../../components/InteractiveSpaceBackground';
 import { LandingView } from './LandingView';
-import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
 
 type PageState = 'LANDING' | 'AUTH';
 type AuthMode = 'LOGIN' | 'REGISTER';
 
 export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthComplete }) => {
+  const { signIn, signUp, loading: isAuthInitializing, error: contextAuthError, clearError } = useAuth();
   const [pageState, setPageState] = useState<PageState>('LANDING');
   const [authMode, setAuthMode] = useState<AuthMode>('LOGIN');
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
@@ -26,40 +27,46 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const displayedError = authError ?? contextAuthError;
+
+  const switchAuthMode = (nextMode: AuthMode) => {
+    setAuthMode(nextMode);
     setAuthError(null);
     setAuthNotice(null);
+    clearError();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isAuthInitializing) return;
+    setAuthError(null);
+    setAuthNotice(null);
+    clearError();
     setIsAuthenticating(true);
 
     try {
       const trimmedEmail = email.trim();
       if (authMode === 'REGISTER') {
-        const { data, error } = await supabase.auth.signUp({
-          email: trimmedEmail,
-          password,
-          options: {
-            data: { full_name: fullName.trim() }
-          }
+        const result = await signUp(trimmedEmail, password, {
+          fullName: fullName.trim(),
         });
-        if (error) throw error;
-        if (!data.session) {
+        if (result.requiresEmailConfirmation || !result.session) {
           setAuthMode('LOGIN');
           setAuthNotice('Your account was created. Check your email to confirm your address, then sign in.');
           return;
         }
         onAuthComplete();
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: trimmedEmail,
-          password
-        });
-        if (error) throw error;
+        const result = await signIn(trimmedEmail, password);
+        if (!result.session) {
+          setAuthError('Sign in did not establish an active session. Please try again.');
+          return;
+        }
         onAuthComplete();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setAuthNotice(null);
-      setAuthError(err.message || 'Authentication failed.');
+      setAuthError(err instanceof Error ? err.message : 'Authentication failed.');
     } finally {
       setIsAuthenticating(false);
     }
@@ -67,7 +74,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
 
   const triggerTraversal = (destination: PageState, mode?: AuthMode) => {
     setPageState(destination);
-    if (mode) setAuthMode(mode);
+    if (mode) switchAuthMode(mode);
   };
 
   React.useEffect(() => {
@@ -203,7 +210,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   <div className="flex p-1 bg-black/50 rounded-2xl border border-white/10 mb-6">
                     <button
                       type="button"
-                      onClick={() => setAuthMode('LOGIN')}
+                      onClick={() => switchAuthMode('LOGIN')}
                       className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${authMode === 'LOGIN'
                         ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 shadow-[0_0_15px_rgba(6,182,212,0.2)]'
                         : 'text-gray-400 dark:text-gray-500 hover:text-white'
@@ -213,7 +220,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </button>
                     <button
                       type="button"
-                      onClick={() => setAuthMode('REGISTER')}
+                      onClick={() => switchAuthMode('REGISTER')}
                       className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-1.5 ${authMode === 'REGISTER'
                         ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
                         : 'text-gray-400 dark:text-gray-500 hover:text-white'
@@ -257,7 +264,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <input
                           type="email"
                           value={email}
-                          onChange={(e) => { setEmail(e.target.value); setAuthError(null); setAuthNotice(null); }}
+                          onChange={(e) => { setEmail(e.target.value); setAuthError(null); setAuthNotice(null); clearError(); }}
                           placeholder="admin@researchgraph.ai"
                           required
                           className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${authMode === 'LOGIN'
@@ -280,7 +287,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <input
                           type={showPassword ? 'text' : 'password'}
                           value={password}
-                          onChange={(e) => { setPassword(e.target.value); setAuthError(null); setAuthNotice(null); }}
+                          onChange={(e) => { setPassword(e.target.value); setAuthError(null); setAuthNotice(null); clearError(); }}
                           placeholder="••••••••••••"
                           required
                           className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-11 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${authMode === 'LOGIN'
@@ -327,7 +334,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                     </AnimatePresence>
 
                     <AnimatePresence>
-                      {authError && (
+                      {displayedError && (
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -335,21 +342,26 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                           className="w-full p-3 rounded-lg bg-red-500/10 border border-red-500/30 flex items-center gap-2"
                         >
                           <Info className="w-4 h-4 text-red-400 flex-shrink-0" />
-                          <span className="text-xs text-red-200 font-semibold">{authError}</span>
+                          <span className="text-xs text-red-200 font-semibold">{displayedError}</span>
                         </motion.div>
                       )}
                     </AnimatePresence>
 
                     <button
                       type="submit"
-                      disabled={isAuthenticating}
-                      className={`w-full text-white rounded-xl py-3.5 mt-4 font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide shadow-lg ${isAuthenticating ? 'opacity-80 cursor-wait' : ''
+                      disabled={isAuthenticating || isAuthInitializing}
+                      className={`w-full text-white rounded-xl py-3.5 mt-4 font-bold flex items-center justify-center gap-2 transition-all text-sm tracking-wide shadow-lg ${(isAuthenticating || isAuthInitializing) ? 'opacity-80 cursor-wait' : ''
                         } ${authMode === 'LOGIN'
                           ? 'bg-gradient-to-r from-cyan-600 via-cyan-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-500/25 hover:shadow-cyan-500/40'
                           : 'bg-gradient-to-r from-purple-600 via-fuchsia-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-500/25 hover:shadow-purple-500/40'
                         }`}
                     >
-                      {isAuthenticating ? (
+                      {isAuthInitializing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Checking Session...
+                        </>
+                      ) : isAuthenticating ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
                           {authMode === 'LOGIN' ? 'Authenticating...' : 'Initializing Account...'}
@@ -367,7 +379,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                   <div className="mt-6 text-center text-xs text-gray-400 dark:text-gray-500 border-t border-white/10 pt-5">
                     {authMode === 'LOGIN' ? "Don't have an account? " : "Already registered? "}
                     <button
-                      onClick={() => setAuthMode(authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
+                      onClick={() => switchAuthMode(authMode === 'LOGIN' ? 'REGISTER' : 'LOGIN')}
                       className={`font-semibold ml-1 transition-colors ${authMode === 'LOGIN' ? 'text-cyan-400 hover:text-cyan-300' : 'text-purple-400 hover:text-purple-300'
                         }`}
                     >
