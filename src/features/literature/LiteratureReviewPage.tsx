@@ -1,24 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
+import {
+  createEmptyLiteratureDraft,
+  loadLiteratureDraftForUser,
+  saveLiteratureDraftForUser,
+  type LiteratureDraftData,
+  type LiteratureReviewSection,
+} from '../../context/workspaceIsolation';
+import { normalizeAuthenticatedUserId } from '../../lib/userStorage';
 import { 
   BookOpen, ArrowLeft, Check, Sparkles, 
   Download, Copy, RefreshCw, Search,
   ArrowUp, ArrowDown, FileText, Printer, Edit3, X, ChevronRight
 } from 'lucide-react';
 
+interface LiteratureDraftState extends LiteratureDraftData {
+  ownerUserId: string | null;
+  isDirty: boolean;
+}
+
 export const LiteratureReviewPage: React.FC = () => {
-  const { allPapers, setActivePage, savedPaperIds, setSelectedPaperId } = useApp();
+  const { allPapers, setActivePage, savedPaperIds, setSelectedPaperId, workspaceVersion } = useApp();
+  const { user, loading: authLoading } = useAuth();
+  const activeUserId = authLoading ? null : normalizeAuthenticatedUserId(user?.id);
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [selectedPaperIds, setSelectedPaperIds] = useState<string[]>(['p3', 'p4', 'p2']);
-  
+  const [draft, setDraft] = useState<LiteratureDraftState>(() => ({
+    ownerUserId: activeUserId,
+    isDirty: false,
+    ...loadLiteratureDraftForUser(activeUserId),
+  }));
+
   // Step 1 Search, Sort, Filter
   const [searchFilter, setSearchFilter] = useState('');
   const [sortCriteria, setSortCriteria] = useState<'citations' | 'year' | 'title'>('citations');
   const [venueFilter, setVenueFilter] = useState<'all' | 'saved' | 'arXiv' | 'CVPR' | 'NeurIPS'>('all');
 
   // Step 2 Settings
-  const [topic, setTopic] = useState('Self-Supervised Vision Transformers & Feature Representation');
   const [scope, setScope] = useState<'broad' | 'methodological' | 'comparative'>('comparative');
   const [structure, setStructure] = useState<'thematic' | 'chronological' | 'narrative'>('thematic');
   const [citationStyle, setCitationStyle] = useState<'apa' | 'ieee' | 'nature' | 'chicago'>('apa');
@@ -28,52 +47,67 @@ export const LiteratureReviewPage: React.FC = () => {
   const [generationStage, setGenerationStage] = useState('Reading selected papers...');
   const [copied, setCopied] = useState(false);
   const [isEditingOutline, setIsEditingOutline] = useState(false);
-  const [reviewSections, setReviewSections] = useState<{ title: string; content: string }[]>([
-    {
-      title: '1. Introduction & Foundational Motivation',
-      content: 'Recent breakthroughs in deep learning have witnessed a pivotal paradigm shift from supervised convolutional networks toward self-supervised Vision Transformers. By removing reliance on human-annotated labels, self-supervised learning unlocks massive pre-training on uncurated visual datasets, producing generalizable visual representations [1].'
-    },
-    {
-      title: '2. Major Approaches & Theoretical Taxonomy',
-      content: 'Existing literature falls broadly into two dominant architectural philosophies:\n- Generative Autoencoding: Exemplified by Masked Autoencoders (He et al., 2022) [2], which reconstruct masked image patches by optimizing pixel reconstruction loss with asymmetric encoder-decoders.\n- Discriminative Self-Distillation: Exemplified by DINOv2 (Oquab et al., 2023) [1], using multi-crop self-distillation between student and teacher networks without reconstruction overhead.'
-    },
-    {
-      title: '3. Comparative Methodologies & Inductive Biases',
-      content: 'MAE establishes that high masking ratios (75%–80%) prevent spatial redundancy, forcing models to capture holistic semantic structures. In contrast, DINOv2 integrates KoLeo regularization with patch-level objective functions to prevent representation collapse while preserving fine-grained localized features [3].'
-    },
-    {
-      title: '4. Benchmark Metrics & Empirical Evaluation',
-      content: 'Evaluated systematically across ImageNet-1K, LVD-142M, and zero-shot downstream tasks. DINOv2 demonstrates 86.5% top-1 accuracy on ImageNet with frozen linear probing without fine-tuning weights, whereas MAE achieves higher peak fine-tuning throughput when entire parameter matrices are adapted.'
-    },
-    {
-      title: '5. Limitations & Open Challenges',
-      content: 'Key bottlenecks include high pre-training energy requirements across multi-node GPU clusters, sensitivity to patch resolution during high-resolution inference, and an absence of real-time edge quantization benchmarks for billion-parameter ViT architectures.'
-    }
-  ]);
 
-  // Load persisted draft if available
+  // Re-hydrate cleanly when authenticated user or workspace reset version changes
   useEffect(() => {
-    const savedDraft = localStorage.getItem('rg_lit_review_draft');
-    if (savedDraft) {
-      try {
-        const parsed = JSON.parse(savedDraft);
-        if (parsed.topic) setTopic(parsed.topic);
-        if (parsed.selectedPaperIds) setSelectedPaperIds(parsed.selectedPaperIds);
-        if (parsed.sections) setReviewSections(parsed.sections);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }, []);
+    setStep(1);
+    setDraft({
+      ownerUserId: activeUserId,
+      isDirty: false,
+      ...loadLiteratureDraftForUser(activeUserId),
+    });
+  }, [activeUserId, workspaceVersion]);
 
-  // Save draft on changes
-  useEffect(() => {
-    localStorage.setItem('rg_lit_review_draft', JSON.stringify({
-      topic,
-      selectedPaperIds,
-      sections: reviewSections
+  const effectiveDraft: LiteratureDraftData =
+    draft.ownerUserId === activeUserId ? draft : createEmptyLiteratureDraft();
+
+  const { topic, selectedPaperIds, sections: reviewSections } = effectiveDraft;
+
+  const updateDraft = (updater: (prev: LiteratureDraftData) => LiteratureDraftData) => {
+    setDraft((prev) => {
+      const base: LiteratureDraftData =
+        prev.ownerUserId === activeUserId
+          ? { topic: prev.topic, selectedPaperIds: prev.selectedPaperIds, sections: prev.sections }
+          : loadLiteratureDraftForUser(activeUserId);
+      const next = updater(base);
+      return {
+        ...next,
+        ownerUserId: activeUserId,
+        isDirty: activeUserId !== null,
+      };
+    });
+  };
+
+  const setTopic = (nextTopic: string) => {
+    updateDraft((prev) => ({ ...prev, topic: nextTopic }));
+  };
+
+  const setSelectedPaperIds = (nextIds: string[]) => {
+    updateDraft((prev) => ({ ...prev, selectedPaperIds: nextIds }));
+  };
+
+  const setReviewSections = (
+    updater:
+      | LiteratureReviewSection[]
+      | ((prev: LiteratureReviewSection[]) => LiteratureReviewSection[]),
+  ) => {
+    updateDraft((prev) => ({
+      ...prev,
+      sections: typeof updater === 'function' ? updater(prev.sections) : updater,
     }));
-  }, [topic, selectedPaperIds, reviewSections]);
+  };
+
+  // Persist draft only after user edits within the authenticated user's namespace
+  useEffect(() => {
+    if (!activeUserId || draft.ownerUserId !== activeUserId || !draft.isDirty) {
+      return;
+    }
+    saveLiteratureDraftForUser(activeUserId, {
+      topic: draft.topic,
+      selectedPaperIds: draft.selectedPaperIds,
+      sections: draft.sections,
+    });
+  }, [activeUserId, draft]);
 
   const togglePaper = (id: string) => {
     if (selectedPaperIds.includes(id)) {

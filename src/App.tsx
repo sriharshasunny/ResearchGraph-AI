@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useApp } from './context/AppContext';
+import { useAuth } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './features/dashboard/Dashboard';
@@ -17,10 +19,31 @@ import { LiteratureReviewPage } from './features/literature/LiteratureReviewPage
 import { ResearchGapsPage } from './features/gaps/ResearchGapsPage';
 import { HistoryPage } from './features/history/HistoryPage';
 
+import { executeLogout } from './features/auth/routeGuard';
+
 const MainAppLayout = () => {
-  const { activePage, theme } = useApp();
+  const { activePage, theme, resetPrivateState, workspaceVersion } = useApp();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const handleLogout = () => navigate('/auth');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    setLogoutError(null);
+    const result = await executeLogout({
+      signOut,
+      resetPrivateState,
+      navigateToAuth: () => navigate('/auth', { replace: true }),
+    });
+    if (!result.ok) {
+      setLogoutError(result.error);
+    }
+    setIsLoggingOut(false);
+  };
+
+  const userWorkspaceKey = `${user?.id ?? 'guest'}-${workspaceVersion}`;
 
   return (
     <motion.div
@@ -33,7 +56,22 @@ const MainAppLayout = () => {
       <div className="absolute inset-0 pointer-events-none z-0 bg-[#F7FAFC] dark:bg-[#080E1A] transition-colors duration-200">
       </div>
       <div className="relative z-10 flex h-full w-full min-w-0 flex-col">
-        <Navbar onLogout={handleLogout} />
+        <Navbar onLogout={handleLogout} isLoggingOut={isLoggingOut} />
+        {logoutError && (
+          <div
+            role="alert"
+            className="flex items-center justify-between gap-3 border-b border-rose-500/30 bg-rose-500/10 px-4 py-2 text-xs font-medium text-rose-700 dark:text-rose-200"
+          >
+            <span>Sign out failed: {logoutError}</span>
+            <button
+              type="button"
+              onClick={() => setLogoutError(null)}
+              className="rounded px-2 py-0.5 text-[11px] font-semibold hover:bg-rose-500/20"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
         <div className="relative flex min-h-0 min-w-0 flex-1">
           <Sidebar />
           <main
@@ -51,7 +89,7 @@ const MainAppLayout = () => {
             {activePage === 'details'    && <PaperDetailsPage />}
             {activePage === 'saved'      && <SavedPage />}
             {activePage === 'compare'    && <ComparePage />}
-            {activePage === 'literature' && <LiteratureReviewPage />}
+            {activePage === 'literature' && <LiteratureReviewPage key={userWorkspaceKey} />}
             {activePage === 'gaps'       && <ResearchGapsPage />}
             {activePage === 'history'    && <HistoryPage />}
           </main>
@@ -95,8 +133,22 @@ export const App = () => {
             </motion.div>
           }
         />
-        <Route path="/launch" element={<LaunchSequence onComplete={() => navigate('/app')} />} />
-        <Route path="/app/*" element={<MainAppLayout />} />
+        <Route
+          path="/launch"
+          element={
+            <ProtectedRoute>
+              <LaunchSequence onComplete={() => navigate('/app')} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/*"
+          element={
+            <ProtectedRoute>
+              <MainAppLayout />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/auth" replace />} />
         <Route path="*" element={<Navigate to="/auth" replace />} />
       </Routes>

@@ -5,10 +5,15 @@ import {
   Download, Trash2
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { useAuth } from '../context/AuthContext';
+import { clearUserWorkspaceStorage, normalizeAuthenticatedUserId } from '../lib/userStorage';
 
 export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-  const { uiMode } = useApp();
+  const { uiMode, resetPrivateState } = useApp();
+  const { user } = useAuth();
+  const authenticatedUserId = normalizeAuthenticatedUserId(user?.id);
   const [activeTab, setActiveTab] = useState<'preferences' | 'integrations' | 'account' | 'privacy' | 'shortcuts'>('preferences');
+  const [workspaceClearedMessage, setWorkspaceClearedMessage] = useState<string | null>(null);
 
   // Preferences states
   const [exportFormat, setExportFormat] = useState('bibtex');
@@ -304,20 +309,29 @@ export const SettingsModal: React.FC<{ isOpen: boolean; onClose: () => void }> =
                 <div className="p-4 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/40 dark:bg-red-900/10 space-y-3">
                   <h4 className="font-bold text-sm text-red-600 dark:text-red-400">Danger Zone</h4>
                   <p className="text-xs text-gray-600 dark:text-gray-300 dark:text-gray-400">
-                    Permanently delete all indexed citations, cache directories, and local history.
+                    Permanently delete your account&apos;s locally stored workspace data (saved papers, scratchpad, notes, and review drafts). Your sign-in session and theme preferences remain intact.
                   </p>
                   <button
+                    type="button"
+                    disabled={!authenticatedUserId}
                     onClick={() => {
-                      if (window.confirm('Are you sure you want to clear all local data? This action cannot be undone.')) {
-                        localStorage.clear();
-                        window.location.reload();
+                      if (!authenticatedUserId) return;
+                      if (window.confirm('Clear all local workspace data for your account? This action cannot be undone.')) {
+                        clearUserWorkspaceStorage(authenticatedUserId);
+                        resetPrivateState();
+                        setWorkspaceClearedMessage('Local workspace data for your account has been cleared.');
                       }
                     }}
-                    className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-semibold text-xs transition-colors shadow-xs flex items-center gap-1.5"
+                    className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50 text-white font-semibold text-xs transition-colors shadow-xs flex items-center gap-1.5"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     <span>Clear All Local Workspace Data</span>
                   </button>
+                  {workspaceClearedMessage && (
+                    <p role="status" className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                      {workspaceClearedMessage}
+                    </p>
+                  )}
                 </div>
               </div>
             )}

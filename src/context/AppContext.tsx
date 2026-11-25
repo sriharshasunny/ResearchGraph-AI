@@ -1,20 +1,28 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ChatMessage, PageType, Paper } from '../types';
+import { useAuth } from './AuthContext';
+import { normalizeAuthenticatedUserId } from '../lib/userStorage';
+import {
+  CLEAR_CHAT_MESSAGE_CONTENT,
+  createEmptyWorkspaceState,
+  createWelcomeChatMessage,
+  loadWorkspaceStateForUser,
+  saveWorkspacePaperNotes,
+  saveWorkspaceReadingStatus,
+  saveWorkspaceSavedPapers,
+  saveWorkspaceScratchpad,
+  type ReadingStatus,
+  type WorkspaceState,
+} from './workspaceIsolation';
 
-export type ReadingStatus = 'to_read' | 'reading' | 'completed';
+export type { ReadingStatus } from './workspaceIsolation';
 
 export type UIMode = 'simple' | 'expert';
 
-const readSavedPapers = (): Paper[] => {
-  try {
-    const value = localStorage.getItem('researchgraph_saved_papers');
-    const parsed: unknown = value ? JSON.parse(value) : [];
-    return Array.isArray(parsed) ? parsed as Paper[] : [];
-  } catch {
-    return [];
-  }
-};
+interface InternalWorkspaceState extends WorkspaceState {
+  persistSavedPapers: boolean;
+}
 
 interface AppContextType {
   activePage: PageType;
@@ -32,7 +40,7 @@ interface AppContextType {
   addToRecentlyViewed: (id: string) => void;
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
-  
+
   // UI Mode
   uiMode: UIMode;
   setUIMode: (mode: UIMode) => void;
@@ -57,34 +65,40 @@ interface AppContextType {
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
+  workspaceVersion: number;
+  resetPrivateState: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const readStoredUIMode = (): UIMode => {
+  try {
+    return (localStorage.getItem('rg_uiMode') as UIMode) || 'simple';
+  } catch {
+    return 'simple';
+  }
+};
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [activePage, setActivePage] = useState<PageType>('dashboard');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [allPapers, setAllPapers] = useState<Paper[]>(readSavedPapers);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{
-    id: 'welcome',
-    sender: 'assistant',
-    content: 'Ask a question about papers you have added to the research index. Answers use retrieved passages and show the source paper and page when available.',
-    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }]);
-  const [savedPaperIds, setSavedPaperIds] = useState<string[]>(() => readSavedPapers().map(paper => paper.id));
-  const [selectedPaperId, setSelectedPaperId] = useState<string | null>(null);
-  const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
+  const { user, loading: authLoading } = useAuth();
+  const activeUserId = authLoading ? null : normalizeAuthenticatedUserId(user?.id);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [workspaceVersion, setWorkspaceVersion] = useState(0);
 
-  // UI Mode
-  const [uiMode, setUIModeState] = useState<UIMode>(() => (localStorage.getItem('rg_uiMode') as UIMode) || 'simple');
+  // Global application preferences (preserved across users & logout)
+  const [uiMode, setUIModeState] = useState<UIMode>(readStoredUIMode);
 
-  const setUIMode = (mode: UIMode) => {
+  const setUIMode = useCallback((mode: UIMode) => {
     setUIModeState(mode);
-    localStorage.setItem('rg_uiMode', mode);
-  };
+    try {
+      localStorage.setItem('rg_uiMode', mode);
+    } catch {
+      // ignore storage errors for non-critical preferences
+    }
+  }, []);
 
-  // Dark Mode Theme State
+  // Global Dark Mode Theme State
   const [theme, setThemeState] = useState<'light' | 'dark'>(() => {
     try {
       const saved = localStorage.getItem('rg_theme');
@@ -121,153 +135,218 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, [theme]);
 
-
-
-
-  // Reading status
-  const [paperReadingStatus, setPaperReadingStatusState] = useState<Record<string, ReadingStatus>>({});
-
-  // Paper personal notes
-  const [paperNotes, setPaperNotes] = useState<Record<string, string>>({
-    p1: 'Essential reference for self-attention scaling. Key equations 1 & 2 on scaled dot-product.',
-    p2: 'Patch projection layer implementation in Section 3.1 is remarkably simple. Need to benchmark against ConvNeXt.',
-    p5: 'GRPO algorithm bypasses value model memory overhead. Critical for test-time scaling experiments.'
-  });
-
-  // Comparison list
-  const [comparisonPaperIds, setComparisonPaperIds] = useState<string[]>([]);
-
-  // Active research project
-  const [activeProject, setActiveProject] = useState('Research workspace');
-
-  // Scratchpad
-  const [scratchpad, setScratchpadState] = useState(() => {
-    return localStorage.getItem('researchgraph_scratchpad') || 
-`# Working Hypothesis
-- Exploring whether self-distillation (DINOv2) visual embeddings retain spatial compositionality better than contrastive text-image pairs (CLIP) when injected into cross-attention multimodal decoders.
-
-# Key References To Revisit:
-- Dosovitskiy et al. (ViT) patch resolution trade-offs
-- Radford et al. (CLIP) zero-shot robustness
-- DeepSeek-R1 test-time computation steps`;
-  });
-
-  const [chatScope, setChatScope] = useState<string>('all');
-
-  const setScratchpad = (text: string) => {
-    setScratchpadState(text);
-    localStorage.setItem('researchgraph_scratchpad', text);
-  };
-
-  const toggleSidebar = () => setIsSidebarOpen((prev) => !prev);
-
-  const addChatMessage = (msg: ChatMessage) => {
-    setChatMessages((prev) => [...prev, msg]);
-  };
-
-  const clearChat = () => {
-    setChatMessages([{
-      id: 'welcome',
-      sender: 'assistant',
-      content: 'Chat cleared. Add open-access papers from Research Search to the index, then ask a question grounded in their passages.',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    }]);
-  };
-
-  const toggleSavedPaper = (id: string) => {
-    setSavedPaperIds((prev) => 
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
-    );
-  };
-
-  const addToRecentlyViewed = (id: string) => {
-    setRecentlyViewed((prev) => {
-      const filtered = prev.filter((p) => p !== id);
-      return [id, ...filtered].slice(0, 10);
-    });
-  };
-
-  const setPaperReadingStatus = (id: string, status: ReadingStatus) => {
-    setPaperReadingStatusState(prev => ({ ...prev, [id]: status }));
-  };
-
-  const setPaperNote = (id: string, note: string) => {
-    setPaperNotes(prev => ({ ...prev, [id]: note }));
-  };
-
-  const toggleComparisonPaper = (id: string) => {
-    setComparisonPaperIds(prev => {
-      if (prev.includes(id)) return prev.filter(x => x !== id);
-      if (prev.length >= 3) return [...prev.slice(1), id]; // Max 3
-      return [...prev, id];
-    });
-  };
-
-  const clearComparison = () => {
-    setComparisonPaperIds([]);
-  };
-
-  const addCustomPaper = (paper: Paper) => {
-    setAllPapers(prev => [paper, ...prev]);
-    setSavedPaperIds(prev => [paper.id, ...prev]);
-  };
-
-  const addSearchResults = useCallback((papers: Paper[]) => {
-    setAllPapers(prev => {
-      const papersById = new Map(prev.map(paper => [paper.id, paper]));
-      for (const paper of papers) papersById.set(paper.id, paper);
-      return [...papersById.values()];
-    });
-  }, []);
+  // Isolated per-user private workspace state
+  const [workspace, setWorkspace] = useState<InternalWorkspaceState>(() => ({
+    ...loadWorkspaceStateForUser(activeUserId),
+    persistSavedPapers: false,
+  }));
 
   useEffect(() => {
-    const savedPapers = allPapers.filter(paper => savedPaperIds.includes(paper.id));
-    try {
-      localStorage.setItem('researchgraph_saved_papers', JSON.stringify(savedPapers));
-    } catch {
-      // The in-memory saved-paper state remains available if browser storage is unavailable.
+    setWorkspace({
+      ...loadWorkspaceStateForUser(activeUserId),
+      persistSavedPapers: false,
+    });
+  }, [activeUserId]);
+
+  // Immediately reflect empty/new-user state on the render pass where activeUserId changes
+  const effectiveWorkspace: InternalWorkspaceState =
+    workspace.ownerUserId === activeUserId
+      ? workspace
+      : { ...loadWorkspaceStateForUser(activeUserId), persistSavedPapers: false };
+
+  useEffect(() => {
+    if (!activeUserId || workspace.ownerUserId !== activeUserId || !workspace.persistSavedPapers) {
+      return;
     }
-  }, [allPapers, savedPaperIds]);
+    saveWorkspaceSavedPapers(activeUserId, workspace.allPapers, workspace.savedPaperIds);
+  }, [activeUserId, workspace.ownerUserId, workspace.persistSavedPapers, workspace.allPapers, workspace.savedPaperIds]);
+
+  const updateWorkspace = useCallback(
+    (updater: (prev: InternalWorkspaceState) => InternalWorkspaceState) => {
+      setWorkspace((prev) => {
+        const base: InternalWorkspaceState =
+          prev.ownerUserId === activeUserId
+            ? prev
+            : { ...loadWorkspaceStateForUser(activeUserId), persistSavedPapers: false };
+        return updater(base);
+      });
+    },
+    [activeUserId],
+  );
+
+  const resetPrivateState = useCallback(() => {
+    setWorkspace({
+      ...createEmptyWorkspaceState(activeUserId),
+      persistSavedPapers: false,
+    });
+    setWorkspaceVersion((prev) => prev + 1);
+  }, [activeUserId]);
+
+  const setActivePage = useCallback((activePage: PageType) => {
+    updateWorkspace((prev) => ({ ...prev, activePage }));
+  }, [updateWorkspace]);
+
+  const setSearchQuery = useCallback((searchQuery: string) => {
+    updateWorkspace((prev) => ({ ...prev, searchQuery }));
+  }, [updateWorkspace]);
+
+  const setSelectedPaperId = useCallback((selectedPaperId: string | null) => {
+    updateWorkspace((prev) => ({ ...prev, selectedPaperId }));
+  }, [updateWorkspace]);
+
+  const setActiveProject = useCallback((activeProject: string) => {
+    updateWorkspace((prev) => ({ ...prev, activeProject }));
+  }, [updateWorkspace]);
+
+  const setChatScope = useCallback((chatScope: string) => {
+    updateWorkspace((prev) => ({ ...prev, chatScope }));
+  }, [updateWorkspace]);
+
+  const setScratchpad = useCallback((text: string) => {
+    updateWorkspace((prev) => ({ ...prev, scratchpad: text }));
+    saveWorkspaceScratchpad(activeUserId, text);
+  }, [activeUserId, updateWorkspace]);
+
+  const toggleSidebar = useCallback(() => setIsSidebarOpen((prev) => !prev), []);
+
+  const addChatMessage = useCallback((msg: ChatMessage) => {
+    updateWorkspace((prev) => ({
+      ...prev,
+      chatMessages: [...prev.chatMessages, msg],
+    }));
+  }, [updateWorkspace]);
+
+  const clearChat = useCallback(() => {
+    updateWorkspace((prev) => ({
+      ...prev,
+      chatMessages: [createWelcomeChatMessage(CLEAR_CHAT_MESSAGE_CONTENT)],
+    }));
+  }, [updateWorkspace]);
+
+  const toggleSavedPaper = useCallback((id: string) => {
+    updateWorkspace((prev) => ({
+      ...prev,
+      savedPaperIds: prev.savedPaperIds.includes(id)
+        ? prev.savedPaperIds.filter((p) => p !== id)
+        : [...prev.savedPaperIds, id],
+      persistSavedPapers: activeUserId !== null,
+    }));
+  }, [activeUserId, updateWorkspace]);
+
+  const addToRecentlyViewed = useCallback((id: string) => {
+    updateWorkspace((prev) => {
+      const filtered = prev.recentlyViewed.filter((p) => p !== id);
+      return {
+        ...prev,
+        recentlyViewed: [id, ...filtered].slice(0, 10),
+      };
+    });
+  }, [updateWorkspace]);
+
+  const setPaperReadingStatus = useCallback((id: string, status: ReadingStatus) => {
+    updateWorkspace((prev) => {
+      const nextStatus = { ...prev.paperReadingStatus, [id]: status };
+      saveWorkspaceReadingStatus(activeUserId, nextStatus);
+      return {
+        ...prev,
+        paperReadingStatus: nextStatus,
+      };
+    });
+  }, [activeUserId, updateWorkspace]);
+
+  const setPaperNote = useCallback((id: string, note: string) => {
+    updateWorkspace((prev) => {
+      const nextNotes = { ...prev.paperNotes, [id]: note };
+      saveWorkspacePaperNotes(activeUserId, nextNotes);
+      return {
+        ...prev,
+        paperNotes: nextNotes,
+      };
+    });
+  }, [activeUserId, updateWorkspace]);
+
+  const toggleComparisonPaper = useCallback((id: string) => {
+    updateWorkspace((prev) => {
+      const curr = prev.comparisonPaperIds;
+      let next: string[];
+      if (curr.includes(id)) {
+        next = curr.filter((x) => x !== id);
+      } else if (curr.length >= 3) {
+        next = [...curr.slice(1), id];
+      } else {
+        next = [...curr, id];
+      }
+      return { ...prev, comparisonPaperIds: next };
+    });
+  }, [updateWorkspace]);
+
+  const clearComparison = useCallback(() => {
+    updateWorkspace((prev) => ({ ...prev, comparisonPaperIds: [] }));
+  }, [updateWorkspace]);
+
+  const addCustomPaper = useCallback((paper: Paper) => {
+    updateWorkspace((prev) => ({
+      ...prev,
+      allPapers: [paper, ...prev.allPapers],
+      savedPaperIds: prev.savedPaperIds.includes(paper.id)
+        ? prev.savedPaperIds
+        : [paper.id, ...prev.savedPaperIds],
+      persistSavedPapers: activeUserId !== null,
+    }));
+  }, [activeUserId, updateWorkspace]);
+
+  const addSearchResults = useCallback((papers: Paper[]) => {
+    updateWorkspace((prev) => {
+      const papersById = new Map(prev.allPapers.map((paper) => [paper.id, paper]));
+      for (const paper of papers) papersById.set(paper.id, paper);
+      return {
+        ...prev,
+        allPapers: [...papersById.values()],
+      };
+    });
+  }, [updateWorkspace]);
 
   return (
     <AppContext.Provider
       value={{
-        activePage,
+        activePage: effectiveWorkspace.activePage,
         setActivePage,
-        searchQuery,
+        searchQuery: effectiveWorkspace.searchQuery,
         setSearchQuery,
-        chatMessages,
+        chatMessages: effectiveWorkspace.chatMessages,
         addChatMessage,
         clearChat,
-        savedPaperIds,
+        savedPaperIds: effectiveWorkspace.savedPaperIds,
         toggleSavedPaper,
-        selectedPaperId,
+        selectedPaperId: effectiveWorkspace.selectedPaperId,
         setSelectedPaperId,
-        recentlyViewed,
+        recentlyViewed: effectiveWorkspace.recentlyViewed,
         addToRecentlyViewed,
         isSidebarOpen,
         toggleSidebar,
         uiMode,
         setUIMode,
-        paperReadingStatus,
+        paperReadingStatus: effectiveWorkspace.paperReadingStatus,
         setPaperReadingStatus,
-        paperNotes,
+        paperNotes: effectiveWorkspace.paperNotes,
         setPaperNote,
-        comparisonPaperIds,
+        comparisonPaperIds: effectiveWorkspace.comparisonPaperIds,
         toggleComparisonPaper,
         clearComparison,
-        activeProject,
+        activeProject: effectiveWorkspace.activeProject,
         setActiveProject,
-        scratchpad,
+        scratchpad: effectiveWorkspace.scratchpad,
         setScratchpad,
-        chatScope,
+        chatScope: effectiveWorkspace.chatScope,
         setChatScope,
-        allPapers,
+        allPapers: effectiveWorkspace.allPapers,
         addCustomPaper,
         addSearchResults,
         theme,
         toggleTheme,
         setTheme,
+        workspaceVersion,
+        resetPrivateState,
       }}
     >
       {children}
