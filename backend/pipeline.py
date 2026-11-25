@@ -716,14 +716,14 @@ def start_ingestion(paper_id: str, user_id: str = "legacy") -> dict[str, Any]:
     return _save_status(metadata["id"], user_id=user_id, status="metadata_available", stage="queued", paper=metadata, vector_ready=bool((existing or {}).get("vector_ready")), graph_ready=bool((existing or {}).get("graph_ready")), message="Paper accepted for indexing.")
 
 
-def _query_chunks(question: str, paper_ids: list[str], limit: int = 8) -> list[dict[str, Any]]:
+def _query_chunks(question: str, paper_ids: list[str], user_id: str = "legacy", limit: int = 8) -> list[dict[str, Any]]:
     allowed_ids = list(dict.fromkeys(item.strip() for item in paper_ids if isinstance(item, str) and item.strip()))
     if not allowed_ids:
         return []
     provider = EmbeddingProvider()
     query_vector = provider.embed([question])[0]
     collection = _chroma_collection()
-    where = {"paper_id": {"$in": allowed_ids}}
+    where = {"$and": [{"paper_id": {"$in": allowed_ids}}, {"user_id": user_id}]}
     try:
         result = collection.query(query_embeddings=[query_vector], n_results=limit, where=where, include=["documents", "metadatas", "distances"])
     except Exception as exc:
@@ -740,7 +740,7 @@ def _query_chunks(question: str, paper_ids: list[str], limit: int = 8) -> list[d
     ]
 
 
-def _query_graph(paper_ids: list[str], terms: list[str]) -> list[dict[str, Any]]:
+def _query_graph(paper_ids: list[str], terms: list[str], user_id: str = "legacy") -> list[dict[str, Any]]:
     allowed_ids = list(dict.fromkeys(item.strip() for item in paper_ids if isinstance(item, str) and item.strip()))
     if not allowed_ids:
         return []
@@ -748,36 +748,36 @@ def _query_graph(paper_ids: list[str], terms: list[str]) -> list[dict[str, Any]]
     try:
         query = (
             "MATCH (s:ResearchEntity)-[r]->(t:ResearchEntity) "
-            "WHERE r.paper_id IN $paper_ids AND r.validation_status IN ['verified','source_metadata'] "
+            "WHERE r.paper_id IN $paper_ids AND r.user_id=$user_id AND r.validation_status IN ['verified','source_metadata'] "
             "AND any(term IN $terms WHERE toLower(s.name) CONTAINS toLower(term) OR toLower(t.name) CONTAINS toLower(term)) "
-            "OPTIONAL MATCH (p:Paper {paper_id:r.paper_id}) "
+            "OPTIONAL MATCH (p:Paper {paper_id:r.paper_id,user_id:$user_id}) "
             "RETURN r.paper_id AS paper_id,p.name AS paper_title,type(r) AS relation,"
             "s.name AS subject,s.type AS subject_type,t.name AS object,t.type AS object_type,"
             "r.evidence AS evidence,r.page AS page,r.section AS section,r.chunk_id AS chunk_id,"
             "r.attribution AS attribution,r.polarity AS polarity LIMIT 40"
         )
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            return [record.data() for record in session.run(query, paper_ids=allowed_ids, terms=terms)]
+            return [record.data() for record in session.run(query, paper_ids=allowed_ids, user_id=user_id, terms=terms)]
     except Exception as exc:
         raise PipelineError("Knowledge graph retrieval failed. Confirm Neo4j is reachable and graph data has been indexed.") from exc
     finally:
         driver.close()
 
 
-def query_research(question: str, paper_ids: list[str] | None = None) -> dict[str, Any]:
+def query_research(question: str, paper_ids: list[str] | None = None, user_id: str = "legacy") -> dict[str, Any]:
     paper_ids = list(dict.fromkeys(paper_ids or []))
     if len(paper_ids) > 50:
         raise PipelineError("A maximum of 50 paper IDs can be selected for one question.")
     if not paper_ids:
         return {"answer": "Select at least one paper from a research workspace before asking a question. Empty paper scopes never search the full collection.", "answer_type": "insufficient_context", "citations": [], "graph_evidence": []}
-    chunks = _query_chunks(question, paper_ids)
+    chunks = _query_chunks(question, paper_ids, user_id)
     if not chunks:
         return {"answer": "I could not find indexed paper passages relevant to this question. Add one or more open-access papers to the research index first.", "answer_type": "insufficient_context", "citations": [], "graph_evidence": []}
     terms = [word for word in re.findall(r"[\w-]{4,}", question)[:10]]
     graph_evidence: list[dict[str, Any]] = []
     if len(terms) >= 2:
         try:
-            graph_evidence = _query_graph(paper_ids, terms)
+            graph_evidence = _query_graph(paper_ids, terms, user_id)
         except PipelineError:
             # RAG remains useful without graph traversal; health indicates unavailable Neo4j.
             graph_evidence = []
@@ -803,26 +803,26 @@ def query_research(question: str, paper_ids: list[str] | None = None) -> dict[st
     return {"answer": answer, "answer_type": "grounded_generation", "citations": cited, "graph_evidence": graph_evidence}
 
 
-def get_paper_chunks(paper_id: str, limit: int = 100) -> list[dict[str, Any]]:
+def get_paper_chunks(paper_id: str, limit: int = 100, user_id: str = "legacy") -> list[dict[str, Any]]:
     collection = _chroma_collection()
     try:
-        result = collection.get(where={"paper_id": paper_id}, limit=limit, include=["documents", "metadatas"])
+        result = collection.get(where={"$and": [{"paper_id": paper_id}, {"user_id": user_id}]}, limit=limit, include=["documents", "metadatas"])
     except Exception as exc:
         raise PipelineError("ChromaDB could not load the paper's indexed passages.") from exc
     return [{"chunk_id": item_id, "text": text, "metadata": meta} for item_id, text, meta in zip(result.get("ids", []), result.get("documents", []), result.get("metadatas", []))]
 
 
-def get_graph_for_paper(paper_id: str) -> dict[str, Any]:
+def get_graph_for_paper(paper_id: str, user_id: str = "legacy") -> dict[str, Any]:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             records = session.run(
                 "MATCH (s:ResearchEntity)-[r]->(t:ResearchEntity) "
-                "WHERE r.paper_id=$paper_id AND r.validation_status IN ['verified','source_metadata'] "
+                "WHERE r.paper_id=$paper_id AND r.user_id=$user_id AND r.validation_status IN ['verified','source_metadata'] "
                 "RETURN s,t,type(r) AS relation,r.evidence AS evidence,r.page AS page,"
                 "r.section AS section,r.chunk_id AS chunk_id,r.attribution AS attribution,"
                 "r.polarity AS polarity,r.evidence_id AS evidence_id LIMIT 300",
-                paper_id=paper_id,
+                paper_id=paper_id, user_id=user_id,
             )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
@@ -854,15 +854,15 @@ def get_graph_for_paper(paper_id: str) -> dict[str, Any]:
         driver.close()
 
 
-def get_graph(limit: int = 500) -> dict[str, Any]:
+def get_graph(limit: int = 500, user_id: str = "legacy") -> dict[str, Any]:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             records = session.run(
                 "MATCH (a:ResearchEntity)-[r]->(b:ResearchEntity) "
-                "WHERE r.paper_id IS NOT NULL AND r.validation_status IN ['verified','source_metadata'] "
+                "WHERE r.user_id=$user_id AND r.paper_id IS NOT NULL AND r.validation_status IN ['verified','source_metadata'] "
                 "RETURN a,r,b LIMIT $limit",
-                limit=limit,
+                limit=limit, user_id=user_id,
             )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
@@ -892,11 +892,11 @@ def get_graph(limit: int = 500) -> dict[str, Any]:
         driver.close()
 
 
-def get_graph_search(query: str, limit: int = 20) -> list[dict[str, Any]]:
+def get_graph_search(query: str, limit: int = 20, user_id: str = "legacy") -> list[dict[str, Any]]:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (n:ResearchEntity) WHERE toLower(n.name) CONTAINS toLower($query) RETURN n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,n.source_url AS sourceUrl LIMIT $limit", query=query, limit=limit)
+            records = session.run("MATCH (n:ResearchEntity) WHERE n.user_id=$user_id AND toLower(n.name) CONTAINS toLower($query) RETURN n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,n.source_url AS sourceUrl LIMIT $limit", query=query, limit=limit, user_id=user_id)
             return [record.data() for record in records]
     except Exception as exc:
         raise PipelineError("Neo4j graph search is unavailable.") from exc
