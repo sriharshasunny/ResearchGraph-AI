@@ -1,6 +1,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { ChatMessage, PageType, Paper } from '../types';
+import { supabase } from '../lib/supabase';
+import { listResearchWorkspaces } from '../services/api';
+import type { ResearchWorkspace } from '../services/api';
 
 export type ReadingStatus = 'to_read' | 'reading' | 'completed';
 
@@ -19,6 +22,12 @@ const readSavedPapers = (): Paper[] => {
 interface AppContextType {
   activePage: PageType;
   setActivePage: (page: PageType) => void;
+  workspaces: ResearchWorkspace[];
+  activeWorkspaceId: string | null;
+  setActiveWorkspaceId: (workspaceId: string | null) => void;
+  selectedWorkspaceIds: string[];
+  setSelectedWorkspaceIds: (workspaceIds: string[]) => void;
+  refreshWorkspaces: () => Promise<ResearchWorkspace[]>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   chatMessages: ChatMessage[];
@@ -63,6 +72,24 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activePage, setActivePage] = useState<PageType>('dashboard');
+  const [workspaces, setWorkspaces] = useState<ResearchWorkspace[]>([]);
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(null);
+  const [selectedWorkspaceIds, setSelectedWorkspaceIds] = useState<string[]>([]);
+
+  const refreshWorkspaces = useCallback(async () => {
+    const response = await listResearchWorkspaces();
+    const next = response.workspaces || [];
+    setWorkspaces(next);
+    setSelectedWorkspaceIds(previous => {
+      const stillAvailable = previous.filter(id => next.some(workspace => workspace.id === id));
+      return stillAvailable.length ? stillAvailable : next[0] ? [next[0].id] : [];
+    });
+    setActiveWorkspaceId(previous => previous && next.some(workspace => workspace.id === previous)
+      ? previous
+      : next[0]?.id || null
+    );
+    return next;
+  }, []);
   const [searchQuery, setSearchQuery] = useState('');
   const [allPapers, setAllPapers] = useState<Paper[]>(readSavedPapers);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([{
@@ -120,6 +147,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  // Load the authenticated user's persisted workspace list after sign-in.
+  useEffect(() => {
+    const load = () => {
+      void refreshWorkspaces().catch(() => {
+        setWorkspaces([]);
+        setSelectedWorkspaceIds([]);
+        setActiveWorkspaceId(null);
+      });
+    };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        queueMicrotask(load);
+      } else {
+        setWorkspaces([]);
+        setSelectedWorkspaceIds([]);
+        setActiveWorkspaceId(null);
+      }
+    });
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) load();
+    }).catch(() => {
+      setWorkspaces([]);
+      setSelectedWorkspaceIds([]);
+      setActiveWorkspaceId(null);
+    });
+    return () => subscription.unsubscribe();
+  }, [refreshWorkspaces]);
 
 
 
@@ -234,6 +289,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       value={{
         activePage,
         setActivePage,
+        workspaces,
+        activeWorkspaceId,
+        setActiveWorkspaceId,
+        selectedWorkspaceIds,
+        setSelectedWorkspaceIds,
+        refreshWorkspaces,
         searchQuery,
         setSearchQuery,
         chatMessages,
