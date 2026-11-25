@@ -59,7 +59,7 @@ class IngestRequest(BaseModel):
 class RagRequest(BaseModel):
     question: str = Field(min_length=3, max_length=4000)
     paper_ids: list[str] | None = Field(default=None, min_length=1, max_length=50)
-    workspace_ids: list[str] | None = Field(default=None, min_length=1, max_length=20)
+    workspace_ids: list[UUID] | None = Field(default=None, min_length=1, max_length=20)
 
     @model_validator(mode="after")
     def require_one_explicit_scope(self):
@@ -251,7 +251,7 @@ def graph_for_paper_by_id(paper_id: str = Query(..., min_length=1, max_length=50
 def rag(request: RagRequest, user: dict = Depends(require_current_user)):
     try:
         if request.workspace_ids:
-            paper_ids = resolve_workspace_paper_ids(user["id"], user["access_token"], request.workspace_ids)
+            paper_ids = resolve_workspace_paper_ids(user["id"], user["access_token"], [str(workspace_id) for workspace_id in request.workspace_ids])
             if not paper_ids:
                 return {"answer": "The selected workspace scope contains no papers. Add papers to the selected workspace before asking a question.", "answer_type": "insufficient_context", "citations": [], "graph_evidence": []}
         else:
