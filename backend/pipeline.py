@@ -789,17 +789,35 @@ def get_graph_for_paper(paper_id: str) -> dict[str, Any]:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (p:Paper {paper_id:$paper_id})-[r]-(n:ResearchEntity) RETURN p,n,type(r) AS relation,r.evidence AS evidence,r.page AS page LIMIT 150", paper_id=paper_id)
+            records = session.run(
+                "MATCH (s:ResearchEntity)-[r]->(t:ResearchEntity) "
+                "WHERE r.paper_id=$paper_id AND r.validation_status IN ['verified','source_metadata'] "
+                "RETURN s,t,type(r) AS relation,r.evidence AS evidence,r.page AS page,"
+                "r.section AS section,r.chunk_id AS chunk_id,r.attribution AS attribution,"
+                "r.polarity AS polarity,r.evidence_id AS evidence_id LIMIT 300",
+                paper_id=paper_id,
+            )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
             for row in records:
-                paper = dict(row["p"])
-                entity = dict(row["n"])
-                for item, is_paper in ((paper, True), (entity, False)):
+                source, target = dict(row["s"]), dict(row["t"])
+                for item in (source, target):
                     key = item.get("key")
                     if key:
-                        nodes[key] = {"id": key, "label": item.get("name", ""), "type": "Paper" if is_paper else item.get("type", "Concept"), "paperId": item.get("paper_id") if is_paper else None, "sourceUrl": item.get("source_url") if is_paper else None}
-                edges.append({"id": hashlib.sha256((paper.get("key", "") + row["relation"] + entity.get("key", "")).encode()).hexdigest()[:20], "source": paper.get("key"), "target": entity.get("key"), "relation": row["relation"], "evidence": row["evidence"], "page": row["page"]})
+                        nodes[key] = {
+                            "id": key, "label": item.get("name", ""),
+                            "type": item.get("type", "Concept"),
+                            "paperId": item.get("paper_id"),
+                            "sourceUrl": item.get("source_url"),
+                        }
+                edges.append({
+                    "id": row["evidence_id"] or hashlib.sha256((source.get("key", "") + row["relation"] + target.get("key", "")).encode()).hexdigest()[:20],
+                    "source": source.get("key"), "target": target.get("key"),
+                    "relation": row["relation"], "evidence": row["evidence"],
+                    "page": row["page"], "section": row["section"],
+                    "paperId": paper_id, "chunkId": row["chunk_id"],
+                    "attribution": row["attribution"], "polarity": row["polarity"],
+                })
             return {"paper_id": paper_id, "nodes": list(nodes.values()), "edges": edges, "indexed": bool(nodes)}
     except Exception as exc:
         if isinstance(exc, PipelineError):
@@ -813,7 +831,12 @@ def get_graph(limit: int = 500) -> dict[str, Any]:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (a:ResearchEntity)-[r]->(b:ResearchEntity) RETURN a,r,b LIMIT $limit", limit=limit)
+            records = session.run(
+                "MATCH (a:ResearchEntity)-[r]->(b:ResearchEntity) "
+                "WHERE r.paper_id IS NOT NULL AND r.validation_status IN ['verified','source_metadata'] "
+                "RETURN a,r,b LIMIT $limit",
+                limit=limit,
+            )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
             for row in records:
@@ -821,8 +844,20 @@ def get_graph(limit: int = 500) -> dict[str, Any]:
                 for item in (source, target):
                     key = item.get("key")
                     if key:
-                        nodes[key] = {"id": key, "label": item.get("name", ""), "type": item.get("type", "Paper"), "paperId": item.get("paper_id"), "sourceUrl": item.get("source_url")}
-                edges.append({"id": hashlib.sha256((source.get("key", "") + relationship.type + target.get("key", "") + relationship.get("evidence_id", "")).encode()).hexdigest()[:20], "source": source.get("key"), "target": target.get("key"), "relation": relationship.type, "evidence": relationship.get("evidence"), "page": relationship.get("page")})
+                        nodes[key] = {
+                            "id": key, "label": item.get("name", ""),
+                            "type": item.get("type", "Concept"),
+                            "paperId": item.get("paper_id"),
+                            "sourceUrl": item.get("source_url"),
+                        }
+                edges.append({
+                    "id": hashlib.sha256((source.get("key", "") + relationship.type + target.get("key", "") + relationship.get("evidence_id", "")).encode()).hexdigest()[:20],
+                    "source": source.get("key"), "target": target.get("key"),
+                    "relation": relationship.type, "evidence": relationship.get("evidence"),
+                    "page": relationship.get("page"), "section": relationship.get("section"),
+                    "paperId": relationship.get("paper_id"), "chunkId": relationship.get("chunk_id"),
+                    "attribution": relationship.get("attribution"), "polarity": relationship.get("polarity"),
+                })
             return {"nodes": list(nodes.values()), "edges": edges, "indexed": bool(nodes)}
     except Exception as exc:
         raise PipelineError("Neo4j graph data could not be loaded.") from exc
