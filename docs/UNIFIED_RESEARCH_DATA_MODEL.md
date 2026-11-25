@@ -1,7 +1,7 @@
 # Unified Research Data Model
 
 Status: Step 1 implementation contract  
-Migration: `supabase/migrations/20261125224000_unified_research_data_model.sql`
+Migration: `supabase/migrations/20261125171558_unified_research_data_model.sql`
 
 ## 1. Architecture decision
 
