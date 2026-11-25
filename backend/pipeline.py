@@ -405,7 +405,7 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
         relations.append({"source_type": "Paper", "source_key": metadata["id"], "target_type": "Concept", "target_key": key, "type": "HAS_TOPIC", "evidence": "Structured topic metadata supplied by " + metadata["source"], "page": None, "method": "source_metadata"})
     # LLM-extracted assertions are accepted only when their cited evidence is an exact excerpt of indexed text.
     if os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY"):
-        excerpts = [{"chunk_id": chunk["id"], "page": chunk["metadata"]["page"], "text": chunk["text"][:2200]} for chunk in chunks[:18]]
+        excerpts = [{"chunk_id": chunk["id"], "page": chunk["metadata"].get("page"), "text": chunk["text"][:2200]} for chunk in chunks[:18]]
         provider = EmbeddingProvider()
         raw = provider.complete([
             {"role": "system", "content": "Extract only explicit research entities and relationships supported by the provided excerpts. Return JSON with entities [{type,name}] and relationships [{source_type,source_name,target_type,target_name,type,evidence,chunk_id,page}]. Allowed entity types: Method, Model, Dataset, Algorithm, Concept, ResearchTask. Allowed relationship types: USES_METHOD, USES_MODEL, USES_DATASET, USES_ALGORITHM, ADDRESSES_TASK, RELATED_TO. Evidence must be a verbatim substring of the named excerpt. Never infer citations or co-occurrence relationships."},
