@@ -301,8 +301,6 @@ export const SearchPage: React.FC = () => {
           </div> : filteredPapers.map(paper => {
             const saved = savedPaperIds.includes(paper.id);
             const compared = comparisonPaperIds.includes(paper.id);
-            const paperStatus = ingestion[paper.id]?.status;
-            const paperIsProcessing = Boolean(paperStatus && ['metadata_available', 'downloading', 'extracting', 'indexing'].includes(paperStatus));
             return <article key={paper.id} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E172A] p-4 transition hover:border-blue-200 dark:hover:border-slate-700 hover:shadow-[0_8px_28px_-22px_rgba(37,99,235,.55)] sm:p-5">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0 flex-1">
