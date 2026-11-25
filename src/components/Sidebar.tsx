@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Clock3,
   GitCompare,
+  FolderKanban,
   Home,
   MessageSquare,
   Network,
@@ -19,6 +20,7 @@ import { ProfileModal } from './ProfileModal';
 const navItems = [
   { id: 'dashboard', label: 'Home', rail: 'Home', description: 'Dashboard & overview', icon: Home, accent: 'text-blue-600 dark:text-blue-400 bg-gradient-to-br from-blue-100 to-blue-200/70 dark:from-blue-950/80 dark:to-blue-900/50 shadow-xs border border-white/80 dark:border-blue-500/20' },
   { id: 'search', label: 'Search', rail: 'Search', description: 'Find papers & authors', icon: Search, accent: 'text-fuchsia-600 dark:text-fuchsia-400 bg-gradient-to-br from-fuchsia-100 to-fuchsia-200/70 dark:from-fuchsia-950/80 dark:to-fuchsia-900/50 shadow-xs border border-white/80 dark:border-fuchsia-500/20' },
+  { id: 'workspaces', label: 'Workspaces', rail: 'Spaces', description: 'Organize papers & scopes', icon: FolderKanban, accent: 'text-sky-600 dark:text-sky-400 bg-gradient-to-br from-sky-100 to-cyan-200/70 dark:from-sky-950/80 dark:to-cyan-900/50 shadow-xs border border-white/80 dark:border-sky-500/20' },
   { id: 'chat', label: 'Chat', rail: 'Chat', description: 'Ask research questions', icon: MessageSquare, accent: 'text-violet-600 dark:text-violet-400 bg-gradient-to-br from-violet-100 to-violet-200/70 dark:from-violet-950/80 dark:to-violet-900/50 shadow-xs border border-white/80 dark:border-violet-500/20' },
   { id: 'graph', label: 'Graph', rail: 'Graph', description: 'Explore knowledge graph', icon: Network, accent: 'text-emerald-600 dark:text-emerald-400 bg-gradient-to-br from-emerald-100 to-teal-200/70 dark:from-emerald-950/80 dark:to-teal-900/50 shadow-xs border border-white/80 dark:border-emerald-500/20' },
   { id: 'compare', label: 'Compare', rail: 'Compare', description: 'Compare papers & methods', icon: GitCompare, accent: 'text-amber-600 dark:text-amber-400 bg-gradient-to-br from-amber-100 to-orange-200/70 dark:from-amber-950/80 dark:to-orange-900/50 shadow-xs border border-white/80 dark:border-amber-500/20' },
