@@ -26,7 +26,7 @@ interface AppContextType {
   activeWorkspaceId: string | null;
   setActiveWorkspaceId: (workspaceId: string | null) => void;
   selectedWorkspaceIds: string[];
-  setSelectedWorkspaceIds: (workspaceIds: string[]) => void;
+  setSelectedWorkspaceIds: React.Dispatch<React.SetStateAction<string[]>>;
   refreshWorkspaces: () => Promise<ResearchWorkspace[]>;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
