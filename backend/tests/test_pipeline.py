@@ -128,21 +128,97 @@ def test_private_network_pdf_hosts_are_rejected_without_download():
         pipeline._validate_download_url("https://localhost/test.pdf")
 
 
-def test_graph_extraction_requires_exact_supporting_evidence(monkeypatch):
+def test_graph_extraction_requires_exact_evidence_and_second_pass_verification(monkeypatch):
+    import json
+
     monkeypatch.setenv("LLM_API_KEY", "test-key")
-    metadata = {"id": "fixture:synthetic", "title": "Synthetic test paper", "authors": [], "topics": []}
-    chunk = {"id": "chunk-1", "text": "The authors evaluate the synthetic method on SampleSet.", "metadata": {"page": 2}}
+    metadata = {"id": "fixture:synthetic", "title": "Synthetic test paper", "source": "Test Fixture", "authors": [], "topics": []}
+    chunk = {
+        "id": "chunk-1",
+        "text": "The authors evaluate the synthetic method on SampleSet. The authors compare SampleSet to OtherSet for analysis.",
+        "metadata": {"page": 2, "section": "Methods"},
+    }
+    extraction = {
+        "entities": [
+            {"type": "Dataset", "name": "SampleSet"},
+            {"type": "Dataset", "name": "OtherSet"},
+        ],
+        "relationships": [
+            {
+                "source_type": "Paper", "source_name": "Synthetic test paper",
+                "target_type": "Dataset", "target_name": "SampleSet",
+                "type": "USES_DATASET",
+                "evidence": "The authors evaluate the synthetic method on SampleSet.",
+                "chunk_id": "chunk-1",
+            },
+            {
+                "source_type": "Paper", "source_name": "Synthetic test paper",
+                "target_type": "Dataset", "target_name": "OtherSet",
+                "type": "USES_DATASET",
+                "evidence": "The authors compare SampleSet to OtherSet for analysis.",
+                "chunk_id": "chunk-1",
+            },
+            {
+                "source_type": "Paper", "source_name": "Synthetic test paper",
+                "target_type": "Dataset", "target_name": "InventedSet",
+                "type": "USES_DATASET",
+                "evidence": "This quote is not in the document.",
+                "chunk_id": "chunk-1",
+            },
+        ],
+    }
 
     class FakeProvider:
-        def complete(self, *_args, **_kwargs):
-            return '{"entities":[{"type":"Dataset","name":"SampleSet"}],"relationships":[{"source_type":"Paper","source_name":"Synthetic test paper","target_type":"Dataset","target_name":"SampleSet","type":"USES_DATASET","evidence":"evaluate the synthetic method on SampleSet","chunk_id":"chunk-1","page":2},{"source_type":"Paper","source_name":"Synthetic test paper","target_type":"Dataset","target_name":"InventedSet","type":"USES_DATASET","evidence":"This quote is not in the document.","chunk_id":"chunk-1","page":2}]}'
+        def __init__(self):
+            self.calls = 0
+
+        def complete(self, messages, **_kwargs):
+            self.calls += 1
+            if self.calls == 1:
+                return json.dumps(extraction)
+            verifier_input = json.loads(messages[-1]["content"])
+            return json.dumps({
+                "verifications": [
+                    {
+                        "claim_id": candidate["claim_id"],
+                        "verdict": "SUPPORTED" if candidate["target_name"] == "SampleSet" else "UNSUPPORTED",
+                        "attribution": "current_work",
+                        "polarity": "affirmative",
+                        "reason": "Synthetic fixture verification",
+                    }
+                    for candidate in verifier_input["candidates"]
+                ]
+            })
 
     monkeypatch.setattr(pipeline, "EmbeddingProvider", FakeProvider)
     entities, relations = pipeline._extract_graph(metadata, [chunk])
-    assert any(entity["name"] == "SampleSet" for entity in entities)
-    assert len(relations) == 1
-    assert relations[0]["evidence"] in chunk["text"]
 
+    assert [entity["name"] for entity in entities] == ["SampleSet"]
+    assert len(relations) == 1
+    assert relations[0]["target_key"] == pipeline._entity_key("Dataset", "SampleSet")
+    assert relations[0]["paper_id"] == "fixture:synthetic"
+    assert relations[0]["chunk_id"] == "chunk-1"
+    assert relations[0]["page"] == 2
+    assert relations[0]["section"] == "Methods"
+    assert relations[0]["validation_status"] == "verified"
+    assert relations[0]["method"] == "llm_two_pass_verified"
+
+
+def test_entity_key_reuses_same_typed_normalized_entity():
+    assert pipeline._entity_key("Model", "Transformer") == pipeline._entity_key("Model", "  transformer  ")
+    assert pipeline._entity_key("Model", "Transformer") != pipeline._entity_key("Architecture", "Transformer")
+
+
+def test_empty_paper_scope_never_searches_the_global_index(monkeypatch):
+    monkeypatch.setattr(pipeline, "EmbeddingProvider", lambda: pytest.fail("Embedding must not run without an explicit scope"))
+    monkeypatch.setattr(pipeline, "_chroma_collection", lambda: pytest.fail("Chroma must not be queried without an explicit scope"))
+    monkeypatch.setattr(pipeline, "_neo4j_driver", lambda: pytest.fail("Neo4j must not be queried without an explicit scope"))
+
+    assert pipeline._query_chunks("synthetic question", []) == []
+    assert pipeline._query_graph([], ["transformer"]) == []
+    response = pipeline.query_research("synthetic question", [])
+    assert response["answer_type"] == "insufficient_context"
+    assert response["citations"] == []
 
 def test_same_name_arxiv_authors_are_not_merged_across_records(monkeypatch):
     monkeypatch.delenv("LLM_API_KEY", raising=False)
