@@ -22,18 +22,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authNotice, setAuthNotice] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
+    setAuthNotice(null);
     setIsAuthenticating(true);
 
     try {
       const trimmedEmail = email.trim();
       if (authMode === 'REGISTER') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: trimmedEmail,
           password,
           options: {
@@ -41,6 +43,11 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
           }
         });
         if (error) throw error;
+        if (!data.session) {
+          setAuthMode('LOGIN');
+          setAuthNotice('Your account was created. Check your email to confirm your address, then sign in.');
+          return;
+        }
         onAuthComplete();
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -51,6 +58,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
         onAuthComplete();
       }
     } catch (err: any) {
+      setAuthNotice(null);
       setAuthError(err.message || 'Authentication failed.');
     } finally {
       setIsAuthenticating(false);
@@ -249,7 +257,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <input
                           type="email"
                           value={email}
-                          onChange={(e) => { setEmail(e.target.value); setAuthError(null); }}
+                          onChange={(e) => { setEmail(e.target.value); setAuthError(null); setAuthNotice(null); }}
                           placeholder="admin@researchgraph.ai"
                           required
                           className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-4 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${authMode === 'LOGIN'
@@ -272,7 +280,7 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         <input
                           type={showPassword ? 'text' : 'password'}
                           value={password}
-                          onChange={(e) => { setPassword(e.target.value); setAuthError(null); }}
+                          onChange={(e) => { setPassword(e.target.value); setAuthError(null); setAuthNotice(null); }}
                           placeholder="••••••••••••"
                           required
                           className={`w-full bg-[#030712]/80 border border-white/15 rounded-xl py-3 pl-11 pr-11 text-white placeholder-gray-500 focus:outline-none transition-all text-sm ${authMode === 'LOGIN'
@@ -303,6 +311,20 @@ export const AuthPage: React.FC<{ onAuthComplete: () => void }> = ({ onAuthCompl
                         </div>
                       </div>
                     )}
+
+                    <AnimatePresence>
+                      {authNotice && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="w-full p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-2"
+                        >
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                          <span className="text-xs text-emerald-200 font-semibold">{authNotice}</span>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
                     <AnimatePresence>
                       {authError && (
