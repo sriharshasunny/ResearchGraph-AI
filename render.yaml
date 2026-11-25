@@ -12,6 +12,10 @@ services:
         value: 3.12.8
       - key: CORS_ORIGINS
         value: https://researchgraph-ai.vercel.app
+      - key: SUPABASE_URL
+        value: https://uhwsbovuzmwvbgrynfiy.supabase.co
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
       - key: CHROMA_API_KEY
         sync: false
       - key: CHROMA_TENANT
