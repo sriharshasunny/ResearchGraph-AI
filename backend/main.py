@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from uuid import UUID
 
 try:
     from .auth import require_current_user
+    from .workspaces import WorkspaceError, add_paper_to_workspace, create_workspace, delete_workspace, list_workspace_papers, list_workspaces, remove_paper_from_workspace, resolve_workspace_paper_ids
     from .pipeline import (
         PaperNotFound,
         PipelineError,
@@ -23,6 +25,7 @@ try:
     )
 except ImportError:  # Supports Render's backend-root command: uvicorn main:app
     from auth import require_current_user
+    from workspaces import WorkspaceError, add_paper_to_workspace, create_workspace, delete_workspace, list_workspace_papers, list_workspaces, remove_paper_from_workspace, resolve_workspace_paper_ids
     from pipeline import (
         PaperNotFound,
         PipelineError,
@@ -55,7 +58,23 @@ class IngestRequest(BaseModel):
 
 class RagRequest(BaseModel):
     question: str = Field(min_length=3, max_length=4000)
-    paper_ids: list[str] = Field(min_length=1, max_length=50)
+    paper_ids: list[str] | None = Field(default=None, min_length=1, max_length=50)
+    workspace_ids: list[str] | None = Field(default=None, min_length=1, max_length=20)
+
+    @model_validator(mode="after")
+    def require_one_explicit_scope(self):
+        if bool(self.paper_ids) == bool(self.workspace_ids):
+            raise ValueError("Provide either paper_ids or workspace_ids, but not both.")
+        return self
+
+
+class WorkspaceCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    description: str = Field(default="", max_length=1000)
+
+
+class WorkspaceAddPaperRequest(BaseModel):
+    paper_id: str = Field(min_length=1, max_length=500)
 
 
 @app.get("/")
@@ -66,6 +85,79 @@ def root():
 @app.get("/api/health")
 def health():
     return health_status()
+
+
+@app.get("/api/workspaces")
+def workspaces_list(user: dict = Depends(require_current_user)):
+    try:
+        return {"workspaces": list_workspaces(user["access_token"])}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/api/workspaces", status_code=201)
+def workspaces_create(request: WorkspaceCreateRequest, user: dict = Depends(require_current_user)):
+    try:
+        workspace = create_workspace(user["id"], user["access_token"], request.name, request.description)
+        return {"workspace": workspace}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.delete("/api/workspaces/{workspace_id}")
+def workspaces_delete(workspace_id: UUID, user: dict = Depends(require_current_user)):
+    try:
+        delete_workspace(user["id"], user["access_token"], str(workspace_id))
+        return {"deleted": True, "workspace_id": str(workspace_id)}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.get("/api/workspaces/{workspace_id}/papers")
+def workspace_papers_list(workspace_id: UUID, user: dict = Depends(require_current_user)):
+    try:
+        papers = list_workspace_papers(user["id"], user["access_token"], str(workspace_id))
+        return {"workspace_id": str(workspace_id), "papers": papers}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+@app.post("/api/workspaces/{workspace_id}/papers", status_code=202)
+def workspace_papers_add(
+    workspace_id: UUID,
+    request: WorkspaceAddPaperRequest,
+    background_tasks: BackgroundTasks,
+    user: dict = Depends(require_current_user),
+):
+    try:
+        metadata = get_paper_metadata(request.paper_id)
+        canonical_paper_id = metadata["id"]
+        membership = add_paper_to_workspace(
+            user["id"], user["access_token"], str(workspace_id), canonical_paper_id, metadata
+        )
+        status = start_ingestion(canonical_paper_id, user["id"])
+        if status.get("stage") == "queued":
+            background_tasks.add_task(ingest_paper, canonical_paper_id, user["id"])
+        return {"workspace_id": str(workspace_id), "paper": membership, "ingestion": status}
+    except PaperNotFound as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    except PipelineError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@app.delete("/api/workspaces/{workspace_id}/papers")
+def workspace_papers_remove(
+    workspace_id: UUID,
+    paper_id: str = Query(..., min_length=1, max_length=500),
+    user: dict = Depends(require_current_user),
+):
+    try:
+        remove_paper_from_workspace(user["id"], user["access_token"], str(workspace_id), paper_id)
+        return {"removed": True, "workspace_id": str(workspace_id), "paper_id": paper_id}
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
 
 
 @app.get("/api/paper")
@@ -158,7 +250,13 @@ def graph_for_paper_by_id(paper_id: str = Query(..., min_length=1, max_length=50
 @app.post("/api/rag/query")
 def rag(request: RagRequest, user: dict = Depends(require_current_user)):
     try:
-        return query_research(request.question, request.paper_ids, user["id"])
+        if request.workspace_ids:
+            paper_ids = resolve_workspace_paper_ids(user["id"], user["access_token"], request.workspace_ids)
+            if not paper_ids:
+                return {"answer": "The selected workspace scope contains no papers. Add papers to the selected workspace before asking a question.", "answer_type": "insufficient_context", "citations": [], "graph_evidence": []}
+        else:
+            paper_ids = request.paper_ids or []
+        return query_research(request.question, paper_ids, user["id"])
     except PaperNotFound as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     except PipelineError as exc:
