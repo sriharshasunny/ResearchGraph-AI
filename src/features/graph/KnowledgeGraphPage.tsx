@@ -122,7 +122,7 @@ const edgeTypes = { relation: RelationEdge };
 
 // --- GRAPH COMPONENT ---
 const GraphCanvas = () => {
-  const { setActivePage, setSelectedPaperId, setSearchQuery, uiMode } = useApp();
+  const { setActivePage, setSelectedPaperId, setSearchQuery, uiMode, selectedWorkspaceIds, workspaces } = useApp();
   const { fitView } = useReactFlow();
   
   const [nodes, setNodes, onNodesChange] = useNodesState<any>([]);
@@ -139,7 +139,9 @@ const GraphCanvas = () => {
 
   useEffect(() => {
     let cancelled = false;
-    getResearchGraph().then(data => {
+    setGraphLoading(true);
+    setGraphError(null);
+    getResearchGraph(selectedWorkspaceIds).then(data => {
       if (cancelled) return;
       setGraphItems(data.nodes.map(node => ({ id: node.id, label: node.label, type: node.type, paperId: node.paperId, sourceUrl: node.sourceUrl })));
       setGraphEdges(data.edges);
@@ -147,7 +149,7 @@ const GraphCanvas = () => {
       if (!cancelled) setGraphError(error instanceof Error ? error.message : 'Knowledge graph service is unavailable.');
     }).finally(() => { if (!cancelled) setGraphLoading(false); });
     return () => { cancelled = true; };
-  }, []);
+  }, [selectedWorkspaceIds]);
 
   // Initialize nodes and edges with d3-force
   useEffect(() => {
@@ -260,6 +262,11 @@ const GraphCanvas = () => {
           <div className="flex items-center gap-2">
             <Network className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <h1 className="text-[14px] font-bold text-gray-900 dark:text-white tracking-tight">Knowledge Graph {uiMode === 'expert' ? '(Expert Mode)' : ''}</h1>
+            <span className="hidden max-w-[280px] truncate text-[10px] text-gray-500 dark:text-gray-400 sm:inline">
+              {selectedWorkspaceIds.length
+                ? workspaces.filter(workspace => selectedWorkspaceIds.includes(workspace.id)).map(workspace => workspace.name).join(' + ')
+                : 'No workspace selected'}
+            </span>
           </div>
         </div>
 

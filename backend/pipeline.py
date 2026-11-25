@@ -10,6 +10,7 @@ import socket
 import sqlite3
 import tempfile
 import time
+import unicodedata
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
@@ -25,9 +26,32 @@ CHUNK_SIZE = int(os.getenv("RAG_CHUNK_CHARS", "1800"))
 CHUNK_OVERLAP = int(os.getenv("RAG_CHUNK_OVERLAP_CHARS", "240"))
 ALLOWED_RELATIONS = {
     "AUTHORED_BY", "USES_METHOD", "USES_MODEL", "USES_DATASET", "USES_ALGORITHM",
-    "ADDRESSES_TASK", "RELATED_TO", "CITES", "HAS_TOPIC",
+    "USES_FRAMEWORK", "ADDRESSES_TASK", "RELATED_TO", "CITES", "HAS_TOPIC",
+    "BASED_ON", "USED_FOR", "EVALUATED_ON", "MEASURED_BY", "PROPOSES",
+    "REPORTS_FINDING", "HAS_LIMITATION", "COMPARED_WITH",
 }
-ALLOWED_ENTITY_TYPES = {"Author", "Method", "Model", "Dataset", "Algorithm", "Concept", "ResearchTask", "Paper"}
+ALLOWED_ENTITY_TYPES = {
+    "Author", "Method", "Model", "Dataset", "Algorithm", "Concept",
+    "ResearchTask", "Benchmark", "Metric", "Framework", "Finding", "ResearchGap", "Paper",
+}
+RELATION_SIGNATURES = {
+    "AUTHORED_BY": ({"Paper"}, {"Author"}),
+    "USES_METHOD": ({"Paper", "Model", "Algorithm"}, {"Method"}),
+    "USES_MODEL": ({"Paper", "Method"}, {"Model"}),
+    "USES_DATASET": ({"Paper", "Model", "Method", "Algorithm"}, {"Dataset"}),
+    "USES_ALGORITHM": ({"Paper", "Model", "Method"}, {"Algorithm"}),
+    "USES_FRAMEWORK": ({"Paper", "Model", "Method"}, {"Framework"}),
+    "ADDRESSES_TASK": ({"Paper", "Model", "Method", "Algorithm"}, {"ResearchTask"}),
+    "HAS_TOPIC": ({"Paper"}, {"Concept", "ResearchTask"}),
+    "BASED_ON": ({"Model", "Method", "Algorithm"}, {"Model", "Method", "Algorithm"}),
+    "USED_FOR": ({"Model", "Method", "Algorithm", "Framework"}, {"ResearchTask"}),
+    "EVALUATED_ON": ({"Paper", "Model", "Method", "Algorithm"}, {"Dataset", "Benchmark"}),
+    "MEASURED_BY": ({"Paper", "Model", "Method", "Algorithm"}, {"Metric"}),
+    "PROPOSES": ({"Paper"}, {"Model", "Method", "Algorithm"}),
+    "REPORTS_FINDING": ({"Paper"}, {"Finding"}),
+    "HAS_LIMITATION": ({"Paper"}, {"Finding", "ResearchGap", "Concept"}),
+    "COMPARED_WITH": ({"Paper", "Model", "Method", "Algorithm"}, {"Model", "Method", "Algorithm"}),
+}
 SECTION_RE = re.compile(r"^(?:\d+(?:\.\d+)*\s+)?(?:abstract|introduction|related work|background|method(?:ology)?|approach|experiments?|results?|discussion|limitations?|conclusion|references)\s*$", re.I)
 ARXIV_RE = re.compile(r"^(?:arxiv:)?((?:\d{4}\.\d{4,5})(?:v\d+)?|[a-z-]+/\d{7}(?:v\d+)?)$", re.I)
 
@@ -58,18 +82,32 @@ def _status_conn():
     return conn
 
 
-def _save_status(paper_id: str, **updates: Any) -> dict[str, Any]:
-    current = get_ingestion_status(paper_id) or {"paper_id": paper_id, "status": "discovered", "vector_ready": False, "graph_ready": False}
+def _status_storage_key(paper_id: str, user_id: str) -> str:
+    return hashlib.sha256(f"{user_id}|{paper_id}".encode("utf-8")).hexdigest()
+
+
+def _save_status(paper_id: str, user_id: str = "legacy", **updates: Any) -> dict[str, Any]:
+    current = get_ingestion_status(paper_id, user_id) or {
+        "paper_id": paper_id, "user_id": user_id, "status": "discovered",
+        "vector_ready": False, "graph_ready": False,
+    }
     current.update(updates)
+    current["user_id"] = user_id
     current["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    storage_key = _status_storage_key(paper_id, user_id)
     with _status_conn() as conn:
-        conn.execute("INSERT INTO papers(paper_id,data,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(paper_id) DO UPDATE SET data=excluded.data,updated_at=CURRENT_TIMESTAMP", (paper_id, json.dumps(current)))
+        conn.execute(
+            "INSERT INTO papers(paper_id,data,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) "
+            "ON CONFLICT(paper_id) DO UPDATE SET data=excluded.data,updated_at=CURRENT_TIMESTAMP",
+            (storage_key, json.dumps(current)),
+        )
     return current
 
 
-def get_ingestion_status(paper_id: str) -> dict[str, Any] | None:
+def get_ingestion_status(paper_id: str, user_id: str = "legacy") -> dict[str, Any] | None:
+    storage_key = _status_storage_key(paper_id, user_id)
     with _status_conn() as conn:
-        row = conn.execute("SELECT data FROM papers WHERE paper_id=?", (paper_id,)).fetchone()
+        row = conn.execute("SELECT data FROM papers WHERE paper_id=?", (storage_key,)).fetchone()
     return json.loads(row["data"]) if row else None
 
 
@@ -274,7 +312,7 @@ def _extract_pdf(path: Path) -> list[dict[str, Any]]:
         raise PipelineError("PDF text extraction failed. The file may be damaged, encrypted, or scanned.") from exc
 
 
-def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]], user_id: str = "legacy") -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     overlap = max(0, min(CHUNK_OVERLAP, CHUNK_SIZE // 2))
     for page in pages:
@@ -288,8 +326,8 @@ def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]]) -> list[dict[
                     end = boundary + 1
             body = text[start:end].strip()
             if len(body) > 80:
-                chunk_id = hashlib.sha256(f"{metadata['id']}|{page['page']}|{start}|{body}".encode("utf-8")).hexdigest()
-                result.append({"id": chunk_id, "text": body, "metadata": {"paper_id": metadata["id"], "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": page["page"], "section": page.get("section") or "", "access_type": "open_access_pdf"}})
+                chunk_id = hashlib.sha256(f"{user_id}|{metadata['id']}|{page['page']}|{start}|{body}".encode("utf-8")).hexdigest()
+                result.append({"id": chunk_id, "text": body, "metadata": {"user_id": user_id, "paper_id": metadata["id"], "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": page["page"], "section": page.get("section") or "", "access_type": "open_access_pdf"}})
             if end >= len(text):
                 break
             start = max(start + 1, end - overlap)
@@ -372,83 +410,238 @@ def _neo4j_driver():
         raise PipelineError("Neo4j is configured but could not be reached.") from exc
 
 
-def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def _normalized_entity_name(name: str) -> str:
+    return " ".join(unicodedata.normalize("NFKC", name).split()).casefold()
+
+
+def _entity_key(entity_type: str, name: str, user_id: str = "legacy") -> str:
+    return hashlib.sha256(f"{user_id}|{entity_type}|{_normalized_entity_name(name)}".encode("utf-8")).hexdigest()
+
+
+def _paper_entity_key(user_id: str, paper_id: str) -> str:
+    return hashlib.sha256(f"{user_id}|Paper|{paper_id}".encode("utf-8")).hexdigest()
+
+
+def _relationship_signature_is_valid(relation_type: str, source_type: str, target_type: str) -> bool:
+    signature = RELATION_SIGNATURES.get(relation_type)
+    return bool(signature and source_type in signature[0] and target_type in signature[1])
+
+
+def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]], user_id: str = "legacy") -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Extract candidate graph claims and independently verify each claim against its source passage."""
+    paper_id = metadata["id"]
     entities: dict[tuple[str, str], dict[str, Any]] = {}
     relations: list[dict[str, Any]] = []
+
     for author in metadata.get("authors", []):
         name = author["name"].strip()
-        key = author.get("id") or hashlib.sha256(f"Author|{metadata['id']}|{name.casefold()}".encode()).hexdigest()
-        entities[("Author", str(key))] = {"type": "Author", "key": str(key), "name": name}
-        relations.append({"source_type": "Paper", "source_key": metadata["id"], "target_type": "Author", "target_key": str(key), "type": "AUTHORED_BY", "evidence": "Structured author metadata supplied by " + metadata["source"], "page": None, "method": "source_metadata"})
+        if not name:
+            continue
+        author_identity = author.get("id")
+        identity_scope = f"external:{author_identity}" if author_identity else f"paper:{paper_id}:{name.casefold()}"
+        key = hashlib.sha256(f"{user_id}|Author|{identity_scope}".encode()).hexdigest()
+        entities[("Author", key)] = {"type": "Author", "key": key, "name": name}
+        relations.append({
+            "source_type": "Paper", "source_key": _paper_entity_key(user_id, paper_id), "target_type": "Author", "target_key": key,
+            "type": "AUTHORED_BY", "evidence": "Structured author metadata supplied by " + metadata["source"],
+            "paper_id": paper_id, "chunk_id": None, "page": None, "section": "Metadata",
+            "method": "source_metadata", "attribution": "metadata", "polarity": "affirmative",
+            "validation_status": "source_metadata",
+        })
+
     for topic in metadata.get("topics", []):
-        key = hashlib.sha256(f"Concept|{topic.casefold()}".encode()).hexdigest()
-        entities[("Concept", key)] = {"type": "Concept", "key": key, "name": topic}
-        relations.append({"source_type": "Paper", "source_key": metadata["id"], "target_type": "Concept", "target_key": key, "type": "HAS_TOPIC", "evidence": "Structured topic metadata supplied by " + metadata["source"], "page": None, "method": "source_metadata"})
-    # LLM-extracted assertions are accepted only when their cited evidence is an exact excerpt of indexed text.
-    if os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY"):
-        excerpts = [{"chunk_id": chunk["id"], "page": chunk["metadata"]["page"], "text": chunk["text"][:2200]} for chunk in chunks[:18]]
-        provider = EmbeddingProvider()
-        raw = provider.complete([
-            {"role": "system", "content": "Extract only explicit research entities and relationships supported by the provided excerpts. Return JSON with entities [{type,name}] and relationships [{source_type,source_name,target_type,target_name,type,evidence,chunk_id,page}]. Allowed entity types: Method, Model, Dataset, Algorithm, Concept, ResearchTask. Allowed relationship types: USES_METHOD, USES_MODEL, USES_DATASET, USES_ALGORITHM, ADDRESSES_TASK, RELATED_TO. Evidence must be a verbatim substring of the named excerpt. Never infer citations or co-occurrence relationships."},
-            {"role": "user", "content": json.dumps({"paper_title": metadata["title"], "excerpts": excerpts}, ensure_ascii=False)},
-        ], json_mode=True)
-        try:
-            extracted = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            raise PipelineError("The graph extractor did not return valid JSON; graph indexing was not completed.") from exc
-        if not isinstance(extracted.get("entities"), list) or not isinstance(extracted.get("relationships"), list):
-            raise PipelineError("The graph extractor response did not match the expected schema.")
-        valid_entities: dict[tuple[str, str], dict[str, Any]] = {}
-        for item in extracted["entities"][:100]:
-            if not isinstance(item, dict) or item.get("type") not in ALLOWED_ENTITY_TYPES - {"Paper", "Author"} or not isinstance(item.get("name"), str):
-                continue
-            name = " ".join(item["name"].split())[:160]
-            if len(name) < 2:
-                continue
-            key = hashlib.sha256(f"{item['type']}|{name.casefold()}".encode()).hexdigest()
-            valid_entities[(item["type"], key)] = {"type": item["type"], "key": key, "name": name}
-        chunk_by_id = {chunk["id"]: chunk for chunk in chunks}
-        for item in extracted["relationships"][:200]:
-            if not isinstance(item, dict) or item.get("type") not in ALLOWED_RELATIONS - {"AUTHORED_BY", "CITES"}:
-                continue
-            evidence = item.get("evidence")
-            chunk = chunk_by_id.get(item.get("chunk_id"))
-            if not isinstance(evidence, str) or not chunk or evidence not in chunk["text"]:
-                continue
-            source_type, target_type = item.get("source_type"), item.get("target_type")
-            source_name, target_name = item.get("source_name"), item.get("target_name")
-            if source_type not in ALLOWED_ENTITY_TYPES or target_type not in ALLOWED_ENTITY_TYPES or not isinstance(source_name, str) or not isinstance(target_name, str):
-                continue
-            if source_type == "Paper":
-                source_key = metadata["id"]
-            else:
-                source_key = hashlib.sha256(f"{source_type}|{' '.join(source_name.split()).casefold()}".encode()).hexdigest()
-                valid_entities[(source_type, source_key)] = {"type": source_type, "key": source_key, "name": " ".join(source_name.split())[:160]}
-            if target_type == "Paper":
-                target_key = metadata["id"]
-            else:
-                target_key = hashlib.sha256(f"{target_type}|{' '.join(target_name.split()).casefold()}".encode()).hexdigest()
-                valid_entities[(target_type, target_key)] = {"type": target_type, "key": target_key, "name": " ".join(target_name.split())[:160]}
-            relations.append({"source_type": source_type, "source_key": source_key, "target_type": target_type, "target_key": target_key, "type": item["type"], "evidence": evidence, "page": chunk["metadata"]["page"], "method": "llm_evidence_validated"})
-        entities.update(valid_entities)
+        name = " ".join(str(topic).split())
+        if not name:
+            continue
+        key = _entity_key("Concept", name, user_id)
+        entities[("Concept", key)] = {"type": "Concept", "key": key, "name": name}
+        relations.append({
+            "source_type": "Paper", "source_key": _paper_entity_key(user_id, paper_id), "target_type": "Concept", "target_key": key,
+            "type": "HAS_TOPIC", "evidence": "Structured topic metadata supplied by " + metadata["source"],
+            "paper_id": paper_id, "chunk_id": None, "page": None, "section": "Metadata",
+            "method": "source_metadata", "attribution": "metadata", "polarity": "affirmative",
+            "validation_status": "source_metadata",
+        })
+
+    if not (os.getenv("LLM_API_KEY") or os.getenv("OPENAI_API_KEY")) or not chunks:
+        return list(entities.values()), relations
+
+    excerpts = [
+        {"chunk_id": chunk["id"], "page": (chunk.get("metadata") or {}).get("page"),
+         "section": (chunk.get("metadata") or {}).get("section") or "", "text": chunk["text"][:2400]}
+        for chunk in chunks[:24]
+    ]
+    provider = EmbeddingProvider()
+    extracted_raw = provider.complete([
+        {"role": "system", "content": (
+            "Extract high-value research entities and explicit claims from academic excerpts. Return JSON with "
+            "entities [{type,name}] and relationships [{source_type,source_name,target_type,target_name,type,evidence,chunk_id}]. "
+            "Allowed entity types: Method, Model, Dataset, Algorithm, Concept, ResearchTask, Benchmark, Metric, "
+            "Framework, Finding, ResearchGap. Paper may be an endpoint only for the paper being processed. "
+            "Allowed predicates: USES_METHOD, USES_MODEL, USES_DATASET, USES_ALGORITHM, USES_FRAMEWORK, "
+            "ADDRESSES_TASK, BASED_ON, USED_FOR, EVALUATED_ON, MEASURED_BY, PROPOSES, REPORTS_FINDING, "
+            "HAS_LIMITATION, COMPARED_WITH. Only extract claims directly supported by the same excerpt. "
+            "Evidence must be an exact verbatim substring of the named excerpt. Do not infer from co-occurrence. "
+            "Do not claim the current paper uses a method merely because prior studies used it."
+        )},
+        {"role": "user", "content": json.dumps({"paper_id": paper_id, "paper_title": metadata["title"], "excerpts": excerpts}, ensure_ascii=False)},
+    ], json_mode=True)
+    try:
+        extracted = json.loads(extracted_raw)
+    except json.JSONDecodeError as exc:
+        raise PipelineError("The graph extractor did not return valid JSON; graph indexing was not completed.") from exc
+    if not isinstance(extracted, dict) or not isinstance(extracted.get("entities"), list) or not isinstance(extracted.get("relationships"), list):
+        raise PipelineError("The graph extractor response did not match the expected schema.")
+
+    chunk_by_id = {chunk["id"]: chunk for chunk in chunks}
+    candidates: list[dict[str, Any]] = []
+    for item in extracted["relationships"][:200]:
+        if not isinstance(item, dict):
+            continue
+        relation_type = item.get("type")
+        source_type, target_type = item.get("source_type"), item.get("target_type")
+        source_name, target_name = item.get("source_name"), item.get("target_name")
+        evidence, chunk_id = item.get("evidence"), item.get("chunk_id")
+        if not all(isinstance(value, str) for value in (relation_type, source_type, target_type, chunk_id)):
+            continue
+        if relation_type not in (ALLOWED_RELATIONS - {"AUTHORED_BY", "CITES", "HAS_TOPIC", "RELATED_TO"}):
+            continue
+        if source_type not in ALLOWED_ENTITY_TYPES or target_type not in ALLOWED_ENTITY_TYPES:
+            continue
+        if not _relationship_signature_is_valid(relation_type, source_type, target_type):
+            continue
+        if not isinstance(source_name, str) or not isinstance(target_name, str):
+            continue
+        source_name, target_name = " ".join(source_name.split())[:160], " ".join(target_name.split())[:160]
+        chunk = chunk_by_id.get(chunk_id)
+        if len(source_name) < 2 or len(target_name) < 2 or not isinstance(evidence, str) or not chunk or evidence not in chunk["text"]:
+            continue
+        evidence_folded = _normalized_entity_name(evidence)
+        if source_type != "Paper" and _normalized_entity_name(source_name) not in evidence_folded:
+            continue
+        if target_type != "Paper" and _normalized_entity_name(target_name) not in evidence_folded:
+            continue
+        claim_id = hashlib.sha256(
+            f"{paper_id}|{chunk_id}|{source_type}|{source_name}|{relation_type}|{target_type}|{target_name}|{evidence}".encode("utf-8")
+        ).hexdigest()
+        candidates.append({
+            "claim_id": claim_id, "source_type": source_type, "source_name": source_name,
+            "target_type": target_type, "target_name": target_name, "relation_type": relation_type,
+            "evidence": evidence, "chunk_id": chunk_id,
+            "page": (chunk.get("metadata") or {}).get("page"),
+            "section": (chunk.get("metadata") or {}).get("section") or "",
+            "context": chunk["text"][:2400],
+        })
+
+    if not candidates:
+        return list(entities.values()), relations
+
+    verification_raw = provider.complete([
+        {"role": "system", "content": (
+            "You are an independent academic KG verifier. Check each candidate against its original context only; "
+            "use no outside knowledge. Return JSON {verifications:[{claim_id,verdict,attribution,polarity,reason}]}. "
+            "verdict: SUPPORTED or UNSUPPORTED. SUPPORTED means the context entails the exact subject-predicate-object "
+            "claim, not merely that terms co-occur. attribution: current_work, prior_work, general_background, unknown. "
+            "polarity: affirmative, negative, uncertain. Distinguish this paper's proposed method from related work. "
+            "If ambiguous, hypothetical or weakly implied, choose UNSUPPORTED. Preserve claim_id exactly."
+        )},
+        {"role": "user", "content": json.dumps({"paper_id": paper_id, "candidates": candidates}, ensure_ascii=False)},
+    ], json_mode=True)
+    try:
+        verified = json.loads(verification_raw)
+    except json.JSONDecodeError as exc:
+        raise PipelineError("The graph verifier did not return valid JSON; unverified claims were not stored.") from exc
+    verifications = verified.get("verifications") if isinstance(verified, dict) else None
+    if not isinstance(verifications, list):
+        raise PipelineError("The graph verifier response did not match the expected schema.")
+    verification_by_id = {
+        item.get("claim_id"): item for item in verifications
+        if isinstance(item, dict) and isinstance(item.get("claim_id"), str)
+    }
+
+    for candidate in candidates:
+        decision = verification_by_id.get(candidate["claim_id"], {})
+        if decision.get("verdict") != "SUPPORTED":
+            continue
+        attribution, polarity = decision.get("attribution"), decision.get("polarity")
+        if not isinstance(attribution, str) or attribution not in {"current_work", "prior_work", "general_background", "unknown"}:
+            continue
+        if not isinstance(polarity, str) or polarity not in {"affirmative", "negative", "uncertain"}:
+            continue
+        source_type, target_type = candidate["source_type"], candidate["target_type"]
+        if source_type == "Paper" and attribution != "current_work":
+            continue
+        if source_type == "Paper":
+            source_key = _paper_entity_key(user_id, paper_id)
+        else:
+            source_key = _entity_key(source_type, candidate["source_name"], user_id)
+            entities[(source_type, source_key)] = {"type": source_type, "key": source_key, "name": candidate["source_name"]}
+        if target_type == "Paper":
+            target_key = _paper_entity_key(user_id, paper_id)
+        else:
+            target_key = _entity_key(target_type, candidate["target_name"], user_id)
+            entities[(target_type, target_key)] = {"type": target_type, "key": target_key, "name": candidate["target_name"]}
+        relations.append({
+            "source_type": source_type, "source_key": source_key,
+            "target_type": target_type, "target_key": target_key, "type": candidate["relation_type"],
+            "evidence": candidate["evidence"], "paper_id": paper_id, "chunk_id": candidate["chunk_id"],
+            "page": candidate["page"], "section": candidate["section"],
+            "method": "llm_two_pass_verified", "attribution": attribution, "polarity": polarity,
+            "validation_status": "verified", "verification_reason": str(decision.get("reason") or "")[:500],
+        })
     return list(entities.values()), relations
 
 
-def _write_graph(metadata: dict[str, Any], entities: list[dict[str, Any]], relations: list[dict[str, Any]]) -> None:
+def _write_graph(metadata: dict[str, Any], entities: list[dict[str, Any]], relations: list[dict[str, Any]], user_id: str = "legacy") -> None:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             session.run("CREATE CONSTRAINT researchgraph_entity_key IF NOT EXISTS FOR (n:ResearchEntity) REQUIRE n.key IS UNIQUE").consume()
-            session.run("MERGE (p:ResearchEntity:Paper {key:$key}) SET p.name=$name,p.paper_id=$paper_id,p.source_url=$source_url,p.doi=$doi", key=metadata["id"], name=metadata["title"], paper_id=metadata["id"], source_url=metadata["source_url"], doi=metadata.get("doi") or "").consume()
+            session.run(
+                "MERGE (p:ResearchEntity:Paper {key:$key}) "
+                "SET p.name=$name,p.paper_id=$paper_id,p.user_id=$user_id,p.source_url=$source_url,p.doi=$doi,p.type='Paper'",
+                key=_paper_entity_key(user_id, metadata["id"]), name=metadata["title"], paper_id=metadata["id"],
+                user_id=user_id, source_url=metadata["source_url"], doi=metadata.get("doi") or "",
+            ).consume()
             for entity in entities:
-                session.run("MERGE (e:ResearchEntity {key:$key}) SET e.name=$name,e.type=$type", key=entity["key"], name=entity["name"], type=entity["type"]).consume()
-                session.run("MATCH (e:ResearchEntity {key:$key}) SET e:`" + entity["type"] + "`", key=entity["key"]).consume()
-            for relation in relations:
-                if relation["type"] not in ALLOWED_RELATIONS:
+                if entity.get("type") not in ALLOWED_ENTITY_TYPES - {"Paper"}:
                     continue
-                cypher = "MATCH (s:ResearchEntity {key:$source}) MATCH (t:ResearchEntity {key:$target}) MERGE (s)-[r:" + relation["type"] + " {evidence_id:$evidence_id}]->(t) SET r.evidence=$evidence,r.page=$page,r.extraction_method=$method"
-                evidence_id = hashlib.sha256((relation["source_key"] + relation["target_key"] + relation["type"] + relation["evidence"]).encode()).hexdigest()
-                session.run(cypher, source=relation["source_key"], target=relation["target_key"], evidence_id=evidence_id, evidence=relation["evidence"], page=relation["page"], method=relation["method"]).consume()
+                session.run(
+                    "MERGE (e:ResearchEntity {key:$key}) SET e.name=$name,e.type=$type,e.user_id=$user_id",
+                    key=entity["key"], name=entity["name"], type=entity["type"], user_id=user_id,
+                ).consume()
+                # Apply a validated, allow-listed Neo4j label for typed graph queries.
+                session.run(
+                    "MATCH (e:ResearchEntity {key:$key}) SET e:`" + entity["type"] + "`",
+                    key=entity["key"],
+                ).consume()
+            for relation in relations:
+                relation_type = relation.get("type")
+                if relation_type not in ALLOWED_RELATIONS:
+                    continue
+                paper_id = relation.get("paper_id") or metadata["id"]
+                chunk_id = relation.get("chunk_id") or ""
+                evidence_id = hashlib.sha256(
+                    f"{user_id}|{paper_id}|{chunk_id}|{relation['source_key']}|{relation['target_key']}|{relation_type}|{relation['evidence']}".encode("utf-8")
+                ).hexdigest()
+                cypher = (
+                    "MATCH (s:ResearchEntity {key:$source}) MATCH (t:ResearchEntity {key:$target}) "
+                    "MERGE (s)-[r:" + relation_type + " {evidence_id:$evidence_id}]->(t) "
+                    "SET r.evidence=$evidence,r.paper_id=$paper_id,r.user_id=$user_id,r.chunk_id=$chunk_id,"
+                    "r.page=$page,r.section=$section,r.extraction_method=$method,"
+                    "r.attribution=$attribution,r.polarity=$polarity,"
+                    "r.validation_status=$validation_status,r.verification_reason=$verification_reason"
+                )
+                session.run(
+                    cypher, source=relation["source_key"], target=relation["target_key"],
+                    evidence_id=evidence_id, evidence=relation["evidence"], paper_id=paper_id, user_id=user_id,
+                    chunk_id=chunk_id, page=relation.get("page"), section=relation.get("section") or "",
+                    method=relation.get("method", "source_metadata"),
+                    attribution=relation.get("attribution", "metadata"),
+                    polarity=relation.get("polarity", "affirmative"),
+                    validation_status=relation.get("validation_status", "source_metadata"),
+                    verification_reason=relation.get("verification_reason", ""),
+                ).consume()
     except Exception as exc:
         raise PipelineError("Neo4j graph indexing failed after vector indexing; the paper remains available for retrieval and graph retry.") from exc
     finally:
@@ -466,70 +659,73 @@ def _index_chunks(chunks: list[dict[str, Any]]) -> None:
         collection.upsert(ids=[chunk["id"] for chunk in batch], documents=[chunk["text"] for chunk in batch], metadatas=[chunk["metadata"] for chunk in batch], embeddings=vectors)
 
 
-def ingest_paper(paper_id: str) -> None:
-    record = _save_status(paper_id, status="metadata_available", stage="metadata", error=None)
+def ingest_paper(paper_id: str, user_id: str = "legacy") -> None:
+    record = _save_status(paper_id, user_id=user_id, status="metadata_available", stage="metadata", error=None)
     metadata: dict[str, Any] = {}
     temp: Path | None = None
     try:
         metadata = get_paper_metadata(paper_id)
         canonical = metadata["id"]
         if canonical != paper_id:
-            _save_status(paper_id, canonical_paper_id=canonical)
+            _save_status(paper_id, user_id=user_id, canonical_paper_id=canonical)
         abstract_only = not metadata.get("pdf_url")
         if abstract_only:
             if not metadata.get("abstract"):
-                _save_status(canonical, status="abstract_only", stage="metadata", paper=metadata, message="No accessible open-access PDF or abstract was identified. Full text was not indexed.", vector_ready=False, graph_ready=False)
+                _save_status(canonical, user_id=user_id, status="abstract_only", stage="metadata", paper=metadata, message="No accessible open-access PDF or abstract was identified. Full text was not indexed.", vector_ready=False, graph_ready=False)
                 return
-            chunk_id = hashlib.sha256(f"{canonical}|abstract|{metadata['abstract']}".encode("utf-8")).hexdigest()
-            chunks = [{"id": chunk_id, "text": metadata["abstract"], "metadata": {"paper_id": canonical, "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "section": "Abstract", "access_type": "abstract_only"}}]
+            chunk_id = hashlib.sha256(f"{user_id}|{canonical}|abstract|{metadata['abstract']}".encode("utf-8")).hexdigest()
+            chunks = [{"id": chunk_id, "text": metadata["abstract"], "metadata": {"user_id": user_id, "paper_id": canonical, "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": 1, "section": "Abstract", "access_type": "abstract_only"}}]
             pages = []
         else:
             chunks = []
             pages = []
         if not abstract_only:
-            record = _save_status(canonical, status="downloading", stage="download", paper=metadata, error=None)
+            record = _save_status(canonical, user_id=user_id, status="downloading", stage="download", paper=metadata, error=None)
             temp = _download_pdf(metadata["pdf_url"])
-            record = _save_status(canonical, status="extracting", stage="extract", paper=metadata)
+            record = _save_status(canonical, user_id=user_id, status="extracting", stage="extract", paper=metadata)
             pages = _extract_pdf(temp)
-            chunks = _chunks(metadata, pages)
+            chunks = _chunks(metadata, pages, user_id)
             if not chunks:
                 raise PipelineError("Extracted full text did not contain enough usable content to index.")
-        _save_status(canonical, status="indexing", stage="embeddings", paper=metadata, chunk_count=len(chunks))
+        _save_status(canonical, user_id=user_id, status="indexing", stage="embeddings", paper=metadata, chunk_count=len(chunks))
         _index_chunks(chunks)
-        _save_status(canonical, status="indexing", stage="knowledge_graph", paper=metadata, chunk_count=len(chunks), vector_ready=True)
-        entities, relations = _extract_graph(metadata, chunks)
-        _write_graph(metadata, entities, relations)
-        _save_status(canonical, status="abstract_only" if abstract_only else "ready", stage="complete", paper=metadata, chunk_count=len(chunks), entity_count=len(entities) + 1, relationship_count=len(relations), vector_ready=True, graph_ready=True, error=None, message="Abstract indexed with real embeddings and metadata graph; full text was unavailable." if abstract_only else "Full text, semantic index, and evidence-backed graph are ready.")
+        _save_status(canonical, user_id=user_id, status="indexing", stage="knowledge_graph", paper=metadata, chunk_count=len(chunks), vector_ready=True)
+        entities, relations = _extract_graph(metadata, chunks, user_id)
+        _write_graph(metadata, entities, relations, user_id)
+        _save_status(canonical, user_id=user_id, status="abstract_only" if abstract_only else "ready", stage="complete", paper=metadata, chunk_count=len(chunks), entity_count=len(entities) + 1, relationship_count=len(relations), vector_ready=True, graph_ready=True, graph_schema_version=2, error=None, message="Abstract indexed with real embeddings and metadata graph; full text was unavailable." if abstract_only else "Full text, semantic index, and evidence-backed graph are ready.")
     except PaperNotFound as exc:
-        _save_status(paper_id, status="failed", stage="metadata", error=str(exc))
+        _save_status(paper_id, user_id=user_id, status="failed", stage="metadata", error=str(exc))
     except PipelineError as exc:
         current_id = metadata.get("id", paper_id)
-        current = get_ingestion_status(current_id) or {}
-        _save_status(current_id, status="failed", stage=current.get("stage", "processing"), paper=metadata or current.get("paper"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error=str(exc), retryable=True)
+        current = get_ingestion_status(current_id, user_id) or {}
+        _save_status(current_id, user_id=user_id, status="failed", stage=current.get("stage", "processing"), paper=metadata or current.get("paper"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error=str(exc), retryable=True)
     except Exception:
         current_id = metadata.get("id", paper_id)
-        current = get_ingestion_status(current_id) or {}
-        _save_status(current_id, status="failed", stage=current.get("stage", "processing"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error="Unexpected processing failure.", retryable=True)
+        current = get_ingestion_status(current_id, user_id) or {}
+        _save_status(current_id, user_id=user_id, status="failed", stage=current.get("stage", "processing"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error="Unexpected processing failure.", retryable=True)
     finally:
         if temp:
             temp.unlink(missing_ok=True)
 
 
-def start_ingestion(paper_id: str) -> dict[str, Any]:
+def start_ingestion(paper_id: str, user_id: str = "legacy") -> dict[str, Any]:
     metadata = get_paper_metadata(paper_id)
-    existing = get_ingestion_status(metadata["id"])
-    if existing and existing.get("status") in {"ready", "abstract_only"}:
+    existing = get_ingestion_status(metadata["id"], user_id)
+    if existing and existing.get("status") in {"ready", "abstract_only"} and existing.get("graph_schema_version") == 2:
         return existing
     if existing and existing.get("status") in {"metadata_available", "downloading", "extracting", "indexing"}:
         return existing
-    return _save_status(metadata["id"], status="metadata_available", stage="queued", paper=metadata, vector_ready=bool((existing or {}).get("vector_ready")), graph_ready=bool((existing or {}).get("graph_ready")), message="Paper accepted for indexing.")
+    return _save_status(metadata["id"], user_id=user_id, status="metadata_available", stage="queued", paper=metadata, vector_ready=bool((existing or {}).get("vector_ready")), graph_ready=bool((existing or {}).get("graph_ready")), message="Paper accepted for indexing.")
 
 
-def _query_chunks(question: str, paper_ids: list[str], limit: int = 8) -> list[dict[str, Any]]:
+def _query_chunks(question: str, paper_ids: list[str], user_id: str = "legacy", limit: int = 8) -> list[dict[str, Any]]:
+    allowed_ids = list(dict.fromkeys(item.strip() for item in paper_ids if isinstance(item, str) and item.strip()))
+    if not allowed_ids:
+        return []
     provider = EmbeddingProvider()
     query_vector = provider.embed([question])[0]
     collection = _chroma_collection()
-    where = {"paper_id": {"$in": paper_ids}} if paper_ids else None
+    where = {"$and": [{"paper_id": {"$in": allowed_ids}}, {"user_id": user_id}]}
     try:
         result = collection.query(query_embeddings=[query_vector], n_results=limit, where=where, include=["documents", "metadatas", "distances"])
     except Exception as exc:
@@ -539,33 +735,51 @@ def _query_chunks(question: str, paper_ids: list[str], limit: int = 8) -> list[d
     ids = (result.get("ids") or [[]])[0]
     distances = (result.get("distances") or [[]])[0]
     max_distance = float(os.getenv("RAG_MAX_COSINE_DISTANCE", "0.65"))
-    return [{"chunk_id": ids[index], "text": text, "metadata": metas[index] or {}, "distance": distances[index] if index < len(distances) else None} for index, text in enumerate(docs) if text and (index >= len(distances) or distances[index] <= max_distance)]
+    return [
+        {"chunk_id": ids[index], "text": text, "metadata": metas[index] or {}, "distance": distances[index] if index < len(distances) else None}
+        for index, text in enumerate(docs)
+        if text and (index >= len(distances) or distances[index] <= max_distance)
+    ]
 
 
-def _query_graph(paper_ids: list[str], terms: list[str]) -> list[dict[str, Any]]:
+def _query_graph(paper_ids: list[str], terms: list[str], user_id: str = "legacy") -> list[dict[str, Any]]:
+    allowed_ids = list(dict.fromkeys(item.strip() for item in paper_ids if isinstance(item, str) and item.strip()))
+    if not allowed_ids:
+        return []
     driver = _neo4j_driver()
     try:
-        query = "MATCH (p:Paper)-[r]-(n:ResearchEntity) WHERE ($paper_ids = [] OR p.paper_id IN $paper_ids) AND any(term IN $terms WHERE toLower(n.name) CONTAINS toLower(term)) RETURN p.paper_id AS paper_id,p.name AS paper_title,type(r) AS relation,n.name AS entity,n.type AS entity_type,r.evidence AS evidence,r.page AS page LIMIT 40"
+        query = (
+            "MATCH (s:ResearchEntity)-[r]->(t:ResearchEntity) "
+            "WHERE r.paper_id IN $paper_ids AND r.user_id=$user_id AND r.validation_status IN ['verified','source_metadata'] "
+            "AND any(term IN $terms WHERE toLower(s.name) CONTAINS toLower(term) OR toLower(t.name) CONTAINS toLower(term)) "
+            "OPTIONAL MATCH (p:Paper {paper_id:r.paper_id,user_id:$user_id}) "
+            "RETURN r.paper_id AS paper_id,p.name AS paper_title,type(r) AS relation,"
+            "s.name AS subject,s.type AS subject_type,t.name AS object,t.type AS object_type,"
+            "r.evidence AS evidence,r.page AS page,r.section AS section,r.chunk_id AS chunk_id,"
+            "r.attribution AS attribution,r.polarity AS polarity LIMIT 40"
+        )
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            return [record.data() for record in session.run(query, paper_ids=paper_ids, terms=terms)]
+            return [record.data() for record in session.run(query, paper_ids=allowed_ids, user_id=user_id, terms=terms)]
     except Exception as exc:
         raise PipelineError("Knowledge graph retrieval failed. Confirm Neo4j is reachable and graph data has been indexed.") from exc
     finally:
         driver.close()
 
 
-def query_research(question: str, paper_ids: list[str] | None = None) -> dict[str, Any]:
+def query_research(question: str, paper_ids: list[str] | None = None, user_id: str = "legacy") -> dict[str, Any]:
     paper_ids = list(dict.fromkeys(paper_ids or []))
     if len(paper_ids) > 50:
         raise PipelineError("A maximum of 50 paper IDs can be selected for one question.")
-    chunks = _query_chunks(question, paper_ids)
+    if not paper_ids:
+        return {"answer": "Select at least one paper from a research workspace before asking a question. Empty paper scopes never search the full collection.", "answer_type": "insufficient_context", "citations": [], "graph_evidence": []}
+    chunks = _query_chunks(question, paper_ids, user_id)
     if not chunks:
         return {"answer": "I could not find indexed paper passages relevant to this question. Add one or more open-access papers to the research index first.", "answer_type": "insufficient_context", "citations": [], "graph_evidence": []}
     terms = [word for word in re.findall(r"[\w-]{4,}", question)[:10]]
     graph_evidence: list[dict[str, Any]] = []
     if len(terms) >= 2:
         try:
-            graph_evidence = _query_graph(paper_ids, terms)
+            graph_evidence = _query_graph(paper_ids, terms, user_id)
         except PipelineError:
             # RAG remains useful without graph traversal; health indicates unavailable Neo4j.
             graph_evidence = []
@@ -591,30 +805,48 @@ def query_research(question: str, paper_ids: list[str] | None = None) -> dict[st
     return {"answer": answer, "answer_type": "grounded_generation", "citations": cited, "graph_evidence": graph_evidence}
 
 
-def get_paper_chunks(paper_id: str, limit: int = 100) -> list[dict[str, Any]]:
+def get_paper_chunks(paper_id: str, limit: int = 100, user_id: str = "legacy") -> list[dict[str, Any]]:
     collection = _chroma_collection()
     try:
-        result = collection.get(where={"paper_id": paper_id}, limit=limit, include=["documents", "metadatas"])
+        result = collection.get(where={"$and": [{"paper_id": paper_id}, {"user_id": user_id}]}, limit=limit, include=["documents", "metadatas"])
     except Exception as exc:
         raise PipelineError("ChromaDB could not load the paper's indexed passages.") from exc
     return [{"chunk_id": item_id, "text": text, "metadata": meta} for item_id, text, meta in zip(result.get("ids", []), result.get("documents", []), result.get("metadatas", []))]
 
 
-def get_graph_for_paper(paper_id: str) -> dict[str, Any]:
+def get_graph_for_paper(paper_id: str, user_id: str = "legacy") -> dict[str, Any]:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (p:Paper {paper_id:$paper_id})-[r]-(n:ResearchEntity) RETURN p,n,type(r) AS relation,r.evidence AS evidence,r.page AS page LIMIT 150", paper_id=paper_id)
+            records = session.run(
+                "MATCH (s:ResearchEntity)-[r]->(t:ResearchEntity) "
+                "WHERE r.paper_id=$paper_id AND r.user_id=$user_id AND r.validation_status IN ['verified','source_metadata'] "
+                "RETURN s,t,type(r) AS relation,r.evidence AS evidence,r.page AS page,"
+                "r.section AS section,r.chunk_id AS chunk_id,r.attribution AS attribution,"
+                "r.polarity AS polarity,r.evidence_id AS evidence_id LIMIT 300",
+                paper_id=paper_id, user_id=user_id,
+            )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
             for row in records:
-                paper = dict(row["p"])
-                entity = dict(row["n"])
-                for item, is_paper in ((paper, True), (entity, False)):
+                source, target = dict(row["s"]), dict(row["t"])
+                for item in (source, target):
                     key = item.get("key")
                     if key:
-                        nodes[key] = {"id": key, "label": item.get("name", ""), "type": "Paper" if is_paper else item.get("type", "Concept"), "paperId": item.get("paper_id") if is_paper else None, "sourceUrl": item.get("source_url") if is_paper else None}
-                edges.append({"id": hashlib.sha256((paper.get("key", "") + row["relation"] + entity.get("key", "")).encode()).hexdigest()[:20], "source": paper.get("key"), "target": entity.get("key"), "relation": row["relation"], "evidence": row["evidence"], "page": row["page"]})
+                        nodes[key] = {
+                            "id": key, "label": item.get("name", ""),
+                            "type": item.get("type", "Concept"),
+                            "paperId": item.get("paper_id"),
+                            "sourceUrl": item.get("source_url"),
+                        }
+                edges.append({
+                    "id": row["evidence_id"] or hashlib.sha256((source.get("key", "") + row["relation"] + target.get("key", "")).encode()).hexdigest()[:20],
+                    "source": source.get("key"), "target": target.get("key"),
+                    "relation": row["relation"], "evidence": row["evidence"],
+                    "page": row["page"], "section": row["section"],
+                    "paperId": paper_id, "chunkId": row["chunk_id"],
+                    "attribution": row["attribution"], "polarity": row["polarity"],
+                })
             return {"paper_id": paper_id, "nodes": list(nodes.values()), "edges": edges, "indexed": bool(nodes)}
     except Exception as exc:
         if isinstance(exc, PipelineError):
@@ -624,11 +856,20 @@ def get_graph_for_paper(paper_id: str) -> dict[str, Any]:
         driver.close()
 
 
-def get_graph(limit: int = 500) -> dict[str, Any]:
+def get_graph(limit: int = 500, user_id: str = "legacy", paper_ids: list[str] | None = None) -> dict[str, Any]:
+    allowed_ids = list(dict.fromkeys(item.strip() for item in (paper_ids or []) if isinstance(item, str) and item.strip()))
+    if not allowed_ids:
+        return {"nodes": [], "edges": [], "indexed": False}
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (a:ResearchEntity)-[r]->(b:ResearchEntity) RETURN a,r,b LIMIT $limit", limit=limit)
+            records = session.run(
+                "MATCH (a:ResearchEntity)-[r]->(b:ResearchEntity) "
+                "WHERE r.user_id=$user_id AND r.paper_id IN $paper_ids "
+                "AND r.validation_status IN ['verified','source_metadata'] "
+                "RETURN a,r,b LIMIT $limit",
+                limit=limit, user_id=user_id, paper_ids=allowed_ids,
+            )
             nodes: dict[str, dict[str, Any]] = {}
             edges = []
             for row in records:
@@ -636,8 +877,20 @@ def get_graph(limit: int = 500) -> dict[str, Any]:
                 for item in (source, target):
                     key = item.get("key")
                     if key:
-                        nodes[key] = {"id": key, "label": item.get("name", ""), "type": item.get("type", "Paper"), "paperId": item.get("paper_id"), "sourceUrl": item.get("source_url")}
-                edges.append({"id": hashlib.sha256((source.get("key", "") + relationship.type + target.get("key", "") + relationship.get("evidence_id", "")).encode()).hexdigest()[:20], "source": source.get("key"), "target": target.get("key"), "relation": relationship.type, "evidence": relationship.get("evidence"), "page": relationship.get("page")})
+                        nodes[key] = {
+                            "id": key, "label": item.get("name", ""),
+                            "type": item.get("type", "Concept"),
+                            "paperId": item.get("paper_id"),
+                            "sourceUrl": item.get("source_url"),
+                        }
+                edges.append({
+                    "id": hashlib.sha256((source.get("key", "") + relationship.type + target.get("key", "") + relationship.get("evidence_id", "")).encode()).hexdigest()[:20],
+                    "source": source.get("key"), "target": target.get("key"),
+                    "relation": relationship.type, "evidence": relationship.get("evidence"),
+                    "page": relationship.get("page"), "section": relationship.get("section"),
+                    "paperId": relationship.get("paper_id"), "chunkId": relationship.get("chunk_id"),
+                    "attribution": relationship.get("attribution"), "polarity": relationship.get("polarity"),
+                })
             return {"nodes": list(nodes.values()), "edges": edges, "indexed": bool(nodes)}
     except Exception as exc:
         raise PipelineError("Neo4j graph data could not be loaded.") from exc
@@ -645,11 +898,20 @@ def get_graph(limit: int = 500) -> dict[str, Any]:
         driver.close()
 
 
-def get_graph_search(query: str, limit: int = 20) -> list[dict[str, Any]]:
+def get_graph_search(query: str, limit: int = 20, user_id: str = "legacy", paper_ids: list[str] | None = None) -> list[dict[str, Any]]:
+    allowed_ids = list(dict.fromkeys(item.strip() for item in (paper_ids or []) if isinstance(item, str) and item.strip()))
+    if not allowed_ids:
+        return []
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (n:ResearchEntity) WHERE toLower(n.name) CONTAINS toLower($query) RETURN n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,n.source_url AS sourceUrl LIMIT $limit", query=query, limit=limit)
+            records = session.run(
+                "MATCH (s:ResearchEntity)-[r]->(n:ResearchEntity) "
+                "WHERE r.user_id=$user_id AND r.paper_id IN $paper_ids "
+                "AND n.user_id=$user_id AND toLower(n.name) CONTAINS toLower($search_query) "
+                "RETURN DISTINCT n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,n.source_url AS sourceUrl LIMIT $limit",
+                search_query=query, limit=limit, user_id=user_id, paper_ids=allowed_ids,
+            )
             return [record.data() for record in records]
     except Exception as exc:
         raise PipelineError("Neo4j graph search is unavailable.") from exc

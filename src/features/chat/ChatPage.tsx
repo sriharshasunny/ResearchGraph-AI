@@ -8,7 +8,7 @@ import {
   Pin, Edit2, RotateCcw, X, GitCompare, Printer
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { askResearchQuestion } from '../../services/api';
+import { askResearchQuestion, askResearchQuestionInWorkspaces } from '../../services/api';
 
 interface SessionItem {
   id: string;
@@ -29,7 +29,9 @@ export const ChatPage: React.FC = () => {
     allPapers,
     selectedPaperId,
     comparisonPaperIds,
-    toggleComparisonPaper
+    toggleComparisonPaper,
+    selectedWorkspaceIds,
+    workspaces,
   } = useApp();
 
   const [prompt, setPrompt] = useState('');
@@ -43,6 +45,12 @@ export const ChatPage: React.FC = () => {
   // Research Context Papers
   const [contextPaperIds, setContextPaperIds] = useState<string[]>(() => selectedPaperId ? [selectedPaperId] : []);
   const [isAddContextModalOpen, setIsAddContextModalOpen] = useState(false);
+
+  // When another page opens Chat with a selected paper, include it in this research scope.
+  useEffect(() => {
+    if (!selectedPaperId) return;
+    setContextPaperIds(previous => previous.includes(selectedPaperId) ? previous : [...previous, selectedPaperId]);
+  }, [selectedPaperId]);
 
   // Sessions state with Pin, Rename, Delete
   const [sessions, setSessions] = useState<SessionItem[]>([
@@ -78,6 +86,17 @@ export const ChatPage: React.FC = () => {
     const content = textToSend || prompt;
     if (!content.trim() || isStreaming) return;
 
+    if (selectedWorkspaceIds.length === 0 && contextPaperIds.length === 0) {
+      setPrompt('');
+      addChatMessage({
+        id: `scope-required-${Date.now()}`,
+        sender: 'assistant',
+        content: 'Add at least one indexed paper to the research context before asking a question. ResearchGraph will not search papers outside your selected scope.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      return;
+    }
+
     const userMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
       sender: 'user',
@@ -92,7 +111,9 @@ export const ChatPage: React.FC = () => {
     const controller = new AbortController();
     requestControllerRef.current = controller;
     try {
-      const response = await askResearchQuestion(content.trim(), contextPaperIds, controller.signal);
+      const response = selectedWorkspaceIds.length > 0
+        ? await askResearchQuestionInWorkspaces(content.trim(), selectedWorkspaceIds, controller.signal)
+        : await askResearchQuestion(content.trim(), contextPaperIds, controller.signal);
       addChatMessage({
         id: `ai-${Date.now()}`,
         sender: 'assistant',
@@ -124,7 +145,7 @@ export const ChatPage: React.FC = () => {
       setIsTyping(false);
       setIsStreaming(false);
     }
-  }, [addChatMessage, contextPaperIds, isStreaming, prompt]);
+  }, [addChatMessage, contextPaperIds, isStreaming, prompt, selectedWorkspaceIds]);
 
   // Handle incoming query from other pages.
   useEffect(() => {
@@ -392,6 +413,16 @@ export const ChatPage: React.FC = () => {
             <p className="text-[12px] text-gray-500 dark:text-gray-400">
               Ask questions, compare studies, explore empirical findings.
             </p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+              <span>
+                Research scope: {selectedWorkspaceIds.length > 0
+                  ? workspaces.filter(workspace => selectedWorkspaceIds.includes(workspace.id)).map(workspace => workspace.name).join(' + ')
+                  : `${contextPaperIds.length} selected paper(s)`}
+              </span>
+              <button type="button" onClick={() => setActivePage('workspaces')} className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                Manage scope
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

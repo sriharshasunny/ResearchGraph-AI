@@ -1,4 +1,5 @@
 import type { Paper } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface OpenAlexWork {
   id: string;
@@ -64,7 +65,7 @@ export interface RagResponse {
 }
 
 export interface ResearchGraph {
-  paper_id: string;
+  paper_id?: string;
   indexed: boolean;
   nodes: Array<{ id: string; label: string; type: string; paperId?: string; sourceUrl?: string }>;
   edges: Array<{ id: string; source: string; target: string; relation: string; evidence?: string; page?: number }>;
@@ -74,9 +75,16 @@ const backendRequest = async <T,>(path: string, init?: RequestInit): Promise<T> 
   if (!backendBaseUrl) throw new Error('Research backend is not configured. Set VITE_API_BASE_URL to your FastAPI service URL.');
   let response: Response;
   try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
     response = await fetch(`${backendBaseUrl}${path}`, {
       ...init,
-      headers: { Accept: 'application/json', ...(init?.body ? { 'Content-Type': 'application/json' } : {}), ...init?.headers },
+      headers: {
+        Accept: 'application/json',
+        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...init?.headers,
+      },
     });
   } catch {
     throw new Error('Research backend is unavailable. Set VITE_API_BASE_URL to the deployed FastAPI service.');
@@ -111,14 +119,33 @@ export const getPaperDetails = async (paperId: string): Promise<Paper> => {
   };
 };
 
-export const askResearchQuestion = (question: string, paperIds: string[], signal?: AbortSignal) => backendRequest<RagResponse>('/api/rag/query', {
-  method: 'POST', body: JSON.stringify({ question, paper_ids: paperIds }), signal,
-});
+export const askResearchQuestion = (question: string, paperIds: string[], signal?: AbortSignal) => {
+  if (!paperIds.length) {
+    return Promise.reject(new Error('Select at least one indexed paper before asking a research question.'));
+  }
+  return backendRequest<RagResponse>('/api/rag/query', {
+    method: 'POST', body: JSON.stringify({ question, paper_ids: paperIds }), signal,
+  });
+};
 
 export const getPaperGraph = (paperId: string) => backendRequest<ResearchGraph>(`/api/graph/paper?paper_id=${encodeURIComponent(paperId)}`);
-export const getResearchGraph = () => backendRequest<ResearchGraph>('/api/graph');
+export const getResearchGraph = (workspaceIds: string[]) => {
+  if (!workspaceIds.length) {
+    return Promise.resolve<ResearchGraph>({ nodes: [], edges: [], indexed: false });
+  }
+  const params = new URLSearchParams();
+  workspaceIds.forEach(id => params.append('workspace_ids', id));
+  return backendRequest<ResearchGraph>(`/api/graph?${params.toString()}`);
+};
 
-export const searchGraph = (query: string) => backendRequest<{ results: ResearchGraph['nodes'] }>(`/api/graph/search?q=${encodeURIComponent(query)}`);
+export const searchGraph = (query: string, workspaceIds: string[]) => {
+  if (!workspaceIds.length) {
+    return Promise.resolve<{ results: ResearchGraph['nodes'] }>({ results: [] });
+  }
+  const params = new URLSearchParams({ q: query });
+  workspaceIds.forEach(id => params.append('workspace_ids', id));
+  return backendRequest<{ results: ResearchGraph['nodes'] }>(`/api/graph/search?${params.toString()}`);
+};
 
 const restoreAbstract = (invertedIndex?: Record<string, number[]> | null) => {
   if (!invertedIndex) return 'Abstract not available.';
@@ -197,4 +224,67 @@ export const searchPapers = async (query: string, options: PaperSearchOptions = 
 
   const data = await response.json() as { meta?: { count?: number }; results?: OpenAlexWork[] };
   return { papers: (data.results || []).map(toPaper), totalCount: data.meta?.count };
+};
+
+
+export interface ResearchWorkspace {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkspacePaperRecord {
+  paper_id: string;
+  added_at: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface WorkspaceIngestionResult {
+  workspace_id: string;
+  paper: { paper_id?: string; workspace_id?: string };
+  ingestion: IngestionStatus;
+}
+
+export const listResearchWorkspaces = () =>
+  backendRequest<{ workspaces: ResearchWorkspace[] }>('/api/workspaces');
+
+export const createResearchWorkspace = (name: string, description = '') =>
+  backendRequest<{ workspace: ResearchWorkspace }>('/api/workspaces', {
+    method: 'POST',
+    body: JSON.stringify({ name, description }),
+  });
+
+export const deleteResearchWorkspace = (workspaceId: string) =>
+  backendRequest<{ deleted: boolean; workspace_id: string }>(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
+    method: 'DELETE',
+  });
+
+export const listWorkspacePapers = (workspaceId: string) =>
+  backendRequest<{ workspace_id: string; papers: WorkspacePaperRecord[] }>(
+    `/api/workspaces/${encodeURIComponent(workspaceId)}/papers`
+  );
+
+export const addPaperToWorkspace = (workspaceId: string, paperId: string) =>
+  backendRequest<WorkspaceIngestionResult>(`/api/workspaces/${encodeURIComponent(workspaceId)}/papers`, {
+    method: 'POST',
+    body: JSON.stringify({ paper_id: paperId }),
+  });
+
+export const removePaperFromWorkspace = (workspaceId: string, paperId: string) =>
+  backendRequest<{ removed: boolean; workspace_id: string; paper_id: string }>(
+    `/api/workspaces/${encodeURIComponent(workspaceId)}/papers?paper_id=${encodeURIComponent(paperId)}`,
+    { method: 'DELETE' }
+  );
+
+export const askResearchQuestionInWorkspaces = (question: string, workspaceIds: string[], signal?: AbortSignal) => {
+  if (!workspaceIds.length) {
+    return Promise.reject(new Error('Select at least one workspace before asking a research question.'));
+  }
+  return backendRequest<RagResponse>('/api/rag/query', {
+    method: 'POST',
+    body: JSON.stringify({ question, workspace_ids: workspaceIds }),
+    signal,
+  });
 };
