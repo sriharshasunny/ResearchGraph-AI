@@ -1,4 +1,5 @@
 import type { Paper } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface OpenAlexWork {
   id: string;
@@ -72,16 +73,32 @@ export interface ResearchGraph {
 
 const backendRequest = async <T,>(path: string, init?: RequestInit): Promise<T> => {
   if (!backendBaseUrl) throw new Error('Research backend is not configured. Set VITE_API_BASE_URL to your FastAPI service URL.');
+
+  // Supabase manages session refresh; use its current access token for every
+  // user-scoped FastAPI request. Do not accept a caller-supplied auth header.
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  const accessToken = sessionData.session?.access_token;
+  if (sessionError || !accessToken) {
+    throw new Error('Please sign in to access your research workspace.');
+  }
+
+  const headers = new Headers(init?.headers);
+  headers.set('Accept', 'application/json');
+  headers.set('Authorization', `Bearer ${accessToken}`);
+  if (init?.body && !headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
+
   let response: Response;
   try {
-    response = await fetch(`${backendBaseUrl}${path}`, {
-      ...init,
-      headers: { Accept: 'application/json', ...(init?.body ? { 'Content-Type': 'application/json' } : {}), ...init?.headers },
-    });
+    response = await fetch(`${backendBaseUrl}${path}`, { ...init, headers });
   } catch {
     throw new Error('Research backend is unavailable. Set VITE_API_BASE_URL to the deployed FastAPI service.');
   }
   const data = await response.json().catch(() => ({})) as { detail?: string };
+  if (response.status === 401) {
+    throw new Error('Your sign-in session is invalid or expired. Please sign in again.');
+  }
   if (!response.ok) throw new Error(data.detail || `Research request failed (${response.status}).`);
   return data as T;
 };
