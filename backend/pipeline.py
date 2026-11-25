@@ -898,11 +898,20 @@ def get_graph(limit: int = 500, user_id: str = "legacy", paper_ids: list[str] | 
         driver.close()
 
 
-def get_graph_search(query: str, limit: int = 20, user_id: str = "legacy") -> list[dict[str, Any]]:
+def get_graph_search(query: str, limit: int = 20, user_id: str = "legacy", paper_ids: list[str] | None = None) -> list[dict[str, Any]]:
+    allowed_ids = list(dict.fromkeys(item.strip() for item in (paper_ids or []) if isinstance(item, str) and item.strip()))
+    if not allowed_ids:
+        return []
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            records = session.run("MATCH (n:ResearchEntity) WHERE n.user_id=$user_id AND toLower(n.name) CONTAINS toLower($query) RETURN n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,n.source_url AS sourceUrl LIMIT $limit", query=query, limit=limit, user_id=user_id)
+            records = session.run(
+                "MATCH (s:ResearchEntity)-[r]->(n:ResearchEntity) "
+                "WHERE r.user_id=$user_id AND r.paper_id IN $paper_ids "
+                "AND n.user_id=$user_id AND toLower(n.name) CONTAINS toLower($query) "
+                "RETURN DISTINCT n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,n.source_url AS sourceUrl LIMIT $limit",
+                query=query, limit=limit, user_id=user_id, paper_ids=allowed_ids,
+            )
             return [record.data() for record in records]
     except Exception as exc:
         raise PipelineError("Neo4j graph search is unavailable.") from exc
