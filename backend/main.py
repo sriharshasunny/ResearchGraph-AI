@@ -53,7 +53,7 @@ class IngestRequest(BaseModel):
 
 class RagRequest(BaseModel):
     question: str = Field(min_length=3, max_length=4000)
-    paper_ids: list[str] = Field(default_factory=list, max_length=50)
+    paper_ids: list[str] = Field(min_length=1, max_length=50)
 
 
 @app.get("/")
