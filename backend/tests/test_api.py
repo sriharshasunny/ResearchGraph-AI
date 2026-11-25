@@ -46,12 +46,26 @@ def test_rag_api_validates_question_length():
     assert response.status_code == 422
 
 
-def test_knowledge_graph_api_returns_only_service_graph_records(monkeypatch):
+def test_knowledge_graph_api_resolves_selected_workspace_scope(monkeypatch):
     graph = {"nodes": [{"id": "fixture-paper", "label": "Synthetic fixture", "type": "Paper"}], "edges": [], "indexed": True}
-    monkeypatch.setattr(main, "get_graph", lambda *_args: graph)
-    response = client.get("/api/graph")
+    workspace_id = "4dc3f7a3-4ccf-4dbd-b44c-c011edc7c319"
+    captured = {}
+    monkeypatch.setattr(main, "resolve_workspace_paper_ids", lambda user_id, token, ids: ["P101", "P201"])
+    monkeypatch.setattr(main, "get_graph", lambda limit, user_id, paper_ids: captured.update(limit=limit, user_id=user_id, paper_ids=paper_ids) or graph)
+    response = client.get(f"/api/graph?workspace_ids={workspace_id}")
     assert response.status_code == 200
     assert response.json() == graph
+    assert captured["user_id"] == "test-user"
+    assert captured["paper_ids"] == ["P101", "P201"]
+
+
+def test_knowledge_graph_api_returns_empty_graph_for_empty_workspace_scope(monkeypatch):
+    workspace_id = "4dc3f7a3-4ccf-4dbd-b44c-c011edc7c319"
+    monkeypatch.setattr(main, "resolve_workspace_paper_ids", lambda *_args: [])
+    monkeypatch.setattr(main, "get_graph", lambda *_args: pytest.fail("Graph retrieval must not run for an empty workspace"))
+    response = client.get(f"/api/graph?workspace_ids={workspace_id}")
+    assert response.status_code == 200
+    assert response.json() == {"nodes": [], "edges": [], "indexed": False}
 
 def test_workspace_list_uses_authenticated_supabase_session(monkeypatch):
     captured = {}
