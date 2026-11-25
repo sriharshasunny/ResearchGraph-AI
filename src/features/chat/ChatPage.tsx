@@ -44,6 +44,12 @@ export const ChatPage: React.FC = () => {
   const [contextPaperIds, setContextPaperIds] = useState<string[]>(() => selectedPaperId ? [selectedPaperId] : []);
   const [isAddContextModalOpen, setIsAddContextModalOpen] = useState(false);
 
+  // When another page opens Chat with a selected paper, include it in this research scope.
+  useEffect(() => {
+    if (!selectedPaperId) return;
+    setContextPaperIds(previous => previous.includes(selectedPaperId) ? previous : [...previous, selectedPaperId]);
+  }, [selectedPaperId]);
+
   // Sessions state with Pin, Rename, Delete
   const [sessions, setSessions] = useState<SessionItem[]>([
     { id: 's1', title: 'DINOv2 vs MAE Comparison', date: 'Today, 21:42', pinned: true },
@@ -77,6 +83,17 @@ export const ChatPage: React.FC = () => {
   const handleSendMessage = useCallback(async (textToSend?: string) => {
     const content = textToSend || prompt;
     if (!content.trim() || isStreaming) return;
+
+    if (contextPaperIds.length === 0) {
+      setPrompt('');
+      addChatMessage({
+        id: `scope-required-${Date.now()}`,
+        sender: 'assistant',
+        content: 'Add at least one indexed paper to the research context before asking a question. ResearchGraph will not search papers outside your selected scope.',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      });
+      return;
+    }
 
     const userMsg: ChatMessage = {
       id: `msg-${Date.now()}`,
