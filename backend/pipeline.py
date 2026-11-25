@@ -590,6 +590,11 @@ def _write_graph(metadata: dict[str, Any], entities: list[dict[str, Any]], relat
                     "MERGE (e:ResearchEntity {key:$key}) SET e.name=$name,e.type=$type",
                     key=entity["key"], name=entity["name"], type=entity["type"],
                 ).consume()
+                # Apply a validated, allow-listed Neo4j label for typed graph queries.
+                session.run(
+                    "MATCH (e:ResearchEntity {key:$key}) SET e:`" + entity["type"] + "`",
+                    key=entity["key"],
+                ).consume()
             for relation in relations:
                 relation_type = relation.get("type")
                 if relation_type not in ALLOWED_RELATIONS:
@@ -667,7 +672,7 @@ def ingest_paper(paper_id: str) -> None:
         _save_status(canonical, status="indexing", stage="knowledge_graph", paper=metadata, chunk_count=len(chunks), vector_ready=True)
         entities, relations = _extract_graph(metadata, chunks)
         _write_graph(metadata, entities, relations)
-        _save_status(canonical, status="abstract_only" if abstract_only else "ready", stage="complete", paper=metadata, chunk_count=len(chunks), entity_count=len(entities) + 1, relationship_count=len(relations), vector_ready=True, graph_ready=True, error=None, message="Abstract indexed with real embeddings and metadata graph; full text was unavailable." if abstract_only else "Full text, semantic index, and evidence-backed graph are ready.")
+        _save_status(canonical, status="abstract_only" if abstract_only else "ready", stage="complete", paper=metadata, chunk_count=len(chunks), entity_count=len(entities) + 1, relationship_count=len(relations), vector_ready=True, graph_ready=True, graph_schema_version=2, error=None, message="Abstract indexed with real embeddings and metadata graph; full text was unavailable." if abstract_only else "Full text, semantic index, and evidence-backed graph are ready.")
     except PaperNotFound as exc:
         _save_status(paper_id, status="failed", stage="metadata", error=str(exc))
     except PipelineError as exc:
@@ -686,7 +691,7 @@ def ingest_paper(paper_id: str) -> None:
 def start_ingestion(paper_id: str) -> dict[str, Any]:
     metadata = get_paper_metadata(paper_id)
     existing = get_ingestion_status(metadata["id"])
-    if existing and existing.get("status") in {"ready", "abstract_only"}:
+    if existing and existing.get("status") in {"ready", "abstract_only"} and existing.get("graph_schema_version") == 2:
         return existing
     if existing and existing.get("status") in {"metadata_available", "downloading", "extracting", "indexing"}:
         return existing
