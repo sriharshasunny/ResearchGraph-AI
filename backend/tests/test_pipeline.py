@@ -33,10 +33,13 @@ def test_openalex_metadata_normalizes_authors_and_access_urls():
 def test_chunk_ids_are_stable_and_keep_page_and_section():
     metadata = {"id": "fixture:synthetic", "title": "Synthetic test paper", "source": "Test Fixture", "source_url": "https://example.org/fixture", "doi": None}
     page = {"page": 3, "section": "Methods", "text": ("Synthetic evidence sentence about a test-only research method. " * 100)}
-    first = pipeline._chunks(metadata, [page])
-    second = pipeline._chunks(metadata, [page])
+    first = pipeline._chunks(metadata, [page], "user-one")
+    second = pipeline._chunks(metadata, [page], "user-one")
+    another_users_chunks = pipeline._chunks(metadata, [page], "user-two")
     assert [item["id"] for item in first] == [item["id"] for item in second]
+    assert [item["id"] for item in first] != [item["id"] for item in another_users_chunks]
     assert first and all(item["metadata"]["page"] == 3 for item in first)
+    assert all(item["metadata"]["owner_id"] == "user-one" for item in first)
     assert all(item["metadata"]["section"] == "Methods" for item in first)
 
 
@@ -69,10 +72,11 @@ def test_chroma_index_uses_upsert_with_stable_ids(monkeypatch):
     monkeypatch.setattr(pipeline, "EmbeddingProvider", FakeProvider)
     monkeypatch.setattr(pipeline, "_chroma_collection", lambda: FakeCollection())
     chunk = {"id": "stable-fixture-id", "text": "Synthetic fixture passage", "metadata": {"paper_id": "fixture:synthetic"}}
-    pipeline._index_chunks([chunk])
-    pipeline._index_chunks([chunk])
+    pipeline._index_chunks("user-one", [chunk])
+    pipeline._index_chunks("user-one", [chunk])
     assert [call["ids"] for call in calls] == [["stable-fixture-id"], ["stable-fixture-id"]]
     assert calls[0]["embeddings"] == [[0.25, 0.75]]
+    assert calls[0]["metadatas"][0]["owner_id"] == "user-one"
 
 
 def test_chroma_cloud_client_uses_server_environment(monkeypatch):
@@ -154,11 +158,15 @@ def test_same_name_arxiv_authors_are_not_merged_across_records(monkeypatch):
     assert first[0]["key"] != second[0]["key"]
 
 
-def test_status_record_persists_without_credentials(monkeypatch, tmp_path):
+def test_status_record_is_scoped_by_owner_without_credentials(monkeypatch, tmp_path):
     monkeypatch.setenv("RESEARCHGRAPH_DATA_DIR", str(tmp_path))
-    saved = pipeline._save_status("fixture:synthetic", status="extracting", stage="extract")
-    loaded = pipeline.get_ingestion_status("fixture:synthetic")
+    saved = pipeline._save_status("user-one", "fixture:synthetic", status="extracting", stage="extract")
+    pipeline._save_status("user-two", "fixture:synthetic", status="queued", stage="queued")
+    loaded = pipeline.get_ingestion_status("user-one", "fixture:synthetic")
+    other_user = pipeline.get_ingestion_status("user-two", "fixture:synthetic")
     assert loaded == saved
+    assert other_user["status"] == "queued"
+    assert loaded["status"] != other_user["status"]
     assert Path(tmp_path, "status.sqlite3").exists()
 
 
@@ -173,8 +181,8 @@ def test_graph_failure_keeps_vector_stage_as_a_reported_partial_result(monkeypat
     monkeypatch.setattr(pipeline, "_extract_graph", lambda *_args: ([], []))
     monkeypatch.setattr(pipeline, "_write_graph", lambda *_args: (_ for _ in ()).throw(pipeline.PipelineError("synthetic graph failure")))
 
-    pipeline.ingest_paper(metadata["id"])
-    status = pipeline.get_ingestion_status(metadata["id"])
+    pipeline.ingest_paper("00000000-0000-4000-8000-000000000001", metadata["id"])
+    status = pipeline.get_ingestion_status("00000000-0000-4000-8000-000000000001", metadata["id"])
     assert status["status"] == "failed"
     assert status["stage"] == "knowledge_graph"
     assert status["vector_ready"] is True
