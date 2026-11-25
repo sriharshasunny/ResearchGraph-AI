@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - "backend/**"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig*.json"
       - ".github/workflows/backend-tests.yml"
   push:
     branches:
@@ -11,6 +15,10 @@ on:
       - feature/paper-scoped-kg-validation
     paths:
       - "backend/**"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig*.json"
       - ".github/workflows/backend-tests.yml"
 
 jobs:
@@ -34,3 +42,20 @@ jobs:
 
       - name: Run backend tests
         run: python -m pytest -q backend/tests
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12.0"
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Type-check and build frontend
+        run: npm run build
