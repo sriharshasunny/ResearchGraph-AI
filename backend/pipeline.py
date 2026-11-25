@@ -437,7 +437,9 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]], user_
         name = author["name"].strip()
         if not name:
             continue
-        key = hashlib.sha256(f"{user_id}|Author|{author.get('id') or name.casefold()}".encode()).hexdigest()
+        author_identity = author.get("id")
+        identity_scope = f"external:{author_identity}" if author_identity else f"paper:{paper_id}:{name.casefold()}"
+        key = hashlib.sha256(f"{user_id}|Author|{identity_scope}".encode()).hexdigest()
         entities[("Author", key)] = {"type": "Author", "key": key, "name": name}
         relations.append({
             "source_type": "Paper", "source_key": _paper_entity_key(user_id, paper_id), "target_type": "Author", "target_key": key,
