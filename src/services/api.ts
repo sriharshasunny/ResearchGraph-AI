@@ -211,3 +211,66 @@ export const searchPapers = async (query: string, options: PaperSearchOptions = 
   const data = await response.json() as { meta?: { count?: number }; results?: OpenAlexWork[] };
   return { papers: (data.results || []).map(toPaper), totalCount: data.meta?.count };
 };
+
+
+export interface ResearchWorkspace {
+  id: string;
+  name: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface WorkspacePaperRecord {
+  paper_id: string;
+  added_at: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface WorkspaceIngestionResult {
+  workspace_id: string;
+  paper: { paper_id?: string; workspace_id?: string };
+  ingestion: IngestionStatus;
+}
+
+export const listResearchWorkspaces = () =>
+  backendRequest<{ workspaces: ResearchWorkspace[] }>('/api/workspaces');
+
+export const createResearchWorkspace = (name: string, description = '') =>
+  backendRequest<{ workspace: ResearchWorkspace }>('/api/workspaces', {
+    method: 'POST',
+    body: JSON.stringify({ name, description }),
+  });
+
+export const deleteResearchWorkspace = (workspaceId: string) =>
+  backendRequest<{ deleted: boolean; workspace_id: string }>(`/api/workspaces/${encodeURIComponent(workspaceId)}`, {
+    method: 'DELETE',
+  });
+
+export const listWorkspacePapers = (workspaceId: string) =>
+  backendRequest<{ workspace_id: string; papers: WorkspacePaperRecord[] }>(
+    `/api/workspaces/${encodeURIComponent(workspaceId)}/papers`
+  );
+
+export const addPaperToWorkspace = (workspaceId: string, paperId: string) =>
+  backendRequest<WorkspaceIngestionResult>(`/api/workspaces/${encodeURIComponent(workspaceId)}/papers`, {
+    method: 'POST',
+    body: JSON.stringify({ paper_id: paperId }),
+  });
+
+export const removePaperFromWorkspace = (workspaceId: string, paperId: string) =>
+  backendRequest<{ removed: boolean; workspace_id: string; paper_id: string }>(
+    `/api/workspaces/${encodeURIComponent(workspaceId)}/papers?paper_id=${encodeURIComponent(paperId)}`,
+    { method: 'DELETE' }
+  );
+
+export const askResearchQuestionInWorkspaces = (question: string, workspaceIds: string[], signal?: AbortSignal) => {
+  if (!workspaceIds.length) {
+    return Promise.reject(new Error('Select at least one workspace before asking a research question.'));
+  }
+  return backendRequest<RagResponse>('/api/rag/query', {
+    method: 'POST',
+    body: JSON.stringify({ question, workspace_ids: workspaceIds }),
+    signal,
+  });
+};
