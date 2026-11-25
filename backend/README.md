@@ -23,3 +23,18 @@ uvicorn main:app --reload --port 8000
 ```
 
 Alternatively, from the repository root, run `uvicorn backend.main:app --reload --port 8000`.
+
+## Paper-scoped retrieval and verified graph claims
+
+The RAG endpoint now requires an explicit, non-empty `paper_ids` list. An empty selection returns an insufficient-context response; it never searches the entire Chroma collection.
+
+Knowledge-graph extraction uses two LLM passes:
+1. An extractor proposes typed entities and relationships with a verbatim evidence excerpt and chunk ID.
+2. A separate verifier checks whether the excerpt entails the exact subject–predicate–object claim, and records attribution and polarity.
+
+The backend also validates evidence against the original chunk, checks allowed relationship/type combinations, and stores accepted relationship provenance (`paper_id`, `chunk_id`, page, section, validation status, attribution, and polarity). Canonical entity keys are deterministic by entity type and normalized name, so repeated mentions of the same typed name reuse one node.
+
+Existing papers indexed before graph schema version 2 are queued for reprocessing the next time the ingestion action is requested. Their old graph edges are not treated as verified evidence. Reprocessing refreshes the evidence-backed graph records.
+
+**Current scope of this change:** paper-level filtering and graph evidence provenance are implemented. Persistent workspace membership and server-verified per-user authorization are separate follow-up work; do not expose the current shared Chroma/Neo4j infrastructure as a multi-user isolated service until those controls are added.
+
