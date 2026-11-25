@@ -31,4 +31,4 @@ export interface ChatMessage {
   relatedConcepts?: string[];
 }
 
-export type PageType = 'dashboard' | 'search' | 'graph' | 'chat' | 'details' | 'papers' | 'saved' | 'compare' | 'literature' | 'gaps' | 'history';
+export type PageType = 'dashboard' | 'search' | 'graph' | 'chat' | 'details' | 'papers' | 'saved' | 'compare' | 'literature' | 'gaps' | 'history' | 'workspaces';
