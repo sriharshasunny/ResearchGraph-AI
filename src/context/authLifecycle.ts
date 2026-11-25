@@ -85,7 +85,8 @@ export const createAuthController = (auth: SupabaseAuthAdapter): AuthController 
   };
 
   let epoch = 0;
-  let active = false;
+  let lifecycleGeneration = 0;
+  let activeGeneration: number | null = null;
   let subscription: { unsubscribe: () => void } | null = null;
   const listeners = new Set<(snapshot: AuthStateSnapshot) => void>();
 
@@ -105,14 +106,22 @@ export const createAuthController = (auth: SupabaseAuthAdapter): AuthController 
     });
   };
 
+  const isCurrentGeneration = (generation: number) => activeGeneration === generation;
+
   const start = () => {
-    if (active) return;
-    active = true;
+    if (activeGeneration !== null) return;
+    lifecycleGeneration += 1;
+    const generation = lifecycleGeneration;
+    activeGeneration = generation;
     const startEpoch = epoch;
 
+    if (!state.loading) {
+      emit({ ...state, loading: true });
+    }
+
     const { data } = auth.onAuthStateChange((_event, nextSession) => {
+      if (!isCurrentGeneration(generation)) return;
       epoch += 1;
-      if (!active) return;
       applyAuthenticatedSession(nextSession ?? null, null);
     });
     subscription = data.subscription;
@@ -120,7 +129,7 @@ export const createAuthController = (auth: SupabaseAuthAdapter): AuthController 
     void auth
       .getSession()
       .then(({ data: sessionData, error }) => {
-        if (!active) return;
+        if (!isCurrentGeneration(generation)) return;
         // If an auth-state event or explicit sign-in/out already happened since
         // start(), keep that newer state instead of overwriting with stale getSession().
         if (epoch !== startEpoch) {
@@ -136,7 +145,7 @@ export const createAuthController = (auth: SupabaseAuthAdapter): AuthController 
         applyAuthenticatedSession(sessionData.session ?? null, null);
       })
       .catch((err: unknown) => {
-        if (!active) return;
+        if (!isCurrentGeneration(generation)) return;
         if (epoch !== startEpoch) {
           if (state.loading) {
             emit({ ...state, loading: false });
@@ -148,7 +157,8 @@ export const createAuthController = (auth: SupabaseAuthAdapter): AuthController 
   };
 
   const dispose = () => {
-    active = false;
+    lifecycleGeneration += 1;
+    activeGeneration = null;
     if (subscription) {
       subscription.unsubscribe();
       subscription = null;

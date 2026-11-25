@@ -287,3 +287,108 @@ test('10. Logout failure propagates error and preserves error state', async () =
   assert.equal(controller.getState().session?.user.id, session.user.id);
   controller.dispose();
 });
+
+test('11. StrictMode restart ignores outdated pending getSession from disposed lifecycle', async () => {
+  const firstPending = createDeferred<{ data: { session: Session | null }; error: { message: string } | null }>();
+  const secondPending = createDeferred<{ data: { session: Session | null }; error: { message: string } | null }>();
+  const userASession = makeSession(makeUser('00000000-0000-4000-8000-00000000000a', 'user-a@example.edu'));
+  const userBSession = makeSession(makeUser('00000000-0000-4000-8000-00000000000b', 'user-b@example.edu'));
+
+  let getSessionCallCount = 0;
+  const mock = createMockAuth({
+    getSession: () => {
+      getSessionCallCount += 1;
+      return getSessionCallCount === 1 ? firstPending.promise : secondPending.promise;
+    },
+  });
+
+  const controller = createAuthController(mock.adapter);
+
+  // 1-2. Start controller with first getSession() pending.
+  controller.start();
+  assert.equal(controller.getState().loading, true);
+
+  // 3. Dispose controller (simulating React StrictMode cleanup).
+  controller.dispose();
+
+  // 4-5. Restart controller with second getSession() pending.
+  controller.start();
+  assert.equal(controller.getState().loading, true);
+
+  // 6-7. Resolve outdated first getSession() with User A; state must remain loading without User A.
+  firstPending.resolve({ data: { session: userASession }, error: null });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(controller.getState().loading, true);
+  assert.equal(controller.getState().session, null);
+  assert.equal(controller.getState().user, null);
+
+  // 8-9. Resolve second getSession() with User B; User B is restored and loading becomes false.
+  secondPending.resolve({ data: { session: userBSession }, error: null });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(controller.getState().loading, false);
+  assert.equal(controller.getState().session?.user.id, userBSession.user.id);
+  assert.equal(controller.getState().user?.email, 'user-b@example.edu');
+  assert.equal(controller.getState().error, null);
+  controller.dispose();
+});
+
+test('12. Stale auth-state callback and failed getSession from disposed lifecycle cannot modify state', async () => {
+  const firstPending = createDeferred<{ data: { session: Session | null }; error: { message: string } | null }>();
+  const secondPending = createDeferred<{ data: { session: Session | null }; error: { message: string } | null }>();
+  const staleUserSession = makeSession(makeUser('00000000-0000-4000-8000-00000000000c', 'stale@example.edu'));
+  const currentUserSession = makeSession(makeUser('00000000-0000-4000-8000-00000000000d', 'current@example.edu'));
+
+  const retainedCallbacks: Array<(event: AuthChangeEvent | string, session: Session | null) => void> = [];
+  let getSessionCallCount = 0;
+
+  const adapter: SupabaseAuthAdapter = {
+    getSession: () => {
+      getSessionCallCount += 1;
+      return getSessionCallCount === 1 ? firstPending.promise : secondPending.promise;
+    },
+    onAuthStateChange: (callback) => {
+      retainedCallbacks.push(callback);
+      return {
+        data: {
+          subscription: {
+            unsubscribe: () => {
+              // Deliberately keep reference in retainedCallbacks to simulate an async in-flight callback.
+            },
+          },
+        },
+      };
+    },
+    signInWithPassword: async () => ({ data: { session: null, user: null }, error: null }),
+    signUp: async () => ({ data: { session: null, user: null }, error: null }),
+    signOut: async () => ({ error: null }),
+  };
+
+  const controller = createAuthController(adapter);
+  controller.start();
+  controller.dispose();
+  controller.start();
+
+  // Fire stale callback from the disposed first lifecycle; current state must remain unaffected.
+  retainedCallbacks[0]('SIGNED_IN', staleUserSession);
+  assert.equal(controller.getState().loading, true);
+  assert.equal(controller.getState().session, null);
+  assert.equal(controller.getState().user, null);
+
+  // Reject stale first getSession(); must not clear loading or set error on the new lifecycle.
+  firstPending.reject(new Error('Old lifecycle error'));
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(controller.getState().loading, true);
+  assert.equal(controller.getState().error, null);
+
+  // Current lifecycle resolves with User D.
+  secondPending.resolve({ data: { session: currentUserSession }, error: null });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  assert.equal(controller.getState().loading, false);
+  assert.equal(controller.getState().user?.email, 'current@example.edu');
+  assert.equal(controller.getState().error, null);
+
+  // Even after settling, firing the old disposed callback must not overwrite current user or sign out.
+  retainedCallbacks[0]('SIGNED_OUT', null);
+  assert.equal(controller.getState().user?.email, 'current@example.edu');
+  controller.dispose();
+});
