@@ -232,9 +232,20 @@ def graph_search(q: str = Query(..., min_length=1, max_length=200), limit: int =
 
 
 @app.get("/api/graph")
-def graph_all(limit: int = Query(500, ge=1, le=2000), user: dict = Depends(require_current_user)):
+def graph_all(
+    workspace_ids: list[UUID] = Query(..., min_length=1, max_length=20),
+    limit: int = Query(500, ge=1, le=2000),
+    user: dict = Depends(require_current_user),
+):
     try:
-        return get_graph(limit, user["id"])
+        paper_ids = resolve_workspace_paper_ids(
+            user["id"], user["access_token"], [str(workspace_id) for workspace_id in workspace_ids]
+        )
+        if not paper_ids:
+            return {"nodes": [], "edges": [], "indexed": False}
+        return get_graph(limit, user["id"], paper_ids)
+    except WorkspaceError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
     except PipelineError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
