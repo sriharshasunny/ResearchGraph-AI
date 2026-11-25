@@ -52,7 +52,7 @@ RELATION_SIGNATURES = {
     "HAS_LIMITATION": ({"Paper"}, {"Finding", "ResearchGap", "Concept"}),
     "COMPARED_WITH": ({"Paper", "Model", "Method", "Algorithm"}, {"Model", "Method", "Algorithm"}),
 }
-SECTION_RE =SECTION_RE = re.compile(r"^(?:\d+(?:\.\d+)*\s+)?(?:abstract|introduction|related work|background|method(?:ology)?|approach|experiments?|results?|discussion|limitations?|conclusion|references)\s*$", re.I)
+SECTION_RE = re.compile(r"^(?:\d+(?:\.\d+)*\s+)?(?:abstract|introduction|related work|background|method(?:ology)?|approach|experiments?|results?|discussion|limitations?|conclusion|references)\s*$", re.I)
 ARXIV_RE = re.compile(r"^(?:arxiv:)?((?:\d{4}\.\d{4,5})(?:v\d+)?|[a-z-]+/\d{7}(?:v\d+)?)$", re.I)
 
 
@@ -82,18 +82,32 @@ def _status_conn():
     return conn
 
 
-def _save_status(paper_id: str, **updates: Any) -> dict[str, Any]:
-    current = get_ingestion_status(paper_id) or {"paper_id": paper_id, "status": "discovered", "vector_ready": False, "graph_ready": False}
+def _status_storage_key(paper_id: str, user_id: str) -> str:
+    return hashlib.sha256(f"{user_id}|{paper_id}".encode("utf-8")).hexdigest()
+
+
+def _save_status(paper_id: str, user_id: str = "legacy", **updates: Any) -> dict[str, Any]:
+    current = get_ingestion_status(paper_id, user_id) or {
+        "paper_id": paper_id, "user_id": user_id, "status": "discovered",
+        "vector_ready": False, "graph_ready": False,
+    }
     current.update(updates)
+    current["user_id"] = user_id
     current["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    storage_key = _status_storage_key(paper_id, user_id)
     with _status_conn() as conn:
-        conn.execute("INSERT INTO papers(paper_id,data,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(paper_id) DO UPDATE SET data=excluded.data,updated_at=CURRENT_TIMESTAMP", (paper_id, json.dumps(current)))
+        conn.execute(
+            "INSERT INTO papers(paper_id,data,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) "
+            "ON CONFLICT(paper_id) DO UPDATE SET data=excluded.data,updated_at=CURRENT_TIMESTAMP",
+            (storage_key, json.dumps(current)),
+        )
     return current
 
 
-def get_ingestion_status(paper_id: str) -> dict[str, Any] | None:
+def get_ingestion_status(paper_id: str, user_id: str = "legacy") -> dict[str, Any] | None:
+    storage_key = _status_storage_key(paper_id, user_id)
     with _status_conn() as conn:
-        row = conn.execute("SELECT data FROM papers WHERE paper_id=?", (paper_id,)).fetchone()
+        row = conn.execute("SELECT data FROM papers WHERE paper_id=?", (storage_key,)).fetchone()
     return json.loads(row["data"]) if row else None
 
 
@@ -298,7 +312,7 @@ def _extract_pdf(path: Path) -> list[dict[str, Any]]:
         raise PipelineError("PDF text extraction failed. The file may be damaged, encrypted, or scanned.") from exc
 
 
-def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]], user_id: str = "legacy") -> list[dict[str, Any]]:
     result: list[dict[str, Any]] = []
     overlap = max(0, min(CHUNK_OVERLAP, CHUNK_SIZE // 2))
     for page in pages:
@@ -312,8 +326,8 @@ def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]]) -> list[dict[
                     end = boundary + 1
             body = text[start:end].strip()
             if len(body) > 80:
-                chunk_id = hashlib.sha256(f"{metadata['id']}|{page['page']}|{start}|{body}".encode("utf-8")).hexdigest()
-                result.append({"id": chunk_id, "text": body, "metadata": {"paper_id": metadata["id"], "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": page["page"], "section": page.get("section") or "", "access_type": "open_access_pdf"}})
+                chunk_id = hashlib.sha256(f"{user_id}|{metadata['id']}|{page['page']}|{start}|{body}".encode("utf-8")).hexdigest()
+                result.append({"id": chunk_id, "text": body, "metadata": {"user_id": user_id, "paper_id": metadata["id"], "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": page["page"], "section": page.get("section") or "", "access_type": "open_access_pdf"}})
             if end >= len(text):
                 break
             start = max(start + 1, end - overlap)
@@ -400,8 +414,12 @@ def _normalized_entity_name(name: str) -> str:
     return " ".join(unicodedata.normalize("NFKC", name).split()).casefold()
 
 
-def _entity_key(entity_type: str, name: str) -> str:
-    return hashlib.sha256(f"{entity_type}|{_normalized_entity_name(name)}".encode("utf-8")).hexdigest()
+def _entity_key(entity_type: str, name: str, user_id: str = "legacy") -> str:
+    return hashlib.sha256(f"{user_id}|{entity_type}|{_normalized_entity_name(name)}".encode("utf-8")).hexdigest()
+
+
+def _paper_entity_key(user_id: str, paper_id: str) -> str:
+    return hashlib.sha256(f"{user_id}|Paper|{paper_id}".encode("utf-8")).hexdigest()
 
 
 def _relationship_signature_is_valid(relation_type: str, source_type: str, target_type: str) -> bool:
@@ -409,7 +427,7 @@ def _relationship_signature_is_valid(relation_type: str, source_type: str, targe
     return bool(signature and source_type in signature[0] and target_type in signature[1])
 
 
-def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]], user_id: str = "legacy") -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """Extract candidate graph claims and independently verify each claim against its source passage."""
     paper_id = metadata["id"]
     entities: dict[tuple[str, str], dict[str, Any]] = {}
@@ -419,7 +437,7 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
         name = author["name"].strip()
         if not name:
             continue
-        key = str(author.get("id") or hashlib.sha256(f"Author|{paper_id}|{name.casefold()}".encode()).hexdigest())
+        key = hashlib.sha256(f"{user_id}|Author|{author.get('id') or name.casefold()}".encode()).hexdigest()
         entities[("Author", key)] = {"type": "Author", "key": key, "name": name}
         relations.append({
             "source_type": "Paper", "source_key": paper_id, "target_type": "Author", "target_key": key,
@@ -433,7 +451,7 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
         name = " ".join(str(topic).split())
         if not name:
             continue
-        key = _entity_key("Concept", name)
+        key = _entity_key("Concept", name, user_id)
         entities[("Concept", key)] = {"type": "Concept", "key": key, "name": name}
         relations.append({
             "source_type": "Paper", "source_key": paper_id, "target_type": "Concept", "target_key": key,
@@ -552,14 +570,14 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
         if source_type == "Paper" and attribution != "current_work":
             continue
         if source_type == "Paper":
-            source_key = paper_id
+            source_key = _paper_entity_key(user_id, paper_id)
         else:
-            source_key = _entity_key(source_type, candidate["source_name"])
+            source_key = _entity_key(source_type, candidate["source_name"], user_id)
             entities[(source_type, source_key)] = {"type": source_type, "key": source_key, "name": candidate["source_name"]}
         if target_type == "Paper":
-            target_key = paper_id
+            target_key = _paper_entity_key(user_id, paper_id)
         else:
-            target_key = _entity_key(target_type, candidate["target_name"])
+            target_key = _entity_key(target_type, candidate["target_name"], user_id)
             entities[(target_type, target_key)] = {"type": target_type, "key": target_key, "name": candidate["target_name"]}
         relations.append({
             "source_type": source_type, "source_key": source_key,
@@ -572,23 +590,23 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
     return list(entities.values()), relations
 
 
-def _write_graph(metadata: dict[str, Any], entities: list[dict[str, Any]], relations: list[dict[str, Any]]) -> None:
+def _write_graph(metadata: dict[str, Any], entities: list[dict[str, Any]], relations: list[dict[str, Any]], user_id: str = "legacy") -> None:
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             session.run("CREATE CONSTRAINT researchgraph_entity_key IF NOT EXISTS FOR (n:ResearchEntity) REQUIRE n.key IS UNIQUE").consume()
             session.run(
                 "MERGE (p:ResearchEntity:Paper {key:$key}) "
-                "SET p.name=$name,p.paper_id=$paper_id,p.source_url=$source_url,p.doi=$doi,p.type='Paper'",
-                key=metadata["id"], name=metadata["title"], paper_id=metadata["id"],
-                source_url=metadata["source_url"], doi=metadata.get("doi") or "",
+                "SET p.name=$name,p.paper_id=$paper_id,p.user_id=$user_id,p.source_url=$source_url,p.doi=$doi,p.type='Paper'",
+                key=_paper_entity_key(user_id, metadata["id"]), name=metadata["title"], paper_id=metadata["id"],
+                user_id=user_id, source_url=metadata["source_url"], doi=metadata.get("doi") or "",
             ).consume()
             for entity in entities:
                 if entity.get("type") not in ALLOWED_ENTITY_TYPES - {"Paper"}:
                     continue
                 session.run(
-                    "MERGE (e:ResearchEntity {key:$key}) SET e.name=$name,e.type=$type",
-                    key=entity["key"], name=entity["name"], type=entity["type"],
+                    "MERGE (e:ResearchEntity {key:$key}) SET e.name=$name,e.type=$type,e.user_id=$user_id",
+                    key=entity["key"], name=entity["name"], type=entity["type"], user_id=user_id,
                 ).consume()
                 # Apply a validated, allow-listed Neo4j label for typed graph queries.
                 session.run(
@@ -602,19 +620,19 @@ def _write_graph(metadata: dict[str, Any], entities: list[dict[str, Any]], relat
                 paper_id = relation.get("paper_id") or metadata["id"]
                 chunk_id = relation.get("chunk_id") or ""
                 evidence_id = hashlib.sha256(
-                    f"{paper_id}|{chunk_id}|{relation['source_key']}|{relation['target_key']}|{relation_type}|{relation['evidence']}".encode("utf-8")
+                    f"{user_id}|{paper_id}|{chunk_id}|{relation['source_key']}|{relation['target_key']}|{relation_type}|{relation['evidence']}".encode("utf-8")
                 ).hexdigest()
                 cypher = (
                     "MATCH (s:ResearchEntity {key:$source}) MATCH (t:ResearchEntity {key:$target}) "
                     "MERGE (s)-[r:" + relation_type + " {evidence_id:$evidence_id}]->(t) "
-                    "SET r.evidence=$evidence,r.paper_id=$paper_id,r.chunk_id=$chunk_id,"
+                    "SET r.evidence=$evidence,r.paper_id=$paper_id,r.user_id=$user_id,r.chunk_id=$chunk_id,"
                     "r.page=$page,r.section=$section,r.extraction_method=$method,"
                     "r.attribution=$attribution,r.polarity=$polarity,"
                     "r.validation_status=$validation_status,r.verification_reason=$verification_reason"
                 )
                 session.run(
                     cypher, source=relation["source_key"], target=relation["target_key"],
-                    evidence_id=evidence_id, evidence=relation["evidence"], paper_id=paper_id,
+                    evidence_id=evidence_id, evidence=relation["evidence"], paper_id=paper_id, user_id=user_id,
                     chunk_id=chunk_id, page=relation.get("page"), section=relation.get("section") or "",
                     method=relation.get("method", "source_metadata"),
                     attribution=relation.get("attribution", "metadata"),
