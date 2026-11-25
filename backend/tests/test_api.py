@@ -15,12 +15,9 @@ def test_health_reports_service_configuration_without_claiming_private_upload_su
     assert "neo4j" in response.json()["services"]
 
 
-def test_rag_api_returns_insufficient_context_instead_of_fabricating(monkeypatch):
-    monkeypatch.setattr(pipeline, "_query_chunks", lambda *_args, **_kwargs: [])
+def test_rag_api_rejects_an_empty_paper_scope():
     response = client.post("/api/rag/query", json={"question": "What does this synthetic fixture say?", "paper_ids": []})
-    assert response.status_code == 200
-    assert response.json()["answer_type"] == "insufficient_context"
-    assert response.json()["citations"] == []
+    assert response.status_code == 422
 
 
 def test_rag_api_returns_citations_with_retrieved_passage_when_llm_is_unconfigured(monkeypatch):
@@ -33,7 +30,7 @@ def test_rag_api_returns_citations_with_retrieved_passage_when_llm_is_unconfigur
         "distance": 0.1,
     }])
     monkeypatch.setattr(pipeline, "_query_graph", lambda *_args, **_kwargs: [])
-    response = client.post("/api/rag/query", json={"question": "Describe the fixture method", "paper_ids": []})
+    response = client.post("/api/rag/query", json={"question": "Describe the fixture method", "paper_ids": ["fixture:synthetic"]})
     assert response.status_code == 200
     body = response.json()
     assert body["answer_type"] == "retrieval_only"
@@ -42,7 +39,7 @@ def test_rag_api_returns_citations_with_retrieved_passage_when_llm_is_unconfigur
 
 
 def test_rag_api_validates_question_length():
-    response = client.post("/api/rag/query", json={"question": "x", "paper_ids": []})
+    response = client.post("/api/rag/query", json={"question": "x", "paper_ids": ["fixture:synthetic"]})
     assert response.status_code == 422
 
 
