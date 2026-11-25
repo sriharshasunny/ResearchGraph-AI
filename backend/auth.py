@@ -53,4 +53,4 @@ def require_current_user(authorization: str | None = Header(default=None)) -> di
     if not isinstance(user_id, str) or not user_id.strip():
         raise HTTPException(status_code=401, detail="The verified session did not contain a user identity.")
 
-    return {"id": user_id, "email": user.get("email") if isinstance(user, dict) else None}
+    return {"id": user_id, "email": user.get("email") if isinstance(user, dict) else None, "access_token": token.strip()}
