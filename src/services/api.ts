@@ -65,7 +65,7 @@ export interface RagResponse {
 }
 
 export interface ResearchGraph {
-  paper_id: string;
+  paper_id?: string;
   indexed: boolean;
   nodes: Array<{ id: string; label: string; type: string; paperId?: string; sourceUrl?: string }>;
   edges: Array<{ id: string; source: string; target: string; relation: string; evidence?: string; page?: number }>;
