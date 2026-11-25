@@ -1,7 +1,9 @@
 """FastAPI contract checks; backend responses are mocked where services are external."""
 from fastapi.testclient import TestClient
 
-from backend import main, pipeline
+from backend import auth, main, pipeline
+
+main.app.dependency_overrides[auth.require_current_user] = lambda: {"id": "test-user"}
 
 
 client = TestClient(main.app)
