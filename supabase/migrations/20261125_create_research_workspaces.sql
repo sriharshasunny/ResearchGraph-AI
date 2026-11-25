@@ -43,6 +43,11 @@ create index if not exists workspace_papers_user_paper_idx
 create index if not exists workspace_papers_workspace_added_idx
     on public.workspace_papers(workspace_id, added_at desc);
 
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.research_workspaces to authenticated;
+grant select, insert, update, delete on public.research_papers to authenticated;
+grant select, insert, update, delete on public.workspace_papers to authenticated;
+
 alter table public.research_workspaces enable row level security;
 alter table public.research_papers enable row level security;
 alter table public.workspace_papers enable row level security;
