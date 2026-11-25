@@ -31,6 +31,7 @@ export const ChatPage: React.FC = () => {
     comparisonPaperIds,
     toggleComparisonPaper,
     selectedWorkspaceIds,
+    workspaces,
   } = useApp();
 
   const [prompt, setPrompt] = useState('');
@@ -412,6 +413,16 @@ export const ChatPage: React.FC = () => {
             <p className="text-[12px] text-gray-500 dark:text-gray-400">
               Ask questions, compare studies, explore empirical findings.
             </p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-gray-500 dark:text-gray-400">
+              <span>
+                Research scope: {selectedWorkspaceIds.length > 0
+                  ? workspaces.filter(workspace => selectedWorkspaceIds.includes(workspace.id)).map(workspace => workspace.name).join(' + ')
+                  : `${contextPaperIds.length} selected paper(s)`}
+              </span>
+              <button type="button" onClick={() => setActivePage('workspaces')} className="font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                Manage scope
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
