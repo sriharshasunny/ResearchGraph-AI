@@ -1,4 +1,5 @@
 import type { Paper } from '../types';
+import { supabase } from '../lib/supabase';
 
 interface OpenAlexWork {
   id: string;
@@ -74,9 +75,16 @@ const backendRequest = async <T,>(path: string, init?: RequestInit): Promise<T> 
   if (!backendBaseUrl) throw new Error('Research backend is not configured. Set VITE_API_BASE_URL to your FastAPI service URL.');
   let response: Response;
   try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData.session?.access_token;
     response = await fetch(`${backendBaseUrl}${path}`, {
       ...init,
-      headers: { Accept: 'application/json', ...(init?.body ? { 'Content-Type': 'application/json' } : {}), ...init?.headers },
+      headers: {
+        Accept: 'application/json',
+        ...(init?.body ? { 'Content-Type': 'application/json' } : {}),
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...init?.headers,
+      },
     });
   } catch {
     throw new Error('Research backend is unavailable. Set VITE_API_BASE_URL to the deployed FastAPI service.');
