@@ -392,3 +392,78 @@ def test_graph_retrieval_filters_relationships_by_user_and_paper(monkeypatch):
     assert params["user_id"] == "user-a"
     assert params["paper_ids"] == ["P101"]
 
+def test_graph_visualization_query_filters_user_and_selected_papers(monkeypatch):
+    calls = []
+
+    class FakeResult:
+        def __iter__(self):
+            return iter([])
+
+    class FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def run(self, query, **params):
+            calls.append((query, params))
+            return FakeResult()
+
+    class FakeDriver:
+        def session(self, **_kwargs):
+            return FakeSession()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pipeline, "_neo4j_driver", lambda: FakeDriver())
+    response = pipeline.get_graph(limit=25, user_id="user-a", paper_ids=["P101", "P201"])
+
+    assert response == {"nodes": [], "edges": [], "indexed": False}
+    query, params = calls[0]
+    assert "r.user_id=$user_id" in query
+    assert "r.paper_id IN $paper_ids" in query
+    assert params["user_id"] == "user-a"
+    assert params["paper_ids"] == ["P101", "P201"]
+
+
+def test_graph_visualization_does_not_query_for_empty_paper_scope(monkeypatch):
+    monkeypatch.setattr(pipeline, "_neo4j_driver", lambda: pytest.fail("Neo4j must not be queried for an empty graph scope"))
+    assert pipeline.get_graph(limit=25, user_id="user-a", paper_ids=[]) == {
+        "nodes": [], "edges": [], "indexed": False
+    }
+
+
+def test_graph_entity_search_filters_selected_papers(monkeypatch):
+    calls = []
+
+    class FakeResult:
+        def __iter__(self):
+            return iter([])
+
+    class FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def run(self, query, **params):
+            calls.append((query, params))
+            return FakeResult()
+
+    class FakeDriver:
+        def session(self, **_kwargs):
+            return FakeSession()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pipeline, "_neo4j_driver", lambda: FakeDriver())
+    assert pipeline.get_graph_search("transformer", user_id="user-a", paper_ids=["P101"]) == []
+    query, params = calls[0]
+    assert "r.paper_id IN $paper_ids" in query
+    assert params["user_id"] == "user-a"
+    assert params["paper_ids"] == ["P101"]
+
