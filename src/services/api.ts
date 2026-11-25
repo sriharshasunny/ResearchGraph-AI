@@ -111,9 +111,14 @@ export const getPaperDetails = async (paperId: string): Promise<Paper> => {
   };
 };
 
-export const askResearchQuestion = (question: string, paperIds: string[], signal?: AbortSignal) => backendRequest<RagResponse>('/api/rag/query', {
-  method: 'POST', body: JSON.stringify({ question, paper_ids: paperIds }), signal,
-});
+export const askResearchQuestion = (question: string, paperIds: string[], signal?: AbortSignal) => {
+  if (!paperIds.length) {
+    return Promise.reject(new Error('Select at least one indexed paper before asking a research question.'));
+  }
+  return backendRequest<RagResponse>('/api/rag/query', {
+    method: 'POST', body: JSON.stringify({ question, paper_ids: paperIds }), signal,
+  });
+};
 
 export const getPaperGraph = (paperId: string) => backendRequest<ResearchGraph>(`/api/graph/paper?paper_id=${encodeURIComponent(paperId)}`);
 export const getResearchGraph = () => backendRequest<ResearchGraph>('/api/graph');
