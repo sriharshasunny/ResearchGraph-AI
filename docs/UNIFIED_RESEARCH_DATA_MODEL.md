@@ -1,7 +1,8 @@
 # Unified Research Data Model
 
 Status: Step 1 implementation contract  
-Migration: `supabase/migrations/20261125171558_unified_research_data_model.sql`
+Migration: `supabase/migrations/20261125171558_unified_research_data_model.sql`  
+Privilege hardening: `supabase/migrations/20261125171721_restrict_authenticated_table_privileges.sql`
 
 ## 1. Architecture decision
 
