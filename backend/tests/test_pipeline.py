@@ -230,6 +230,30 @@ def test_same_name_arxiv_authors_are_not_merged_across_records(monkeypatch):
     assert first[0]["key"] != second[0]["key"]
 
 
+
+def test_legacy_ready_paper_is_queued_for_graph_schema_refresh(monkeypatch, tmp_path):
+    monkeypatch.setenv("RESEARCHGRAPH_DATA_DIR", str(tmp_path))
+    metadata = {
+        "id": "fixture:legacy",
+        "title": "Synthetic legacy paper",
+        "source": "Test Fixture",
+        "authors": [],
+        "topics": [],
+    }
+    monkeypatch.setattr(pipeline, "get_paper_metadata", lambda _paper_id: metadata)
+    pipeline._save_status(
+        metadata["id"],
+        status="ready",
+        vector_ready=True,
+        graph_ready=True,
+    )
+
+    queued = pipeline.start_ingestion(metadata["id"])
+
+    assert queued["status"] == "metadata_available"
+    assert queued["stage"] == "queued"
+    assert "graph_schema_version" not in queued
+
 def test_status_record_persists_without_credentials(monkeypatch, tmp_path):
     monkeypatch.setenv("RESEARCHGRAPH_DATA_DIR", str(tmp_path))
     saved = pipeline._save_status("fixture:synthetic", status="extracting", stage="extract")
