@@ -657,63 +657,63 @@ def _index_chunks(chunks: list[dict[str, Any]]) -> None:
         collection.upsert(ids=[chunk["id"] for chunk in batch], documents=[chunk["text"] for chunk in batch], metadatas=[chunk["metadata"] for chunk in batch], embeddings=vectors)
 
 
-def ingest_paper(paper_id: str) -> None:
-    record = _save_status(paper_id, status="metadata_available", stage="metadata", error=None)
+def ingest_paper(paper_id: str, user_id: str = "legacy") -> None:
+    record = _save_status(paper_id, user_id=user_id, status="metadata_available", stage="metadata", error=None)
     metadata: dict[str, Any] = {}
     temp: Path | None = None
     try:
         metadata = get_paper_metadata(paper_id)
         canonical = metadata["id"]
         if canonical != paper_id:
-            _save_status(paper_id, canonical_paper_id=canonical)
+            _save_status(paper_id, user_id=user_id, canonical_paper_id=canonical)
         abstract_only = not metadata.get("pdf_url")
         if abstract_only:
             if not metadata.get("abstract"):
-                _save_status(canonical, status="abstract_only", stage="metadata", paper=metadata, message="No accessible open-access PDF or abstract was identified. Full text was not indexed.", vector_ready=False, graph_ready=False)
+                _save_status(canonical, user_id=user_id, status="abstract_only", stage="metadata", paper=metadata, message="No accessible open-access PDF or abstract was identified. Full text was not indexed.", vector_ready=False, graph_ready=False)
                 return
-            chunk_id = hashlib.sha256(f"{canonical}|abstract|{metadata['abstract']}".encode("utf-8")).hexdigest()
-            chunks = [{"id": chunk_id, "text": metadata["abstract"], "metadata": {"paper_id": canonical, "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": 1, "section": "Abstract", "access_type": "abstract_only"}}]
+            chunk_id = hashlib.sha256(f"{user_id}|{canonical}|abstract|{metadata['abstract']}".encode("utf-8")).hexdigest()
+            chunks = [{"id": chunk_id, "text": metadata["abstract"], "metadata": {"user_id": user_id, "paper_id": canonical, "title": metadata["title"], "source": metadata["source"], "source_url": metadata["source_url"], "doi": metadata.get("doi") or "", "page": 1, "section": "Abstract", "access_type": "abstract_only"}}]
             pages = []
         else:
             chunks = []
             pages = []
         if not abstract_only:
-            record = _save_status(canonical, status="downloading", stage="download", paper=metadata, error=None)
+            record = _save_status(canonical, user_id=user_id, status="downloading", stage="download", paper=metadata, error=None)
             temp = _download_pdf(metadata["pdf_url"])
-            record = _save_status(canonical, status="extracting", stage="extract", paper=metadata)
+            record = _save_status(canonical, user_id=user_id, status="extracting", stage="extract", paper=metadata)
             pages = _extract_pdf(temp)
-            chunks = _chunks(metadata, pages)
+            chunks = _chunks(metadata, pages, user_id)
             if not chunks:
                 raise PipelineError("Extracted full text did not contain enough usable content to index.")
-        _save_status(canonical, status="indexing", stage="embeddings", paper=metadata, chunk_count=len(chunks))
+        _save_status(canonical, user_id=user_id, status="indexing", stage="embeddings", paper=metadata, chunk_count=len(chunks))
         _index_chunks(chunks)
-        _save_status(canonical, status="indexing", stage="knowledge_graph", paper=metadata, chunk_count=len(chunks), vector_ready=True)
-        entities, relations = _extract_graph(metadata, chunks)
-        _write_graph(metadata, entities, relations)
-        _save_status(canonical, status="abstract_only" if abstract_only else "ready", stage="complete", paper=metadata, chunk_count=len(chunks), entity_count=len(entities) + 1, relationship_count=len(relations), vector_ready=True, graph_ready=True, graph_schema_version=2, error=None, message="Abstract indexed with real embeddings and metadata graph; full text was unavailable." if abstract_only else "Full text, semantic index, and evidence-backed graph are ready.")
+        _save_status(canonical, user_id=user_id, status="indexing", stage="knowledge_graph", paper=metadata, chunk_count=len(chunks), vector_ready=True)
+        entities, relations = _extract_graph(metadata, chunks, user_id)
+        _write_graph(metadata, entities, relations, user_id)
+        _save_status(canonical, user_id=user_id, status="abstract_only" if abstract_only else "ready", stage="complete", paper=metadata, chunk_count=len(chunks), entity_count=len(entities) + 1, relationship_count=len(relations), vector_ready=True, graph_ready=True, graph_schema_version=2, error=None, message="Abstract indexed with real embeddings and metadata graph; full text was unavailable." if abstract_only else "Full text, semantic index, and evidence-backed graph are ready.")
     except PaperNotFound as exc:
-        _save_status(paper_id, status="failed", stage="metadata", error=str(exc))
+        _save_status(paper_id, user_id=user_id, status="failed", stage="metadata", error=str(exc))
     except PipelineError as exc:
         current_id = metadata.get("id", paper_id)
-        current = get_ingestion_status(current_id) or {}
-        _save_status(current_id, status="failed", stage=current.get("stage", "processing"), paper=metadata or current.get("paper"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error=str(exc), retryable=True)
+        current = get_ingestion_status(current_id, user_id) or {}
+        _save_status(current_id, user_id=user_id, status="failed", stage=current.get("stage", "processing"), paper=metadata or current.get("paper"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error=str(exc), retryable=True)
     except Exception:
         current_id = metadata.get("id", paper_id)
-        current = get_ingestion_status(current_id) or {}
-        _save_status(current_id, status="failed", stage=current.get("stage", "processing"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error="Unexpected processing failure.", retryable=True)
+        current = get_ingestion_status(current_id, user_id) or {}
+        _save_status(current_id, user_id=user_id, status="failed", stage=current.get("stage", "processing"), vector_ready=bool(current.get("vector_ready")), graph_ready=bool(current.get("graph_ready")), error="Unexpected processing failure.", retryable=True)
     finally:
         if temp:
             temp.unlink(missing_ok=True)
 
 
-def start_ingestion(paper_id: str) -> dict[str, Any]:
+def start_ingestion(paper_id: str, user_id: str = "legacy") -> dict[str, Any]:
     metadata = get_paper_metadata(paper_id)
-    existing = get_ingestion_status(metadata["id"])
+    existing = get_ingestion_status(metadata["id"], user_id)
     if existing and existing.get("status") in {"ready", "abstract_only"} and existing.get("graph_schema_version") == 2:
         return existing
     if existing and existing.get("status") in {"metadata_available", "downloading", "extracting", "indexing"}:
         return existing
-    return _save_status(metadata["id"], status="metadata_available", stage="queued", paper=metadata, vector_ready=bool((existing or {}).get("vector_ready")), graph_ready=bool((existing or {}).get("graph_ready")), message="Paper accepted for indexing.")
+    return _save_status(metadata["id"], user_id=user_id, status="metadata_available", stage="queued", paper=metadata, vector_ready=bool((existing or {}).get("vector_ready")), graph_ready=bool((existing or {}).get("graph_ready")), message="Paper accepted for indexing.")
 
 
 def _query_chunks(question: str, paper_ids: list[str], limit: int = 8) -> list[dict[str, Any]]:
