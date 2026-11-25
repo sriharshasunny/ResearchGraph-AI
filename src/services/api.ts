@@ -138,7 +138,14 @@ export const getResearchGraph = (workspaceIds: string[]) => {
   return backendRequest<ResearchGraph>(`/api/graph?${params.toString()}`);
 };
 
-export const searchGraph = (query: string) => backendRequest<{ results: ResearchGraph['nodes'] }>(`/api/graph/search?q=${encodeURIComponent(query)}`);
+export const searchGraph = (query: string, workspaceIds: string[]) => {
+  if (!workspaceIds.length) {
+    return Promise.resolve<{ results: ResearchGraph['nodes'] }>({ results: [] });
+  }
+  const params = new URLSearchParams({ q: query });
+  workspaceIds.forEach(id => params.append('workspace_ids', id));
+  return backendRequest<{ results: ResearchGraph['nodes'] }>(`/api/graph/search?${params.toString()}`);
+};
 
 const restoreAbstract = (invertedIndex?: Record<string, number[]> | null) => {
   if (!invertedIndex) return 'Abstract not available.';
