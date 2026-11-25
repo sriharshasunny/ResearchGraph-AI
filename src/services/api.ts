@@ -129,7 +129,14 @@ export const askResearchQuestion = (question: string, paperIds: string[], signal
 };
 
 export const getPaperGraph = (paperId: string) => backendRequest<ResearchGraph>(`/api/graph/paper?paper_id=${encodeURIComponent(paperId)}`);
-export const getResearchGraph = () => backendRequest<ResearchGraph>('/api/graph');
+export const getResearchGraph = (workspaceIds: string[]) => {
+  if (!workspaceIds.length) {
+    return Promise.resolve<ResearchGraph>({ nodes: [], edges: [], indexed: false });
+  }
+  const params = new URLSearchParams();
+  workspaceIds.forEach(id => params.append('workspace_ids', id));
+  return backendRequest<ResearchGraph>(`/api/graph?${params.toString()}`);
+};
 
 export const searchGraph = (query: string) => backendRequest<{ results: ResearchGraph['nodes'] }>(`/api/graph/search?q=${encodeURIComponent(query)}`);
 
