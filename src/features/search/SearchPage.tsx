@@ -26,7 +26,7 @@ export const SearchPage: React.FC = () => {
   const {
     searchQuery, setSearchQuery, savedPaperIds, toggleSavedPaper,
     setSelectedPaperId, setActivePage, comparisonPaperIds,
-    toggleComparisonPaper, clearComparison, addSearchResults, activeWorkspaceId,
+    toggleComparisonPaper, clearComparison, addSearchResults, activeWorkspaceId, workspaces,
   } = useApp();
 
   const [query, setQuery] = useState(searchQuery);
@@ -293,6 +293,16 @@ export const SearchPage: React.FC = () => {
           </div>}
 
           {ingestionError && <div role="alert" className="rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/40 px-4 py-3 text-sm text-rose-800 dark:text-rose-300">{ingestionError}</div>}
+          <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 px-3 py-2 text-xs">
+            <span className="text-slate-600 dark:text-slate-300">
+              Add target: <strong className="text-slate-900 dark:text-white">
+                {workspaces.find(workspace => workspace.id === activeWorkspaceId)?.name || 'No workspace selected'}
+              </strong>
+            </span>
+            <button type="button" onClick={() => setActivePage('workspaces')} className="font-semibold text-blue-700 hover:text-blue-800 dark:text-blue-400">
+              Change workspace
+            </button>
+          </div>
 
           {loading && papers.length === 0 ? Array.from({ length: 3 }, (_, index) => <div key={index} className="animate-pulse rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E172A] p-5"><div className="h-4 w-3/5 rounded bg-slate-200 dark:bg-slate-800" /><div className="mt-3 h-3 w-2/5 rounded bg-slate-100 dark:bg-slate-800/60" /><div className="mt-5 h-3 w-full rounded bg-slate-100 dark:bg-slate-800/60" /><div className="mt-2 h-3 w-4/5 rounded bg-slate-100 dark:bg-slate-800/60" /></div>) : error ? <div role="alert" className="rounded-2xl border border-rose-200 dark:border-rose-900/60 bg-white dark:bg-[#0E172A] p-8 text-center">
             <h3 className="font-semibold text-slate-900 dark:text-white">Unable to retrieve papers.</h3><p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Check your connection or try again in a moment.</p><button type="button" onClick={() => setRetryToken(value => value + 1)} className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"><RotateCcw className="h-4 w-4" /> Try again</button>
