@@ -279,3 +279,116 @@ def test_graph_failure_keeps_vector_stage_as_a_reported_partial_result(monkeypat
     assert status["stage"] == "knowledge_graph"
     assert status["vector_ready"] is True
     assert status["graph_ready"] is False
+
+def test_chunks_and_ids_are_scoped_to_user():
+    metadata = {"id": "fixture:shared-paper", "title": "Shared paper", "source": "Fixture", "source_url": "https://example.org/paper", "doi": None}
+    page = {"page": 1, "section": "Abstract", "text": "A sufficiently long synthetic passage about a research method. " * 8}
+
+    first = pipeline._chunks(metadata, [page], user_id="user-a")
+    second = pipeline._chunks(metadata, [page], user_id="user-b")
+
+    assert first[0]["metadata"]["user_id"] == "user-a"
+    assert second[0]["metadata"]["user_id"] == "user-b"
+    assert first[0]["id"] != second[0]["id"]
+
+
+def test_canonical_entity_keys_are_shared_within_but_not_across_users():
+    assert pipeline._entity_key("Model", "Transformer", "user-a") == pipeline._entity_key("Model", " transformer ", "user-a")
+    assert pipeline._entity_key("Model", "Transformer", "user-a") != pipeline._entity_key("Model", "Transformer", "user-b")
+    assert pipeline._paper_entity_key("user-a", "P101") != pipeline._paper_entity_key("user-b", "P101")
+
+
+def test_metadata_claims_attach_to_the_user_scoped_paper_node(monkeypatch):
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    metadata = {
+        "id": "P101",
+        "title": "Synthetic test paper",
+        "source": "Test Fixture",
+        "authors": [{"id": "A1", "name": "Synthetic Author"}],
+        "topics": ["Knowledge Graph"],
+    }
+
+    entities, relations = pipeline._extract_graph(metadata, [], user_id="user-a")
+
+    paper_key = pipeline._paper_entity_key("user-a", "P101")
+    assert {entity["type"] for entity in entities} == {"Author", "Concept"}
+    assert len(relations) == 2
+    assert all(relation["source_key"] == paper_key for relation in relations)
+    assert all(relation["paper_id"] == "P101" for relation in relations)
+
+
+def test_status_records_are_isolated_by_user(monkeypatch, tmp_path):
+    monkeypatch.setenv("RESEARCHGRAPH_DATA_DIR", str(tmp_path))
+    pipeline._save_status("P101", user_id="user-a", status="ready")
+    pipeline._save_status("P101", user_id="user-b", status="failed")
+
+    assert pipeline.get_ingestion_status("P101", "user-a")["status"] == "ready"
+    assert pipeline.get_ingestion_status("P101", "user-b")["status"] == "failed"
+    assert pipeline.get_ingestion_status("P101", "user-c") is None
+
+
+def test_chroma_retrieval_filters_by_user_and_allowed_papers(monkeypatch):
+    calls = []
+
+    class FakeProvider:
+        def embed(self, _texts):
+            return [[0.1, 0.9]]
+
+    class FakeCollection:
+        def query(self, **kwargs):
+            calls.append(kwargs)
+            return {
+                "ids": [["chunk-a"]],
+                "documents": [["Synthetic evidence"]],
+                "metadatas": [[{"paper_id": "P101", "user_id": "user-a"}]],
+                "distances": [[0.1]],
+            }
+
+    monkeypatch.setattr(pipeline, "EmbeddingProvider", FakeProvider)
+    monkeypatch.setattr(pipeline, "_chroma_collection", lambda: FakeCollection())
+
+    results = pipeline._query_chunks("synthetic question", ["P101"], user_id="user-a")
+
+    assert len(results) == 1
+    assert calls[0]["where"] == {
+        "$and": [
+            {"paper_id": {"$in": ["P101"]}},
+            {"user_id": "user-a"},
+        ]
+    }
+
+
+def test_graph_retrieval_filters_relationships_by_user_and_paper(monkeypatch):
+    calls = []
+
+    class FakeResult:
+        def __iter__(self):
+            return iter([])
+
+    class FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def run(self, query, **params):
+            calls.append((query, params))
+            return FakeResult()
+
+    class FakeDriver:
+        def session(self, **_kwargs):
+            return FakeSession()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pipeline, "_neo4j_driver", lambda: FakeDriver())
+    assert pipeline._query_graph(["P101"], ["transformer"], user_id="user-a") == []
+
+    query, params = calls[0]
+    assert "r.user_id=$user_id" in query
+    assert params["user_id"] == "user-a"
+    assert params["paper_ids"] == ["P101"]
+
