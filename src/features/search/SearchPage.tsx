@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { getPaperIngestionStatus, ingestPaper, searchPapers } from '../../services/api';
+import { addPaperToWorkspace, getPaperIngestionStatus, searchPapers } from '../../services/api';
 import type { IngestionStatus } from '../../services/api';
 import type { Paper } from '../../types';
 import {
@@ -26,7 +26,7 @@ export const SearchPage: React.FC = () => {
   const {
     searchQuery, setSearchQuery, savedPaperIds, toggleSavedPaper,
     setSelectedPaperId, setActivePage, comparisonPaperIds,
-    toggleComparisonPaper, clearComparison, addSearchResults,
+    toggleComparisonPaper, clearComparison, addSearchResults, activeWorkspaceId,
   } = useApp();
 
   const [query, setQuery] = useState(searchQuery);
@@ -52,8 +52,12 @@ export const SearchPage: React.FC = () => {
     setIngestingId(paper.id);
     setIngestionError(null);
     try {
-      const status = await ingestPaper(paper.id);
-      setIngestion(previous => ({ ...previous, [paper.id]: status }));
+      if (!activeWorkspaceId) {
+        setActivePage('workspaces');
+        return;
+      }
+      const result = await addPaperToWorkspace(activeWorkspaceId, paper.id);
+      setIngestion(previous => ({ ...previous, [paper.id]: result.ingestion }));
     } catch (error) {
       setIngestionError(error instanceof Error ? error.message : 'Paper indexing could not be started.');
     } finally {
@@ -205,6 +209,8 @@ export const SearchPage: React.FC = () => {
           </div>
         </header>
 
+        {ingestionError && <div role="alert" className="mb-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300">{ingestionError}</div>}
+        {activeWorkspaceId ? null : <button type="button" onClick={() => setActivePage('workspaces')} className="mb-3 inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-300">Choose a workspace before adding papers</button>}
         <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E172A] p-4 shadow-[0_6px_22px_-18px_rgba(15,23,42,.3)] sm:p-5 transition-colors duration-200">
           <form role="search" onSubmit={submitSearch} className="flex min-h-[54px] items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#080E1A] px-3 focus-within:border-blue-400 dark:focus-within:border-blue-500 focus-within:bg-white dark:focus-within:bg-[#080E1A] focus-within:ring-4 focus-within:ring-blue-100 dark:focus-within:ring-blue-500/20 sm:px-4 transition-all">
             <Search aria-hidden="true" className="h-[18px] w-[18px] shrink-0 text-slate-400 dark:text-slate-500" />
@@ -312,7 +318,7 @@ export const SearchPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:max-w-[230px] sm:justify-end">
                   <button type="button" onClick={() => openPaper(paper)} className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-blue-600 px-3 text-xs font-semibold text-white hover:bg-blue-700"><BookOpen className="h-3.5 w-3.5" /> Open paper</button>
-                  <button type="button" onClick={() => void startIngestion(paper)} title="Indexes this publicly available scholarly paper for AI research." disabled={ingestingId === paper.id || paperIsProcessing || ['ready', 'abstract_only'].includes(paperStatus || '')} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 px-3 text-xs font-semibold text-blue-800 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 disabled:cursor-not-allowed disabled:opacity-65"><Database className="h-3.5 w-3.5" />{ingestingId === paper.id ? 'Starting…' : paperIsProcessing ? 'Processing…' : ['ready', 'abstract_only'].includes(paperStatus || '') ? 'Indexed' : 'Index paper'}</button>
+                  <button type="button" onClick={() => void startIngestion(paper)} title={activeWorkspaceId ? "Add this paper to the selected workspace and index it for research." : "Create or select a workspace first."} disabled={ingestingId === paper.id} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-blue-200 dark:border-blue-800/60 bg-blue-50 dark:bg-blue-950/50 px-3 text-xs font-semibold text-blue-800 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50 disabled:cursor-not-allowed disabled:opacity-65"><Database className="h-3.5 w-3.5" />{ingestingId === paper.id ? 'Adding…' : activeWorkspaceId ? 'Add to workspace' : 'Choose workspace'}</button>
                   <button type="button" onClick={() => toggleSavedPaper(paper.id)} aria-label={saved ? 'Remove from saved papers' : 'Save paper'} className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium ${saved ? 'border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}>{saved ? <Check className="h-3.5 w-3.5" /> : <Bookmark className="h-3.5 w-3.5" />}{saved ? 'Saved' : 'Save'}</button>
                   <button type="button" onClick={() => toggleComparisonPaper(paper.id)} disabled={!compared && comparisonPaperIds.length >= 3} aria-pressed={compared} title={!compared && comparisonPaperIds.length >= 3 ? 'Remove a paper from the current comparison first (maximum 3)' : undefined} className={`inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-45 ${compared ? 'border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-300' : 'border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'}`}><GitCompare className="h-3.5 w-3.5" />{compared ? 'Selected' : 'Compare'}</button>
                   <button type="button" onClick={() => askAboutPaper(paper)} className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 px-3 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"><MessageSquareText className="h-3.5 w-3.5" /> Ask AI</button>
