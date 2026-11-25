@@ -482,6 +482,8 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
         source_type, target_type = item.get("source_type"), item.get("target_type")
         source_name, target_name = item.get("source_name"), item.get("target_name")
         evidence, chunk_id = item.get("evidence"), item.get("chunk_id")
+        if not all(isinstance(value, str) for value in (relation_type, source_type, target_type, chunk_id)):
+            continue
         if relation_type not in (ALLOWED_RELATIONS - {"AUTHORED_BY", "CITES", "HAS_TOPIC", "RELATED_TO"}):
             continue
         if source_type not in ALLOWED_ENTITY_TYPES or target_type not in ALLOWED_ENTITY_TYPES:
@@ -542,11 +544,13 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
         if decision.get("verdict") != "SUPPORTED":
             continue
         attribution, polarity = decision.get("attribution"), decision.get("polarity")
-        if attribution not in {"current_work", "prior_work", "general_background", "unknown"}:
+        if not isinstance(attribution, str) or attribution not in {"current_work", "prior_work", "general_background", "unknown"}:
             continue
-        if polarity not in {"affirmative", "negative", "uncertain"}:
+        if not isinstance(polarity, str) or polarity not in {"affirmative", "negative", "uncertain"}:
             continue
         source_type, target_type = candidate["source_type"], candidate["target_type"]
+        if source_type == "Paper" and attribution != "current_work":
+            continue
         if source_type == "Paper":
             source_key = paper_id
         else:
