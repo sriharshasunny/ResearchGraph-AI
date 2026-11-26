@@ -107,17 +107,19 @@ SELECT
     CASE
         WHEN ap.policyname IS NULL THEN 'FAIL: missing policy'
         WHEN ap.permissive <> 'PERMISSIVE' THEN 'FAIL: non-permissive policy'
-        WHEN NOT (ap.roles @> ARRAY['authenticated']::text[])
-             OR ap.roles && ARRAY['anon', 'public']::text[] THEN 'FAIL: invalid policy roles'
+        WHEN ap.roles <> ARRAY['authenticated']::text[] THEN 'FAIL: invalid policy roles'
         WHEN ep.cmd IN ('SELECT', 'DELETE')
-             AND ap.norm_qual NOT LIKE '%owner_id=(selectauth.uid()%' THEN 'FAIL: missing owner_id=(select auth.uid()) in USING'
+             AND ap.norm_qual <> '(owner_id=(selectauth.uid()asuid))'
+            THEN 'FAIL: USING expression must equal (owner_id = ( SELECT auth.uid() AS uid))'
         WHEN ep.cmd = 'INSERT'
-             AND ap.norm_with_check NOT LIKE '%owner_id=(selectauth.uid()%' THEN 'FAIL: missing owner_id=(select auth.uid()) in WITH CHECK'
+             AND ap.norm_with_check <> '(owner_id=(selectauth.uid()asuid))'
+            THEN 'FAIL: WITH CHECK expression must equal (owner_id = ( SELECT auth.uid() AS uid))'
         WHEN ep.cmd = 'UPDATE'
              AND (
-                 ap.norm_qual NOT LIKE '%owner_id=(selectauth.uid()%'
-                 OR ap.norm_with_check NOT LIKE '%owner_id=(selectauth.uid()%'
-             ) THEN 'FAIL: UPDATE policy must enforce ownership in both USING and WITH CHECK'
+                 ap.norm_qual <> '(owner_id=(selectauth.uid()asuid))'
+                 OR ap.norm_with_check <> '(owner_id=(selectauth.uid()asuid))'
+             )
+            THEN 'FAIL: UPDATE policy must equal (owner_id = ( SELECT auth.uid() AS uid)) in both USING and WITH CHECK'
         ELSE 'PASS'
     END AS check_status
 FROM expected_policies ep
@@ -202,17 +204,17 @@ role_grants AS (
     SELECT
         g.table_name,
         coalesce(
-            array_agg(g.privilege_type ORDER BY g.privilege_type)
+            array_agg(g.privilege_type::text ORDER BY g.privilege_type::text)
                 FILTER (WHERE g.grantee = 'authenticated'),
             ARRAY[]::text[]
         ) AS authenticated_privs,
         coalesce(
-            array_agg(g.privilege_type ORDER BY g.privilege_type)
+            array_agg(g.privilege_type::text ORDER BY g.privilege_type::text)
                 FILTER (WHERE g.grantee = 'anon'),
             ARRAY[]::text[]
         ) AS anon_privs,
         coalesce(
-            array_agg(g.privilege_type ORDER BY g.privilege_type)
+            array_agg(g.privilege_type::text ORDER BY g.privilege_type::text)
                 FILTER (WHERE g.grantee = 'PUBLIC'),
             ARRAY[]::text[]
         ) AS public_privs
@@ -253,7 +255,7 @@ ORDER BY eg.table_name;
 SELECT
     'CHECK_C2_SERVICE_ROLE_PRIVILEGES' AS check_id,
     g.table_name,
-    array_agg(g.privilege_type ORDER BY g.privilege_type) AS service_role_privs,
+    array_agg(g.privilege_type::text ORDER BY g.privilege_type::text) AS service_role_privs,
     'SERVER_ONLY_NEVER_EXPOSE_TO_BROWSER' AS security_classification
 FROM information_schema.role_table_grants g
 WHERE g.table_schema = 'public'
@@ -268,7 +270,7 @@ ORDER BY g.table_name;
 
 -- ============================================================================
 -- CHECK D: Referential integrity, composite ownership FKs, PKs, and uniqueness
--- Expected: 11 rows, all check_status = 'PASS'
+-- Expected: 12 rows, all check_status = 'PASS'
 -- ============================================================================
 WITH expected_constraints (
     table_name,

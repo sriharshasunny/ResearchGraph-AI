@@ -101,7 +101,15 @@ PGOPTIONS="-c default_transaction_read_only=on" psql "$DATABASE_URL" -v ON_ERROR
 
 ---
 
-## 6. Static Metadata Checks vs. Live Two-User Integration Testing
+## 6. Verification History & Static vs. Runtime Scope
+
+### Phase 7 & Phase 7.1 Execution Notes
+- Read-only checks from the Phase 7 script were executed against the live `ResearchGraph_AI` (`uhwsbovuzmwvbgrynfiy`) Supabase project, surfacing a PostgreSQL `character_data[]` vs `text[]` type mismatch in Check C1.
+- Phase 7.1 corrected Check C1 by casting `g.privilege_type::text` before `array_agg`, hardened Check B1 to require exact equality on normalized expressions (`(owner_id=(selectauth.uid()asuid))`) and exact role array `ARRAY['authenticated']::text[]`, and corrected the Check D comment to 12 expected constraints.
+- The corrected privilege inventory was independently verified, with all six table privilege configurations matching the expected allowlists.
+- A complete successful rerun of the committed `supabase/verification/verify_unified_research_data_model.sql` file must be executed and confirmed in a live read-only Supabase session before marking the updated script itself as live-verified.
+
+### Static Metadata Checks vs. Live Two-User Integration Testing
 
 - **What this SQL suite proves (static metadata checks):** All 6 tables exist, RLS is enabled, every expected ownership policy uses `owner_id = (select auth.uid())`, `anon` has no grants, `authenticated` grants exclude unsafe operations (`TRUNCATE`, `REFERENCES`, `TRIGGER`, and `UPDATE` on `workspace_papers`/`paper_assets`), composite foreign keys prevent cross-owner joins, and `updated_at` triggers are intact.
 - **What a read-only catalog audit CANNOT prove:** It **does not** execute live queries under real User A and User B JWT sessions, so it cannot by itself prove runtime cross-user `SELECT`/`INSERT`/`UPDATE`/`DELETE` rejection against PostgREST or Supabase Auth.
