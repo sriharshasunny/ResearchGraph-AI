@@ -323,10 +323,319 @@ def test_error_mappings_for_config_network_5xx_and_malformed_response(monkeypatc
         resolve_or_create_paper(access_token=TOKEN_A, identifiers=[doi])
 
 
-@pytest.mark.skipif(
-    not (os.getenv("TEST_SUPABASE_URL") and os.getenv("TEST_SUPABASE_USER_A_JWT") and os.getenv("TEST_SUPABASE_USER_B_JWT")),
-    reason="Real PostgreSQL/Supabase RLS and 23505 concurrency integration tests require controlled test project env vars; local Postgres/Docker is unavailable.",
+def _live_supabase_env() -> tuple[str, str, str, str] | None:
+    url = os.getenv("TEST_SUPABASE_URL", "").strip().rstrip("/")
+    key = os.getenv("TEST_SUPABASE_PUBLISHABLE_KEY", "").strip()
+    jwt_a = os.getenv("TEST_SUPABASE_USER_A_JWT", "").strip()
+    jwt_b = os.getenv("TEST_SUPABASE_USER_B_JWT", "").strip()
+    if url and key and jwt_a and jwt_b:
+        return url, key, jwt_a, jwt_b
+    return None
+
+
+_LIVE_ENV_MISSING = _live_supabase_env() is None
+_LIVE_SKIP_REASON = (
+    "Live Supabase PostgREST RPC integration tests require TEST_SUPABASE_URL, "
+    "TEST_SUPABASE_PUBLISHABLE_KEY, TEST_SUPABASE_USER_A_JWT, and TEST_SUPABASE_USER_B_JWT; "
+    "no isolated test database environment is configured."
 )
-def test_live_supabase_rpc_rls_and_concurrency_integration():  # pragma: no cover
-    """Live two-user integration test executed only against an explicit non-production test DB."""
-    raise AssertionError("Configure isolated test helper if running live Supabase integration.")
+
+
+def _live_rest_headers(publishable_key: str, jwt_token: str) -> dict[str, str]:
+    return {
+        "apikey": publishable_key,
+        "Authorization": f"Bearer {jwt_token}",
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+
+def _live_rest_get(url: str, publishable_key: str, jwt_token: str, table: str, params: dict[str, str]) -> list[dict]:
+    res = requests.get(
+        f"{url}/rest/v1/{table}",
+        params=params,
+        headers=_live_rest_headers(publishable_key, jwt_token),
+        timeout=10,
+    )
+    res.raise_for_status()
+    return res.json()
+
+
+def _live_cleanup_papers(url: str, publishable_key: str, jwt_token: str, paper_ids: set[str]) -> None:
+    if not paper_ids:
+        return
+    ids_filter = f"in.({','.join(sorted(paper_ids))})"
+    requests.delete(
+        f"{url}/rest/v1/papers",
+        params={"id": ids_filter},
+        headers=_live_rest_headers(publishable_key, jwt_token),
+        timeout=10,
+    )
+
+
+@pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
+def test_live_supabase_paper_creation_aliases_and_idempotency(monkeypatch):
+    url, key, jwt_a, _jwt_b = _live_supabase_env()  # type: ignore[misc]
+    monkeypatch.setenv("SUPABASE_URL", url)
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
+
+    run_tag = uuid.uuid4().hex[:12]
+    created_ids: set[str] = set()
+    try:
+        doi = normalize_doi(f"10.99999/rg-live-{run_tag}")
+        res_1 = resolve_or_create_paper(
+            access_token=jwt_a,
+            identifiers=[doi],
+            paper=PaperMetadataInput(title=f"Live Test Paper {run_tag}", source_provider="openalex"),
+        )
+        created_ids.add(str(res_1.paper_id))
+        assert res_1.created is True
+
+        res_2 = resolve_or_create_paper(
+            access_token=jwt_a,
+            identifiers=[normalize_doi(f"https://doi.org/10.99999/RG-LIVE-{run_tag}")],
+        )
+        assert res_2.created is False
+        assert res_2.paper_id == res_1.paper_id
+
+        arxiv = normalize_arxiv(f"2501.{int(uuid.uuid4().int % 89999) + 10000:05d}v2")
+        res_3 = resolve_or_create_paper(access_token=jwt_a, identifiers=[doi, arxiv])
+        assert res_3.created is False and res_3.paper_id == res_1.paper_id
+
+        openalex = normalize_openalex(f"W{9000000000 + (uuid.uuid4().int % 900000000)}")
+        res_4 = resolve_or_create_paper(access_token=jwt_a, identifiers=[arxiv, openalex])
+        assert res_4.created is False and res_4.paper_id == res_1.paper_id
+
+        aliases = _live_rest_get(url, key, jwt_a, "paper_identifiers", {"paper_id": f"eq.{res_1.paper_id}"})
+        assert len(aliases) == 3
+
+        # Multiple previously unknown aliases create one paper row
+        doi_multi = normalize_doi(f"10.99999/rg-multi-{run_tag}")
+        arxiv_multi = normalize_arxiv(f"2502.{int(uuid.uuid4().int % 89999) + 10000:05d}")
+        res_multi = resolve_or_create_paper(access_token=jwt_a, identifiers=[doi_multi, arxiv_multi])
+        created_ids.add(str(res_multi.paper_id))
+        assert res_multi.created is True
+        multi_aliases = _live_rest_get(url, key, jwt_a, "paper_identifiers", {"paper_id": f"eq.{res_multi.paper_id}"})
+        assert len(multi_aliases) == 2
+    finally:
+        _live_cleanup_papers(url, key, jwt_a, created_ids)
+
+
+@pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
+def test_live_supabase_alias_conflict_and_transaction_rollback(monkeypatch):
+    url, key, jwt_a, _jwt_b = _live_supabase_env()  # type: ignore[misc]
+    monkeypatch.setenv("SUPABASE_URL", url)
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
+
+    run_tag = uuid.uuid4().hex[:12]
+    created_ids: set[str] = set()
+    try:
+        doi_a = normalize_doi(f"10.99999/rg-conflict-a-{run_tag}")
+        arxiv_b = normalize_arxiv(f"2503.{int(uuid.uuid4().int % 89999) + 10000:05d}")
+        oa_unregistered = normalize_openalex(f"W{8000000000 + (uuid.uuid4().int % 900000000)}")
+
+        res_a = resolve_or_create_paper(access_token=jwt_a, identifiers=[doi_a])
+        res_b = resolve_or_create_paper(access_token=jwt_a, identifiers=[arxiv_b])
+        created_ids.update({str(res_a.paper_id), str(res_b.paper_id)})
+        assert res_a.paper_id != res_b.paper_id
+
+        with pytest.raises(AliasConflictError) as exc_info:
+            resolve_or_create_paper(access_token=jwt_a, identifiers=[doi_a, arxiv_b, oa_unregistered])
+
+        assert set(exc_info.value.conflicting_paper_ids) == {str(res_a.paper_id), str(res_b.paper_id)}
+
+        # Ensure conflict rolled back completely and left no extra alias
+        oa_rows = _live_rest_get(
+            url,
+            key,
+            jwt_a,
+            "paper_identifiers",
+            {"identifier_type": "eq.openalex", "normalized_value": f"eq.{oa_unregistered.normalized_value}"},
+        )
+        assert oa_rows == []
+        doi_rows = _live_rest_get(
+            url, key, jwt_a, "paper_identifiers", {"normalized_value": f"eq.{doi_a.normalized_value}"}
+        )
+        arxiv_rows = _live_rest_get(
+            url, key, jwt_a, "paper_identifiers", {"normalized_value": f"eq.{arxiv_b.normalized_value}"}
+        )
+        assert doi_rows[0]["paper_id"] == str(res_a.paper_id)
+        assert arxiv_rows[0]["paper_id"] == str(res_b.paper_id)
+    finally:
+        _live_cleanup_papers(url, key, jwt_a, created_ids)
+
+
+@pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
+def test_live_supabase_concurrent_resolution_advisory_locks_and_conflicts(monkeypatch):
+    url, key, jwt_a, _jwt_b = _live_supabase_env()  # type: ignore[misc]
+    monkeypatch.setenv("SUPABASE_URL", url)
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
+
+    run_tag = uuid.uuid4().hex[:12]
+    created_ids: set[str] = set()
+    try:
+        doi = normalize_doi(f"10.99999/rg-concurrent-{run_tag}")
+        arxiv = normalize_arxiv(f"2504.{int(uuid.uuid4().int % 89999) + 10000:05d}")
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            futures = [
+                pool.submit(
+                    resolve_or_create_paper,
+                    access_token=jwt_a,
+                    identifiers=[doi] if i % 2 == 0 else [doi, arxiv],
+                )
+                for i in range(8)
+            ]
+            results = [f.result() for f in futures]
+
+        winning_ids = {str(r.paper_id) for r in results}
+        created_ids.update(winning_ids)
+        assert len(winning_ids) == 1
+        assert sum(1 for r in results if r.created) == 1
+
+        alias_rows = _live_rest_get(
+            url, key, jwt_a, "paper_identifiers", {"normalized_value": f"in.({doi.normalized_value},{arxiv.normalized_value})"}
+        )
+        assert {row["paper_id"] for row in alias_rows} == winning_ids
+        assert len(alias_rows) == 2
+    finally:
+        _live_cleanup_papers(url, key, jwt_a, created_ids)
+
+
+@pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
+def test_live_supabase_rls_user_isolation_and_unauthenticated_rejection(monkeypatch):
+    url, key, jwt_a, jwt_b = _live_supabase_env()  # type: ignore[misc]
+    monkeypatch.setenv("SUPABASE_URL", url)
+    monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
+
+    run_tag = uuid.uuid4().hex[:12]
+    ids_a: set[str] = set()
+    ids_b: set[str] = set()
+    try:
+        shared_doi = normalize_doi(f"10.99999/rg-rls-{run_tag}")
+        res_a = resolve_or_create_paper(access_token=jwt_a, identifiers=[shared_doi])
+        res_b = resolve_or_create_paper(access_token=jwt_b, identifiers=[shared_doi])
+        ids_a.add(str(res_a.paper_id))
+        ids_b.add(str(res_b.paper_id))
+
+        assert res_a.paper_id != res_b.paper_id
+        assert _live_rest_get(url, key, jwt_a, "papers", {"id": f"eq.{res_b.paper_id}"}) == []
+        assert _live_rest_get(url, key, jwt_b, "papers", {"id": f"eq.{res_a.paper_id}"}) == []
+        assert _live_rest_get(url, key, jwt_a, "paper_identifiers", {"paper_id": f"eq.{res_b.paper_id}"}) == []
+        assert _live_rest_get(url, key, jwt_b, "paper_identifiers", {"paper_id": f"eq.{res_a.paper_id}"}) == []
+
+        # Attempt to spoof owner_id in raw RPC p_paper JSON payload
+        spoof_doi = normalize_doi(f"10.99999/rg-spoof-{run_tag}")
+        spoof_res = requests.post(
+            f"{url}/rest/v1/rpc/resolve_or_create_paper",
+            json={
+                "p_identifiers": [
+                    {
+                        "identifier_type": "doi",
+                        "original_value": spoof_doi.original_value,
+                        "normalized_value": spoof_doi.normalized_value,
+                    }
+                ],
+                "p_paper": {"owner_id": USER_B, "title": "Owner Spoof Attempt"},
+            },
+            headers=_live_rest_headers(key, jwt_a),
+            timeout=10,
+        )
+        spoof_res.raise_for_status()
+        spoof_paper_id = spoof_res.json()["paper_id"]
+        ids_a.add(spoof_paper_id)
+        assert _live_rest_get(url, key, jwt_b, "papers", {"id": f"eq.{spoof_paper_id}"}) == []
+        assert len(_live_rest_get(url, key, jwt_a, "papers", {"id": f"eq.{spoof_paper_id}"})) == 1
+
+        # Unauthenticated RPC call (anon key only, no Bearer JWT) must be rejected
+        unauth_res = requests.post(
+            f"{url}/rest/v1/rpc/resolve_or_create_paper",
+            json={
+                "p_identifiers": [
+                    {
+                        "identifier_type": "doi",
+                        "original_value": shared_doi.original_value,
+                        "normalized_value": shared_doi.normalized_value,
+                    }
+                ],
+                "p_paper": {"title": "Unauthenticated Attempt"},
+            },
+            headers={"apikey": key, "Content-Type": "application/json"},
+            timeout=10,
+        )
+        assert unauth_res.status_code in (401, 403)
+    finally:
+        _live_cleanup_papers(url, key, jwt_a, ids_a)
+        _live_cleanup_papers(url, key, jwt_b, ids_b)
+
+
+@pytest.mark.skipif(
+    not os.getenv("TEST_POSTGRES_DSN", "").strip(),
+    reason=(
+        "Direct PostgreSQL 23505 savepoint recovery test requires TEST_POSTGRES_DSN and psycopg "
+        "against an isolated non-production PostgreSQL instance; local Postgres/Docker is unavailable."
+    ),
+)
+def test_live_postgres_direct_23505_unique_violation_recovery():  # pragma: no cover
+    psycopg = pytest.importorskip("psycopg")
+    dsn = os.environ["TEST_POSTGRES_DSN"].strip()
+    user_a_id = str(uuid.UUID(USER_A))
+    test_doi = f"10.99999/rg-23505-{uuid.uuid4().hex[:12]}"
+
+    # Out-of-band concurrent writer inserts an uncommitted identifier row so the RPC thread blocks
+    # on the unique index tuple lock, then wakes on commit with genuine SQLSTATE 23505 inside its
+    # PL/pgSQL subtransaction block and rolls back its uncommitted papers insert cleanly.
+    with psycopg.connect(dsn, autocommit=False) as conn_winner:
+        winner_paper_id = str(uuid.uuid4())
+        with conn_winner.cursor() as cur_w:
+            cur_w.execute(
+                "insert into public.papers (id, owner_id, title) values (%s, %s, 'Winner')",
+                (winner_paper_id, user_a_id),
+            )
+            cur_w.execute(
+                "insert into public.paper_identifiers (owner_id, paper_id, identifier_type, original_value, normalized_value) "
+                "values (%s, %s, 'doi', %s, %s)",
+                (user_a_id, winner_paper_id, test_doi, test_doi),
+            )
+
+        racer_started = threading.Event()
+
+        def run_racer():
+            with psycopg.connect(dsn, autocommit=False) as conn_racer:
+                with conn_racer.cursor() as cur_r:
+                    cur_r.execute("set local role authenticated")
+                    cur_r.execute("select set_config('request.jwt.claim.sub', %s, true)", (user_a_id,))
+                    racer_started.set()
+                    cur_r.execute(
+                        "select public.resolve_or_create_paper(%s::jsonb, %s::jsonb)",
+                        (
+                            f'[{{"identifier_type":"doi","original_value":"{test_doi}","normalized_value":"{test_doi}"}}]',
+                            '{"title":"Racer"}',
+                        ),
+                    )
+                    res = cur_r.fetchone()[0]
+                conn_racer.commit()
+                return res
+
+        try:
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                future = pool.submit(run_racer)
+                racer_started.wait(timeout=5)
+                # Allow racer to reach the blocked unique index check before committing winner
+                threading.Event().wait(0.25)
+                conn_winner.commit()
+                rpc_result = future.result(timeout=10)
+
+            assert rpc_result["paper_id"] == winner_paper_id
+            assert rpc_result["created"] is False
+
+            with conn_winner.cursor() as cur_chk:
+                cur_chk.execute(
+                    "select count(*) from public.papers where owner_id = %s and title in ('Winner', 'Racer')",
+                    (user_a_id,),
+                )
+                assert cur_chk.fetchone()[0] == 1
+        finally:
+            with conn_winner.cursor() as cur_del:
+                cur_del.execute("delete from public.papers where id = %s", (winner_paper_id,))
+            conn_winner.commit()
