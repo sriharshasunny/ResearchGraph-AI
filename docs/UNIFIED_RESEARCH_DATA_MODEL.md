@@ -89,7 +89,7 @@ Each indexed chunk uses a stable chunk ID and scalar metadata:
 
 | Field | Meaning |
 |---|---|
-| user_id | Authenticated owner UUID, stored as a string |
+| owner_id | Authenticated owner UUID, stored as a string |
 | paper_id | Internal Supabase paper UUID, stored as a string |
 | chunk_id | Stable chunk UUID/hash |
 | asset_id | Source paper asset UUID, when a PDF asset exists |
@@ -111,7 +111,7 @@ At retrieval time:
 ```python
 where = {
     "$and": [
-        {"user_id": authenticated_user_id},
+        {"owner_id": authenticated_user_id},
         {"paper_id": {"$in": allowed_paper_ids}},
     ]
 }
@@ -158,7 +158,7 @@ Construct entity keys within an owner namespace, for example by hashing owner UU
 The current backend has legacy behavior that must not be mistaken for the new contract:
 
 - Current paper IDs are provider IDs such as OpenAlex work IDs or arXiv IDs.
-- The Chroma collection currently defaults to `researchgraph_public`; existing chunk metadata has `paper_id` but does not yet consistently have `user_id`.
+- The Chroma collection currently defaults to `researchgraph_public`; existing chunk metadata has `paper_id` but does not yet consistently have `owner_id`.
 - Neo4j currently stores direct Paper-to-entity relationships and uses globally unique entity keys.
 - Ingestion status currently lives in a local SQLite file.
 - The frontend currently saves selected/saved paper state in localStorage.
@@ -169,7 +169,7 @@ During the later data-migration step:
 1. Create internal paper UUIDs for papers that are deliberately adopted by a user.
 2. Store each old provider ID as a row in paper_identifiers.
 3. Establish workspace_papers membership explicitly.
-4. Re-chunk/re-index under the new internal paper UUID and user_id metadata, or run a verified one-time metadata migration where the source ownership is known.
+4. Re-chunk/re-index under the new internal paper UUID and owner_id metadata, or run a verified one-time metadata migration where the source ownership is known.
 5. Build the claim-based Neo4j representation alongside the legacy representation, compare results, then switch reads.
 6. Do not assign owner_id to legacy shared records unless the actual owner is known. Do not expose ownerless legacy records through authenticated workspace retrieval.
 

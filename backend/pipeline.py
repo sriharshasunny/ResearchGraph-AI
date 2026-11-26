@@ -65,7 +65,21 @@ def _status_conn():
     return conn
 
 
+def _require_owner_id(owner_id: str) -> str:
+    if not isinstance(owner_id, str) or not owner_id.strip():
+        raise PipelineError("An authenticated owner_id is required.")
+    return owner_id.strip()
+
+
+def _require_paper_id(paper_id: str) -> str:
+    if not isinstance(paper_id, str) or not paper_id.strip():
+        raise PipelineError("A valid paper_id is required.")
+    return paper_id.strip()
+
+
 def _save_status(owner_id: str, paper_id: str, **updates: Any) -> dict[str, Any]:
+    owner_id = _require_owner_id(owner_id)
+    paper_id = _require_paper_id(paper_id)
     current = get_ingestion_status(owner_id, paper_id) or {
         "paper_id": paper_id, "status": "discovered",
         "vector_ready": False, "graph_ready": False,
@@ -84,6 +98,8 @@ def _save_status(owner_id: str, paper_id: str, **updates: Any) -> dict[str, Any]
 
 
 def get_ingestion_status(owner_id: str, paper_id: str) -> dict[str, Any] | None:
+    owner_id = _require_owner_id(owner_id)
+    paper_id = _require_paper_id(paper_id)
     with _status_conn() as conn:
         row = conn.execute(
             "SELECT data FROM paper_statuses WHERE owner_id=? AND paper_id=?",
@@ -294,6 +310,7 @@ def _extract_pdf(path: Path) -> list[dict[str, Any]]:
 
 
 def _chunks(metadata: dict[str, Any], pages: list[dict[str, Any]], owner_id: str) -> list[dict[str, Any]]:
+    owner_id = _require_owner_id(owner_id)
     result: list[dict[str, Any]] = []
     overlap = max(0, min(CHUNK_OVERLAP, CHUNK_SIZE // 2))
     for page in pages:
@@ -454,16 +471,19 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
 
 
 def _scoped_graph_key(owner_id: str, entity_type: str, raw_key: str) -> str:
+    owner_id = _require_owner_id(owner_id)
     return hashlib.sha256(f"{owner_id}|{entity_type}|{raw_key}".encode("utf-8")).hexdigest()
 
 
 def _write_graph(owner_id: str, metadata: dict[str, Any], entities: list[dict[str, Any]], relations: list[dict[str, Any]]) -> None:
+    owner_id = _require_owner_id(owner_id)
+    paper_id = _require_paper_id(str(metadata.get("id") or ""))
     driver = _neo4j_driver()
-    paper_id = metadata["id"]
     paper_key = _scoped_graph_key(owner_id, "Paper", paper_id)
     scoped_entity_keys = {
         (entity["type"], entity["key"]): _scoped_graph_key(owner_id, entity["type"], entity["key"])
         for entity in entities
+        if entity.get("type") in ALLOWED_ENTITY_TYPES and entity.get("type") != "Paper"
     }
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
@@ -480,16 +500,19 @@ def _write_graph(owner_id: str, metadata: dict[str, Any], entities: list[dict[st
                 owner_id=owner_id,
             ).consume()
             for entity in entities:
-                entity_key = scoped_entity_keys[(entity["type"], entity["key"])]
+                entity_type = entity.get("type")
+                if entity_type not in ALLOWED_ENTITY_TYPES or entity_type == "Paper":
+                    continue
+                entity_key = scoped_entity_keys[(entity_type, entity["key"])]
                 session.run(
                     "MERGE (e:ResearchEntity {key:$key}) "
                     "SET e.name=$name,e.type=$type,e.owner_id=$owner_id",
-                    key=entity_key, name=entity["name"], type=entity["type"],
+                    key=entity_key, name=entity["name"], type=entity_type,
                     owner_id=owner_id,
                 ).consume()
                 session.run(
                     "MATCH (e:ResearchEntity {key:$key, owner_id:$owner_id}) "
-                    "SET e:`" + entity["type"] + "`",
+                    "SET e:`" + entity_type + "`",
                     key=entity_key, owner_id=owner_id,
                 ).consume()
             for relation in relations:
@@ -525,6 +548,7 @@ def _write_graph(owner_id: str, metadata: dict[str, Any], entities: list[dict[st
 
 
 def _index_chunks(owner_id: str, chunks: list[dict[str, Any]]) -> None:
+    owner_id = _require_owner_id(owner_id)
     if not chunks:
         raise PipelineError("No indexable text chunks were produced.")
     provider = EmbeddingProvider()
@@ -532,7 +556,14 @@ def _index_chunks(owner_id: str, chunks: list[dict[str, Any]]) -> None:
     for start in range(0, len(chunks), 64):
         batch = chunks[start:start + 64]
         vectors = provider.embed([chunk["text"] for chunk in batch])
-        metadatas = [{**chunk["metadata"], "owner_id": owner_id} for chunk in batch]
+        metadatas = []
+        for chunk in batch:
+            raw_meta = dict(chunk.get("metadata") or {})
+            paper_id = _require_paper_id(str(raw_meta.get("paper_id") or ""))
+            cleaned_meta = {k: v for k, v in raw_meta.items() if v is not None}
+            cleaned_meta["paper_id"] = paper_id
+            cleaned_meta["owner_id"] = owner_id
+            metadatas.append(cleaned_meta)
         collection.upsert(
             ids=[chunk["id"] for chunk in batch],
             documents=[chunk["text"] for chunk in batch],
@@ -642,13 +673,18 @@ def start_ingestion(owner_id: str, paper_id: str) -> dict[str, Any]:
 
 
 def _query_chunks(owner_id: str, question: str, paper_ids: list[str], limit: int = 8) -> list[dict[str, Any]]:
+    owner_id = _require_owner_id(owner_id)
+    allowed_paper_ids = list(
+        dict.fromkeys(pid.strip() for pid in (paper_ids or []) if isinstance(pid, str) and pid.strip())
+    )
     # An empty selection is never an unrestricted/global query.
-    if not paper_ids:
+    if not allowed_paper_ids:
         return []
+    allowed_set = set(allowed_paper_ids)
     provider = EmbeddingProvider()
     query_vector = provider.embed([question])[0]
     collection = _chroma_collection()
-    where = {"$and": [{"owner_id": owner_id}, {"paper_id": {"$in": paper_ids}}]}
+    where = {"$and": [{"owner_id": owner_id}, {"paper_id": {"$in": allowed_paper_ids}}]}
     try:
         result = collection.query(
             query_embeddings=[query_vector], n_results=limit, where=where,
@@ -661,19 +697,36 @@ def _query_chunks(owner_id: str, question: str, paper_ids: list[str], limit: int
     ids = (result.get("ids") or [[]])[0]
     distances = (result.get("distances") or [[]])[0]
     max_distance = float(os.getenv("RAG_MAX_COSINE_DISTANCE", "0.65"))
-    return [
-        {"chunk_id": ids[index], "text": text, "metadata": metas[index] or {},
-         "distance": distances[index] if index < len(distances) else None}
-        for index, text in enumerate(docs)
-        if text and (index >= len(distances) or distances[index] <= max_distance)
-        and (metas[index] or {}).get("owner_id") == owner_id
-        and (metas[index] or {}).get("paper_id") in paper_ids
-    ]
+    rows: list[dict[str, Any]] = []
+    for index, text in enumerate(docs):
+        if not text:
+            continue
+        if index >= len(ids) or not ids[index]:
+            continue
+        if index < len(distances) and distances[index] > max_distance:
+            continue
+        meta = metas[index] if index < len(metas) else None
+        if not isinstance(meta, dict):
+            continue
+        if meta.get("owner_id") != owner_id or meta.get("paper_id") not in allowed_set:
+            continue
+        rows.append({
+            "chunk_id": ids[index],
+            "text": text,
+            "metadata": meta,
+            "distance": distances[index] if index < len(distances) else None,
+        })
+    return rows
 
 
 def _query_graph(owner_id: str, paper_ids: list[str], terms: list[str]) -> list[dict[str, Any]]:
-    if not paper_ids:
+    owner_id = _require_owner_id(owner_id)
+    allowed_paper_ids = list(
+        dict.fromkeys(pid.strip() for pid in (paper_ids or []) if isinstance(pid, str) and pid.strip())
+    )
+    if not allowed_paper_ids or not terms:
         return []
+    allowed_set = set(allowed_paper_ids)
     driver = _neo4j_driver()
     try:
         query = (
@@ -682,12 +735,22 @@ def _query_graph(owner_id: str, paper_ids: list[str], terms: list[str]) -> list[
             "AND r.owner_id=$owner_id AND p.paper_id IN $paper_ids "
             "AND any(term IN $terms WHERE toLower(n.name) CONTAINS toLower(term)) "
             "RETURN p.paper_id AS paper_id,p.name AS paper_title,type(r) AS relation,"
-            "n.name AS entity,n.type AS entity_type,r.evidence AS evidence,r.page AS page LIMIT 40"
+            "n.name AS entity,n.type AS entity_type,r.evidence AS evidence,r.page AS page,"
+            "p.owner_id AS p_owner_id,n.owner_id AS n_owner_id,r.owner_id AS r_owner_id LIMIT 40"
         )
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
-            return [record.data() for record in session.run(
-                query, owner_id=owner_id, paper_ids=paper_ids, terms=terms
-            )]
+            verified: list[dict[str, Any]] = []
+            for record in session.run(query, owner_id=owner_id, paper_ids=allowed_paper_ids, terms=terms):
+                data = record.data()
+                if (
+                    data.pop("p_owner_id", None) != owner_id
+                    or data.pop("n_owner_id", None) != owner_id
+                    or data.pop("r_owner_id", None) != owner_id
+                    or data.get("paper_id") not in allowed_set
+                ):
+                    continue
+                verified.append(data)
+            return verified
     except Exception as exc:
         raise PipelineError("Knowledge graph retrieval failed. Confirm Neo4j is reachable and graph data has been indexed.") from exc
     finally:
@@ -737,6 +800,8 @@ def query_research(owner_id: str, question: str, paper_ids: list[str] | None = N
 
 
 def get_paper_chunks(owner_id: str, paper_id: str, limit: int = 100) -> list[dict[str, Any]]:
+    owner_id = _require_owner_id(owner_id)
+    paper_id = _require_paper_id(paper_id)
     collection = _chroma_collection()
     try:
         result = collection.get(
@@ -747,20 +812,23 @@ def get_paper_chunks(owner_id: str, paper_id: str, limit: int = 100) -> list[dic
         raise PipelineError("ChromaDB could not load the paper's indexed passages.") from exc
     rows = []
     for item_id, text, meta in zip(result.get("ids", []), result.get("documents", []), result.get("metadatas", [])):
-        metadata = meta or {}
-        if metadata.get("owner_id") == owner_id and metadata.get("paper_id") == paper_id:
-            rows.append({"chunk_id": item_id, "text": text, "metadata": metadata})
+        if not item_id or not isinstance(meta, dict):
+            continue
+        if meta.get("owner_id") == owner_id and meta.get("paper_id") == paper_id:
+            rows.append({"chunk_id": item_id, "text": text, "metadata": meta})
     return rows
 
 
 def get_graph_for_paper(owner_id: str, paper_id: str) -> dict[str, Any]:
+    owner_id = _require_owner_id(owner_id)
+    paper_id = _require_paper_id(paper_id)
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             records = session.run(
                 "MATCH (p:Paper {owner_id:$owner_id, paper_id:$paper_id})-[r]-(n:ResearchEntity {owner_id:$owner_id}) "
                 "WHERE r.owner_id=$owner_id "
-                "RETURN p,n,type(r) AS relation,r.evidence AS evidence,r.page AS page LIMIT 150",
+                "RETURN p,n,type(r) AS relation,r.evidence AS evidence,r.page AS page,r.owner_id AS r_owner_id LIMIT 150",
                 owner_id=owner_id, paper_id=paper_id,
             )
             nodes: dict[str, dict[str, Any]] = {}
@@ -768,6 +836,13 @@ def get_graph_for_paper(owner_id: str, paper_id: str) -> dict[str, Any]:
             for row in records:
                 paper = dict(row["p"])
                 entity = dict(row["n"])
+                if (
+                    paper.get("owner_id") != owner_id
+                    or paper.get("paper_id") != paper_id
+                    or entity.get("owner_id") != owner_id
+                    or row.get("r_owner_id") != owner_id
+                ):
+                    continue
                 for item, is_paper in ((paper, True), (entity, False)):
                     key = item.get("key")
                     if key:
@@ -783,6 +858,7 @@ def get_graph_for_paper(owner_id: str, paper_id: str) -> dict[str, Any]:
 
 
 def get_graph(owner_id: str, limit: int = 500) -> dict[str, Any]:
+    owner_id = _require_owner_id(owner_id)
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
@@ -795,6 +871,12 @@ def get_graph(owner_id: str, limit: int = 500) -> dict[str, Any]:
             edges = []
             for row in records:
                 source, target, relationship = dict(row["a"]), dict(row["b"]), row["r"]
+                if (
+                    source.get("owner_id") != owner_id
+                    or target.get("owner_id") != owner_id
+                    or relationship.get("owner_id") != owner_id
+                ):
+                    continue
                 for item in (source, target):
                     key = item.get("key")
                     if key:
@@ -808,6 +890,7 @@ def get_graph(owner_id: str, limit: int = 500) -> dict[str, Any]:
 
 
 def get_graph_search(owner_id: str, query: str, limit: int = 20) -> list[dict[str, Any]]:
+    owner_id = _require_owner_id(owner_id)
     driver = _neo4j_driver()
     try:
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
@@ -815,10 +898,16 @@ def get_graph_search(owner_id: str, query: str, limit: int = 20) -> list[dict[st
                 "MATCH (n:ResearchEntity {owner_id:$owner_id}) "
                 "WHERE toLower(n.name) CONTAINS toLower($query) "
                 "RETURN n.key AS id,n.name AS label,n.type AS type,n.paper_id AS paperId,"
-                "n.source_url AS sourceUrl LIMIT $limit",
+                "n.source_url AS sourceUrl,n.owner_id AS owner_id LIMIT $limit",
                 owner_id=owner_id, query=query, limit=limit,
             )
-            return [record.data() for record in records]
+            verified: list[dict[str, Any]] = []
+            for record in records:
+                data = record.data()
+                if data.pop("owner_id", None) != owner_id:
+                    continue
+                verified.append(data)
+            return verified
     except Exception as exc:
         raise PipelineError("Neo4j graph search is unavailable.") from exc
     finally:
