@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+import importlib
 import os
 import threading
+import time
 import uuid
 
 import pytest
@@ -11,10 +13,12 @@ import requests
 
 from backend import paper_identity
 from backend.identifiers import (
+    InvalidIdentifierError,
     NormalizedIdentifier,
     normalize_arxiv,
     normalize_doi,
     normalize_openalex,
+    normalize_uuid,
 )
 from backend.paper_identity import (
     AliasConflictError,
@@ -333,11 +337,41 @@ def _live_supabase_env() -> tuple[str, str, str, str] | None:
     return None
 
 
-_LIVE_ENV_MISSING = _live_supabase_env() is None
+def _strict_live_mode_enabled() -> bool:
+    return os.getenv("REQUIRE_LIVE_IDENTITY_TESTS", "").strip() == "1"
+
+
+def _require_live_supabase_env() -> tuple[str, str, str, str]:
+    env = _live_supabase_env()
+    if env is None:
+        raise AssertionError(
+            "REQUIRE_LIVE_IDENTITY_TESTS=1 is set, but TEST_SUPABASE_URL, "
+            "TEST_SUPABASE_PUBLISHABLE_KEY, TEST_SUPABASE_USER_A_JWT, and TEST_SUPABASE_USER_B_JWT "
+            "are not all configured."
+        )
+    return env
+
+
+def _require_live_postgres_env() -> tuple[str, str, str, str, str]:
+    url, key, jwt_a, jwt_b = _require_live_supabase_env()
+    dsn = os.getenv("TEST_POSTGRES_DSN", "").strip()
+    if not dsn:
+        raise AssertionError("TEST_POSTGRES_DSN must be configured for direct PostgreSQL 23505 tests.")
+    return url, key, jwt_a, jwt_b, dsn
+
+
+_LIVE_ENV_MISSING = _live_supabase_env() is None and not _strict_live_mode_enabled()
+_DIRECT_PG_ENV_MISSING = (
+    (_live_supabase_env() is None or not os.getenv("TEST_POSTGRES_DSN", "").strip())
+    and not _strict_live_mode_enabled()
+)
 _LIVE_SKIP_REASON = (
-    "Live Supabase PostgREST RPC integration tests require TEST_SUPABASE_URL, "
-    "TEST_SUPABASE_PUBLISHABLE_KEY, TEST_SUPABASE_USER_A_JWT, and TEST_SUPABASE_USER_B_JWT; "
-    "no isolated test database environment is configured."
+    "[SKIPPED - NOT LIVE VERIFIED] Requires TEST_SUPABASE_URL, TEST_SUPABASE_PUBLISHABLE_KEY, "
+    "TEST_SUPABASE_USER_A_JWT, and TEST_SUPABASE_USER_B_JWT (set REQUIRE_LIVE_IDENTITY_TESTS=1 to fail instead of skip)."
+)
+_DIRECT_PG_SKIP_REASON = (
+    "[SKIPPED - NOT LIVE VERIFIED] Requires TEST_POSTGRES_DSN and TEST_SUPABASE_* test user env vars "
+    "(set REQUIRE_LIVE_IDENTITY_TESTS=1 to fail instead of skip)."
 )
 
 
@@ -348,6 +382,28 @@ def _live_rest_headers(publishable_key: str, jwt_token: str) -> dict[str, str]:
         "Accept": "application/json",
         "Content-Type": "application/json",
     }
+
+
+def _verify_test_user_identity(url: str, publishable_key: str, jwt_token: str, label: str) -> str:
+    """Resolve and verify a real authenticated Supabase user UUID without logging tokens."""
+    res = requests.get(
+        f"{url}/auth/v1/user",
+        headers={
+            "apikey": publishable_key,
+            "Authorization": f"Bearer {jwt_token}",
+            "Accept": "application/json",
+        },
+        timeout=10,
+    )
+    if res.status_code != 200:
+        raise AssertionError(f"{label} JWT could not be verified via /auth/v1/user (HTTP {res.status_code}).")
+    payload = res.json()
+    if not isinstance(payload, dict) or payload.get("is_anonymous") is True:
+        raise AssertionError(f"{label} must be a non-anonymous authenticated user.")
+    try:
+        return normalize_uuid(str(payload.get("id") or ""))
+    except InvalidIdentifierError as exc:
+        raise AssertionError(f"{label} returned an invalid user UUID from /auth/v1/user.") from exc
 
 
 def _live_rest_get(url: str, publishable_key: str, jwt_token: str, table: str, params: dict[str, str]) -> list[dict]:
@@ -365,17 +421,37 @@ def _live_cleanup_papers(url: str, publishable_key: str, jwt_token: str, paper_i
     if not paper_ids:
         return
     ids_filter = f"in.({','.join(sorted(paper_ids))})"
-    requests.delete(
+    res = requests.delete(
         f"{url}/rest/v1/papers",
         params={"id": ids_filter},
         headers=_live_rest_headers(publishable_key, jwt_token),
         timeout=10,
     )
+    if res.status_code not in (200, 204):
+        raise AssertionError(f"Test cleanup DELETE /rest/v1/papers failed with HTTP {res.status_code}.")
+
+
+def _import_psycopg_for_dsn_test():
+    try:
+        return importlib.import_module("psycopg")
+    except ImportError as exc:
+        raise RuntimeError(
+            "TEST_POSTGRES_DSN is configured, so psycopg must be installed (see requirements-dev.txt)."
+        ) from exc
+
+
+def _wait_until_racer_blocked(check_fn, *, timeout_seconds: float = 5.0, poll_interval: float = 0.05) -> None:
+    deadline = time.monotonic() + timeout_seconds
+    while time.monotonic() < deadline:
+        if check_fn():
+            return
+        time.sleep(poll_interval)
+    raise TimeoutError("Timed out waiting for competing transaction to block on expected unique-index lock.")
 
 
 @pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
 def test_live_supabase_paper_creation_aliases_and_idempotency(monkeypatch):
-    url, key, jwt_a, _jwt_b = _live_supabase_env()  # type: ignore[misc]
+    url, key, jwt_a, _jwt_b = _require_live_supabase_env()
     monkeypatch.setenv("SUPABASE_URL", url)
     monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
 
@@ -423,7 +499,7 @@ def test_live_supabase_paper_creation_aliases_and_idempotency(monkeypatch):
 
 @pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
 def test_live_supabase_alias_conflict_and_transaction_rollback(monkeypatch):
-    url, key, jwt_a, _jwt_b = _live_supabase_env()  # type: ignore[misc]
+    url, key, jwt_a, _jwt_b = _require_live_supabase_env()
     monkeypatch.setenv("SUPABASE_URL", url)
     monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
 
@@ -467,7 +543,7 @@ def test_live_supabase_alias_conflict_and_transaction_rollback(monkeypatch):
 
 @pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
 def test_live_supabase_concurrent_resolution_advisory_locks_and_conflicts(monkeypatch):
-    url, key, jwt_a, _jwt_b = _live_supabase_env()  # type: ignore[misc]
+    url, key, jwt_a, _jwt_b = _require_live_supabase_env()
     monkeypatch.setenv("SUPABASE_URL", url)
     monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
 
@@ -504,9 +580,13 @@ def test_live_supabase_concurrent_resolution_advisory_locks_and_conflicts(monkey
 
 @pytest.mark.skipif(_LIVE_ENV_MISSING, reason=_LIVE_SKIP_REASON)
 def test_live_supabase_rls_user_isolation_and_unauthenticated_rejection(monkeypatch):
-    url, key, jwt_a, jwt_b = _live_supabase_env()  # type: ignore[misc]
+    url, key, jwt_a, jwt_b = _require_live_supabase_env()
     monkeypatch.setenv("SUPABASE_URL", url)
     monkeypatch.setenv("SUPABASE_PUBLISHABLE_KEY", key)
+
+    user_a_id = _verify_test_user_identity(url, key, jwt_a, "TEST_SUPABASE_USER_A_JWT")
+    user_b_id = _verify_test_user_identity(url, key, jwt_b, "TEST_SUPABASE_USER_B_JWT")
+    assert user_a_id != user_b_id
 
     run_tag = uuid.uuid4().hex[:12]
     ids_a: set[str] = set()
@@ -524,7 +604,7 @@ def test_live_supabase_rls_user_isolation_and_unauthenticated_rejection(monkeypa
         assert _live_rest_get(url, key, jwt_a, "paper_identifiers", {"paper_id": f"eq.{res_b.paper_id}"}) == []
         assert _live_rest_get(url, key, jwt_b, "paper_identifiers", {"paper_id": f"eq.{res_a.paper_id}"}) == []
 
-        # Attempt to spoof owner_id in raw RPC p_paper JSON payload
+        # Attempt to spoof owner_id in raw RPC p_paper JSON payload using verified User B UUID
         spoof_doi = normalize_doi(f"10.99999/rg-spoof-{run_tag}")
         spoof_res = requests.post(
             f"{url}/rest/v1/rpc/resolve_or_create_paper",
@@ -536,7 +616,7 @@ def test_live_supabase_rls_user_isolation_and_unauthenticated_rejection(monkeypa
                         "normalized_value": spoof_doi.normalized_value,
                     }
                 ],
-                "p_paper": {"owner_id": USER_B, "title": "Owner Spoof Attempt"},
+                "p_paper": {"owner_id": user_b_id, "title": "Owner Spoof Attempt"},
             },
             headers=_live_rest_headers(key, jwt_a),
             timeout=10,
@@ -569,25 +649,22 @@ def test_live_supabase_rls_user_isolation_and_unauthenticated_rejection(monkeypa
         _live_cleanup_papers(url, key, jwt_b, ids_b)
 
 
-@pytest.mark.skipif(
-    not os.getenv("TEST_POSTGRES_DSN", "").strip(),
-    reason=(
-        "Direct PostgreSQL 23505 savepoint recovery test requires TEST_POSTGRES_DSN and psycopg "
-        "against an isolated non-production PostgreSQL instance; local Postgres/Docker is unavailable."
-    ),
-)
+@pytest.mark.skipif(_DIRECT_PG_ENV_MISSING, reason=_DIRECT_PG_SKIP_REASON)
 def test_live_postgres_direct_23505_unique_violation_recovery():  # pragma: no cover
-    psycopg = pytest.importorskip("psycopg")
-    dsn = os.environ["TEST_POSTGRES_DSN"].strip()
-    user_a_id = str(uuid.UUID(USER_A))
+    url, key, jwt_a, _jwt_b, dsn = _require_live_postgres_env()
+    psycopg = _import_psycopg_for_dsn_test()
+    user_a_id = _verify_test_user_identity(url, key, jwt_a, "TEST_SUPABASE_USER_A_JWT")
     test_doi = f"10.99999/rg-23505-{uuid.uuid4().hex[:12]}"
 
-    # Out-of-band concurrent writer inserts an uncommitted identifier row so the RPC thread blocks
-    # on the unique index tuple lock, then wakes on commit with genuine SQLSTATE 23505 inside its
-    # PL/pgSQL subtransaction block and rolls back its uncommitted papers insert cleanly.
     with psycopg.connect(dsn, autocommit=False) as conn_winner:
-        winner_paper_id = str(uuid.uuid4())
         with conn_winner.cursor() as cur_w:
+            cur_w.execute("select exists(select 1 from auth.users where id = %s)", (user_a_id,))
+            assert cur_w.fetchone()[0] is True, "Verified test user must exist in auth.users."
+
+            cur_w.execute("select pg_backend_pid()")
+            winner_pid = cur_w.fetchone()[0]
+
+            winner_paper_id = str(uuid.uuid4())
             cur_w.execute(
                 "insert into public.papers (id, owner_id, title) values (%s, %s, 'Winner')",
                 (winner_paper_id, user_a_id),
@@ -598,14 +675,18 @@ def test_live_postgres_direct_23505_unique_violation_recovery():  # pragma: no c
                 (user_a_id, winner_paper_id, test_doi, test_doi),
             )
 
-        racer_started = threading.Event()
+        racer_pid_lock = threading.Lock()
+        racer_pid_holder: dict[str, int | None] = {"pid": None}
 
         def run_racer():
             with psycopg.connect(dsn, autocommit=False) as conn_racer:
                 with conn_racer.cursor() as cur_r:
+                    cur_r.execute("select pg_backend_pid()")
+                    racer_pid = cur_r.fetchone()[0]
+                    with racer_pid_lock:
+                        racer_pid_holder["pid"] = racer_pid
                     cur_r.execute("set local role authenticated")
                     cur_r.execute("select set_config('request.jwt.claim.sub', %s, true)", (user_a_id,))
-                    racer_started.set()
                     cur_r.execute(
                         "select public.resolve_or_create_paper(%s::jsonb, %s::jsonb)",
                         (
@@ -617,12 +698,26 @@ def test_live_postgres_direct_23505_unique_violation_recovery():  # pragma: no c
                 conn_racer.commit()
                 return res
 
+        def racer_is_blocked_on_winner() -> bool:
+            with racer_pid_lock:
+                racer_pid = racer_pid_holder["pid"]
+            if racer_pid is None:
+                return False
+            with psycopg.connect(dsn, autocommit=True) as conn_obs:
+                with conn_obs.cursor() as cur_obs:
+                    cur_obs.execute(
+                        "select state = 'active' and wait_event_type = 'Lock' "
+                        "and %s = any(pg_blocking_pids(pid)) "
+                        "from pg_stat_activity where pid = %s",
+                        (winner_pid, racer_pid),
+                    )
+                    row = cur_obs.fetchone()
+                    return bool(row and row[0])
+
         try:
             with ThreadPoolExecutor(max_workers=1) as pool:
                 future = pool.submit(run_racer)
-                racer_started.wait(timeout=5)
-                # Allow racer to reach the blocked unique index check before committing winner
-                threading.Event().wait(0.25)
+                _wait_until_racer_blocked(racer_is_blocked_on_winner, timeout_seconds=5.0)
                 conn_winner.commit()
                 rpc_result = future.result(timeout=10)
 
@@ -638,4 +733,79 @@ def test_live_postgres_direct_23505_unique_violation_recovery():  # pragma: no c
         finally:
             with conn_winner.cursor() as cur_del:
                 cur_del.execute("delete from public.papers where id = %s", (winner_paper_id,))
+                assert cur_del.rowcount == 1
             conn_winner.commit()
+
+
+def test_integration_helpers_validate_cleanup_identity_sync_and_strict_mode(monkeypatch):
+    # 1. Cleanup verifies HTTP status loudly instead of silently ignoring failures
+    class FakeDeleteResp:
+        def __init__(self, status_code: int):
+            self.status_code = status_code
+
+    monkeypatch.setattr(requests, "delete", lambda *_args, **_kwargs: FakeDeleteResp(204))
+    _live_cleanup_papers(PROJECT_URL, "sb_pub", "jwt", {USER_A})
+
+    monkeypatch.setattr(requests, "delete", lambda *_args, **_kwargs: FakeDeleteResp(403))
+    with pytest.raises(AssertionError, match="HTTP 403"):
+        _live_cleanup_papers(PROJECT_URL, "sb_pub", "jwt", {USER_A})
+
+    # 2. Test-user verifier fetches real UUID from /auth/v1/user without exposing tokens
+    class FakeAuthResp:
+        def __init__(self, status_code: int, body: dict):
+            self.status_code = status_code
+            self._body = body
+
+        def json(self):
+            return self._body
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *_args, **_kwargs: FakeAuthResp(200, {"id": USER_A.upper(), "is_anonymous": False}),
+    )
+    assert _verify_test_user_identity(PROJECT_URL, "sb_pub", "secret-jwt-value", "USER_A") == USER_A
+
+    monkeypatch.setattr(requests, "get", lambda *_args, **_kwargs: FakeAuthResp(401, {}))
+    with pytest.raises(AssertionError) as auth_exc:
+        _verify_test_user_identity(PROJECT_URL, "sb_pub", "secret-jwt-value", "USER_A")
+    assert "secret-jwt-value" not in str(auth_exc.value)
+
+    monkeypatch.setattr(
+        requests,
+        "get",
+        lambda *_args, **_kwargs: FakeAuthResp(200, {"id": USER_A, "is_anonymous": True}),
+    )
+    with pytest.raises(AssertionError, match="non-anonymous"):
+        _verify_test_user_identity(PROJECT_URL, "sb_pub", "secret-jwt-value", "USER_A")
+
+    # 3. Deterministic lock wait helper succeeds once condition turns true and fails on timeout
+    attempts = 0
+
+    def becomes_blocked() -> bool:
+        nonlocal attempts
+        attempts += 1
+        return attempts >= 3
+
+    _wait_until_racer_blocked(becomes_blocked, timeout_seconds=1.0, poll_interval=0.001)
+    assert attempts == 3
+
+    with pytest.raises(TimeoutError):
+        _wait_until_racer_blocked(lambda: False, timeout_seconds=0.02, poll_interval=0.005)
+
+    # 4. Missing psycopg fails loudly when invoked under TEST_POSTGRES_DSN
+    monkeypatch.setattr(importlib, "import_module", lambda _name: (_ for _ in ()).throw(ImportError("no psycopg")))
+    with pytest.raises(RuntimeError, match="psycopg must be installed"):
+        _import_psycopg_for_dsn_test()
+
+    # 5. Strict live acceptance mode cannot mistake missing credentials for passing tests
+    for var in (
+        "TEST_SUPABASE_URL",
+        "TEST_SUPABASE_PUBLISHABLE_KEY",
+        "TEST_SUPABASE_USER_A_JWT",
+        "TEST_SUPABASE_USER_B_JWT",
+        "TEST_POSTGRES_DSN",
+    ):
+        monkeypatch.delenv(var, raising=False)
+    with pytest.raises(AssertionError, match="REQUIRE_LIVE_IDENTITY_TESTS=1"):
+        _require_live_supabase_env()
