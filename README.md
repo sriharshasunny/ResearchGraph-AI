@@ -4,7 +4,7 @@ ResearchGraph AI combines OpenAlex scholarly discovery with a Supabase-authentic
 
 ## Run locally
 
-1. Use Python 3.10+ (tested on 3.12) and Node.js 20.19+ (or 22.12+).
+1. Use Python 3.10+ (tested on 3.12) and Node.js 20.19+ or 22.12+ for the frontend build and dev server (direct execution of the `.ts` unit tests requires Node.js 22.12+; see Checks below).
 2. Copy `.env.example` to `.env` (`.env` is gitignored — never commit it) and fill in:
    - Frontend: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_API_BASE_URL=http://localhost:8000`
    - Backend: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173`
@@ -65,7 +65,10 @@ Missing, malformed, or expired tokens return HTTP `401`; missing auth config or 
 
 ## Checks
 
-- Frontend: `npm run build` and `npm run lint`
-- Unit isolation & auth lifecycle checks: `node --test tests/authLifecycle.test.ts tests/phase2Isolation.test.ts`
+- Frontend: `npm run build` and `npm run lint` (supported on Node.js 20.19+ or 22.12+)
+- Unit isolation & auth lifecycle checks (Node.js 22.18+ with native type stripping):
+  `node --test tests/authLifecycle.test.ts tests/phase2Isolation.test.ts`
+- Unit isolation & auth lifecycle checks on Node.js 22.12–22.17 (Node.js 20.19 cannot execute `.ts` files directly):
+  `node --experimental-strip-types --test tests/authLifecycle.test.ts tests/phase2Isolation.test.ts`
 - Backend tests (with mocked external services / temporary SQLite): `python -m pytest -q backend/tests`
 - Live verification requires reachable Supabase Auth/JWKS, OpenAlex, an OpenAI-compatible embeddings/chat endpoint, ChromaDB, and Neo4j; mocked unit/API tests and builds do not verify live hosted services.
