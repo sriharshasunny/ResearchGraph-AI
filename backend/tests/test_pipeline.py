@@ -423,6 +423,41 @@ def test_neo4j_empty_selection_never_opens_driver(monkeypatch):
     assert pipeline._query_graph(USER_A, ["  "], ["attention", "graph"]) == []
 
 
+def test_neo4j_query_normalizes_terms_and_skips_driver_when_empty(monkeypatch):
+    def forbidden_driver():
+        raise AssertionError("_neo4j_driver must not be opened when normalized terms are empty.")
+
+    monkeypatch.setattr(pipeline, "_neo4j_driver", forbidden_driver)
+    assert pipeline._query_graph(USER_A, ["p1"], []) == []
+    assert pipeline._query_graph(USER_A, ["p1"], ["   "]) == []
+    assert pipeline._query_graph(USER_A, ["p1"], ["", " "]) == []
+
+    captured_params = []
+
+    class FakeSession:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def run(self, _cypher, **params):
+            captured_params.append(params)
+            return []
+
+    class FakeDriver:
+        def session(self, **_kwargs):
+            return FakeSession()
+
+        def close(self):
+            return None
+
+    monkeypatch.setattr(pipeline, "_neo4j_driver", lambda: FakeDriver())
+    pipeline._query_graph(USER_A, [" p1 ", "p1"], ["  GraphRAG ", "GraphRAG", "", "   ", 123, "Transformer\t"])
+    assert captured_params[0]["paper_ids"] == ["p1"]
+    assert captured_params[0]["terms"] == ["GraphRAG", "Transformer"]
+
+
 def test_invalid_pdf_is_rejected(tmp_path):
     invalid_pdf = tmp_path / "not-a-pdf.pdf"
     invalid_pdf.write_bytes(b"synthetic test content")
@@ -449,6 +484,36 @@ def test_graph_extraction_requires_exact_supporting_evidence(monkeypatch):
     assert any(entity["name"] == "SampleSet" for entity in entities)
     assert len(relations) == 1
     assert relations[0]["evidence"] in chunk["text"]
+
+
+def test_graph_extraction_supports_abstract_only_chunks_without_page_metadata(monkeypatch):
+    monkeypatch.setenv("LLM_API_KEY", "test-key")
+    metadata = {"id": "fixture:abstract", "title": "Abstract-Only Paper", "source": "OpenAlex", "authors": [], "topics": []}
+    chunk = {
+        "id": "abstract-chunk-1",
+        "text": "Our abstract introduces SparseGraph to retrieve multi-hop evidence.",
+        "metadata": {
+            "owner_id": USER_A,
+            "paper_id": "fixture:abstract",
+            "title": "Abstract-Only Paper",
+            "source": "OpenAlex",
+            "source_url": "https://example.org/abstract",
+            "doi": "",
+            "section": "Abstract",
+            "access_type": "abstract_only",
+        },
+    }
+
+    class FakeProvider:
+        def complete(self, *_args, **_kwargs):
+            return '{"entities":[{"type":"Method","name":"SparseGraph"}],"relationships":[{"source_type":"Paper","source_name":"Abstract-Only Paper","target_type":"Method","target_name":"SparseGraph","type":"USES_METHOD","evidence":"introduces SparseGraph to retrieve multi-hop evidence","chunk_id":"abstract-chunk-1","page":null},{"source_type":"Paper","source_name":"Abstract-Only Paper","target_type":"Method","target_name":"UnsupportedMethod","type":"USES_METHOD","evidence":"Fabricated sentence absent from abstract","chunk_id":"abstract-chunk-1","page":null}]}'
+
+    monkeypatch.setattr(pipeline, "EmbeddingProvider", FakeProvider)
+    entities, relations = pipeline._extract_graph(metadata, [chunk])
+    assert any(entity["name"] == "SparseGraph" for entity in entities)
+    assert len(relations) == 1
+    assert relations[0]["evidence"] == "introduces SparseGraph to retrieve multi-hop evidence"
+    assert relations[0]["page"] is None
 
 
 def test_same_name_arxiv_authors_are_not_merged_across_records(monkeypatch):

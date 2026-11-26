@@ -465,7 +465,7 @@ def _extract_graph(metadata: dict[str, Any], chunks: list[dict[str, Any]]) -> tu
             else:
                 target_key = hashlib.sha256(f"{target_type}|{' '.join(target_name.split()).casefold()}".encode()).hexdigest()
                 valid_entities[(target_type, target_key)] = {"type": target_type, "key": target_key, "name": " ".join(target_name.split())[:160]}
-            relations.append({"source_type": source_type, "source_key": source_key, "target_type": target_type, "target_key": target_key, "type": item["type"], "evidence": evidence, "page": chunk["metadata"]["page"], "method": "llm_evidence_validated"})
+            relations.append({"source_type": source_type, "source_key": source_key, "target_type": target_type, "target_key": target_key, "type": item["type"], "evidence": evidence, "page": (chunk.get("metadata") or {}).get("page"), "method": "llm_evidence_validated"})
         entities.update(valid_entities)
     return list(entities.values()), relations
 
@@ -724,7 +724,10 @@ def _query_graph(owner_id: str, paper_ids: list[str], terms: list[str]) -> list[
     allowed_paper_ids = list(
         dict.fromkeys(pid.strip() for pid in (paper_ids or []) if isinstance(pid, str) and pid.strip())
     )
-    if not allowed_paper_ids or not terms:
+    normalized_terms = list(
+        dict.fromkeys(term.strip() for term in (terms or []) if isinstance(term, str) and term.strip())
+    )
+    if not allowed_paper_ids or not normalized_terms:
         return []
     allowed_set = set(allowed_paper_ids)
     driver = _neo4j_driver()
@@ -740,7 +743,7 @@ def _query_graph(owner_id: str, paper_ids: list[str], terms: list[str]) -> list[
         )
         with driver.session(database=os.getenv("NEO4J_DATABASE") or None) as session:
             verified: list[dict[str, Any]] = []
-            for record in session.run(query, owner_id=owner_id, paper_ids=allowed_paper_ids, terms=terms):
+            for record in session.run(query, owner_id=owner_id, paper_ids=allowed_paper_ids, terms=normalized_terms):
                 data = record.data()
                 if (
                     data.pop("p_owner_id", None) != owner_id
